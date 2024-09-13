@@ -35,3 +35,6 @@ timesink-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# direnv. https://direnv.net
+.env
+.envrc
