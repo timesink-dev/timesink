@@ -1,0 +1,4 @@
+# direnv .envrc
+# https://direnv.net
+
+# export DATABASE_URL="ecto://postgres@local/timesink_dev"
