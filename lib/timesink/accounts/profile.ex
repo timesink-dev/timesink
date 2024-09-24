@@ -8,6 +8,7 @@ defmodule Timesink.Accounts.Profile do
           __struct__: __MODULE__,
           user_id: integer(),
           user: Accounts.User.t(),
+          avatar_url: String.t(),
           birthdate: Date.t(),
           location: Accounts.Location.t(),
           org_name: String.t(),
@@ -20,6 +21,7 @@ defmodule Timesink.Accounts.Profile do
   schema "profiles" do
     belongs_to :user, Accounts.User
 
+    field :avatar_url, :string
     field :birthdate, :date
     field :org_name, :string
     field :org_position, :string
@@ -36,6 +38,7 @@ defmodule Timesink.Accounts.Profile do
     struct
     |> cast(params, [
       :user_id,
+      :avatar_url,
       :birthdate,
       :org_name,
       :org_position,
