@@ -48,6 +48,7 @@ defmodule Timesink.Accounts.User do
       :last_name,
       :roles
     ])
+    |> cast_assoc(:profile, with: &Accounts.Profile.changeset/2)
     |> validate_required([:username, :email, :password_hash, :first_name, :last_name])
     |> validate_format(:email, ~r/@/)
     |> validate_length(:first_name, min: 2)
