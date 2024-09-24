@@ -7,8 +7,9 @@ defmodule Timesink.Accounts.Profile do
   @type t :: %{
           __struct__: __MODULE__,
           user_id: integer(),
+          user: Accounts.User.t(),
           birthdate: Date.t(),
-          location: map(),
+          location: Accounts.Location.t(),
           org_name: String.t(),
           org_position: String.t(),
           bio: String.t()
@@ -20,10 +21,11 @@ defmodule Timesink.Accounts.Profile do
     belongs_to :user, Accounts.User
 
     field :birthdate, :date
-    field :location, :map
     field :org_name, :string
     field :org_position, :string
     field :bio, :string
+
+    embeds_one :location, Accounts.Location
 
     timestamps(type: :utc_datetime)
   end
@@ -34,13 +36,13 @@ defmodule Timesink.Accounts.Profile do
     struct
     |> cast(params, [
       :user_id,
-      :user,
       :birthdate,
-      :location,
       :org_name,
       :org_position,
       :bio
     ])
+    |> cast_embed(:location)
+    |> cast_assoc(:user, with: &Accounts.User.changeset/2)
     |> validate_required([:user_id])
     |> unique_constraint(:user_id)
   end
