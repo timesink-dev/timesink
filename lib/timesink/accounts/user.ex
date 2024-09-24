@@ -4,6 +4,8 @@ defmodule Timesink.Accounts.User do
   import Ecto.Changeset
   alias Timesink.Accounts
 
+  @roles [:admin, :creator]
+
   @type t :: %{
           __struct__: __MODULE__,
           is_active: boolean(),
@@ -26,7 +28,7 @@ defmodule Timesink.Accounts.User do
     field :first_name, :string
     field :last_name, :string
 
-    field :roles, {:array, :string}, default: [], redact: true
+    field :roles, {:array, Ecto.Enum}, values: @roles, default: [], redact: true
 
     has_one(:profile, Accounts.Profile)
 
