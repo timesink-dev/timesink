@@ -4,12 +4,9 @@ defmodule Timesink.Accounts.Profile do
   import Ecto.Changeset
   alias Timesink.Accounts
 
-  @type sex :: :male | :female | :intersex
-
   @type t :: %{
           __struct__: __MODULE__,
           user_id: integer(),
-          sex: sex(),
           birthdate: Date.t(),
           location: map(),
           org_name: String.t(),
@@ -22,7 +19,6 @@ defmodule Timesink.Accounts.Profile do
   schema "profiles" do
     belongs_to :user, Accounts.User
 
-    field :sex, Ecto.Enum, values: [:male, :female, :intersex]
     field :birthdate, :date
     field :location, :map
     field :org_name, :string
@@ -39,7 +35,6 @@ defmodule Timesink.Accounts.Profile do
     |> cast(params, [
       :user_id,
       :user,
-      :sex,
       :birthdate,
       :location,
       :org_name,
