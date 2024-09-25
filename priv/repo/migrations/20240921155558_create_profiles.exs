@@ -6,8 +6,8 @@ defmodule Timesink.Repo.Migrations.CreateProfiles do
       timestamps type: :utc_datetime
 
       add :user_id, references(:users, on_delete: :delete_all), null: false
-      add :sex, :string
       add :birthdate, :date
+      add :avatar_url, :string
       add :location, :map
       add :org_name, :string
       add :org_position, :string
