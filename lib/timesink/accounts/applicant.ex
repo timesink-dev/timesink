@@ -11,7 +11,7 @@ defmodule Timesink.Accounts.Applicant do
 
   @primary_key {:id, Ecto.UUID, autogenerate: true}
 
-  schema "applicants" do
+  schema "waitlists" do
     field :email, :string
     # pending - default status
     # invited - The person has received an invite code, but they haven’t signed up yet.
