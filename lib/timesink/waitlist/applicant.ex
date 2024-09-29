@@ -5,6 +5,8 @@ defmodule Timesink.Waitlist.Applicant do
 
   @type t :: %{
           __struct__: __MODULE__,
+          first_name: String.t(),
+          last_name: String.t(),
           email: String.t(),
           status: atom()
         }
