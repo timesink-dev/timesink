@@ -1,5 +1,7 @@
 # Timesink
 
+[![GitHub Actions](https://github.com/timesink-dev/timesink/actions/workflows/elixir.yml/badge.svg)](https://github.com/timesink-dev/timesink/actions/workflows/elixir.yml)
+
 To start your Phoenix server:
 
 - Run `mix setup` to install and setup dependencies
