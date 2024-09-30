@@ -36,6 +36,9 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      DATABASE_URL: ecto://postgres:postgres@postgres/timesink_test
+
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
