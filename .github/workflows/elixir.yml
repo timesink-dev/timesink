@@ -1,0 +1,56 @@
+name: Elixir CI
+
+on:
+  push:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1"
+          elixir-version: "1.17.3-otp-27"
+      - uses: actions/cache@v4
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+
+      - run: mix deps.get
+      - run: mix format --check-formatted
+
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17.0-alpine3.20
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: ecto://postgres:postgres@localhost/timesink_test
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1"
+          elixir-version: "1.17.3-otp-27"
+      - uses: actions/cache@v4
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+
+      - run: mix deps.get
+      - run: mix compile
+      - run: mix do ecto.create + ecto.migrate + run priv/repo/seeds.exs
+      - run: mix test
