@@ -37,7 +37,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: ecto://postgres:postgres@postgres/timesink_test
+      DATABASE_URL: ecto://postgres:postgres@localhost/timesink_test
 
     steps:
       - uses: actions/checkout@v4
