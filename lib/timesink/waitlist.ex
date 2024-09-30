@@ -1,5 +1,5 @@
 defmodule Timesink.Waitlist do
-@moduledoc """
- The Waitlist context
-"""
+  @moduledoc """
+  The Waitlist context.
+  """
 end
