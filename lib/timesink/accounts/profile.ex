@@ -6,7 +6,7 @@ defmodule Timesink.Accounts.Profile do
 
   @type t :: %{
           __struct__: __MODULE__,
-          user_id: integer(),
+          user_id: String.t(),
           user: Accounts.User.t(),
           avatar_url: String.t(),
           birthdate: Date.t(),
