@@ -20,16 +20,20 @@ defmodule Timesink.Factory do
     }
   end
 
+  def location_factory do
+    %Timesink.Accounts.Location{
+      locality: Faker.Address.city(),
+      country: Faker.Address.country(),
+      lat: Faker.Address.latitude(),
+      lng: Faker.Address.longitude()
+    }
+  end
+
   def profile_factory do
     %Timesink.Accounts.Profile{
       bio: Faker.Lorem.sentence(),
       avatar_url: Faker.Internet.url(),
-      location: %Timesink.Accounts.Location{
-        locality: Faker.Address.city(),
-        country: Faker.Address.country(),
-        lat: Faker.Address.latitude(),
-        lng: Faker.Address.longitude()
-      },
+      location: build(:location),
       birthdate: Faker.Date.date_of_birth(),
       org_name: Faker.Company.name(),
       org_position: Faker.Company.buzzword()
