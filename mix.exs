@@ -47,7 +47,6 @@ defmodule Timesink.MixProject do
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:ex_machina, "~> 2.8.0", only: :test},
       {:faker, "~> 0.18", only: :test},
-      {:argon2_elixir, "~> 4.0"},
       {:heroicons,
        github: "tailwindlabs/heroicons",
        tag: "v2.1.1",

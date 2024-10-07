@@ -1,5 +1,6 @@
 defmodule Timesink.Factory do
   use ExMachina.Ecto, repo: Timesink.Repo
+  import Timesink.Accounts.Location, only: [iso3166_countries: 0]
 
   def applicant_factory do
     %Timesink.Waitlist.Applicant{
@@ -12,7 +13,7 @@ defmodule Timesink.Factory do
   def user_factory do
     %Timesink.Accounts.User{
       email: Faker.Internet.email(),
-      password_hash: Argon2.hash_pwd_salt(Faker.Lorem.word()),
+      password_hash: Ecto.UUID.generate(),
       username: Faker.Internet.user_name(),
       first_name: Faker.Person.first_name(),
       last_name: Faker.Person.last_name(),
@@ -23,7 +24,7 @@ defmodule Timesink.Factory do
   def location_factory do
     %Timesink.Accounts.Location{
       locality: Faker.Address.city(),
-      country: Faker.Address.country(),
+      country: Enum.random(iso3166_countries()),
       lat: Faker.Address.latitude(),
       lng: Faker.Address.longitude()
     }

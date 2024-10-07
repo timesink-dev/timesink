@@ -256,6 +256,8 @@ defmodule Timesink.Accounts.Location do
     :ZWE
   ]
 
+  def iso3166_countries, do: @iso3166_countries
+
   @type t :: %{
           __struct__: __MODULE__,
           locality: String.t(),
