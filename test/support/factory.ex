@@ -1,6 +1,5 @@
 defmodule Timesink.Factory do
   use ExMachina.Ecto, repo: Timesink.Repo
-  import Timesink.Accounts.Location, only: [iso3166_countries: 0]
 
   def applicant_factory do
     %Timesink.Waitlist.Applicant{
@@ -24,11 +23,12 @@ defmodule Timesink.Factory do
   def location_factory do
     %Timesink.Accounts.Location{
       locality: Faker.Address.city(),
-      country: Enum.random(iso3166_countries()),
+      country: Enum.random(Timesink.Accounts.Location.iso3166_countries()),
       lat: Faker.Address.latitude(),
       lng: Faker.Address.longitude()
     }
   end
+
 
   def profile_factory do
     %Timesink.Accounts.Profile{
