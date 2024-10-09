@@ -16,7 +16,8 @@ defmodule Timesink.Accounts.Profile do
           bio: String.t()
         }
 
-  @primary_key {:id, Ecto.UUID, autogenerate: true}
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   schema "profiles" do
     belongs_to :user, Accounts.User
