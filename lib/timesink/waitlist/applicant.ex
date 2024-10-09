@@ -12,7 +12,7 @@ defmodule Timesink.Waitlist.Applicant do
           first_name: String.t(),
           last_name: String.t(),
           email: String.t(),
-          status: statu()
+          status: status()
         }
 
   @primary_key {:id, Ecto.UUID, autogenerate: true}
