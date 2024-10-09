@@ -24,7 +24,7 @@ defmodule Timesink.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(env) when env in [:dev, :test], do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -45,8 +45,8 @@ defmodule Timesink.MixProject do
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
-      {:ex_machina, "~> 2.8.0", only: :test},
-      {:faker, "~> 0.18", only: :test},
+      {:ex_machina, "~> 2.8.0", only: [:dev, :test]},
+      {:faker, "~> 0.18", only: [:dev, :test]},
       {:heroicons,
        github: "tailwindlabs/heroicons",
        tag: "v2.1.1",
