@@ -3,7 +3,7 @@ defmodule Timesink.Repo.Migrations.CreateUsers do
 
   def change do
     create table(:users, primary_key: false) do
-      add :id, :binary_id, null: false, primary_key: true
+      add :id, :uuid, null: false, primary_key: true
 
       timestamps type: :utc_datetime
 
