@@ -3,21 +3,25 @@ defmodule Timesink.Waitlist.Applicant do
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
 
+  @type status :: :pending | :invited | :completed
+  @statuses [:pending, :invited, :completed]
+  def statuses, do: @statuses
+
   @type t :: %{
           __struct__: __MODULE__,
           first_name: String.t(),
           last_name: String.t(),
           email: String.t(),
-          status: atom()
+          status: status()
         }
 
-  @primary_key {:id, Ecto.UUID, autogenerate: true}
+  @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "waitlist" do
     field :first_name, :string
     field :last_name, :string
     field :email, :string
-    field :status, Ecto.Enum, values: [:pending, :invited, :completed], default: :pending
+    field :status, Ecto.Enum, values: @statuses, default: :pending
 
     timestamps(type: :utc_datetime)
   end
