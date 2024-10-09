@@ -1,0 +1,24 @@
+# Timesink
+alias Timesink.Application
+alias Timesink.Mailer
+alias Timesink.Repo
+
+# Timesink.Accounts
+alias Timesink.Accounts
+alias Timesink.Accounts.User
+
+# Timesink.Waitlist
+alias Timesink.Waitlist
+alias Timesink.Waitlist.Applicant
+
+# TimesinkWeb
+alias TimesinkWeb.Endpoint
+alias TimesinkWeb.Router
+alias TimesinkWeb.Temeletry
+
+alias TimesinkWeb.ErrorJSON
+
+alias TimesinkWeb.PageController
+
+# Local dot-iex file (user/environment-specific, Git-ignored)
+import_file_if_available(".iex.local.exs")
