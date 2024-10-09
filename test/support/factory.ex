@@ -16,8 +16,8 @@ defmodule Timesink.Factory do
       password_hash: Ecto.UUID.generate(),
       username: Faker.Internet.user_name(),
       first_name: Faker.Person.first_name(),
-      last_name: Faker.Person.last_name()
-      # profile: build(:profile)
+      last_name: Faker.Person.last_name(),
+      profile: build(:profile)
     }
   end
 
@@ -34,7 +34,7 @@ defmodule Timesink.Factory do
     %Timesink.Accounts.Profile{
       bio: Faker.Lorem.sentence(),
       avatar_url: Faker.Internet.url(),
-      # location: build(:location),
+      location: build(:location),
       birthdate: Faker.Date.date_of_birth(),
       org_name: Faker.Company.name(),
       org_position: Faker.Company.buzzword()

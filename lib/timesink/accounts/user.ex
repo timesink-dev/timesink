@@ -18,6 +18,8 @@ defmodule Timesink.Accounts.User do
           profile: Accounts.Profile.t()
         }
 
+  @primary_key {:id, Ecto.UUID, autogenerate: true}
+
   schema "users" do
     field :is_active, :boolean, default: true
     field :email, :string
