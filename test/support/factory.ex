@@ -29,7 +29,6 @@ defmodule Timesink.Factory do
     }
   end
 
-
   def profile_factory do
     %Timesink.Accounts.Profile{
       bio: Faker.Lorem.sentence(),
