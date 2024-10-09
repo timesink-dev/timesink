@@ -15,8 +15,6 @@ defmodule Timesink.Waitlist.Applicant do
           status: status()
         }
 
-  @primary_key {:id, Ecto.UUID, autogenerate: true}
-
   schema "waitlist" do
     field :first_name, :string
     field :last_name, :string

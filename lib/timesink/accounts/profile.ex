@@ -6,7 +6,7 @@ defmodule Timesink.Accounts.Profile do
 
   @type t :: %{
           __struct__: __MODULE__,
-          user_id: String.t(),
+          user_id: integer(),
           user: Accounts.User.t(),
           avatar_url: String.t(),
           birthdate: Date.t(),
@@ -15,8 +15,6 @@ defmodule Timesink.Accounts.Profile do
           org_position: String.t(),
           bio: String.t()
         }
-
-  @primary_key {:id, Ecto.UUID, autogenerate: true}
 
   schema "profiles" do
     belongs_to :user, Accounts.User
