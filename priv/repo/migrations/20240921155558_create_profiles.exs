@@ -2,10 +2,11 @@ defmodule Timesink.Repo.Migrations.CreateProfiles do
   use Ecto.Migration
 
   def change do
-    create table(:profiles) do
+    create table(:profiles, primary_key: false) do
+      add :id, :uuid, null: false, primary_key: true
       timestamps type: :utc_datetime
 
-      add :user_id, references(:users, on_delete: :delete_all), null: false
+      add :user_id, references(:users, type: :uuid, on_delete: :delete_all), null: false
       add :birthdate, :date
       add :avatar_url, :string
       add :location, :map
