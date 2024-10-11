@@ -12,7 +12,7 @@ defmodule Timesink.Waitlist.Applicant do
           first_name: String.t(),
           last_name: String.t(),
           email: String.t(),
-          status: atom()
+          status: status()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
