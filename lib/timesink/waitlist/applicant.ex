@@ -12,7 +12,7 @@ defmodule Timesink.Waitlist.Applicant do
           first_name: String.t(),
           last_name: String.t(),
           email: String.t(),
-          status: status()
+          status: atom()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -28,7 +28,7 @@ defmodule Timesink.Waitlist.Applicant do
 
   @spec changeset(applicant :: t(), params :: %{optional(key :: atom()) => value :: term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct_: __MODULE__} = struct, params) do
+  def changeset(%{__struct__: __MODULE__} = struct, params) do
     struct
     |> cast(params, [:email, :status, :first_name, :last_name])
     |> validate_required([:email, :first_name, :last_name])
