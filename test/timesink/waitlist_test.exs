@@ -1,42 +1,33 @@
 defmodule Timesink.WaitlistTest do
   use Timesink.DataCase
+  import Timesink.Factory
   alias Timesink.Waitlist
+  alias Timesink.Waitlist.Applicant
 
-  describe "applicants" do
-    alias Timesink.Waitlist.Applicant
+  describe "join/1" do
+    for field <- [:first_name, :last_name, :email] do
+      test "requires a param #{field}" do
+        params = params_for(:applicant) |> Map.delete(unquote(field))
 
-    @valid_attrs %{
-      first_name: "Jose",
-      last_name: "Val Del Omar",
-      email: "josevaldelomar@gmail.com"
-    }
-
-    @invalid_attrs %{
-      first_name: "Jose",
-      last_name: "",
-      email: "josevaldelomar"
-    }
-
-    test "join/1 with valid attributes creates a new applicant and adds them to the waitlist" do
-      assert {:ok, %Applicant{} = applicant} = Waitlist.join(@valid_attrs)
-      assert applicant.first_name == "Jose"
-      assert applicant.last_name == "Val Del Omar"
-      assert applicant.email == "josevaldelomar@gmail.com"
+        assert {:error, %Ecto.Changeset{errors: e}} = Waitlist.join(params)
+        assert {"can't be blank", _} = Keyword.get(e, unquote(field))
+      end
     end
 
-    test "join/1 with invalid attributes returns an error" do
-      assert {:error, _} = Waitlist.join(@invalid_attrs)
+    test "requires a valid email" do
+      params = params_for(:applicant) |> Map.put(:email, "invalid.email")
+
+      assert {:error, %Ecto.Changeset{errors: e}} = Waitlist.join(params)
+      assert {"has invalid format", _} = Keyword.get(e, :email)
     end
 
-    test "join/1 with invalid #email returns an error" do
-      attrs = %{@valid_attrs | email: "josevaldelomar"}
-      changeset = Waitlist.Applicant.changeset(%Applicant{}, attrs)
-      assert %{email: ["has invalid format"]} = errors_on(changeset)
-    end
+    test "joins an applicant to the waitlist" do
+      params = params_for(:applicant)
 
-    test "join/1 with #status not provided" do
-      changeset = Applicant.changeset(%Applicant{}, Map.delete(@valid_attrs, :status))
-      assert changeset.valid?
+      assert {:ok, %Applicant{} = applicant} = Waitlist.join(params)
+      assert applicant.first_name == params.first_name
+      assert applicant.last_name == params.last_name
+      assert applicant.email == params.email
     end
   end
 end
