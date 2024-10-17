@@ -1,0 +1,7 @@
+@font-face {
+  font-family: "Gangster Grotesk";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200;
+  src: local(""), url("GangsterGrotesk-Light.woff2");
+}

@@ -1,0 +1,17 @@
+@font-face {
+  font-family: "Ano Regular Wide";
+  font-style: normal;
+  font-display: swap;
+  src:
+    local(""),
+    url("01001df7-8270-4d44-ad53-85091f1b6725.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Ano Regular Wide Italic";
+  font-style: normal;
+  font-display: swap;
+  src:
+    local(""),
+    url("af5352dc-274e-4518-872a-3c94487ba2da.woff") format("woff");
+}
