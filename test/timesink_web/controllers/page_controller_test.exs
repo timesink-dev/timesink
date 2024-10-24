@@ -3,6 +3,6 @@ defmodule TimesinkWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Step through the curtain. Welcome to the show."
+    assert html_response(conn, 200) =~ "Welcome to the show."
   end
 end
