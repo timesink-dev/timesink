@@ -1,37 +1,54 @@
 <.flash_group flash={@flash} />
-<div class="mx-auto max-w-xl mt-24">
+<div class="mx-auto max-w-xl mt-24 w-full">
   <span class="flex flex-col -space-y-2.5 font-brand items-center">
-    <p class="text-[2.5rem] font-medium leading-10 tracking-tighter">
+    <p class="text-[2.5rem] leading-10 tracking-tighter">
       TimeSink
     </p>
     <p class="pl-4 text-[2.5rem]">
       presents
     </p>
   </span>
-  <h2 class="mt-8 text-[1.5rem] font-semibold">Step through the curtain. Welcome to the show.</h2>
-  <p class="semibold my-2">
-    While the world outside buzzes with the chaos of endless content, we sift through it all to bring you a collection of hand-picked cinematic gems made by current filmmakers.
-  </p>
-  <p class="my-2">
-    Step into our theaters where every screening is an event, complete with interactive features that bring you closer to the creators and other curious audience members.
-  </p>
-  <p class="text-[1rem] font-semibold mb-12">
-    We hand-pick and curate visionary films, each showcased in its own dedicated theater space, offering you an experience you won’t find on mainstream platforms.
-  </p>
-  <p class="text-dark-theater-lightest">
-    Enter your email below to join our exclusive audience and secure your seat in this one-of-a-kind cinema
-  </p>
-  <div class="mt-8 p-4 bg-dark-theater-primary flex justify-between rounded-md">
-    <input
-      type="email"
-      placeholder="Enter your email"
-      class="w-1/3 sm:w-1/2 p-2 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-    />
-    <button class="text-backroom-black mt-4 sm:mt-0 sm:ml-4 px-6 py-4 bg-neon-blue-lightest rounded hover:bg-neon-blue-lightest focus:ring-2 focus:bg-neon-blue-light">
+  <h2 class="uppercase text-[1.7rem] mt-8 mb-2 tracking-tighter">Welcome to the show.</h2>
+  <div class="flex flex-col gap-y-2">
+    <p>
+      <b>While the world outside buzzes with the chaos of endless content</b>, we sift through it all to bring you a collection of hand-picked cinematic gems made by the filmmakers of today.
+    </p>
+    <p>
+      <b>Join a community of creators and cinephiles in our timeless lounge,</b>
+      where each of our theaters has its own story to tell, with features for live chats, audience reactions, and comments that flow alongside the film, bringing viewers together in real-time.
+    </p>
+
+    <p>
+      <b>
+        Whether you’re a filmmaker or connoisseur, we guarantee this is where your passion finds its audience.
+      </b>
+    </p>
+  </div>
+  <div class="flex justify-center mt-8 items-center h-full">
+    <div class="w-2/3 flex flex-col gap-y-2">
+      <div class="flex gap-x-2 justify-between w-full">
+        <input
+          type="text"
+          placeholder="First name"
+          class="w-1/2 sm:w-1/2 p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+        />
+        <input
+          type="text"
+          placeholder="Last name"
+          class="w-1/2 p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+        />
+      </div>
+      <input
+        type="email"
+        placeholder="Enter your email"
+        class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+      />
+    </div>
+    <button class="text-backroom-black h-full mt-4 sm:mt-0 sm:ml-4 px-6 py-12 bg-neon-blue-lightest rounded hover:bg-neon-blue-lightest focus:ring-2 focus:bg-neon-blue-light">
       Join the Waitlist
     </button>
   </div>
-  <div class="flex">
+  <div class="flex justify-center">
     <div class="w-full sm:w-auto">
       <div class="mt-10 grid grid-cols-1 gap-y-4 text-sm leading-6 text-zinc-700 sm:grid-cols-2">
         <div>
