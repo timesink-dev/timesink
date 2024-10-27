@@ -1,5 +1,6 @@
 defmodule TimesinkWeb.Router do
   use TimesinkWeb, :router
+  alias TimesinkWeb.Live.LiveHelpers
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -17,7 +18,11 @@ defmodule TimesinkWeb.Router do
   scope "/", TimesinkWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", JoinLive
+
+    live_session :default, on_mount: [LiveHelpers] do
+      live "/join", JoinLive, :index
+    end
   end
 
   # Other scopes may use custom stacks.

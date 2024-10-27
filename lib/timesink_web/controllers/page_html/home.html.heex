@@ -1,30 +1,22 @@
 <.flash_group flash={@flash} />
 <div class="mx-auto max-w-xl mt-24 w-full">
   <span class="flex flex-col -space-y-2.5 font-brand items-center">
-    <p class="text-[2.5rem] leading-10 tracking-tighter">
+    <p class="text-[3rem] leading-10 tracking-tighter">
       TimeSink
     </p>
-    <p class="pl-4 text-[2.5rem]">
+    <p class="pl-4 text-[3rem]">
       presents
     </p>
   </span>
-  <h2 class="uppercase text-[1.7rem] mt-8 mb-2 tracking-tighter">Welcome to the show.</h2>
+  <h2 class="uppercase text-[2rem] mt-20 mb-2 tracking-tighter items-center">
+    Welcome to the show.
+  </h2>
   <div class="flex flex-col gap-y-2">
     <p>
       <b>While the world outside buzzes with the chaos of endless content</b>, we sift through it all to bring you a collection of hand-picked cinematic gems made by the filmmakers of today.
     </p>
-    <p>
-      <b>Join a community of creators and cinephiles in our timeless lounge,</b>
-      where each of our theaters has its own story to tell, with features for live chats, audience reactions, and comments that flow alongside the film, bringing viewers together in real-time.
-    </p>
-
-    <p>
-      <b>
-        Whether you’re a filmmaker or connoisseur, we guarantee this is where your passion finds its audience.
-      </b>
-    </p>
   </div>
-  <div class="flex justify-center mt-8 items-center h-full">
+  <div class="flex justify-center mt-8 items-end h-full">
     <div class="w-2/3 flex flex-col gap-y-2">
       <div class="flex gap-x-2 justify-between w-full">
         <input
@@ -44,30 +36,11 @@
         class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
       />
     </div>
-    <button class="text-backroom-black h-full mt-4 sm:mt-0 sm:ml-4 px-6 py-12 bg-neon-blue-lightest rounded hover:bg-neon-blue-lightest focus:ring-2 focus:bg-neon-blue-light">
+    <.button
+      color="primary"
+      class="text-backroom-black font-semibold mt-4 sm:mt-0 sm:ml-4 px-6 py-4 hover:bg-neon-blue-lightest focus:ring-2 focus:bg-neon-blue-light"
+    >
       Join the Waitlist
-    </button>
-  </div>
-  <div class="flex justify-center">
-    <div class="w-full sm:w-auto">
-      <div class="mt-10 grid grid-cols-1 gap-y-4 text-sm leading-6 text-zinc-700 sm:grid-cols-2">
-        <div>
-          <a
-            href="https://twitter.com/elixirphoenix"
-            class="group -mx-2 -my-0.5 inline-flex items-center gap-3 rounded-lg px-2 py-0.5 hover:bg-zinc-50 hover:text-zinc-900"
-          >
-            <svg
-              viewBox="0 0 1200 1227"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 fill-mystery-white group-hover:fill-zinc-600"
-            >
-              <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z" />
-            </svg>
-            Follow on X
-          </a>
-        </div>
-      </div>
-    </div>
+    </.button>
   </div>
 </div>

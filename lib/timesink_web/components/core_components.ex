@@ -222,17 +222,34 @@ defmodule TimesinkWeb.CoreComponents do
   """
   attr :type, :string, default: nil
   attr :class, :string, default: nil
+  attr :color, :string, default: "primary"
   attr :rest, :global, include: ~w(disabled form name value)
 
   slot :inner_block, required: true
 
   def button(assigns) do
+    assigns =
+      assigns
+      |> assign_new(:classes, fn ->
+        case assigns.color do
+          "primary" ->
+            "bg-neon-blue-lightest rounded"
+
+          "secondary" ->
+            "bg-backroom-black text-neon-blue-lightest border-neon-blue-lightest border-[1px]"
+
+          # default styling
+          _ ->
+            ""
+        end
+      end)
+
     ~H"""
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "phx-submit-loading:opacity-75 rounded",
+        @classes,
         @class
       ]}
       {@rest}
