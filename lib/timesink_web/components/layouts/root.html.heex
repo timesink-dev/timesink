@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title suffix=" · Phoenix Framework">
-      <%= assigns[:page_title] || "Timesink" %>
+    <.live_title suffix=" · TimeSink Presents">
+      <%= assigns[:page_title] || "TimeSink Presents" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/fonts/ano/ano.css"} />
     <link
@@ -18,9 +18,8 @@
     </script>
   </head>
   <body class="bg-backroom-black text-mystery-white antialiased font-gangster">
-  <div id="get-breakpoints" phx-hook="GetBreakpoints"></div>
     <%= @inner_content %>
-  <%!-- <div class="flex justify-between items-center mx-8 py-8 mt-8">
+  <div class="flex justify-between items-center mx-8 py-8 mt-8">
     <div class="text-xs">Made with ☕ between 🇫🇷 and 🇺🇸</div>
     <div
       id="social-links"
@@ -39,8 +38,8 @@
           >
             <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z" />
           </svg>
-          <%!-- Follow on X --%>
-        <%!-- </a>
+          Follow on X
+         </a>
       </div>
       <div>
         <a
@@ -54,6 +53,6 @@
       </div>
     </div>
     <div class="text-xs">hello@timesinkpresents.com</div>
-  </div> --%> 
+  </div> 
   </body>
 </html>
