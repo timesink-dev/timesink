@@ -28,7 +28,7 @@ defmodule Timesink.Waitlist.Applicant do
 
   @spec changeset(applicant :: t(), params :: %{optional(key :: atom()) => value :: term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, params) do
+  def changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> cast(params, [:email, :status, :first_name, :last_name])
     |> validate_required([:email, :first_name, :last_name])
