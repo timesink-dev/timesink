@@ -17,8 +17,8 @@ defmodule TimesinkWeb.JoinLive do
         <p class="text-[3rem] leading-10 tracking-tighter">
           TimeSink
         </p>
-        <p class="pl-4 text-[3rem]">
-          presents
+        <p class="pl-4 text-[2.6rem]">
+          Presents
         </p>
       </span>
       <h2 class="uppercase text-[2rem] mt-20 mb-2 tracking-tighter items-center">
