@@ -114,12 +114,18 @@ defmodule TimesinkWeb.CoreComponents do
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
-      class={[
-        "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
-        @kind == :info && "bg-green-500 text-backroom-black ring-emerald-500 fill-cyan-900",
-        @kind == :error &&
-          "bg-backroom-black border-neon-red-primary border-[1px] text-neon-red-primary shadow-md ring-rose-500 fill-rose-900"
-      ]}
+      class={
+        [
+          "fixed bottom-4 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1 transform transition-transform duration-300 ease-in-out",
+          # Initial state for slide-in animation
+          "translate-y-full opacity-0",
+          # Animation class for slide-in effect
+          "animate-slide-in",
+          @kind == :info && "bg-green-500 text-backroom-black ring-emerald-500 fill-cyan-900",
+          @kind == :error &&
+            "bg-backroom-black border-neon-red-primary border-[1px] text-neon-red-primary shadow-md ring-rose-500 fill-rose-900"
+        ]
+      }
       {@rest}
     >
       <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6">
