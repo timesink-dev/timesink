@@ -102,7 +102,6 @@ defmodule TimesinkWeb.JoinLive do
     end
   end
 
-  # Handle validation events and update touched fields
   def handle_event("validate", %{"applicant" => applicant_params}, socket) do
     changeset =
       %Timesink.Waitlist.Applicant{}
