@@ -38,19 +38,21 @@ defmodule TimesinkWeb.JoinLive do
             <.input
               field={@form[:first_name]}
               placeholder="First name"
-              class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              class="w-full"
+              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
             />
             <.input
               field={@form[:last_name]}
               placeholder="Last name"
-              class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              class="w-full"
+              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
             />
           </div>
           <.input
             field={@form[:email]}
             type="email"
             placeholder="Enter your email"
-            class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+            input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
           />
         </div>
         <.button
