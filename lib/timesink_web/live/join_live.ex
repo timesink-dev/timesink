@@ -3,10 +3,8 @@ defmodule TimesinkWeb.JoinLive do
   alias Timesink.Waitlist.Applicant
 
   def mount(_params, _session, socket) do
-    changeset =
-      Applicant.changeset(%Timesink.Waitlist.Applicant{})
-
-    socket = assign(socket, form: to_form(changeset))
+    changeset = Applicant.changeset(%Timesink.Waitlist.Applicant{})
+    socket = assign(socket, form: to_form(changeset), joined: false)
     {:ok, socket}
   end
 
@@ -55,15 +53,18 @@ defmodule TimesinkWeb.JoinLive do
             class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
           />
         </div>
-        <%!-- to do: why is this messing with my css styling of button below ? <:actions> --%>
         <.button
           phx-disable-with="Joining..."
           color="primary"
-          class="text-backroom-black font-semibold mt-4 w-full md:w-2/3 px-6 py-4 hover:bg-neon-blue-lightest focus:ring-2 focus:bg-neon-blue-light"
+          class="text-backroom-black font-semibold mt-4 w-full md:w-2/3 px-6 py-4 hover:bg-neon-blue-lightest focus:ring-2 focus:bg-neon-blue-light flex items-center justify-center"
         >
-          Join the Waitlist
+          <%= if @joined do %>
+            <.icon name="hero-check-circle-mini" class="mt-0.5 h-5 w-5 mr-2 flex-none" />
+            You’re on the List!
+          <% else %>
+            Join the Waitlist
+          <% end %>
         </.button>
-        <%!-- </:actions> --%>
       </.simple_form>
     </div>
     """
@@ -73,12 +74,39 @@ defmodule TimesinkWeb.JoinLive do
     case Timesink.Waitlist.join(applicant_params) do
       {:ok, _applicant} ->
         socket =
-          assign(socket, :form, to_form(Applicant.changeset(%Timesink.Waitlist.Applicant{})))
+          socket
+          |> assign(:form, to_form(Applicant.changeset(%Timesink.Waitlist.Applicant{})))
+          |> assign(:joined, true)
+          |> put_flash(
+            :info,
+            "Stay tuned for your official invite. 🎉"
+          )
 
         {:noreply, socket}
 
-      {:error, changeset} ->
-        {:noreply, assign(socket, :form, to_form(changeset))}
+      {:error, %Ecto.Changeset{} = changeset} ->
+        error_message =
+          changeset
+          |> Ecto.Changeset.traverse_errors(&translate_error/1)
+          |> Map.get(:email)
+          |> Enum.at(0, "An error occurred. Please try again.")
+
+        socket =
+          socket
+          |> assign(:form, to_form(changeset))
+          |> put_flash(:error, error_message)
+
+        {:noreply, socket}
     end
+  end
+
+  # Handle validation events and update touched fields
+  def handle_event("validate", %{"applicant" => applicant_params}, socket) do
+    changeset =
+      %Timesink.Waitlist.Applicant{}
+      |> Applicant.changeset(applicant_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, form: to_form(changeset))}
   end
 end

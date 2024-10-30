@@ -33,5 +33,6 @@ defmodule Timesink.Waitlist.Applicant do
     |> cast(params, [:email, :status, :first_name, :last_name])
     |> validate_required([:email, :first_name, :last_name])
     |> validate_format(:email, ~r/@/)
+    |> unique_constraint(:email, message: "Email already exists")
   end
 end

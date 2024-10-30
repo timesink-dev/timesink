@@ -116,8 +116,9 @@ defmodule TimesinkWeb.CoreComponents do
       role="alert"
       class={[
         "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
-        @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
-        @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
+        @kind == :info && "bg-green-500 text-backroom-black ring-emerald-500 fill-cyan-900",
+        @kind == :error &&
+          "bg-backroom-black border-neon-red-primary border-[1px] text-neon-red-primary shadow-md ring-rose-500 fill-rose-900"
       ]}
       {@rest}
     >
@@ -128,7 +129,7 @@ defmodule TimesinkWeb.CoreComponents do
       </p>
       <p class="mt-2 text-sm leading-5"><%= msg %></p>
       <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>
-        <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
+        <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-100 group-hover:opacity-70" />
       </button>
     </div>
     """
@@ -429,7 +430,7 @@ defmodule TimesinkWeb.CoreComponents do
 
   def error(assigns) do
     ~H"""
-    <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600">
+    <p class="mt-3 flex gap-3 text-sm leading-6 text-neon-red-primary">
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
       <%= render_slot(@inner_block) %>
     </p>
