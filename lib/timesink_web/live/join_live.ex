@@ -74,6 +74,15 @@ defmodule TimesinkWeb.JoinLive do
     """
   end
 
+  def handle_event("validate", %{"applicant" => applicant_params}, socket) do
+    changeset =
+      %Timesink.Waitlist.Applicant{}
+      |> Applicant.changeset(applicant_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, form: to_form(changeset))}
+  end
+
   def handle_event("save", %{"applicant" => applicant_params}, socket) do
     case Timesink.Waitlist.join(applicant_params) do
       {:ok, _applicant} ->
@@ -102,14 +111,5 @@ defmodule TimesinkWeb.JoinLive do
 
         {:noreply, socket}
     end
-  end
-
-  def handle_event("validate", %{"applicant" => applicant_params}, socket) do
-    changeset =
-      %Timesink.Waitlist.Applicant{}
-      |> Applicant.changeset(applicant_params)
-      |> Map.put(:action, :validate)
-
-    {:noreply, assign(socket, form: to_form(changeset))}
   end
 end
