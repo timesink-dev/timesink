@@ -299,6 +299,7 @@ defmodule TimesinkWeb.CoreComponents do
   attr :value, :any
   attr :class, :string, default: nil
   attr :input_class, :string, default: nil
+  attr :error_class, :string, default: nil
 
   attr :type, :string,
     default: "text",
@@ -411,7 +412,7 @@ defmodule TimesinkWeb.CoreComponents do
         ]}
         {@rest}
       />
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors} class={@error_class}><%= msg %></.error>
     </div>
     """
   end
@@ -434,10 +435,11 @@ defmodule TimesinkWeb.CoreComponents do
   Generates a generic error message.
   """
   slot :inner_block, required: true
+  attr :class, :string, default: nil
 
   def error(assigns) do
     ~H"""
-    <p class="mt-3 flex gap-3 text-sm leading-6 text-neon-red-primary">
+    <p class={["mt-3 flex gap-3 text-sm leading-6 text-neon-red-primary", @class]}>
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
       <%= render_slot(@inner_block) %>
     </p>

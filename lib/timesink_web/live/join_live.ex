@@ -52,6 +52,8 @@ defmodule TimesinkWeb.JoinLive do
             field={@form[:email]}
             type="email"
             placeholder="Enter your email"
+            class="md:relative"
+            error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
             input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
           />
         </div>
