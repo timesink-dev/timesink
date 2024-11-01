@@ -204,6 +204,8 @@ defmodule TimesinkWeb.CoreComponents do
     include: ~w(autocomplete name rel action enctype method novalidate target multipart),
     doc: "the arbitrary HTML attributes to apply to the form tag"
 
+  attr :actions_class, :string, default: "w-full"
+
   slot :inner_block, required: true
   slot :actions, doc: "the slot for form actions, such as a submit button"
 
@@ -212,7 +214,7 @@ defmodule TimesinkWeb.CoreComponents do
     <.form :let={f} for={@for} as={@as} {@rest}>
       <div class={@class}>
         <%= render_slot(@inner_block, f) %>
-        <div :for={action <- @actions} class={@class}>
+        <div :for={action <- @actions} class={@actions_class}>
           <%= render_slot(action, f) %>
         </div>
       </div>
@@ -439,7 +441,7 @@ defmodule TimesinkWeb.CoreComponents do
 
   def error(assigns) do
     ~H"""
-    <p class={["mt-3 flex gap-3 text-sm leading-6 text-neon-red-primary", @class]}>
+    <p class={["mt-1 flex gap-3 text-sm leading-6 text-neon-red-primary", @class]}>
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
       <%= render_slot(@inner_block) %>
     </p>
