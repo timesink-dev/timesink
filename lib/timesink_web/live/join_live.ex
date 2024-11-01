@@ -3,6 +3,10 @@ defmodule TimesinkWeb.JoinLive do
   alias Timesink.Waitlist.Applicant
 
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Process.send_after(self(), :reset_joined, 0)
+    end
+
     changeset = Applicant.changeset(%Applicant{})
     socket = assign(socket, form: to_form(changeset), joined: false)
     {:ok, socket}
