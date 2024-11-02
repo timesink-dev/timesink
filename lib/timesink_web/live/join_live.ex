@@ -34,7 +34,6 @@ defmodule TimesinkWeb.JoinLive do
       <.simple_form
         as="applicant"
         for={@form}
-        phx-change="validate"
         phx-submit="save"
         class="mt-8 mb-8 w-full md:flex md:justify-center gap-x-4 h-full md:items-end"
       >
@@ -78,15 +77,6 @@ defmodule TimesinkWeb.JoinLive do
       </.simple_form>
     </div>
     """
-  end
-
-  def handle_event("validate", %{"applicant" => applicant_params}, socket) do
-    changeset =
-      %Applicant{}
-      |> Applicant.changeset(applicant_params)
-      |> Map.put(:action, :validate)
-
-    {:noreply, assign(socket, form: to_form(changeset))}
   end
 
   def handle_event("save", %{"applicant" => applicant_params}, socket) do
