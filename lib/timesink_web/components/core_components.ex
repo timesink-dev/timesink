@@ -114,11 +114,18 @@ defmodule TimesinkWeb.CoreComponents do
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
-      class={[
-        "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
-        @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
-        @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
-      ]}
+      class={
+        [
+          "fixed bottom-4 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1 transform transition-transform duration-300 ease-in-out",
+          # Initial state for slide-in animation
+          "translate-y-full opacity-0",
+          # Animation class for slide-in effect
+          "animate-slide-in",
+          @kind == :info && "bg-green-500 text-backroom-black ring-emerald-500 fill-cyan-900",
+          @kind == :error &&
+            "bg-backroom-black border-neon-red-primary border-[1px] text-neon-red-primary shadow-md ring-rose-500 fill-rose-900"
+        ]
+      }
       {@rest}
     >
       <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6">
@@ -128,7 +135,7 @@ defmodule TimesinkWeb.CoreComponents do
       </p>
       <p class="mt-2 text-sm leading-5"><%= msg %></p>
       <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>
-        <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
+        <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-100 group-hover:opacity-70" />
       </button>
     </div>
     """
@@ -191,10 +198,13 @@ defmodule TimesinkWeb.CoreComponents do
   """
   attr :for, :any, required: true, doc: "the data structure for the form"
   attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
+  attr :class, :string, default: nil
 
   attr :rest, :global,
     include: ~w(autocomplete name rel action enctype method novalidate target multipart),
     doc: "the arbitrary HTML attributes to apply to the form tag"
+
+  attr :actions_class, :string, default: "w-full"
 
   slot :inner_block, required: true
   slot :actions, doc: "the slot for form actions, such as a submit button"
@@ -202,9 +212,9 @@ defmodule TimesinkWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
+      <div class={@class}>
         <%= render_slot(@inner_block, f) %>
-        <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
+        <div :for={action <- @actions} class={@actions_class}>
           <%= render_slot(action, f) %>
         </div>
       </div>
@@ -222,17 +232,34 @@ defmodule TimesinkWeb.CoreComponents do
   """
   attr :type, :string, default: nil
   attr :class, :string, default: nil
+  attr :color, :string, default: "primary"
   attr :rest, :global, include: ~w(disabled form name value)
 
   slot :inner_block, required: true
 
   def button(assigns) do
+    assigns =
+      assigns
+      |> assign_new(:classes, fn ->
+        case assigns.color do
+          "primary" ->
+            "bg-neon-blue-lightest rounded"
+
+          "secondary" ->
+            "bg-backroom-black text-neon-blue-lightest border-neon-blue-lightest border-[1px]"
+
+          # default styling
+          _ ->
+            ""
+        end
+      end)
+
     ~H"""
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "phx-submit-loading:opacity-75 rounded",
+        @classes,
         @class
       ]}
       {@rest}
@@ -272,6 +299,9 @@ defmodule TimesinkWeb.CoreComponents do
   attr :name, :any
   attr :label, :string, default: nil
   attr :value, :any
+  attr :class, :string, default: nil
+  attr :input_class, :string, default: nil
+  attr :error_class, :string, default: nil
 
   attr :type, :string,
     default: "text",
@@ -310,7 +340,7 @@ defmodule TimesinkWeb.CoreComponents do
 
     ~H"""
     <div>
-      <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
+      <label class={@class}>
         <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
         <input
           type="checkbox"
@@ -357,7 +387,8 @@ defmodule TimesinkWeb.CoreComponents do
         class={[
           "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 min-h-[6rem]",
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
+          @errors != [] && "border-rose-400 focus:border-rose-400",
+          @class
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
@@ -369,7 +400,7 @@ defmodule TimesinkWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div>
+    <div class={@class}>
       <.label for={@id}><%= @label %></.label>
       <input
         type={@type}
@@ -377,13 +408,13 @@ defmodule TimesinkWeb.CoreComponents do
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
+          @input_class,
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
         {@rest}
       />
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors} class={@error_class}><%= msg %></.error>
     </div>
     """
   end
@@ -406,10 +437,11 @@ defmodule TimesinkWeb.CoreComponents do
   Generates a generic error message.
   """
   slot :inner_block, required: true
+  attr :class, :string, default: nil
 
   def error(assigns) do
     ~H"""
-    <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600">
+    <p class={["mt-1 flex gap-3 text-sm leading-6 text-neon-red-primary", @class]}>
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
       <%= render_slot(@inner_block) %>
     </p>

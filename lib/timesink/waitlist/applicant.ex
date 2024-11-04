@@ -26,12 +26,14 @@ defmodule Timesink.Waitlist.Applicant do
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset(applicant :: t(), params :: %{optional(key :: atom()) => value :: term()}) ::
+  @spec changeset(applicant :: %__MODULE__{}, params :: %{optional(key :: atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, params) do
+
+  def changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> cast(params, [:email, :status, :first_name, :last_name])
     |> validate_required([:email, :first_name, :last_name])
     |> validate_format(:email, ~r/@/)
+    |> unique_constraint(:email, message: "Email already exists")
   end
 end

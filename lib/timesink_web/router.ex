@@ -17,7 +17,7 @@ defmodule TimesinkWeb.Router do
   scope "/", TimesinkWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", JoinLive
   end
 
   # Other scopes may use custom stacks.
