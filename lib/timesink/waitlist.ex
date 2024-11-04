@@ -2,8 +2,7 @@ defmodule Timesink.Waitlist do
   @moduledoc """
   The Waitlist context.
   """
-
-  alias Timesink.Repo
+  import Ecto.Changeset
   alias Timesink.Waitlist.Applicant
 
   @doc """
@@ -16,12 +15,22 @@ defmodule Timesink.Waitlist do
   """
   @spec join(params :: map()) ::
           {:ok, Applicant.t()} | {:error, Ecto.Changeset.t()}
+
   def join(params) do
-    with changeset <- Applicant.changeset(%Applicant{}, params),
-         {:ok, applicant} <- Repo.insert(changeset) do
-      {:ok, applicant}
-    else
-      {:error, changeset} -> {:error, changeset}
+    params_schema = %{
+      first_name: :string,
+      last_name: :string,
+      email: :string
+    }
+
+    changeset =
+      {%Applicant{}, params_schema}
+      |> cast(params, Map.keys(params_schema))
+      |> validate_required([:first_name, :last_name, :email])
+
+    with {:ok, params} <- apply_action(changeset, :join),
+         {:ok, user} <- Applicant.create(params) do
+      {:ok, user}
     end
   end
 end
