@@ -3,7 +3,6 @@ defmodule Timesink.Waitlist do
   The Waitlist context.
   """
 
-  import Ecto.Changeset
   alias Timesink.Waitlist.Applicant
 
   @doc """
