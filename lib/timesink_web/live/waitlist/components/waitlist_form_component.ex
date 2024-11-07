@@ -9,14 +9,6 @@ defmodule TimesinkWeb.WaitlistFormComponent do
     {:ok, assign(socket, form: to_form(changeset))}
   end
 
-  # @spec update(maybe_improper_list() | map(), any()) :: {:ok, map()}
-  # def update(assigns, socket) do
-  #   socket = socket |> assign(assigns) |> assign(:joined, assigns.joined)
-  #   IO.inspect(socket)
-  #   {:ok, socket}
-  # end
-
-  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <div>

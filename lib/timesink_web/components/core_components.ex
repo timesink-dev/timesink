@@ -116,14 +116,14 @@ defmodule TimesinkWeb.CoreComponents do
       role="alert"
       class={
         [
-          "fixed bottom-4 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1 transform transition-transform duration-300 ease-in-out",
+          "fixed bottom-4 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 transform transition-transform duration-300 ease-in-out",
           # Initial state for slide-in animation
           "translate-y-full opacity-0",
           # Animation class for slide-in effect
           "animate-slide-in",
-          @kind == :info && "bg-green-500 text-backroom-black ring-emerald-500 fill-cyan-900",
+          @kind == :info && "bg-green-500 text-backroom-black",
           @kind == :error &&
-            "bg-backroom-black border-neon-red-primary border-[1px] text-neon-red-primary shadow-md ring-rose-500 fill-rose-900"
+            "bg-backroom-black border-[1px] border-neon-red-primary text-red-500"
         ]
       }
       {@rest}

@@ -60,9 +60,6 @@ defmodule TimesinkWeb do
     end
   end
 
-  @spec live_component() ::
-          {:__block__, [],
-           [{:__block__, [], [...]} | {:import, [...], [...]} | {:use, [...], [...]}, ...]}
   def live_component do
     quote do
       use Phoenix.LiveComponent
