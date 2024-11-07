@@ -1,40 +1,30 @@
-defmodule TimesinkWeb.JoinLive do
-  use TimesinkWeb, :live_view
+defmodule TimesinkWeb.WaitlistFormComponent do
+  use TimesinkWeb, :live_component
+
   alias Timesink.Waitlist.Applicant
 
-  def mount(_params, _session, socket) do
-    if connected?(socket) do
-      Process.send_after(self(), :reset_joined, 0)
-    end
-
+  def mount(socket) do
     changeset = Applicant.changeset(%Applicant{})
-    socket = assign(socket, form: to_form(changeset), joined: false)
-    {:ok, socket}
+
+    {:ok, assign(socket, form: to_form(changeset))}
   end
 
+  # @spec update(maybe_improper_list() | map(), any()) :: {:ok, map()}
+  # def update(assigns, socket) do
+  #   socket = socket |> assign(assigns) |> assign(:joined, assigns.joined)
+  #   IO.inspect(socket)
+  #   {:ok, socket}
+  # end
+
+  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-xl w-full flex flex-col justify-center min-h-screen">
-      <span class="flex flex-col -space-y-2.5 font-brand items-center">
-        <p class="text-[3rem] leading-10 tracking-tighter">
-          TimeSink
-        </p>
-        <p class="pl-4 text-[2.6rem]">
-          Presents
-        </p>
-      </span>
-      <h2 class="uppercase text-[2rem] mt-12 mb-2 tracking-tighter items-center">
-        Welcome to the show.
-      </h2>
-      <div class="flex flex-col gap-y-2">
-        <p>
-          <b>While the world outside buzzes with the chaos of endless content</b>, we sift through it all to bring you a collection of hand-picked cinematic gems made by the filmmakers of today.
-        </p>
-      </div>
+    <div>
       <.simple_form
         as="applicant"
         for={@form}
         phx-submit="save"
+        phx-target={@myself}
         class="mt-8 mb-8 w-full md:flex md:justify-center gap-x-4 h-full md:items-end"
       >
         <div class="w-full flex flex-col gap-y-2">
@@ -82,17 +72,15 @@ defmodule TimesinkWeb.JoinLive do
   def handle_event("save", %{"applicant" => applicant_params}, socket) do
     case Timesink.Waitlist.join(applicant_params) do
       {:ok, _applicant} ->
+        send(self(), :applicant_joined)
+
         socket =
           socket
           |> assign(:form, to_form(Applicant.changeset(%Applicant{})))
-          |> assign(:joined, true)
-          |> put_flash(
+          |> put_flash!(
             :info,
             "Stay tuned for your official invite. 🎉"
           )
-
-        # Reset the `joined` status after 3 seconds
-        Process.send_after(self(), :reset_joined, 3000)
 
         {:noreply, socket}
 
@@ -106,13 +94,9 @@ defmodule TimesinkWeb.JoinLive do
         socket =
           socket
           |> assign(:form, to_form(changeset))
-          |> put_flash(:error, error_message)
+          |> put_flash!(:error, error_message)
 
         {:noreply, socket}
     end
-  end
-
-  def handle_info(:reset_joined, socket) do
-    {:noreply, assign(socket, :joined, false)}
   end
 end
