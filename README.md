@@ -1,4 +1,4 @@
-# 🎬 TimeSink – Welcome to the Show!
+# 🎬 TimeSink Presents – Welcome to the Show
 
 [![GitHub Actions](https://github.com/timesink-dev/timesink/actions/workflows/elixir.yml/badge.svg)](https://github.com/timesink-dev/timesink/actions/workflows/elixir.yml)
 
@@ -11,16 +11,26 @@ Dive into our setup instructions below to get your environment up and running, a
 To start your Phoenix server:
 
 1. **Install and Set Up Dependencies**
+
    ```bash
    mix setup
    ```
-2. **Start Phoenix Endpoint**
-   Run `mix phx.server` or start it inside IEx with:
 
-   ````bash
-   iex -S mix phx.server
-       ```
-   ````
+2. **Run Database Migrations**
+
+After setting up dependencies, make sure your database is up to date by running migrations:
+
+```bash
+mix ecto.migrate
+```
+
+3. **Start Phoenix Endpoint**
+
+Run `mix phx.server` or start it inside IEx with:
+
+```bash
+iex -S mix phx.server
+```
 
 Now, you can visit `localhost:4000` in your browser.
 
@@ -46,7 +56,7 @@ In TimeSink, we create a cinematic experience in a fictional theater. Below are 
 - **Posters**
   Digital representations of movie posters that provide an at-a-glance preview of each film. These appear on the platform’s homepage and in theater lobbies, mimicking a real cinema’s look and feel.
 
-- **Movies**
+- **Films**
   The featured content on TimeSink. Each movie is handpicked to align with our cinematic themes and is scheduled for release at specific times. Our movies cater to film enthusiasts looking for something beyond mainstream streaming platforms.
 
 ---
@@ -74,11 +84,3 @@ With digital posters, themed theaters, and showtimes, TimeSink offers an experie
 - **Documentation**: [https://hexdocs.pm/phoenix](https://hexdocs.pm/phoenix)
 - **Forum**: [https://elixirforum.com/c/phoenix-forum](https://elixirforum.com/c/phoenix-forum)
 - **Source Code**: [https://github.com/phoenixframework/phoenix](https://github.com/phoenixframework/phoenix)
-
-```
-
-```
-
-```
-
-```
