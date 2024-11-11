@@ -1,4 +1,4 @@
-# ✨ TimeSink Presents – Welcome to the Show
+# TimeSink Presents – Welcome to the Show
 
 > **️🚧 Work in Progress**: This document is a living, ongoing work in progress! We're constantly improving and updating it to better reflect our evolving understanding of the platform and its features. As we build and refine TimeSink, this documentation will dynamically change, so check back often for the latest updates and improvements. Your contributions and suggestions are always welcome as we shape this exciting project together!
 
@@ -20,7 +20,7 @@ This isn’t just a digital platform; it’s an imaginary world made real. TimeS
 
 <img width="540" alt="Screen Shot 2021-08-29 at 2 59 59 PM" src="https://user-images.githubusercontent.com/63470294/131251169-1264e72b-2fa7-4297-bfee-5f948baa5911.png">
 
-Dive into our setup instructions below to get your environment up and running, and see our glossary of cinema terms to make sure we're all on the same page!
+Dive into our setup instructions below to get your environment up and running, and see our [glossary](./OVERVIEW.md) of cinema terms to make sure we're all on the same page!
 
 ## 🚀 Getting Started
 
