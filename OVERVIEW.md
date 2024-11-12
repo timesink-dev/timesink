@@ -31,7 +31,7 @@ An individual screening event or presentation of a **Film**, specifically as par
 
 A **Poster** is the primary visual representation of a Film, serving as its main promotional image on TimeSink. It functions as the "cover" that gives users a first impression of the Film, conveying its style, genre, and atmosphere. Posters are carefully selected to capture the essence of each Film and are displayed prominently in Showcases, on the homepage, and in the Archives.
 
-### 🎟️ Theater
+### 💡 Theater
 
 A virtual cinema space where members enter to experience films together as part of a Showcase. Each **Theater** is dedicated to streaming a specific Film, providing a communal viewing environment that enhances the shared cinematic experience. Members can see who else is in the Theater, engage in live discussions, and interact with each other through chats and commentary features. The Theater is designed to foster community, encourage discussions about the film’s themes and artistry, and create a dynamic space where creators and audience members can connect and build relationships. This virtual setting brings the immersive atmosphere of a traditional cinema into an online format, complete with opportunities for real-time interaction, making each visit to the Theater a unique and engaging experience.
 
