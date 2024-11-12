@@ -53,3 +53,10 @@ Being a member means being part of something bigger than just watching films –
 A **Film Submission** is the process by which creators bring their films to TimeSink, proposing them for potential showcases. This is the gateway for filmmakers to share their work with an engaged audience, providing an opportunity for their films to be featured in the TimeSink theaters. Each submission includes essential details—such as the film’s title, release year, genre, and a screening link—allowing the TimeSink team to carefully review and consider it for inclusion in future showcases.
 
 Through the submission process, TimeSink enables creators to share their stories, expand their reach, and become part of a community where their work is celebrated, discussed, and, ultimately, experienced as a meaningful part of cinema's ongoing journey.
+
+### 🎟️ Waitlist
+
+The **Waitlist** is the entry queue for prospective members eager to join TimeSink— a line reminiscent of an audience awaiting entry into an exclusive theater.
+Although TimeSink doesn’t have a physical limit to occupancy, joining isn’t instant—it’s a process, adding an element of anticipation, exclusivity, and excitement.
+This suspense echoes the feel of a premiere, creating a sense of scarcity as members await their turn to enter the unique world of TimeSink.
+It’s the place where aspiring viewers and creators sign up to be notified of platform access and updates, ensuring that they’re first in line when new invitations are sent out.
