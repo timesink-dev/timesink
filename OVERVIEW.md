@@ -31,7 +31,7 @@ An individual screening event or presentation of a **Film**, specifically as par
 
 A **Poster** is the primary visual representation of a Film, serving as its main promotional image on TimeSink. It functions as the "cover" that gives users a first impression of the Film, conveying its style, genre, and atmosphere. Posters are carefully selected to capture the essence of each Film and are displayed prominently in Showcases, on the homepage, and in the Archives.
 
-### 🎟️ Theater
+### 💡 Theater
 
 A virtual cinema space where members enter to experience films together as part of a Showcase. Each **Theater** is dedicated to streaming a specific Film, providing a communal viewing environment that enhances the shared cinematic experience. Members can see who else is in the Theater, engage in live discussions, and interact with each other through chats and commentary features. The Theater is designed to foster community, encourage discussions about the film’s themes and artistry, and create a dynamic space where creators and audience members can connect and build relationships. This virtual setting brings the immersive atmosphere of a traditional cinema into an online format, complete with opportunities for real-time interaction, making each visit to the Theater a unique and engaging experience.
 
@@ -53,3 +53,10 @@ Being a member means being part of something bigger than just watching films –
 A **Film Submission** is the process by which creators bring their films to TimeSink, proposing them for potential showcases. This is the gateway for filmmakers to share their work with an engaged audience, providing an opportunity for their films to be featured in the TimeSink theaters. Each submission includes essential details—such as the film’s title, release year, genre, and a screening link—allowing the TimeSink team to carefully review and consider it for inclusion in future showcases.
 
 Through the submission process, TimeSink enables creators to share their stories, expand their reach, and become part of a community where their work is celebrated, discussed, and, ultimately, experienced as a meaningful part of cinema's ongoing journey.
+
+### 🎟️ Waitlist
+
+The **Waitlist** is the entry queue for prospective members eager to join TimeSink— a line reminiscent of an audience awaiting entry into an exclusive theater.
+Although TimeSink doesn’t have a physical limit to occupancy, joining isn’t instant—it’s a process, adding an element of anticipation, exclusivity, and excitement.
+This suspense echoes the feel of a premiere, creating a sense of scarcity as members await their turn to enter the unique world of TimeSink.
+It’s the place where aspiring viewers and creators sign up to be notified of platform access and updates, ensuring that they’re first in line when new invitations are sent out.
