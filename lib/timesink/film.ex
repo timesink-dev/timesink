@@ -28,11 +28,11 @@ defmodule Timesink.Film do
     field :format, :integer
     field :synopsis, :string
 
-    # has_many :directors, Creative
-    # has_many :producers, Creative
-    # has_many :writers, Creative
-    # has_many :cast, Creative
-    # has_many :crew, Creative
+    has_many :directors, Timesink.FilmCreative
+    has_many :producers, Timesink.FilmCreative
+    has_many :writers, Timesink.FilmCreative
+    has_many :cast, Timesink.FilmCreative
+    has_many :crew, Timesink.FilmCreative
 
     timestamps(type: :utc_datetime)
   end
