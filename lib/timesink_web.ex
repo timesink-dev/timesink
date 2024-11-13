@@ -54,6 +54,8 @@ defmodule TimesinkWeb do
       use Phoenix.LiveView,
         layout: {TimesinkWeb.Layouts, :app}
 
+      on_mount TimesinkWeb.Flash
+
       unquote(html_helpers())
     end
   end
@@ -61,6 +63,8 @@ defmodule TimesinkWeb do
   def live_component do
     quote do
       use Phoenix.LiveComponent
+
+      import TimesinkWeb.Flash, only: [put_flash!: 3]
 
       unquote(html_helpers())
     end
