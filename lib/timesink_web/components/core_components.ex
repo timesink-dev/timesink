@@ -123,7 +123,7 @@ defmodule TimesinkWeb.CoreComponents do
           "animate-slide-in",
           @kind == :info && "bg-green-500 text-backroom-black",
           @kind == :error &&
-            "bg-backroom-black border-[1px] border-neon-red-primary text-red-500"
+            "bg-neon-red-primary bg-opacity-10 border-[1px] border-neon-red-primary text-neon-red-light"
         ]
       }
       {@rest}
