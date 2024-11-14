@@ -32,6 +32,7 @@ defmodule Timesink.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:swiss_schema, "~> 0.6.0"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
