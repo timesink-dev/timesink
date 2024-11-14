@@ -19,7 +19,7 @@ defmodule Timesink.Accounts.Profile do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  schema "profiles" do
+  schema "profile" do
     belongs_to :user, Accounts.User
 
     field :avatar_url, :string

@@ -20,7 +20,7 @@ defmodule Timesink.Accounts.User do
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
-  schema "users" do
+  schema "user" do
     field :is_active, :boolean, default: true
     field :email, :string
     field :password_hash, :string, redact: true
