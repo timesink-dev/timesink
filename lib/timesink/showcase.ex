@@ -1,0 +1,45 @@
+defmodule Timesink.Showcase do
+  use Ecto.Schema
+  use SwissSchema, repo: Timesink.Repo
+  import Ecto.Changeset
+
+  @type status :: :upcoming | :active | :archived
+  @statuses [:upcoming, :active, :archived]
+
+  @type t :: %{
+          __struct__: __MODULE__,
+          name: :string,
+          description: :string,
+          start_date: :naive_datetime,
+          end_date: :naive_datetime,
+          status: status()
+        }
+
+  @primary_key {:id, :binary_id, autogenerate: true}
+
+  schema "showcase" do
+    field :name, :string
+    field :description, :string
+    field :start_date, :naive_datetime
+    field :end_date, :naive_datetime
+    field :status, Ecto.Enum, values: @statuses
+
+    has_many :film_showings, TimeSink.FilmShowing
+    has_many :films, through: [:film_showings, :film]
+
+    timestamps(type: :utc_datetime)
+  end
+
+  @spec changeset(showcase :: t(), params :: %{optional(atom()) => term()}) ::
+          Ecto.Changeset.t()
+  def changeset(%{__struct__: __MODULE} = struct, %{} = params) do
+    struct
+    |> cast(params, [:name, :description, :start_date, :end_date, :status])
+    |> validate_required([:name, :description, :start_date, :end_date, :status])
+    |> validate_length(:name, min: 1)
+    |> validate_length(:description, min: 1)
+    |> validate_inclusion(:status, @statuses)
+    |> cast_assoc(:film_showings, with: &Timesink.FilmShowing.changeset/2)
+    |> cast_assoc(:films, with: &Timesink.Film.changeset/2)
+  end
+end
