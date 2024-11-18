@@ -24,7 +24,7 @@ defmodule Timesink.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(env) when env in [:dev, :test], do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -32,6 +32,7 @@ defmodule Timesink.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:swiss_schema, "~> 0.6.0"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
