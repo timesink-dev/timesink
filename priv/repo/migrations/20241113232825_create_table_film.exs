@@ -1,8 +1,8 @@
-defmodule Timesink.Repo.Migrations.CreateTableFilms do
+defmodule Timesink.Repo.Migrations.CreateTableFilm do
   use Ecto.Migration
 
   def change do
-    create table(:films, primary_key: false) do
+    create table(:film, primary_key: false) do
       add :id, :uuid, null: false, primary_key: true
 
       timestamps type: :utc_datetime
@@ -12,13 +12,13 @@ defmodule Timesink.Repo.Migrations.CreateTableFilms do
       add :duration, :integer
       add :color, :string
       add :aspect_ratio, :string
-      add :format, :integer
-      add :synopsis, :string
+      add :format, :string
+      add :synopsis, :text
     end
 
-    create unique_index(:films, [:year, :title])
+    create unique_index(:film, [:year, :title])
 
-    create index(:films, [:inserted_at])
-    create index(:films, [:title])
+    create index(:film, [:inserted_at])
+    create index(:film, [:title])
   end
 end

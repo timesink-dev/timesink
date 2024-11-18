@@ -13,19 +13,19 @@ defmodule Timesink.Film do
           duration: :integer,
           color: color(),
           aspect_ratio: :string,
-          format: :integer,
+          format: :string,
           synopsis: :string
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
-  schema "films" do
+  schema "film" do
     field :title, :string
     field :year, :integer
     field :duration, :integer
     field :color, Ecto.Enum, values: @colors
     field :aspect_ratio, :string
-    field :format, :integer
+    field :format, :string
     field :synopsis, :string
 
     has_many :directors, Timesink.FilmCreative

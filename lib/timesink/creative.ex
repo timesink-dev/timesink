@@ -12,7 +12,7 @@ defmodule Timesink.Creative do
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
-  schema "creatives" do
+  schema "creative" do
     belongs_to :user, Timesink.Accounts.User
 
     field :first_name, :string

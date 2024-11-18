@@ -1,8 +1,8 @@
-defmodule Timesink.Repo.Migrations.CreateTableCreatives do
+defmodule Timesink.Repo.Migrations.CreateTableCreative do
   use Ecto.Migration
 
   def change do
-    create table(:creatives, primary_key: false) do
+    create table(:creative, primary_key: false) do
       add :id, :uuid, null: false, primary_key: true
 
       timestamps type: :utc_datetime
@@ -13,9 +13,9 @@ defmodule Timesink.Repo.Migrations.CreateTableCreatives do
       add :last_name, :string, null: false
     end
 
-    create unique_index(:creatives, [:last_name, :first_name])
+    create unique_index(:creative, [:last_name, :first_name])
 
-    create index(:creatives, [:inserted_at])
-    create index(:creatives, [:first_name, :last_name])
+    create index(:creative, [:inserted_at])
+    create index(:creative, [:first_name, :last_name])
   end
 end

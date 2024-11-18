@@ -1,4 +1,4 @@
-defmodule Timesink.Repo.Migrations.CreateTableFilmCreatives do
+defmodule Timesink.Repo.Migrations.CreateTableFilmCreative do
   use Ecto.Migration
 
   def change do
