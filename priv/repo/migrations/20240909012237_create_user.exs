@@ -1,8 +1,8 @@
-defmodule Timesink.Repo.Migrations.CreateUsers do
+defmodule Timesink.Repo.Migrations.CreateUser do
   use Ecto.Migration
 
   def change do
-    create table(:users, primary_key: false) do
+    create table(:user, primary_key: false) do
       add :id, :uuid, null: false, primary_key: true
 
       timestamps type: :utc_datetime
@@ -16,10 +16,10 @@ defmodule Timesink.Repo.Migrations.CreateUsers do
       add :roles, {:array, :string}, null: false, default: []
     end
 
-    create unique_index(:users, [:email])
+    create unique_index(:user, [:email])
 
-    create index(:users, [:inserted_at])
-    create index(:users, [:first_name])
-    create index(:users, [:last_name])
+    create index(:user, [:inserted_at])
+    create index(:user, [:first_name])
+    create index(:user, [:last_name])
   end
 end
