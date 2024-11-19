@@ -8,7 +8,7 @@ defmodule Timesink.Repo.Migrations.CreateTableFilmCreative do
       timestamps type: :utc_datetime
 
       add :film_id, references(:film, type: :uuid), null: false
-      add :creative_id, references(:film, type: :uuid), null: false
+      add :creative_id, references(:creative, type: :uuid), null: false
 
       add :role, :string, null: false
     end
