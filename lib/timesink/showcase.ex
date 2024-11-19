@@ -5,6 +5,7 @@ defmodule Timesink.Showcase do
 
   @type status :: :upcoming | :active | :archived
   @statuses [:upcoming, :active, :archived]
+  def statuses, do: @statuses
 
   @type t :: %{
           __struct__: __MODULE__,
