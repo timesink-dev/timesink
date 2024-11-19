@@ -12,7 +12,7 @@ defmodule Timesink.Repo.Migrations.CreateTableFilm do
       add :duration, :integer
       add :color, :string
       add :aspect_ratio, :string
-      add :format, :string
+      add :format, :string, null: false
       add :synopsis, :text
     end
 
@@ -20,5 +20,14 @@ defmodule Timesink.Repo.Migrations.CreateTableFilm do
 
     create index(:film, [:inserted_at])
     create index(:film, [:title])
+
+    create constraint(:film, :color_check,
+             check:
+               "color IN ('black_and_white', 'sepia', 'monochrome', 'partially_colorized', 'color')"
+           )
+
+    create constraint(:film, :format_check,
+             check: "format IN ('digital', '70mm', '65mm', '35mm', '16mm', '8mm')"
+           )
   end
 end

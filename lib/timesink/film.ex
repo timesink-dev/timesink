@@ -7,6 +7,10 @@ defmodule Timesink.Film do
   @colors [:black_and_white, :sepia, :monochrome, :partially_colorized, :color]
   def colors, do: @colors
 
+  @type format :: :digital | :"70mm" | :"65" | :"35mm" | :"16mm" | :"8mm"
+  @formats [:digital, :"70mm", :"65mm", :"35mm", :"16mm", :"8mm"]
+  def formats, do: @formats
+
   @type t :: %{
           __struct__: __MODULE__,
           title: :string,
@@ -14,7 +18,7 @@ defmodule Timesink.Film do
           duration: :integer,
           color: color(),
           aspect_ratio: :string,
-          format: :string,
+          format: format(),
           synopsis: :string
         }
 
@@ -26,7 +30,7 @@ defmodule Timesink.Film do
     field :duration, :integer
     field :color, Ecto.Enum, values: @colors
     field :aspect_ratio, :string
-    field :format, :string
+    field :format, Ecto.Enum, values: @formats
     field :synopsis, :string
 
     has_many :directors, Timesink.FilmCreative
