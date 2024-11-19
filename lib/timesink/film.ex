@@ -5,6 +5,7 @@ defmodule Timesink.Film do
 
   @type color :: :black_and_white | :sepia | :monochrome | :partially_colorized | :color
   @colors [:black_and_white, :sepia, :monochrome, :partially_colorized, :color]
+  def colors, do: @colors
 
   @type t :: %{
           __struct__: __MODULE__,
