@@ -33,7 +33,7 @@ defmodule Timesink.Showcase do
 
   @spec changeset(showcase :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE} = struct, %{} = params) do
+  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
     |> cast(params, [:name, :description, :start_date, :end_date, :status])
     |> validate_required([:name, :description, :start_date, :end_date, :status])

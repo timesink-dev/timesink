@@ -20,7 +20,7 @@ defmodule Timesink.Theater do
 
   @spec changeset(theater :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE} = struct, %{} = params) do
+  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
     |> cast(params, [:name])
     |> validate_required([:name])
