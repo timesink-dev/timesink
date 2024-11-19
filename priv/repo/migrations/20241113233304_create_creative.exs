@@ -7,7 +7,7 @@ defmodule Timesink.Repo.Migrations.CreateTableCreative do
 
       timestamps type: :utc_datetime
 
-      add :user_id, references(:users, type: :uuid), null: false
+      add :user_id, references(:user, type: :uuid), null: false
 
       add :first_name, :string, null: false
       add :last_name, :string, null: false
