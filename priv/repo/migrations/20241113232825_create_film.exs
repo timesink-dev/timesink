@@ -9,11 +9,11 @@ defmodule Timesink.Repo.Migrations.CreateTableFilm do
 
       add :title, :string, null: false
       add :year, :integer, null: false
-      add :duration, :integer
-      add :color, :string
-      add :aspect_ratio, :string
+      add :duration, :integer, null: false
+      add :color, :string, null: false
+      add :aspect_ratio, :string, null: false
       add :format, :string, null: false
-      add :synopsis, :text
+      add :synopsis, :text, null: false
     end
 
     create unique_index(:film, [:year, :title])

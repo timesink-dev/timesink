@@ -23,7 +23,7 @@ defmodule Timesink.Showcase do
     field :description, :string
     field :start_date, :naive_datetime
     field :end_date, :naive_datetime
-    field :status, Ecto.Enum, values: @statuses
+    field :status, Ecto.Enum, values: @statuses, default: :upcoming
 
     has_many :film_showings, TimeSink.FilmShowing
     has_many :films, through: [:film_showings, :film]
@@ -36,7 +36,7 @@ defmodule Timesink.Showcase do
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
     |> cast(params, [:name, :description, :start_date, :end_date, :status])
-    |> validate_required([:name, :description, :start_date, :end_date, :status])
+    |> validate_required([:name, :description, :status])
     |> validate_length(:name, min: 1)
     |> validate_length(:description, min: 1)
     |> validate_inclusion(:status, @statuses)
