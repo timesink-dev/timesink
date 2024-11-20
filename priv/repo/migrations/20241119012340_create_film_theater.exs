@@ -8,10 +8,10 @@ defmodule Timesink.Repo.Migrations.CreateFilmTheater do
       timestamps type: :utc_datetime
 
       add :is_active, :boolean, null: false, default: true
-      add :title, :string, null: false
+      add :name, :string, null: false
     end
 
     create index(:theater, [:inserted_at])
-    create index(:theater, [:is_active, :title])
+    create index(:theater, [:is_active, :name])
   end
 end
