@@ -27,9 +27,9 @@ defmodule Timesink.FilmShowing do
     struct
     |> cast(params, [:film, :showcase, :theater, :upcoming_showing])
     |> validate_required([:film, :showcase, :theater])
-    |> cast_assoc(:film, with: &Timesink.Film.changeset/2)
-    |> cast_assoc(:showcase, with: &Timesink.Showcase.changeset/2)
-    |> cast_assoc(:theater, with: &Timesink.Theater.changeset/2)
+    |> cast_assoc(:film, required: true, with: &Timesink.Film.changeset/2)
+    |> cast_assoc(:showcase, required: true, with: &Timesink.Showcase.changeset/2)
+    |> cast_assoc(:theater, required: true, with: &Timesink.Theater.changeset/2)
     |> cast_assoc(:upcoming_showing, with: &Timesink.FilmShowing.changeset/2)
   end
 end

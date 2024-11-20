@@ -24,7 +24,7 @@ defmodule Timesink.FilmCreative do
     struct
     |> cast(params, [:film, :creative, :role])
     |> validate_required([:role])
-    |> cast_assoc(:film, with: &Timesink.Film.changeset/2)
-    |> cast_assoc(:creative, with: &Timesink.Creative.changeset/2)
+    |> cast_assoc(:film, required: true, with: &Timesink.Film.changeset/2)
+    |> cast_assoc(:creative, required: true, with: &Timesink.Creative.changeset/2)
   end
 end

@@ -27,7 +27,7 @@ defmodule Timesink.Creative do
     struct
     |> cast(params, [:first_name, :last_name])
     |> validate_required([:first_name, :last_name])
-    |> cast_assoc(:user, with: &Timesink.Accounts.User.changeset/2)
+    |> cast_assoc(:user, required: true, with: &Timesink.Accounts.User.changeset/2)
     |> validate_length(:first_name, min: 2)
     |> validate_length(:last_name, min: 2)
   end

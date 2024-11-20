@@ -47,7 +47,7 @@ defmodule Timesink.Film do
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
     |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
-    |> validate_required([:title, :year, :synopsis])
+    |> validate_required([:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
     |> validate_length(:title, min: 1)
   end
 end
