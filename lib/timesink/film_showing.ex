@@ -7,8 +7,7 @@ defmodule Timesink.FilmShowing do
           __struct__: __MODULE__,
           film: Timesink.Film.t(),
           showcase: Timesink.Showcase.t(),
-          theater: Timesink.Theater.t(),
-          upcoming_showing: Timesink.FilmShowing.t()
+          theater: Timesink.Theater.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -25,11 +24,10 @@ defmodule Timesink.FilmShowing do
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
-    |> cast(params, [:film, :showcase, :theater, :upcoming_showing])
+    |> cast(params, [:film, :showcase, :theater])
     |> validate_required([:film, :showcase, :theater])
     |> cast_assoc(:film, required: true, with: &Timesink.Film.changeset/2)
     |> cast_assoc(:showcase, required: true, with: &Timesink.Showcase.changeset/2)
     |> cast_assoc(:theater, required: true, with: &Timesink.Theater.changeset/2)
-    |> cast_assoc(:upcoming_showing, with: &Timesink.FilmShowing.changeset/2)
   end
 end
