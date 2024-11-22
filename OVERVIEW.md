@@ -60,3 +60,11 @@ The **Waitlist** is the entry queue for prospective members eager to join TimeSi
 Although TimeSink doesn’t have a physical limit to occupancy, joining isn’t instant—it’s a process, adding an element of anticipation, exclusivity, and excitement.
 This suspense echoes the feel of a premiere, creating a sense of scarcity as members await their turn to enter the unique world of TimeSink.
 It’s the place where aspiring viewers and creators sign up to be notified of platform access and updates, ensuring that they’re first in line when new invitations are sent out.
+
+### 📩 Applicant
+
+An **Applicant** is someone who has joined the TimeSink waitlist, eagerly awaiting an invitation to officially join the platform. Applicants are prospective members who wish to claim their username, step into the TimeSink community, and experience the immersive cinematic world firsthand. Their journey begins with anticipation, as they wait to unlock access to the platform and all its offerings.
+
+### 🖋️ Creative
+
+A **Creative** is any individual who has contributed to the creation of a work featured on TimeSink, including directors, writers, cast members, crew, or other collaborators. Creatives can also be linked to registered user/member profiles on the platform, giving them the opportunity to engage with the community, share insights, and connect directly with audiences. These visionaries collectively shape the artistic landscape of TimeSink, bringing stories and showcases to life.
