@@ -12,7 +12,7 @@ defmodule Timesink.Repo.Migrations.CreateProfile do
       add :location, :map
       add :org_name, :string
       add :org_position, :string
-      add :bio, :string
+      add :bio, :text
     end
 
     create unique_index(:profile, [:user_id])
