@@ -34,6 +34,8 @@ defmodule Timesink.Film do
     field :format, Ecto.Enum, values: @formats
     field :synopsis, :string
 
+    many_to_many :genres, Timesink.Genre, join_through: "film_genre"
+
     has_many :directors, Timesink.FilmCreative
     has_many :producers, Timesink.FilmCreative
     has_many :writers, Timesink.FilmCreative
