@@ -3,8 +3,15 @@ defmodule Timesink.FilmCreative do
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
 
+  @type role :: :director | :producer | :writer | :cast | :crew
+  @roles [:director, :producer, :writer, :cast, :crew]
+  def roles, do: @roles
+
   @type t :: %{
-          __struct__: __MODULE__
+          __struct__: __MODULE__,
+          film: Timesink.Film.t(),
+          creative: Timesink.Creative.t(),
+          role: role()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -13,7 +20,8 @@ defmodule Timesink.FilmCreative do
     belongs_to :film, Timesink.Film
     belongs_to :creative, Timesink.Creative
 
-    field :role, :string
+    field :role, Ecto.Enum, values: @roles
+    field :subrole, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -23,7 +31,7 @@ defmodule Timesink.FilmCreative do
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
     |> cast(params, [:film_id, :creative_id, :role])
-    |> validate_required([:role, :film_id, :creative_id])
+    |> validate_required([:film_id, :creative_id, :role])
     |> assoc_constraint(:film)
     |> assoc_constraint(:creative)
   end

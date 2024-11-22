@@ -5,7 +5,6 @@ defmodule Timesink.Film do
 
   @type color :: :black_and_white | :sepia | :monochrome | :partially_colorized | :color
   @colors [:black_and_white, :sepia, :monochrome, :partially_colorized, :color]
-  @spec colors() :: [:black_and_white | :color | :monochrome | :partially_colorized | :sepia, ...]
   def colors, do: @colors
 
   @type format :: :digital | :"70mm" | :"65mm" | :"35mm" | :"16mm" | :"8mm"
@@ -36,11 +35,11 @@ defmodule Timesink.Film do
 
     many_to_many :genres, Timesink.Genre, join_through: "film_genre"
 
-    has_many :directors, Timesink.FilmCreative
-    has_many :producers, Timesink.FilmCreative
-    has_many :writers, Timesink.FilmCreative
-    has_many :cast, Timesink.FilmCreative
-    has_many :crew, Timesink.FilmCreative
+    has_many :directors, Timesink.FilmCreative, where: [role: :director]
+    has_many :producers, Timesink.FilmCreative, where: [role: :producer]
+    has_many :writers, Timesink.FilmCreative, where: [role: :writer]
+    has_many :cast, Timesink.FilmCreative, where: [role: :cast]
+    has_many :crew, Timesink.FilmCreative, where: [role: :crew]
 
     timestamps(type: :utc_datetime)
   end
