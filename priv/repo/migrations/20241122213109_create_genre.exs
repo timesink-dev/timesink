@@ -13,7 +13,7 @@ defmodule Timesink.Repo.Migrations.CreateGenre do
 
     create unique_index(:genre, [:name])
 
-    create index(:creative, [:inserted_at])
+    create index(:genre, [:inserted_at])
 
     create table(:film_genre, primary_key: false) do
       add :film_id, references(:film, type: :uuid, on_delete: :delete_all), primary_key: true
