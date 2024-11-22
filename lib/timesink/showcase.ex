@@ -25,8 +25,8 @@ defmodule Timesink.Showcase do
     field :end_date, :naive_datetime
     field :status, Ecto.Enum, values: @statuses, default: :upcoming
 
-    has_many :film_showings, TimeSink.FilmShowing
-    has_many :films, through: [:film_showings, :film]
+    has_many :exhibitions, TimeSink.Exhibition
+    has_many :films, through: [:exhibitions, :film]
 
     timestamps(type: :utc_datetime)
   end

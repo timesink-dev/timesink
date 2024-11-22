@@ -1,8 +1,8 @@
-defmodule Timesink.Repo.Migrations.CreateFilmShowing do
+defmodule Timesink.Repo.Migrations.CreateExhibition do
   use Ecto.Migration
 
   def change do
-    create table(:film_showing, primary_key: false) do
+    create table(:exhibition, primary_key: false) do
       add :id, :uuid, null: false, primary_key: true
 
       timestamps type: :utc_datetime
@@ -12,9 +12,9 @@ defmodule Timesink.Repo.Migrations.CreateFilmShowing do
       add :film_id, references(:film, type: :uuid), null: false
     end
 
-    create unique_index(:film_showing, [:showcase_id, :theater_id])
+    create unique_index(:exhibition, [:showcase_id, :theater_id])
 
-    create index(:film_showing, [:inserted_at])
-    create index(:film_showing, [:film_id])
+    create index(:exhibition, [:inserted_at])
+    create index(:exhibition, [:film_id])
   end
 end

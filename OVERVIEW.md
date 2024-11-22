@@ -23,9 +23,9 @@ A **Showcase** is a curated collection of films that go "live" simultaneously, a
 
 Refers to a single movie or cinematic work available on TimeSink. Each **Film** is treated as a distinct piece within the platform, with details including its title, director, cast, genre, and synopsis. This term encompasses any standalone work of cinema that users can experience as part of a Showcase or later through the Archives.
 
-### 🍿 Film Showing
+### 🍿 Exhibition
 
-An individual screening event or presentation of a **Film**, specifically as part of a Showcase. It is the "screening moment" for the Film within a given Showcase, similar to how a movie would be scheduled at a specific time in a cinema. Film Showings are time-bound, heightening the sense of exclusivity and excitement for audiences, and marking when the Film is available for real-time viewing on TimeSink.
+An individual screening event or presentation of a **Film**, specifically as part of a Showcase. It is the "screening moment" for the Film within a given Showcase, similar to how a movie would be scheduled at a specific time in a cinema. Exhibitions are time-bound, heightening the sense of exclusivity and excitement for audiences, and marking when the Film is available for real-time viewing on TimeSink.
 
 ### 🎨 Poster
 

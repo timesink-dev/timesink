@@ -13,7 +13,7 @@ defmodule Timesink.Theater do
   schema "theater" do
     field :name, :string
 
-    has_one :film_showing, TimeSink.FilmShowing
+    has_one :exhibition, TimeSink.Exhibition
 
     timestamps(type: :utc_datetime)
   end

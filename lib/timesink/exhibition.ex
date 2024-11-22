@@ -1,4 +1,4 @@
-defmodule Timesink.FilmShowing do
+defmodule Timesink.Exhibition do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
@@ -12,7 +12,7 @@ defmodule Timesink.FilmShowing do
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
-  schema "film_showing" do
+  schema "exhibition" do
     belongs_to :film, Timesink.Film
     belongs_to :showcase, Timesink.Showcase
     belongs_to :theater, Timesink.Theater
@@ -20,7 +20,7 @@ defmodule Timesink.FilmShowing do
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset(film_showing :: t(), params :: %{optional(atom()) => term()}) ::
+  @spec changeset(exhibition :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
