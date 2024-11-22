@@ -31,7 +31,6 @@ defmodule Timesink.Accounts.User do
     field :roles, {:array, Ecto.Enum}, values: @roles, default: [], redact: true
 
     has_one :profile, Accounts.Profile
-    has_one :creative, Timesink.Creative
 
     timestamps(type: :utc_datetime)
   end

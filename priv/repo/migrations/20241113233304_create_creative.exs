@@ -7,15 +7,14 @@ defmodule Timesink.Repo.Migrations.CreateTableCreative do
 
       timestamps type: :utc_datetime
 
-      add :user_id, references(:user, type: :uuid), null: false
-
       add :first_name, :string, null: false
       add :last_name, :string, null: false
-    end
 
-    create unique_index(:creative, [:last_name, :first_name])
+      add :profile_id, references(:profile, type: :uuid)
+    end
 
     create index(:creative, [:inserted_at])
     create index(:creative, [:first_name, :last_name])
+    create index(:creative, [:last_name, :first_name])
   end
 end

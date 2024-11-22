@@ -30,6 +30,8 @@ defmodule Timesink.Accounts.Profile do
 
     embeds_one :location, Accounts.Location
 
+    has_one :creative, Timesink.Creative
+
     timestamps(type: :utc_datetime)
   end
 
