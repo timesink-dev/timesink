@@ -25,6 +25,5 @@ defmodule Timesink.Theater do
     |> cast(params, [:name])
     |> validate_required([:name])
     |> validate_length(:name, min: 1)
-    |> cast_assoc(:film_showing, with: &Timesink.FilmShowing.changeset/2)
   end
 end

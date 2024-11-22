@@ -5,6 +5,7 @@ defmodule Timesink.Film do
 
   @type color :: :black_and_white | :sepia | :monochrome | :partially_colorized | :color
   @colors [:black_and_white, :sepia, :monochrome, :partially_colorized, :color]
+  @spec colors() :: [:black_and_white | :color | :monochrome | :partially_colorized | :sepia, ...]
   def colors, do: @colors
 
   @type format :: :digital | :"70mm" | :"65mm" | :"35mm" | :"16mm" | :"8mm"

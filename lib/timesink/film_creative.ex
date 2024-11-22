@@ -22,9 +22,9 @@ defmodule Timesink.FilmCreative do
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
-    |> cast(params, [:film, :creative, :role])
-    |> validate_required([:role])
-    |> cast_assoc(:film, required: true, with: &Timesink.Film.changeset/2)
-    |> cast_assoc(:creative, required: true, with: &Timesink.Creative.changeset/2)
+    |> cast(params, [:film_id, :creative_id, :role])
+    |> validate_required([:role, :film_id, :creative_id])
+    |> assoc_constraint(:film)
+    |> assoc_constraint(:creative)
   end
 end

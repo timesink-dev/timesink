@@ -40,7 +40,5 @@ defmodule Timesink.Showcase do
     |> validate_length(:name, min: 1)
     |> validate_length(:description, min: 1)
     |> validate_inclusion(:status, @statuses)
-    |> cast_assoc(:film_showings, with: &Timesink.FilmShowing.changeset/2)
-    |> cast_assoc(:films, with: &Timesink.Film.changeset/2)
   end
 end

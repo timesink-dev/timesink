@@ -46,7 +46,6 @@ defmodule Timesink.Accounts.Profile do
       :bio
     ])
     |> cast_embed(:location)
-    |> cast_assoc(:user, with: &Accounts.User.changeset/2)
     |> validate_required([:user_id])
     |> unique_constraint(:user_id)
   end
