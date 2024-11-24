@@ -10,6 +10,7 @@ module.exports = {
     "./js/**/*.js",
     "../lib/timesink_web.ex",
     "../lib/timesink_web/**/*.*ex",
+    "../deps/backpex/**/*.*ex",
   ],
   theme: {
     extend: {
@@ -46,6 +47,7 @@ module.exports = {
     //
     //     <div class="phx-click-loading:animate-ping">
     //
+    require("daisyui"),
     plugin(({ addVariant }) =>
       addVariant("phx-click-loading", [
         ".phx-click-loading&",
