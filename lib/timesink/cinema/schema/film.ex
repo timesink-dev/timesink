@@ -1,4 +1,4 @@
-defmodule Timesink.Film do
+defmodule Timesink.Cinema.Film do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
@@ -33,19 +33,35 @@ defmodule Timesink.Film do
     field :format, Ecto.Enum, values: @formats
     field :synopsis, :string
 
-    many_to_many :genres, Timesink.Genre, join_through: "film_genre"
+    many_to_many :genres, Timesink.Cinema.Genre, join_through: "film_genre"
 
-    has_many :directors, Timesink.FilmCreative, where: [role: :director]
-    has_many :producers, Timesink.FilmCreative, where: [role: :producer]
-    has_many :writers, Timesink.FilmCreative, where: [role: :writer]
-    has_many :cast, Timesink.FilmCreative, where: [role: :cast]
-    has_many :crew, Timesink.FilmCreative, where: [role: :crew]
+    has_many :directors, Timesink.Cinema.FilmCreative, where: [role: :director]
+    has_many :producers, Timesink.Cinema.FilmCreative, where: [role: :producer]
+    has_many :writers, Timesink.Cinema.FilmCreative, where: [role: :writer]
+    has_many :cast, Timesink.Cinema.FilmCreative, where: [role: :cast]
+    has_many :crew, Timesink.Cinema.FilmCreative, where: [role: :crew]
 
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset(film :: t(), params :: %{optional(atom()) => term()}) ::
-          Ecto.Changeset.t()
+  @spec changeset(
+          Timesink.Cinema.Film.t(),
+          %{optional(:__struct__) => none(), optional(atom()) => any()},
+          any()
+        ) :: Ecto.Changeset.t()
+  def changeset(%{__struct__: __MODULE__} = struct, %{} = params, _metadata) do
+    changeset(struct, params)
+  end
+
+  @spec changeset(
+          Timesink.Cinema.Film.t(),
+          %{optional(:__struct__) => none(), optional(atom()) => any()},
+          any()
+        ) :: Ecto.Changeset.t()
+  @spec changeset(Timesink.Cinema.Film.t(), %{
+          optional(:__struct__) => none(),
+          optional(atom() | binary()) => any()
+        }) :: Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
     |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])

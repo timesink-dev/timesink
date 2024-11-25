@@ -1,4 +1,4 @@
-defmodule Timesink.Accounts.Profile do
+defmodule Timesink.Account.Profile do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
