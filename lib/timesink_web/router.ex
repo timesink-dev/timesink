@@ -37,7 +37,7 @@ defmodule TimesinkWeb.Router do
       live_resources "/showcases", Admin.ShowcaseLive
       live_resources "/exhibitions", Admin.ExhibitionLive
       live_resources "/theaters", Admin.TheaterLive
-      live_resources "/genres", Admin.GenresLive
+      live_resources "/genres", Admin.GenreLive
       live_resources "/members", Admin.UserLive
     end
   end

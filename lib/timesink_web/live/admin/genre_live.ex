@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.Admin.GenresLive do
+defmodule TimesinkWeb.Admin.GenreLive do
   use Backpex.LiveResource,
     adapter_config: [
       schema: Timesink.Cinema.Genre,
@@ -25,6 +25,10 @@ defmodule TimesinkWeb.Admin.GenresLive do
       name: %{
         module: Backpex.Fields.Text,
         label: "Name"
+      },
+      description: %{
+        module: Backpex.Fields.Textarea,
+        label: "Description"
       }
     ]
   end

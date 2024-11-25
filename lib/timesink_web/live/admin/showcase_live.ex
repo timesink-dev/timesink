@@ -11,7 +11,8 @@ defmodule TimesinkWeb.Admin.ShowcaseLive do
       name: Timesink.PubSub,
       topic: "showcases",
       event_prefix: "showcase_"
-    ]
+    ],
+    fluid?: true
 
   @impl Backpex.LiveResource
   def singular_name, do: "Showcase"
