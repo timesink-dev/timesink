@@ -1,12 +1,10 @@
-defmodule TimesinkWeb.Admin.ApplicantLive do
+defmodule TimesinkWeb.Admin.WaitlistLive do
   use Backpex.LiveResource,
     adapter_config: [
       schema: Timesink.Waitlist.Applicant,
       repo: Timesink.Repo,
-      update_changeset: &Timesink.Waitlist.Applicant.update_changeset/3,
-      create_changeset: &Timesink.Waitlist.Applicant.create_changeset/3,
-      # update_changeset: &MyApp.Waitlist.Applicant.update_changeset/3,
-      # create_changeset: &Timesink.Waitlist.Applicant.create_changeset/3,
+      update_changeset: &Timesink.Waitlist.Applicant.changeset/3,
+      create_changeset: &Timesink.Waitlist.Applicant.changeset/3,
       item_query: &__MODULE__.item_query/3
     ],
     layout: {TimesinkWeb.Layouts, :admin},
@@ -25,13 +23,17 @@ defmodule TimesinkWeb.Admin.ApplicantLive do
   @impl Backpex.LiveResource
   def fields do
     [
-      title: %{
+      first_name: %{
         module: Backpex.Fields.Text,
-        label: "Title"
+        label: "First name"
       },
-      views: %{
-        module: Backpex.Fields.Number,
-        label: "Views"
+      last_name: %{
+        module: Backpex.Fields.Text,
+        label: "Last name"
+      },
+      email: %{
+        module: Backpex.Fields.Text,
+        label: "Email"
       }
     ]
   end

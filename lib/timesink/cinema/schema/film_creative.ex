@@ -1,10 +1,11 @@
-defmodule Timesink.FilmCreative do
+defmodule Timesink.Cinema.FilmCreative do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
 
   @type role :: :director | :producer | :writer | :cast | :crew
   @roles [:director, :producer, :writer, :cast, :crew]
+  @spec roles() :: [:cast | :crew | :director | :producer | :writer, ...]
   def roles, do: @roles
 
   @type t :: %{
@@ -17,7 +18,7 @@ defmodule Timesink.FilmCreative do
   @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "film_creative" do
-    belongs_to :film, Timesink.Film
+    belongs_to :film, Timesink.Cinema.Film
     belongs_to :creative, Timesink.Creative
 
     field :role, Ecto.Enum, values: @roles

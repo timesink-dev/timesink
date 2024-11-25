@@ -1,4 +1,4 @@
-defmodule Timesink.Showcase do
+defmodule Timesink.Cinema.Showcase do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
@@ -29,6 +29,10 @@ defmodule Timesink.Showcase do
     has_many :films, through: [:exhibitions, :film]
 
     timestamps(type: :utc_datetime)
+  end
+
+  def changeset(struct, params, _metadata) do
+    changeset(struct, params)
   end
 
   @spec changeset(showcase :: t(), params :: %{optional(atom()) => term()}) ::

@@ -32,9 +32,13 @@ defmodule TimesinkWeb.Router do
     backpex_routes()
 
     live_session :default, on_mount: Backpex.InitAssigns do
-      live_resources "/waitlist", Admin.ApplicantLive
+      live_resources "/waitlist", Admin.WaitlistLive
       live_resources "/films", Admin.FilmLive
       live_resources "/showcases", Admin.ShowcaseLive
+      live_resources "/exhibitions", Admin.ExhibitionLive
+      live_resources "/theaters", Admin.TheaterLive
+      live_resources "/genres", Admin.GenresLive
+      live_resources "/members", Admin.UserLive
     end
   end
 
