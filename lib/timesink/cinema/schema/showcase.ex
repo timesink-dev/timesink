@@ -25,7 +25,7 @@ defmodule Timesink.Cinema.Showcase do
     field :end_at, :naive_datetime
     field :status, Ecto.Enum, values: @statuses, default: :upcoming
 
-    has_many :exhibitions, TimeSink.Exhibition
+    has_many :exhibitions, Timesink.Cinema.Exhibition
     has_many :films, through: [:exhibitions, :film]
 
     timestamps(type: :utc_datetime)
@@ -40,7 +40,7 @@ defmodule Timesink.Cinema.Showcase do
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
     |> cast(params, [:title, :description, :start_at, :end_at, :status])
-    |> validate_required([:title, :status])
+    # |> validate_required([:title, :status])
     |> validate_length(:title, min: 1)
     |> validate_length(:description, min: 1)
     |> validate_inclusion(:status, @statuses)

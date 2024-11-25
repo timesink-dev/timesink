@@ -10,6 +10,7 @@ defmodule Timesink.Repo.Migrations.CreateTableFilmEnums do
         'monochrome',
         'partially_colorized',
         'color'
+        'technicolor'
       )
     """
 
@@ -18,6 +19,7 @@ defmodule Timesink.Repo.Migrations.CreateTableFilmEnums do
       CREATE TYPE film_format AS ENUM (
         '8mm',
         '16mm',
+        'Super 16mm',
         '35mm',
         '65mm',
         '70mm',

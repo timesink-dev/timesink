@@ -10,7 +10,7 @@ defmodule Timesink.Cinema.FilmCreative do
 
   @type t :: %{
           __struct__: __MODULE__,
-          film: Timesink.Film.t(),
+          film: Timesink.Cinema.Film.t(),
           creative: Timesink.Creative.t(),
           role: role()
         }
