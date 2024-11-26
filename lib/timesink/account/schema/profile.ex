@@ -2,7 +2,7 @@ defmodule Timesink.Account.Profile do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
-  alias Timesink.Accounts
+  alias Timesink.Account
 
   @type t :: %{
           __struct__: __MODULE__,
@@ -10,7 +10,7 @@ defmodule Timesink.Account.Profile do
           user: Accounts.User.t(),
           avatar_url: String.t(),
           birthdate: Date.t(),
-          location: Accounts.Location.t(),
+          location: Account.Location.t(),
           org_name: String.t(),
           org_position: String.t(),
           bio: String.t()
@@ -20,7 +20,7 @@ defmodule Timesink.Account.Profile do
   @foreign_key_type :binary_id
 
   schema "profile" do
-    belongs_to :user, Accounts.User
+    belongs_to :user, Account.User
 
     field :avatar_url, :string
     field :birthdate, :date
@@ -28,7 +28,7 @@ defmodule Timesink.Account.Profile do
     field :org_position, :string
     field :bio, :string
 
-    embeds_one :location, Accounts.Location
+    embeds_one :location, Account.Location
 
     has_one :creative, Timesink.Creative
 
@@ -48,7 +48,7 @@ defmodule Timesink.Account.Profile do
       :bio
     ])
     |> cast_embed(:location)
-    |> cast_assoc(:user, with: &Accounts.User.changeset/2)
+    |> cast_assoc(:user, with: &Account.User.changeset/2)
     |> validate_required([:user_id])
     |> unique_constraint(:user_id)
   end

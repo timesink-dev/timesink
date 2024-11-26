@@ -11,8 +11,7 @@ defmodule TimesinkWeb.Admin.ShowcaseLive do
       name: Timesink.PubSub,
       topic: "showcases",
       event_prefix: "showcase_"
-    ],
-    fluid?: true
+    ]
 
   @impl Backpex.LiveResource
   def singular_name, do: "Showcase"
@@ -28,8 +27,30 @@ defmodule TimesinkWeb.Admin.ShowcaseLive do
         label: "Title"
       },
       description: %{
-        module: Backpex.Fields.Text,
+        module: Backpex.Fields.Textarea,
         label: "Description"
+      },
+      start_at: %{
+        module: Backpex.Fields.DateTime,
+        label: "Start Date and Time"
+      },
+      end_at: %{
+        module: Backpex.Fields.DateTime,
+        label: "End Date and Time"
+      },
+      status: %{
+        module: Backpex.Fields.Select,
+        label: "Status",
+        options:
+          Enum.map(Timesink.Cinema.Showcase.statuses(), fn status ->
+            {String.capitalize(Atom.to_string(status)), status}
+          end)
+      },
+      exhibitions: %{
+        module: Backpex.Fields.HasMany,
+        label: "Exhibitions",
+        display_field: :film_id,
+        live_resource: TimesinkWeb.Admin.ExhibitionLive
       }
     ]
   end

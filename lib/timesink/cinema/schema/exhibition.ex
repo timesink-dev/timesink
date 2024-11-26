@@ -11,6 +11,7 @@ defmodule Timesink.Cinema.Exhibition do
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   schema "exhibition" do
     belongs_to :film, Timesink.Cinema.Film
@@ -20,18 +21,21 @@ defmodule Timesink.Cinema.Exhibition do
     timestamps(type: :utc_datetime)
   end
 
-  def changeset(struct, params, _metadata) do
-    changeset(struct, params)
-  end
-
   @spec changeset(exhibition :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
-    struct
+  def changeset(exhibition, params, _metadata \\ []) do
+    IO.inspect(params)
+
+    exhibition
     |> cast(params, [:film_id, :showcase_id, :theater_id])
-    |> validate_required([:film_id, :showcase_id, :theater_id])
-    |> assoc_constraint(:film)
-    |> assoc_constraint(:showcase)
-    |> assoc_constraint(:theater)
+    |> cast_assoc(:film)
+    |> cast_assoc(:showcase)
+    |> cast_assoc(:theater)
+
+    # |> validate_required([:film_id, :showcase_id, :theater_id])
+
+    # |> assoc_constraint(:film)
+    # |> assoc_constraint(:showcase)
+    # |> assoc_constraint(:theater)
   end
 end
