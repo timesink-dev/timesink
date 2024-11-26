@@ -7,13 +7,13 @@ defmodule Timesink.Creative do
           __struct__: __MODULE__,
           first_name: :string,
           last_name: :string,
-          user: Timesink.Accounts.User.t()
+          user: Timesink.Account.User.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "creative" do
-    belongs_to :profile, Timesink.Accounts.Profile
+    belongs_to :profile, Timesink.Account.Profile
 
     field :first_name, :string
     field :last_name, :string

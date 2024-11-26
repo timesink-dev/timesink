@@ -18,14 +18,10 @@ defmodule Timesink.Cinema.Theater do
     timestamps(type: :utc_datetime)
   end
 
-  def changeset(struct, params, _metadata) do
-    changeset(struct, params)
-  end
-
   @spec changeset(theater :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
-    struct
+  def changeset(theater, params, _metadata \\ []) do
+    theater
     |> cast(params, [:name])
     |> validate_required([:name])
     |> validate_length(:name, min: 1)

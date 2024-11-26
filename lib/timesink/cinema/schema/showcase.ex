@@ -31,16 +31,12 @@ defmodule Timesink.Cinema.Showcase do
     timestamps(type: :utc_datetime)
   end
 
-  def changeset(struct, params, _metadata) do
-    changeset(struct, params)
-  end
-
   @spec changeset(showcase :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
-    struct
+  def changeset(showcase, params, _metadata \\ []) do
+    showcase
     |> cast(params, [:title, :description, :start_at, :end_at, :status])
-    # |> validate_required([:title, :status])
+    |> validate_required([:title, :status])
     |> validate_length(:title, min: 1)
     |> validate_length(:description, min: 1)
     |> validate_inclusion(:status, @statuses)

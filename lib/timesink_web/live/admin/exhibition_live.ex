@@ -22,20 +22,23 @@ defmodule TimesinkWeb.Admin.ExhibitionLive do
   @impl Backpex.LiveResource
   def fields do
     [
-      film_id: %{
-        module: Backpex.Fields.Select,
+      film: %{
+        module: Backpex.Fields.BelongsTo,
         label: "Film",
-        options: fn -> Timesink.Cinema.Film |> Timesink.Cinema.Film.list_films() end
+        live_resource: TimesinkWeb.Admin.FilmLive,
+        display_field: :title
       },
-      showcase_id: %{
-        module: Backpex.Fields.Select,
+      showcase: %{
+        module: Backpex.Fields.BelongsTo,
         label: "Showcase",
-        options: fn -> Timesink.Cinema.Showcase |> Timesink.Cinema.Showcase.list_showcases() end
+        live_resource: TimesinkWeb.Admin.ShowcaseLive,
+        display_field: :title
       },
-      theater_id: %{
-        module: Backpex.Fields.Select,
+      theater: %{
+        module: Backpex.Fields.BelongsTo,
         label: "Theater",
-        options: fn -> Timesink.Cinema.Theater |> Timesink.Cinema.Theater.list_theaters() end
+        live_resource: TimesinkWeb.Admin.TheaterLive,
+        display_field: :name
       }
     ]
   end
