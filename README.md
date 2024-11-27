@@ -3,9 +3,9 @@
 > **️🚧 Work in Progress**: This document is a living, ongoing work in progress! We're constantly improving and updating it to better reflect our evolving understanding of the platform and its features. As we build and refine TimeSink, this documentation will dynamically change, so check back often for the latest updates and improvements. Your contributions and suggestions are always welcome as we shape this exciting project together!
 
 
-## 🚰 What is (a) TimeSink ?
+## 🚰 What is TimeSink ?
 
-A **TimeSink** is more than just a cinema; it’s a place where time is not lost, but held, preserved, and waiting. In the world of film, time has a cyclical nature—each story is a sequence of moments, captured, frozen, and woven into a narrative that defies the usual flow of time. Like drops filling a well, these moments accumulate within each film, creating a timeless reservoir. The TimeSink.
+**TimeSink** is more than just a cinema; it’s a place where time is not lost, but held, preserved, and waiting. In the world of film, time has a cyclical nature—each story is a sequence of moments, captured, frozen, and woven into a narrative that defies the usual flow of time. Like drops filling a well, these moments accumulate within each film, creating a timeless reservoir. The TimeSink.
 
 When a film plays, it allows those moments to live again, inviting the audience to re-experience them as though for the first time. This is the magic of cinema: each viewing is a new encounter, bringing different meanings, emotions, and insights that only reveal themselves as they interact with the soul watching. A TimeSink exists to hold this magic, enabling audiences to step back into a film’s preserved moments, repeatedly discovering something new in the familiar.
 
