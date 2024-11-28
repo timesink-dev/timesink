@@ -1,4 +1,4 @@
-defmodule Timesink.Account do
+defmodule Timesink.Accounts do
   @moduledoc """
   The Accounts context.
   """

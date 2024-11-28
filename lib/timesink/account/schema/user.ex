@@ -2,7 +2,7 @@ defmodule Timesink.Accounts.User do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
-  alias Timesink.Account
+  alias Timesink.Accounts
 
   @roles [:admin, :creator]
 
