@@ -11,7 +11,7 @@ defmodule Timesink.Cinema.FilmCreative do
   @type t :: %{
           __struct__: __MODULE__,
           film: Timesink.Cinema.Film.t(),
-          creative: Timesink.Creative.t(),
+          creative: Timesink.Cinema.Creative.t(),
           role: role()
         }
 
@@ -20,7 +20,7 @@ defmodule Timesink.Cinema.FilmCreative do
 
   schema "film_creative" do
     belongs_to :film, Timesink.Cinema.Film
-    belongs_to :creative, Timesink.Creative
+    belongs_to :creative, Timesink.Cinema.Creative
 
     field :role, Ecto.Enum, values: @roles
     field :subrole, :string

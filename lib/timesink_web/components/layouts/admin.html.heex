@@ -1,9 +1,8 @@
 <Backpex.HTML.Layout.app_shell fluid={@fluid?}>
   <:topbar>
-    <Backpex.HTML.Layout.topbar_branding title='' class="font-brand">
+    <Backpex.HTML.Layout.topbar_branding title="" class="font-brand">
       <:logo>BaCKroom OffiCe & prOGraMMinG</:logo>
     </Backpex.HTML.Layout.topbar_branding>
-
     <Backpex.HTML.Layout.topbar_dropdown>
       <:label>
         <label tabindex="0" class="btn btn-square btn-ghost">
@@ -46,16 +45,18 @@
     <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate="/admin/members">
       <Backpex.HTML.CoreComponents.icon name="hero-user" class="h-5 w-5" /> Members
     </Backpex.HTML.Layout.sidebar_item>
-        <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate="/admin/creatives">
+    <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate="/admin/creatives">
       <Backpex.HTML.CoreComponents.icon name="hero-user" class="h-5 w-5" /> Creatives
     </Backpex.HTML.Layout.sidebar_item>
-            <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate="/admin/film_creatives">
+    <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate="/admin/film_creatives">
       <Backpex.HTML.CoreComponents.icon name="hero-user" class="h-5 w-5" /> Film Creatives
     </Backpex.HTML.Layout.sidebar_item>
   </:sidebar>
   <Backpex.HTML.Layout.flash_messages flash={@flash} />
   <%= @inner_content %>
   <:footer>
-    <div class="flex flex-col items-center font-brand mb-8">TimeSink PreseNts © <%= DateTime.utc_now.year %></div>
+    <div class="flex flex-col items-center font-brand mb-8">
+      TimeSink PreseNts © <%= DateTime.utc_now().year %>
+    </div>
   </:footer>
 </Backpex.HTML.Layout.app_shell>

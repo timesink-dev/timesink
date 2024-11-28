@@ -67,13 +67,4 @@ defmodule Timesink.Cinema do
       {:ok, exhibition}
     end
   end
-
-  def list_exhibitions_with_film_titles do
-    Repo.all(
-      from e in Exhibition,
-        preload: [:film]
-    )
-    # EXTRACT FROM LIST
-    |> Enum.map(fn e -> e.film.title end)
-  end
 end

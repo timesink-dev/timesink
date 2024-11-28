@@ -3,8 +3,8 @@ defmodule TimesinkWeb.Admin.CreativeLive do
     adapter_config: [
       schema: Timesink.Creative,
       repo: Timesink.Repo,
-      update_changeset: &Timesink.Creative.changeset/3,
-      create_changeset: &Timesink.Creative.changeset/3
+      update_changeset: &Timesink.Cinema.Creative.changeset/3,
+      create_changeset: &Timesink.Cinema.Creative.changeset/3
     ],
     layout: {TimesinkWeb.Layouts, :admin},
     pubsub: [
