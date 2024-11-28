@@ -29,20 +29,6 @@ defmodule TimesinkWeb.Admin.FilmLive do
         module: Backpex.Fields.Text,
         label: "Title"
       },
-      # directors: %{
-      #   module: Backpex.Fields.HasMany,
-      #   label: "Director",
-      #   display_field: :role,
-      #   searchable: false,
-      #   live_resource: TimesinkWeb.Admin.UserLive
-      # },
-      # film_creative: %{
-      #   module: Backpex.Fields.HasMany,
-      #   label: "Film Creative",
-      #   display_field: :role,
-      #   searchable: false,
-      #   live_resource: TimesinkWeb.Admin.FilmCreativeLive
-      # },
       year: %{
         module: Backpex.Fields.Number,
         label: "Year"

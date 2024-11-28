@@ -45,26 +45,6 @@ defmodule TimesinkWeb.Admin.ShowcaseLive do
           Enum.map(Timesink.Cinema.Showcase.statuses(), fn status ->
             {String.capitalize(Atom.to_string(status)), status}
           end)
-      },
-      # list all existign theaters (no rel to showcase), and then render each exhibition associated with that theater and this showcase
-      # theaters: %{
-      #   module: Backpex.Fields.InlineCRUD,
-      #   label: "Theaters",
-      #   live_resource: TimesinkWeb.Admin.TheaterLive
-      # },
-      exhibitions: %{
-        module: Backpex.Fields.HasMany,
-        label: "Exhibitions",
-        # get the film title from the exhibition
-        display_field: :film_title,
-        live_resource: TimesinkWeb.Admin.ExhibitionLive,
-        options_query: fn query, _field ->
-          from e in query,
-            # Join the film association
-            join: f in assoc(e, :film),
-            # Include the film title as a virtual field
-            select: %{e | film_title: f.title}
-        end
       }
     ]
   end

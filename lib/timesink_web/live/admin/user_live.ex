@@ -20,6 +20,12 @@ defmodule TimesinkWeb.Admin.UserLive do
   def plural_name, do: "Members"
 
   @impl Backpex.LiveResource
+  def can?(_assigns, :index, _item), do: true
+
+  @impl Backpex.LiveResource
+  def can?(_assigns, _action, _item), do: false
+
+  @impl Backpex.LiveResource
   def fields do
     [
       email: %{
