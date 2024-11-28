@@ -2,7 +2,7 @@ defmodule Timesink.Accounts.Profile do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
-  alias Timesink.Account
+  alias Timesink.Accounts
 
   @type t :: %{
           __struct__: __MODULE__,
