@@ -11,7 +11,7 @@ defmodule Timesink.Factory do
   end
 
   def user_factory do
-    %Timesink.Account.User{
+    %Timesink.Accounts.User{
       email: Faker.Internet.email(),
       password_hash: Ecto.UUID.generate(),
       username: Faker.Internet.user_name(),
@@ -22,16 +22,16 @@ defmodule Timesink.Factory do
   end
 
   def location_factory do
-    %Timesink.Account.Location{
+    %Timesink.Accounts.Location{
       locality: Faker.Address.city(),
-      country: Enum.random(Timesink.Account.Location.iso3166_countries()),
+      country: Enum.random(Timesink.Accounts.Location.iso3166_countries()),
       lat: Faker.Address.latitude(),
       lng: Faker.Address.longitude()
     }
   end
 
   def profile_factory do
-    %Timesink.Account.Profile{
+    %Timesink.Accounts.Profile{
       bio: Faker.Lorem.sentence(),
       avatar_url: Faker.Internet.url(),
       location: build(:location),

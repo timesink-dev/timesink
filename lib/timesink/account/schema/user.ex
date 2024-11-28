@@ -1,4 +1,4 @@
-defmodule Timesink.Account.User do
+defmodule Timesink.Accounts.User do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
@@ -15,7 +15,7 @@ defmodule Timesink.Account.User do
           first_name: String.t(),
           last_name: String.t(),
           roles: list(String.t()),
-          profile: Account.Profile.t()
+          profile: Accounts.Profile.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -30,7 +30,7 @@ defmodule Timesink.Account.User do
 
     field :roles, {:array, Ecto.Enum}, values: @roles, default: [], redact: true
 
-    has_one :profile, Account.Profile
+    has_one :profile, Accounts.Profile
 
     timestamps(type: :utc_datetime)
   end
@@ -52,7 +52,7 @@ defmodule Timesink.Account.User do
       :last_name,
       :roles
     ])
-    |> cast_assoc(:profile, required: true, with: &Account.Profile.changeset/2)
+    |> cast_assoc(:profile, required: true, with: &Accounts.Profile.changeset/2)
     |> validate_required([:username, :email, :password_hash, :first_name, :last_name])
     |> validate_format(:email, ~r/@/)
     |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{2,32}$/)
