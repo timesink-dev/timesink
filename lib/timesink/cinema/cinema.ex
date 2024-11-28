@@ -1,7 +1,5 @@
 defmodule Timesink.Cinema do
-  import Ecto.Query
   alias Timesink.Cinema.{Film, Showcase, Theater, Exhibition}
-  alias Timesink.Repo
 
   @moduledoc """
   The Cinema context.
