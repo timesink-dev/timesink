@@ -12,7 +12,7 @@ defmodule Timesink.Cinema.Theater do
 
   schema "theater" do
     field :name, :string
-
+    field :description, :string
     has_one :exhibition, TimeSink.Cinema.Exhibition
 
     timestamps(type: :utc_datetime)
@@ -22,7 +22,7 @@ defmodule Timesink.Cinema.Theater do
           Ecto.Changeset.t()
   def changeset(theater, params, _metadata \\ []) do
     theater
-    |> cast(params, [:name])
+    |> cast(params, [:name, :description])
     |> validate_required([:name])
     |> validate_length(:name, min: 1)
   end

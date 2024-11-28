@@ -11,6 +11,7 @@ defmodule Timesink.Repo.Migrations.CreateTableFilmCreative do
       add :creative_id, references(:creative, type: :uuid), null: false
 
       add :role, :string, null: false
+      add :subrole, :string
     end
 
     create unique_index(:film_creative, [:film_id, :creative_id, :role])

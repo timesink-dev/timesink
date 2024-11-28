@@ -29,6 +29,26 @@ defmodule TimesinkWeb.Admin.UserLive do
       password: %{
         module: Backpex.Fields.Text,
         label: "Password"
+      },
+      username: %{
+        module: Backpex.Fields.Text,
+        label: "Username"
+      },
+      first_name: %{
+        module: Backpex.Fields.Text,
+        label: "First Name"
+      },
+      last_name: %{
+        module: Backpex.Fields.Text,
+        label: "Last Name"
+      },
+      roles: %{
+        module: Backpex.Fields.Select,
+        label: "Roles",
+        options: [
+          {"Admin", :admin},
+          {"Creator", :creator}
+        ]
       }
     ]
   end

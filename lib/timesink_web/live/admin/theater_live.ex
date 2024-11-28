@@ -25,6 +25,10 @@ defmodule TimesinkWeb.Admin.TheaterLive do
       name: %{
         module: Backpex.Fields.Text,
         label: "Name"
+      },
+      description: %{
+        module: Backpex.Fields.Text,
+        label: "Description"
       }
     ]
   end

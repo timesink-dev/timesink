@@ -1,5 +1,7 @@
 defmodule Timesink.Cinema do
+  import Ecto.Query
   alias Timesink.Cinema.{Film, Showcase, Theater, Exhibition}
+  alias Timesink.Repo
 
   @moduledoc """
   The Cinema context.
@@ -64,5 +66,14 @@ defmodule Timesink.Cinema do
            Exhibition.create(params) do
       {:ok, exhibition}
     end
+  end
+
+  def list_exhibitions_with_film_titles do
+    Repo.all(
+      from e in Exhibition,
+        preload: [:film]
+    )
+    # EXTRACT FROM LIST
+    |> Enum.map(fn e -> e.film.title end)
   end
 end

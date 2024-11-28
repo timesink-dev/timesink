@@ -4,8 +4,7 @@ defmodule TimesinkWeb.Admin.WaitlistLive do
       schema: Timesink.Waitlist.Applicant,
       repo: Timesink.Repo,
       update_changeset: &Timesink.Waitlist.Applicant.changeset/3,
-      create_changeset: &Timesink.Waitlist.Applicant.changeset/3,
-      item_query: &__MODULE__.item_query/3
+      create_changeset: &Timesink.Waitlist.Applicant.changeset/3
     ],
     layout: {TimesinkWeb.Layouts, :admin},
     pubsub: [
@@ -19,6 +18,12 @@ defmodule TimesinkWeb.Admin.WaitlistLive do
 
   @impl Backpex.LiveResource
   def plural_name, do: "Applicants"
+
+  @impl Backpex.LiveResource
+  def can?(_assigns, :index, _item), do: true
+
+  @impl Backpex.LiveResource
+  def can?(_assigns, _action, _item), do: false
 
   @impl Backpex.LiveResource
   def fields do

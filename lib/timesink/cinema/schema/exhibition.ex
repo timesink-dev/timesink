@@ -17,25 +17,18 @@ defmodule Timesink.Cinema.Exhibition do
     belongs_to :film, Timesink.Cinema.Film
     belongs_to :showcase, Timesink.Cinema.Showcase
     belongs_to :theater, Timesink.Cinema.Theater
-
+    field :film_title, :string, virtual: true
     timestamps(type: :utc_datetime)
   end
 
   @spec changeset(exhibition :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
   def changeset(exhibition, params, _metadata \\ []) do
-    IO.inspect(params)
-
     exhibition
     |> cast(params, [:film_id, :showcase_id, :theater_id])
-    |> cast_assoc(:film)
-    |> cast_assoc(:showcase)
-    |> cast_assoc(:theater)
-
-    # |> validate_required([:film_id, :showcase_id, :theater_id])
-
-    # |> assoc_constraint(:film)
-    # |> assoc_constraint(:showcase)
-    # |> assoc_constraint(:theater)
+    |> validate_required([:film_id, :showcase_id, :theater_id])
+    |> assoc_constraint(:film)
+    |> assoc_constraint(:showcase)
+    |> assoc_constraint(:theater)
   end
 end
