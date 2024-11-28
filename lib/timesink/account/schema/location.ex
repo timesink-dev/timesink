@@ -1,4 +1,4 @@
-defmodule Timesink.Account.Location do
+defmodule Timesink.Accounts.Location do
   use Ecto.Schema
   import Ecto.Changeset
 

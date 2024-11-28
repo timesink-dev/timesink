@@ -7,14 +7,14 @@ defmodule Timesink.Creative do
           __struct__: __MODULE__,
           first_name: :string,
           last_name: :string,
-          user: Timesink.Account.User.t()
+          user: Timesink.Accounts.User.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
   schema "creative" do
-    belongs_to :profile, Timesink.Account.Profile
+    belongs_to :profile, Timesink.Accounts.Profile
 
     field :first_name, :string
     field :last_name, :string
@@ -28,7 +28,7 @@ defmodule Timesink.Creative do
     creative
     |> cast(params, [:first_name, :last_name])
     |> validate_required([:first_name, :last_name])
-    # |> cast_assoc(:user, with: &Timesink.Account.User.changeset/2)
+    # |> cast_assoc(:user, with: &Timesink.Accounts.User.changeset/2)
     |> validate_length(:first_name, min: 2)
     |> validate_length(:last_name, min: 2)
   end

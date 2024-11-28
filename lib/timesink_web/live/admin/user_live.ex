@@ -1,10 +1,10 @@
 defmodule TimesinkWeb.Admin.UserLive do
   use Backpex.LiveResource,
     adapter_config: [
-      schema: Timesink.Account.User,
+      schema: Timesink.Accounts.User,
       repo: Timesink.Repo,
-      update_changeset: &Timesink.Account.User.changeset/3,
-      create_changeset: &Timesink.Account.User.changeset/3
+      update_changeset: &Timesink.Accounts.User.changeset/3,
+      create_changeset: &Timesink.Accounts.User.changeset/3
     ],
     layout: {TimesinkWeb.Layouts, :admin},
     pubsub: [
