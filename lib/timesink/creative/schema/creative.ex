@@ -11,6 +11,7 @@ defmodule Timesink.Creative do
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   schema "creative" do
     belongs_to :profile, Timesink.Account.Profile
@@ -23,11 +24,11 @@ defmodule Timesink.Creative do
 
   @spec changeset(creative :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
-    struct
+  def changeset(creative, params, _metadata \\ []) do
+    creative
     |> cast(params, [:first_name, :last_name])
     |> validate_required([:first_name, :last_name])
-    |> cast_assoc(:user, with: &Timesink.Accounts.User.changeset/2)
+    # |> cast_assoc(:user, with: &Timesink.Account.User.changeset/2)
     |> validate_length(:first_name, min: 2)
     |> validate_length(:last_name, min: 2)
   end

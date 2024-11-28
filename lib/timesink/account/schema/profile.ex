@@ -7,7 +7,7 @@ defmodule Timesink.Account.Profile do
   @type t :: %{
           __struct__: __MODULE__,
           user_id: Ecto.UUID.t(),
-          user: Accounts.User.t(),
+          user: Account.User.t(),
           avatar_url: String.t(),
           birthdate: Date.t(),
           location: Account.Location.t(),

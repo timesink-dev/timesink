@@ -16,6 +16,7 @@ defmodule Timesink.Cinema.FilmCreative do
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   schema "film_creative" do
     belongs_to :film, Timesink.Cinema.Film
@@ -29,7 +30,7 @@ defmodule Timesink.Cinema.FilmCreative do
 
   @spec changeset(creative :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
+  def changeset(struct, params, _metadata \\ []) do
     struct
     |> cast(params, [:film_id, :creative_id, :role])
     |> validate_required([:film_id, :creative_id, :role])

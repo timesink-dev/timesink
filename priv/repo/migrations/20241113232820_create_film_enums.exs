@@ -9,7 +9,7 @@ defmodule Timesink.Repo.Migrations.CreateTableFilmEnums do
         'sepia',
         'monochrome',
         'partially_colorized',
-        'color'
+        'color',
         'technicolor'
       )
     """
