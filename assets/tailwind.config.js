@@ -122,6 +122,6 @@ module.exports = {
    *  @see https://github.com/naymspace/backpex/blob/develop/guides/get_started/installation.md#set-daisyui-theme
    **/
   daisyui: {
-    themes: ["sunset"],
+    themes: ["dark", "luxury", "sunset"],
   },
 };
