@@ -20,7 +20,7 @@ defmodule TimesinkWeb.Admin.FilmLive do
   def plural_name, do: "Films"
 
   def panels do
-    [creators: "Creators", specs: "Specifications"]
+    [creators: "Creators", specs: "Specs"]
   end
 
   @impl Backpex.LiveResource
@@ -37,7 +37,7 @@ defmodule TimesinkWeb.Admin.FilmLive do
       directors: %{
         module: Backpex.Fields.HasMany,
         panel: :creators,
-        label: "Directors",
+        label: "Directed by",
         display_field: :role,
         searchable: false,
         live_resource: TimesinkWeb.Admin.FilmCreativeLive
