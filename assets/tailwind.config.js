@@ -41,12 +41,15 @@ module.exports = {
     },
   },
   plugins: [
-    require("@tailwindcss/forms"),
+    /** remove tailwindcss/forms for now to prevent collisions with admin panel DaisyUI
+    @see  https://github.com/naymspace/backpex/blob/develop/guides/get_started/installation.md#remove-tailwindcssforms-plugin **/
+    // require("@tailwindcss/forms"),
     // Allows prefixing tailwind classes with LiveView classes to add rules
     // only when LiveView classes are applied, for example:
     //
     //     <div class="phx-click-loading:animate-ping">
     //
+
     require("daisyui"),
     plugin(({ addVariant }) =>
       addVariant("phx-click-loading", [
@@ -115,4 +118,10 @@ module.exports = {
       );
     }),
   ],
+  /** sets theme inside admin panel: for other daisyui themes -
+   *  @see https://github.com/naymspace/backpex/blob/develop/guides/get_started/installation.md#set-daisyui-theme
+   **/
+  daisyui: {
+    themes: ["sunset"],
+  },
 };

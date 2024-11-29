@@ -17,7 +17,6 @@ defmodule Timesink.Cinema.Exhibition do
     belongs_to :film, Timesink.Cinema.Film
     belongs_to :showcase, Timesink.Cinema.Showcase
     belongs_to :theater, Timesink.Cinema.Theater
-    field :film_title, :string, virtual: true
     timestamps(type: :utc_datetime)
   end
 
