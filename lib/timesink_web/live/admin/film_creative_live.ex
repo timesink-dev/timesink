@@ -22,19 +22,12 @@ defmodule TimesinkWeb.Admin.FilmCreativeLive do
   @impl Backpex.LiveResource
   def fields do
     [
-      film: %{
-        module: Backpex.Fields.BelongsTo,
-        label: "Film",
-        display_field: :title,
-        searchable: false,
-        live_resource: TimesinkWeb.Admin.FilmLive
-      },
       creative: %{
         module: Backpex.Fields.BelongsTo,
         label: "Creative",
         display_field: :last_name,
         searchable: false,
-        live_resource: TimesinkWeb.Admin.UserLive
+        live_resource: TimesinkWeb.Admin.CreativeLive
       },
       role: %{
         module: Backpex.Fields.Text,

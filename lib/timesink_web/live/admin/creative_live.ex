@@ -1,10 +1,11 @@
 defmodule TimesinkWeb.Admin.CreativeLive do
   use Backpex.LiveResource,
     adapter_config: [
-      schema: Timesink.Creative,
+      schema: Timesink.Cinema.Creative,
       repo: Timesink.Repo,
       update_changeset: &Timesink.Cinema.Creative.changeset/3,
-      create_changeset: &Timesink.Cinema.Creative.changeset/3
+      create_changeset: &Timesink.Cinema.Creative.changeset/3,
+      item_query: &__MODULE__.item_query/3
     ],
     layout: {TimesinkWeb.Layouts, :admin},
     pubsub: [
@@ -33,8 +34,21 @@ defmodule TimesinkWeb.Admin.CreativeLive do
       profile: %{
         module: Backpex.Fields.BelongsTo,
         label: "Profile",
-        display_field: :username
+        display_field: :first_name,
+        live_resource: TimesinkWeb.Admin.ProfileLive
       }
     ]
+  end
+
+  def item_query(query, :show, _assigns) do
+    # get the user :first_name + :last_name from the profile
+    doo =
+      query
+      |> join(:inner, [c], p in assoc(c, :profile))
+      |> select([c, p], %{c | first_name: p.first_name, last_name: p.last_name})
+
+    IO.puts(doo)
+
+    query
   end
 end

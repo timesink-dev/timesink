@@ -26,7 +26,7 @@ defmodule Timesink.Cinema.Creative do
           Ecto.Changeset.t()
   def changeset(creative, params, _metadata \\ []) do
     creative
-    |> cast(params, [:first_name, :last_name])
+    |> cast(params, [:first_name, :last_name, :profile_id])
     |> validate_required([:first_name, :last_name])
     |> validate_length(:first_name, min: 2)
     |> validate_length(:last_name, min: 2)

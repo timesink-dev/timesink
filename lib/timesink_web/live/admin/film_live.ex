@@ -5,9 +5,6 @@ defmodule TimesinkWeb.Admin.FilmLive do
       repo: Timesink.Repo,
       update_changeset: &Timesink.Cinema.Film.changeset/3,
       create_changeset: &Timesink.Cinema.Film.changeset/3
-      # update_changeset: &MyApp.Waitlist.Applicant.update_changeset/3,
-      # create_changeset: &Timesink.Waitlist.Applicant.create_changeset/3,
-      # item_query: &__MODULE__.item_query/3
     ],
     layout: {TimesinkWeb.Layouts, :admin},
     pubsub: [
@@ -22,6 +19,10 @@ defmodule TimesinkWeb.Admin.FilmLive do
   @impl Backpex.LiveResource
   def plural_name, do: "Films"
 
+  def panels do
+    [creators: "Creators", specs: "Specifications"]
+  end
+
   @impl Backpex.LiveResource
   def fields do
     [
@@ -33,13 +34,58 @@ defmodule TimesinkWeb.Admin.FilmLive do
         module: Backpex.Fields.Number,
         label: "Year"
       },
+      directors: %{
+        module: Backpex.Fields.HasMany,
+        panel: :creators,
+        label: "Directors",
+        display_field: :role,
+        searchable: false,
+        live_resource: TimesinkWeb.Admin.FilmCreativeLive
+      },
+      producers: %{
+        module: Backpex.Fields.HasMany,
+        panel: :creators,
+        label: "Producers",
+        display_field: :role,
+        except: [:index],
+        searchable: false,
+        live_resource: TimesinkWeb.Admin.FilmCreativeLive
+      },
+      writers: %{
+        module: Backpex.Fields.HasMany,
+        panel: :creators,
+        label: "Writers",
+        display_field: :role,
+        except: [:index],
+        searchable: false,
+        live_resource: TimesinkWeb.Admin.FilmCreativeLive
+      },
+      cast: %{
+        module: Backpex.Fields.HasMany,
+        panel: :creators,
+        label: "Cast",
+        display_field: :role,
+        except: [:index],
+        searchable: false,
+        live_resource: TimesinkWeb.Admin.FilmCreativeLive
+      },
+      crew: %{
+        module: Backpex.Fields.HasMany,
+        panel: :creators,
+        label: "Crew",
+        display_field: :role,
+        except: [:index],
+        searchable: false,
+        live_resource: TimesinkWeb.Admin.FilmCreativeLive
+      },
       synopsis: %{
         module: Backpex.Fields.Textarea,
         label: "Synopsis"
       },
       duration: %{
         module: Backpex.Fields.Number,
-        label: "Duration (min)"
+        label: "Duration (min)",
+        panel: :specs
       },
       genres: %{
         module: Backpex.Fields.HasMany,
@@ -50,6 +96,7 @@ defmodule TimesinkWeb.Admin.FilmLive do
       },
       format: %{
         module: Backpex.Fields.Select,
+        panel: :specs,
         label: "Format",
         options: [
           {"Digital", :digital},
@@ -63,6 +110,7 @@ defmodule TimesinkWeb.Admin.FilmLive do
       },
       color: %{
         module: Backpex.Fields.Select,
+        panel: :specs,
         label: "Color",
         options: [
           {"Color", :color},
@@ -75,6 +123,7 @@ defmodule TimesinkWeb.Admin.FilmLive do
       },
       aspect_ratio: %{
         module: Backpex.Fields.Text,
+        panel: :specs,
         label: "Aspect Ratio"
       }
     ]

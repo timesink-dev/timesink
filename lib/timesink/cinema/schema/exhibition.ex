@@ -17,7 +17,7 @@ defmodule Timesink.Cinema.Exhibition do
     belongs_to :film, Timesink.Cinema.Film
     belongs_to :showcase, Timesink.Cinema.Showcase
     belongs_to :theater, Timesink.Cinema.Theater
-    field :film_title, :string, virtual: true
+
     timestamps(type: :utc_datetime)
   end
 
@@ -27,8 +27,9 @@ defmodule Timesink.Cinema.Exhibition do
     exhibition
     |> cast(params, [:film_id, :showcase_id, :theater_id])
     |> validate_required([:film_id, :showcase_id, :theater_id])
-    |> assoc_constraint(:film)
-    |> assoc_constraint(:showcase)
-    |> assoc_constraint(:theater)
+
+    # |> assoc_constraint(:film)
+    # |> assoc_constraint(:showcase)
+    # |> assoc_constraint(:theater)
   end
 end

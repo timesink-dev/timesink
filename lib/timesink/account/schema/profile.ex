@@ -37,7 +37,7 @@ defmodule Timesink.Accounts.Profile do
 
   @spec changeset(profile :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
+  def changeset(%{__struct__: __MODULE__} = struct, %{} = params, _metadata \\ []) do
     struct
     |> cast(params, [
       :user_id,
