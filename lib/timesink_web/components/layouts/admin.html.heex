@@ -3,7 +3,7 @@
     <Backpex.HTML.Layout.topbar_branding title="" class="font-brand">
       <:logo>BaCKroom OffiCe & prOGraMMinG</:logo>
     </Backpex.HTML.Layout.topbar_branding>
-        <Backpex.HTML.Layout.theme_selector
+    <Backpex.HTML.Layout.theme_selector
       socket={@socket}
       themes={[
         {"Dark", "dark"},
@@ -46,7 +46,10 @@
       <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate="/admin/creatives">
         <Backpex.HTML.CoreComponents.icon name="hero-user" class="h-5 w-5" /> Creatives
       </Backpex.HTML.Layout.sidebar_item>
-            <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate="/admin/film_creatives">
+      <Backpex.HTML.Layout.sidebar_item
+        current_url={@current_url}
+        navigate="/admin/film_creatives"
+      >
         <Backpex.HTML.CoreComponents.icon name="hero-user" class="h-5 w-5" /> Film Creatives
       </Backpex.HTML.Layout.sidebar_item>
     </Backpex.HTML.Layout.sidebar_section>
