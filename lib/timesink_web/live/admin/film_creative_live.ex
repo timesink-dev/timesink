@@ -39,6 +39,26 @@ defmodule TimesinkWeb.Admin.FilmCreativeLive do
       role: %{
         module: Backpex.Fields.Text,
         label: "Role"
+      },
+      subrole: %{
+        module: Backpex.Fields.Text,
+        label: "Sub Role",
+        visible: fn
+          %{live_action: :new} = assigns ->
+            role = Map.get(assigns.changeset.changes, :role)
+            role in [:cast, :crew]
+
+          %{live_action: :edit} = assigns ->
+            current_role = Map.get(assigns.form.data, :role)
+            is_current_cast_or_crew = current_role in [:cast, :crew]
+
+            changed_role = Map.get(assigns.changeset.changes, :role)
+
+            is_current_cast_or_crew || changed_role in [:cast, :crew]
+
+          _assigns ->
+            true
+        end
       }
     ]
   end

@@ -1,7 +1,7 @@
 defmodule TimesinkWeb.Admin.CreativeLive do
   use Backpex.LiveResource,
     adapter_config: [
-      schema: Timesink.Creative,
+      schema: Timesink.Cinema.Creative,
       repo: Timesink.Repo,
       update_changeset: &Timesink.Cinema.Creative.changeset/3,
       create_changeset: &Timesink.Cinema.Creative.changeset/3

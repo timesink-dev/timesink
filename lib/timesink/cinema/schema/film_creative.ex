@@ -12,7 +12,8 @@ defmodule Timesink.Cinema.FilmCreative do
           __struct__: __MODULE__,
           film: Timesink.Cinema.Film.t(),
           creative: Timesink.Cinema.Creative.t(),
-          role: role()
+          role: role(),
+          subrole: String.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -32,7 +33,7 @@ defmodule Timesink.Cinema.FilmCreative do
           Ecto.Changeset.t()
   def changeset(struct, params, _metadata \\ []) do
     struct
-    |> cast(params, [:film_id, :creative_id, :role])
+    |> cast(params, [:film_id, :creative_id, :role, :subrole])
     |> validate_required([:film_id, :creative_id, :role])
     |> assoc_constraint(:film)
     |> assoc_constraint(:creative)
