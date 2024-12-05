@@ -1,0 +1,13 @@
+# dependabot.yml
+# https://github.com/dependabot
+
+# See: https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# See: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#configuration-options-for-the-dependabotyml-file
+version: 2
+updates:
+  - package-ecosystem: "mix"
+    commit-message:
+      prefix: build
+    directory: "/"
+    schedule:
+      interval: "weekly"
