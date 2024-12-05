@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
     <.live_title suffix=" · TimeSink Presents">
-      {assigns[:page_title] || "TimeSink Presents"}
+      <%= assigns[:page_title] || "TimeSink Presents" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/fonts/ano/ano.css"} />
     <link
@@ -18,7 +18,7 @@
     </script>
   </head>
   <body class="bg-backroom-black text-mystery-white antialiased font-gangster">
-    {@inner_content}
+    <%= @inner_content %>
     <!-- not used for now -->
     <%!-- <div class="flex justify-between items-center mx-8 py-8 mt-8">
     <div class="text-xs">Made with ☕ between 🇫🇷 and 🇺🇸</div>
