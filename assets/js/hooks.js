@@ -55,4 +55,63 @@ Hooks.BackpexThemeSelector = {
   },
 };
 
+Hooks.ScrollHook = {
+  mounted() {
+    const theaterSections = document.querySelectorAll(".film-cover-section");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const theaterId = entry.target.id.split("-")[1];
+            this.pushEventTo(this.el, "scroll_to_theater", { id: theaterId });
+            history.pushState({}, "", `/now-playing?theater=${theaterId}`);
+          }
+        });
+      },
+      { threshold: 0.5 },
+    );
+
+    theaterSections.forEach((section) => observer.observe(section));
+  },
+  updated() {
+    const currentTheaterId = this.el.dataset.currentTheaterId;
+    const targetSection = document.getElementById(
+      `theater-${currentTheaterId}`,
+    );
+
+    if (targetSection) {
+      targetSection.scrollIntoView({ behavior: "smooth" });
+    }
+  },
+};
+
+Hooks.ScrollToChangeURL = {
+  mounted() {
+    console.log("mounted");
+    const heroSection = document.querySelector(".hero-section");
+    const nowPlayingSection = document.querySelector(".now-playing-section");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (entry.target.classList.contains("now-playing-section")) {
+              history.pushState({}, "", "/now-playing");
+              this.pushEvent("update_route", { page: "now-playing" });
+            } else if (entry.target.classList.contains("hero-section")) {
+              history.pushState({}, "", "/");
+              this.pushEvent("update_route", { page: "home" });
+            }
+          }
+        });
+      },
+      { threshold: 0.5 },
+    );
+    console.log("observer", observer);
+    observer.observe(heroSection);
+    observer.observe(nowPlayingSection);
+  },
+};
+
 export default Hooks;
