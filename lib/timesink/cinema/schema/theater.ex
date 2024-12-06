@@ -1,4 +1,4 @@
-defmodule Timesink.Theater do
+defmodule Timesink.Cinema.Theater do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
@@ -12,17 +12,17 @@ defmodule Timesink.Theater do
 
   schema "theater" do
     field :name, :string
-
-    has_one :exhibition, TimeSink.Exhibition
+    field :description, :string
+    has_one :exhibition, TimeSink.Cinema.Exhibition
 
     timestamps(type: :utc_datetime)
   end
 
   @spec changeset(theater :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
-    struct
-    |> cast(params, [:name])
+  def changeset(theater, params, _metadata \\ []) do
+    theater
+    |> cast(params, [:name, :description])
     |> validate_required([:name])
     |> validate_length(:name, min: 1)
   end

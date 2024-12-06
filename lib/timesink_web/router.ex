@@ -1,4 +1,5 @@
 defmodule TimesinkWeb.Router do
+  import Backpex.Router
   use TimesinkWeb, :router
 
   pipeline :browser do
@@ -24,6 +25,24 @@ defmodule TimesinkWeb.Router do
   # scope "/api", TimesinkWeb do
   #   pipe_through :api
   # end
+
+  scope "/admin", TimesinkWeb do
+    pipe_through :browser
+
+    backpex_routes()
+
+    live_session :default, on_mount: Backpex.InitAssigns do
+      live_resources "/showcases", Admin.ShowcaseLive
+      live_resources "/waitlist", Admin.WaitlistLive
+      live_resources "/films", Admin.FilmLive
+      live_resources "/exhibitions", Admin.ExhibitionLive
+      live_resources "/theaters", Admin.TheaterLive
+      live_resources "/genres", Admin.GenreLive
+      live_resources "/members", Admin.UserLive
+      live_resources "/creatives", Admin.CreativeLive
+      live_resources "/film_creatives", Admin.FilmCreativeLive
+    end
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:timesink, :dev_routes) do

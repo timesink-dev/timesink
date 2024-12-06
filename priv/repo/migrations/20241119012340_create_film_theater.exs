@@ -9,6 +9,7 @@ defmodule Timesink.Repo.Migrations.CreateFilmTheater do
 
       add :is_active, :boolean, null: false, default: true
       add :name, :string, null: false
+      add :description, :text
     end
 
     create index(:theater, [:inserted_at])

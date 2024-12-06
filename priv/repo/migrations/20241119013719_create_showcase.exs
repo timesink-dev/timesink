@@ -8,6 +8,7 @@ defmodule Timesink.Repo.Migrations.CreateShowcase do
       timestamps type: :utc_datetime
 
       add :title, :string, null: false
+      add :description, :text
       add :status, :showcase_status, null: false, default: "upcoming"
       add :start_at, :utc_datetime
       add :end_at, :utc_datetime

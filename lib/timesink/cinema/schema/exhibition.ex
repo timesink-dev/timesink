@@ -1,29 +1,29 @@
-defmodule Timesink.Exhibition do
+defmodule Timesink.Cinema.Exhibition do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
 
   @type t :: %{
           __struct__: __MODULE__,
-          film: Timesink.Film.t(),
-          showcase: Timesink.Showcase.t(),
-          theater: Timesink.Theater.t()
+          film: Timesink.Cinema.Film.t(),
+          showcase: Timesink.Cinema.Showcase.t(),
+          theater: Timesink.Cinema.Theater.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   schema "exhibition" do
-    belongs_to :film, Timesink.Film
-    belongs_to :showcase, Timesink.Showcase
-    belongs_to :theater, Timesink.Theater
-
+    belongs_to :film, Timesink.Cinema.Film
+    belongs_to :showcase, Timesink.Cinema.Showcase
+    belongs_to :theater, Timesink.Cinema.Theater
     timestamps(type: :utc_datetime)
   end
 
   @spec changeset(exhibition :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
-    struct
+  def changeset(exhibition, params, _metadata \\ []) do
+    exhibition
     |> cast(params, [:film_id, :showcase_id, :theater_id])
     |> validate_required([:film_id, :showcase_id, :theater_id])
     |> assoc_constraint(:film)

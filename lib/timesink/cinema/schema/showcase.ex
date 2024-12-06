@@ -1,4 +1,4 @@
-defmodule Timesink.Showcase do
+defmodule Timesink.Cinema.Showcase do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
@@ -9,23 +9,23 @@ defmodule Timesink.Showcase do
 
   @type t :: %{
           __struct__: __MODULE__,
-          name: :string,
+          title: :string,
           description: :string,
-          start_date: :naive_datetime,
-          end_date: :naive_datetime,
+          start_at: :naive_datetime,
+          end_at: :naive_datetime,
           status: status()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "showcase" do
-    field :name, :string
+    field :title, :string
     field :description, :string
-    field :start_date, :naive_datetime
-    field :end_date, :naive_datetime
+    field :start_at, :naive_datetime
+    field :end_at, :naive_datetime
     field :status, Ecto.Enum, values: @statuses, default: :upcoming
 
-    has_many :exhibitions, TimeSink.Exhibition
+    has_many :exhibitions, Timesink.Cinema.Exhibition
     has_many :films, through: [:exhibitions, :film]
 
     timestamps(type: :utc_datetime)
@@ -33,11 +33,11 @@ defmodule Timesink.Showcase do
 
   @spec changeset(showcase :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
-    struct
-    |> cast(params, [:name, :description, :start_date, :end_date, :status])
-    |> validate_required([:name, :description, :status])
-    |> validate_length(:name, min: 1)
+  def changeset(showcase, params, _metadata \\ []) do
+    showcase
+    |> cast(params, [:title, :description, :start_at, :end_at, :status])
+    |> validate_required([:title, :status])
+    |> validate_length(:title, min: 1)
     |> validate_length(:description, min: 1)
     |> validate_inclusion(:status, @statuses)
   end

@@ -35,6 +35,10 @@ defmodule Timesink.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
+  def changeset(struct, params, _metadata) do
+    changeset(struct, params)
+  end
+
   @spec changeset(user :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
@@ -51,6 +55,7 @@ defmodule Timesink.Accounts.User do
     |> cast_assoc(:profile, required: true, with: &Accounts.Profile.changeset/2)
     |> validate_required([:username, :email, :password_hash, :first_name, :last_name])
     |> validate_format(:email, ~r/@/)
+    |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{2,32}$/)
     |> validate_length(:first_name, min: 2)
     |> validate_length(:last_name, min: 2)
     |> validate_length(:username, min: 1)

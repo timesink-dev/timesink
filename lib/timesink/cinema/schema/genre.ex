@@ -1,4 +1,4 @@
-defmodule Timesink.Genre do
+defmodule Timesink.Cinema.Genre do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
@@ -11,19 +11,19 @@ defmodule Timesink.Genre do
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
-  schema "film" do
+  schema "genre" do
     field :name, :string
     field :description, :string
 
-    many_to_many :films, Timesink.Film, join_through: "film_genre"
+    many_to_many :film, Timesink.Cinema.Film, join_through: "film_genre"
 
     timestamps(type: :utc_datetime)
   end
 
   @spec changeset(genre :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
-    struct
+  def changeset(genre, params, _metadata \\ []) do
+    genre
     |> cast(params, [:name, :description])
     |> validate_required([:name])
     |> validate_length(:name, min: 1)
