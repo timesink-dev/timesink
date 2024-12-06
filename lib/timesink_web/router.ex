@@ -17,8 +17,10 @@ defmodule TimesinkWeb.Router do
 
   scope "/", TimesinkWeb do
     pipe_through :browser
+    live "/", HomepageLive
+    live "/join", WaitlistLive
 
-    live "/", WaitlistLive
+    live "/me", Accounts.UserLive
   end
 
   # Other scopes may use custom stacks.
