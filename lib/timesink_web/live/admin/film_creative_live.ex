@@ -37,7 +37,14 @@ defmodule TimesinkWeb.Admin.FilmCreativeLive do
         live_resource: TimesinkWeb.Admin.UserLive
       },
       role: %{
-        module: Backpex.Fields.Text,
+        module: Backpex.Fields.Select,
+        options: [
+          {"Director", :director},
+          {"Producer", :producer},
+          {"Writer", :writer},
+          {"Cast", :cast},
+          {"Crew", :crew}
+        ],
         label: "Role"
       },
       subrole: %{

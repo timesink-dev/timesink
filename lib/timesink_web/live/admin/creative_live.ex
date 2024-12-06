@@ -29,11 +29,6 @@ defmodule TimesinkWeb.Admin.CreativeLive do
       last_name: %{
         module: Backpex.Fields.Text,
         label: "Last Name"
-      },
-      profile: %{
-        module: Backpex.Fields.BelongsTo,
-        label: "Profile",
-        display_field: :username
       }
     ]
   end
