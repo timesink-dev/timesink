@@ -64,10 +64,10 @@
     </Backpex.HTML.Layout.sidebar_item>
   </:sidebar>
   <Backpex.HTML.Layout.flash_messages flash={@flash} />
-  <%= @inner_content %>
+  {@inner_content}
   <:footer>
     <div class="flex flex-col items-center font-brand mb-8">
-      TimeSink PreseNts © <%= DateTime.utc_now().year %>
+      TimeSink PreseNts © {DateTime.utc_now().year}
     </div>
   </:footer>
 </Backpex.HTML.Layout.app_shell>
