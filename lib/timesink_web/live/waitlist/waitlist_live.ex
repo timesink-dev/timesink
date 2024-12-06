@@ -7,7 +7,7 @@ defmodule TimesinkWeb.WaitlistLive do
       Process.send_after(self(), :reset_joined, 0)
     end
 
-    {:ok, assign(socket, joined: false)}
+    {:ok, assign(socket, joined: false), layout: {TimesinkWeb.Layouts, :empty}}
   end
 
   def render(assigns) do
