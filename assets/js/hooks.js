@@ -55,15 +55,20 @@ Hooks.BackpexThemeSelector = {
   },
 };
 
-Hooks.ScrollHook = {
+let isNavigating = false;
+
+Hooks.ScrollToTheater = {
   mounted() {
     const theaterSections = document.querySelectorAll(".film-cover-section");
-
     const observer = new IntersectionObserver(
       (entries) => {
+        if (isNavigating) {
+          return;
+        }
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const theaterId = entry.target.id.split("-")[1];
+            console.log({ theaterId });
             this.pushEventTo(this.el, "scroll_to_theater", { id: theaterId });
             history.pushState({}, "", `/now-playing?theater=${theaterId}`);
           }
@@ -71,7 +76,6 @@ Hooks.ScrollHook = {
       },
       { threshold: 0.5 },
     );
-
     theaterSections.forEach((section) => observer.observe(section));
   },
   updated() {
@@ -84,33 +88,27 @@ Hooks.ScrollHook = {
       targetSection.scrollIntoView({ behavior: "smooth" });
     }
   },
+  destroyed() {
+    if (this.observer) {
+      this.observer.disconnect(); // Clean up observer on destruction
+    }
+  },
 };
 
-Hooks.ScrollToChangeURL = {
-  mounted() {
-    console.log("mounted");
-    const heroSection = document.querySelector(".hero-section");
-    const nowPlayingSection = document.querySelector(".now-playing-section");
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (entry.target.classList.contains("now-playing-section")) {
-              history.pushState({}, "", "/now-playing");
-              this.pushEvent("update_route", { page: "now-playing" });
-            } else if (entry.target.classList.contains("hero-section")) {
-              history.pushState({}, "", "/");
-              this.pushEvent("update_route", { page: "home" });
-            }
-          }
-        });
-      },
-      { threshold: 0.5 },
+Hooks.NavigateToTheater = {
+  updated() {
+    isNavigating = true;
+    const currentTheaterId = this.el.dataset.currentTheaterId;
+    const targetSection = document.getElementById(
+      `theater-${currentTheaterId}`,
     );
-    console.log("observer", observer);
-    observer.observe(heroSection);
-    observer.observe(nowPlayingSection);
+
+    if (targetSection) {
+      targetSection.scrollIntoView({ behavior: "smooth" });
+    }
+    setTimeout(() => {
+      isNavigating = false;
+    }, 450);
   },
 };
 

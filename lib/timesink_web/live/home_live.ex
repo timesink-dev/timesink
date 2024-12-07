@@ -54,7 +54,6 @@ defmodule TimesinkWeb.HomepageLive do
     socket =
       socket
       |> assign(:theaters, theaters)
-      # Initially no theater is selected
       |> assign(:current_theater_id, nil)
 
     {:ok, socket}
@@ -67,26 +66,32 @@ defmodule TimesinkWeb.HomepageLive do
       <p>Scroll down to explore cinema</p>
     </div>
 
-    <div id="theaters-container" phx-hook="ScrollHook" data-current-theater-id={@current_theater_id}>
-      <div class="sticky top-0 right-0 h-full w-52 text-white flex flex-col gap-y-4 items-center pt-12">
+    <div
+      id="theaters-container"
+      phx-hook="ScrollToTheater"
+      data-current-theater-id={@current_theater_id}
+      class="w-full flex justify-between items-start"
+    >
+      <div class="sticky top-0 right-0 h-full w-52 text-white flex flex-col gap-y-4 items-center pt-6">
         <%= for theater <- @theaters do %>
           <div
             class={"rounded cursor-pointer bg-dark-theater-primary px-12 py-4 #{if @current_theater_id === Integer.to_string(theater.id), do: "border-[1px] border-neon-red-primary"}"}
-            phx-click="navigate"
+            phx-click="scroll_to_theater"
+            phx-hook="NavigateToTheater"
             phx-value-id={theater.id}
+            id="theater-nav"
           >
             <%= theater.name %>
           </div>
         <% end %>
       </div>
-      <div class="flex justify-center items-center flex-col gap-y-96">
+      <div class="pt-6 mx-auto max-w-2xl flex justify-center items-center flex-col gap-y-24 snap-y snap-mandatory w-full">
         <%= for theater <- @theaters do %>
-          <section id={"theater-#{theater.id}"} class="film-cover-section">
-            <%!-- <img
-              src={Routes.static_path(@socket, "/images/#{theater.film.cover_image}")}
-              alt={theater.film.title}
-            /> --%>
-            <div class="bg-neon-blue-primary px-6 py-24">
+          <section
+            id={"theater-#{theater.id}"}
+            class="film-cover-section h-screen snap-always snap-center w-full"
+          >
+            <div class="bg-neon-blue-primary w-full h-full">
               <h2><%= theater.film.title %></h2>
               <p><%= theater.film.description %></p>
             </div>
@@ -97,23 +102,7 @@ defmodule TimesinkWeb.HomepageLive do
     """
   end
 
-  def handle_event("navigate", %{"id" => theater_id}, socket) do
-    IO.inspect("Navigating to theater with id #{theater_id}")
-    {:noreply, socket |> assign(:current_theater_id, String.to_integer(theater_id))}
-  end
-
   def handle_event("scroll_to_theater", %{"id" => theater_id}, socket) do
-    IO.inspect("Scrolling to theater with id #{theater_id}")
-
-    # Find the corresponding theater based on the theater_id
-    # theater =
-    #   Enum.find(socket.assigns.theaters, fn theater ->
-    #     Integer.to_string(theater.id) == theater_id
-    #   end)
-
-    # You can also assign the current theater here to highlight it in the sidebar, for example
-    socket = assign(socket, :current_theater_id, theater_id)
-
-    {:noreply, socket}
+    {:noreply, assign(socket, :current_theater_id, theater_id)}
   end
 end
