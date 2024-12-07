@@ -1,4 +1,5 @@
 defmodule TimesinkWeb.NowPlayingLive do
+  alias TimesinkWeb.NowPlayingListComponent
   use TimesinkWeb, :live_view
 
   def mount(_params, _session, socket) do
@@ -54,7 +55,7 @@ defmodule TimesinkWeb.NowPlayingLive do
     socket =
       socket
       |> assign(:theaters, theaters)
-      |> assign(:current_theater_id, "1")
+      |> assign(:current_theater_id, 1)
 
     {:ok, socket}
   end
@@ -63,43 +64,12 @@ defmodule TimesinkWeb.NowPlayingLive do
     ~H"""
     <div id="now-playing">
       <div id="now-playing-section">
-        <div
-          id="theaters-container"
-          phx-hook="ScrollHook"
-          data-current-theater-id={@current_theater_id}
-          iv
-          id="theaters-container"
-          phx-hook="ScrollToTheater"
-          data-current-theater-id={@current_theater_id}
-          class="w-full"
-        >
-          <div class="sticky top-0 right-0 h-full w-52 text-white flex flex-col gap-y-4 items-center pt-12">
-            <%= for theater <- @theaters do %>
-              <div
-                class={"rounded cursor-pointer bg-dark-theater-primary px-12 py-4 #{if @current_theater_id === Integer.to_string(theater.id), do: "border-[1px] border-neon-red-primary"}"}
-                phx-click="scroll_to_theater"
-                phx-hook="NavigateToTheater"
-                phx-value-id={theater.id}
-                id="theater-nav"
-              >
-                <%= theater.name %>
-              </div>
-            <% end %>
-          </div>
-          <div class="mx-auto max-w-2xl flex justify-center items-center flex-col gap-y-24 snap-y snap-mandatory w-full">
-            <%= for theater <- @theaters do %>
-              <section
-                id={"theater-#{theater.id}"}
-                class="film-cover-section h-screen snap-always snap-center w-full"
-              >
-                <div class="bg-neon-blue-primary w-full h-full">
-                  <h2><%= theater.film.title %></h2>
-                  <p><%= theater.film.description %></p>
-                </div>
-              </section>
-            <% end %>
-          </div>
-        </div>
+        <.live_component
+          module={NowPlayingListComponent}
+          id="now_playing_list_now"
+          current_theater_id={@current_theater_id}
+          theaters={@theaters}
+        />
       </div>
     </div>
     """

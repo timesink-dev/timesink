@@ -108,7 +108,7 @@ Hooks.NavigateToTheater = {
     }
     setTimeout(() => {
       isNavigating = false;
-    }, 450);
+    }, 500);
   },
 };
 
