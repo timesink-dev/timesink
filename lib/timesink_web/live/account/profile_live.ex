@@ -7,9 +7,9 @@ defmodule TimesinkWeb.Accounts.ProfileLive do
     ~H"""
     <div id="profile">
       <div class="profile-section">
-        <%= @profile.first_name %> <%= @profile.last_name %>
-        <%= @profile.username %>
-        <%= @profile.email %>
+        {@profile.first_name} {@profile.last_name}
+        {@profile.username}
+        {@profile.email}
       </div>
     </div>
     """
