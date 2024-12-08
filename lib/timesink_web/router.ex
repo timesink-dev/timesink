@@ -30,6 +30,8 @@ defmodule TimesinkWeb.Router do
     # Static pages
     get "/info", PageController, :info
     get "/blog", BlogController, :index
+    get "/archives", ShowcaseController, :archives
+    get "/upcoming", ShowcaseController, :upcoming
 
     live "/:profile_username", Accounts.ProfileLive
   end
