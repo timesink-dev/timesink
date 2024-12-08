@@ -6,23 +6,31 @@ defmodule TimesinkWeb.Accounts.ProfileLive do
   def render(assigns) do
     ~H"""
     <div id="profile">
-      <div class="profile-section">
-        {@profile.first_name} {@profile.last_name}
-        {@profile.username}
-        {@profile.email}
+      <div class="profile-section flex flex-col gap-y-2">
+        <div>
+          {@user.first_name} {@user.last_name}
+        </div>
+        <div>
+          {@user.username}
+        </div>
+        <div>
+          {@user.email}
+        </div>
+        <div>
+          {@profile.bio}
+        </div>
+        <div>
+          {@profile.location.locality} {@profile.location.country}
+        </div>
       </div>
     </div>
     """
   end
 
   def mount(%{"profile_username" => profile_username}, _session, socket) do
-    profile_user =
-      Accounts.get_user_by!(username: profile_username)
+    {:ok, %{user: user, profile: profile}} =
+      Accounts.get_profile_by_username!(username: profile_username)
 
-    {:ok, assign(socket, profile: profile_user)}
+    {:ok, assign(socket, user: user, profile: profile)}
   end
-
-  # def handle_params(params, _url, socket) do
-  #   {:noreply, socket |> apply_action(socket.assigns.live_action, params)}
-  # end
 end
