@@ -52,12 +52,22 @@ defmodule Timesink.Accounts.User do
       :last_name,
       :roles
     ])
-    |> cast_assoc(:profile, required: true, with: &Accounts.Profile.changeset/2)
+    # |> cast_assoc(:profile, required: true, with: &Accounts.Profile.changeset/2)
     |> validate_required([:username, :email, :password_hash, :first_name, :last_name])
     |> validate_format(:email, ~r/@/)
     |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{2,32}$/)
     |> validate_length(:first_name, min: 2)
     |> validate_length(:last_name, min: 2)
     |> validate_length(:username, min: 1)
+  end
+
+  def edit_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
+    struct
+    |> cast(params, [
+      :email,
+      :first_name,
+      :last_name
+    ])
+    |> validate_required([:email, :first_name, :last_name])
   end
 end

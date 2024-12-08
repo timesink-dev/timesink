@@ -19,7 +19,6 @@ defmodule TimesinkWeb.Accounts.ProfileLive do
     {:ok, profile_user} =
       Accounts.get_user_by!(username: profile_username)
 
-    IO.puts(~c"doo doo")
     IO.inspect(profile_user)
     {:ok, assign(socket, profile: profile_user)}
   end
