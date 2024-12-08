@@ -16,9 +16,11 @@ defmodule TimesinkWeb.Accounts.ProfileLive do
   end
 
   def mount(%{"profile_username" => profile_username}, _session, socket) do
-    profile_user =
+    {:ok, profile_user} =
       Accounts.get_user_by!(username: profile_username)
 
+    IO.puts(~c"doo doo")
+    IO.inspect(profile_user)
     {:ok, assign(socket, profile: profile_user)}
   end
 

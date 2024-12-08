@@ -5,17 +5,21 @@ defmodule TimesinkWeb.Accounts.MeLive do
     ~H"""
     <div id="user">
       <div class="user-section">
-        Me
+        {@user.username}
+        {@profile.bio}
+        {@profile.location.locality}
       </div>
     </div>
     """
   end
 
   def mount(_params, _session, socket) do
-    # were going to need to get the current_user from the session
-    # and then we can get the user from the database
-    # and then we can assign the user to the socket
-    # so we can render the user's information and allow the user to edit their information
-    {:ok, socket}
+    case Timesink.Accounts.get_me() do
+      {:ok, %{user: user, profile: profile}} ->
+        {:ok, assign(socket, user: user, profile: profile)}
+
+      {:error, _} ->
+        {:error, socket}
+    end
   end
 end
