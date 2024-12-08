@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.NowPlayingLive do
+defmodule TimesinkWeb.Cinema.ShowcaseLive do
   use TimesinkWeb, :live_view
 
   def render(assigns) do

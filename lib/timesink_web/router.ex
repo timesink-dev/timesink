@@ -18,17 +18,20 @@ defmodule TimesinkWeb.Router do
   scope "/", TimesinkWeb do
     pipe_through :browser
     live "/", HomepageLive
-    live "/now-playing", NowPlayingLive
+    live "/now-playing", Cinema.ShowcaseLive
+    live "/now-playing/:theater_slug", Cinema.TheaterLive
 
     live "/join", WaitlistLive
-    live "/sign-in", SignInLive
+    live "/signin", SignInLive
 
     live "/account", Accounts.MeLive
-    live "/:profile_username", Accounts.ProfileLive
+    live "/submit", FilmSubmissionLive
 
     # Static pages
     get "/info", PageController, :info
-    get "/blog", PageController, :blog
+    get "/blog", BlogController, :index
+
+    live "/:profile_username", Accounts.ProfileLive
   end
 
   # Other scopes may use custom stacks.
