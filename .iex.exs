@@ -30,5 +30,13 @@ alias TimesinkWeb.ErrorJSON
 
 alias TimesinkWeb.PageController
 
+# ExMachina factories
+#
+# To manually compile ExMachina factories, run:
+# iex> Code.compile_file("test/support/factory.ex")
+#
+# Then, import them in your IEx with:
+# iex> import Timesink.Factory
+
 # Local dot-iex file (user/environment-specific, Git-ignored)
 import_file_if_available(".iex.local.exs")
