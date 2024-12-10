@@ -17,16 +17,15 @@ defmodule Timesink.Accounts do
   def get_me(user_id \\ @mock_current_user_id) do
     user_id = to_string(user_id)
 
-    user = User.get!(user_id)
+    user = User.get!(user_id) |> Timesink.Repo.preload(:profile)
 
-    case user do
-      nil ->
-        {:error, "User not found"}
+    # case user do
+    #   nil ->
+    #     {:error, "User not found"}
 
-      user ->
-        profile = Profile.get_by!(user_id: user.id)
+    # user ->
+    #   profile = Profile.get_by!(user_id: user.id)
 
-        {:ok, %{user: user, profile: profile}}
-    end
+    {:ok, user}
   end
 end
