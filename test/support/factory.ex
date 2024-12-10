@@ -40,4 +40,36 @@ defmodule Timesink.Factory do
       org_position: Faker.Company.buzzword()
     }
   end
+
+  # Cinema
+
+  @genres [
+    "Action",
+    "Adventure",
+    "Animation",
+    "Biographical",
+    "Comedy",
+    "Crime",
+    "Documental",
+    "Drama",
+    "Family",
+    "Fantasy",
+    "Historical",
+    "Horror",
+    "Musical",
+    "Mystery",
+    "Romance",
+    "Sci-Fi",
+    "Sports",
+    "Thriller",
+    "War",
+    "Western"
+  ]
+
+  def genre_factory do
+    %Timesink.Cinema.Genre{
+      name: @genres |> Enum.random(),
+      description: Faker.Lorem.paragraph(1..2)
+    }
+  end
 end
