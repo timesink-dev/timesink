@@ -1,9 +1,11 @@
 defmodule Timesink.Cinema do
-  alias Timesink.Cinema.{Film, Showcase, Theater, Exhibition}
-
   @moduledoc """
   The Cinema context.
   """
+  alias Timesink.Cinema.Film
+  alias Timesink.Cinema.Showcase
+  alias Timesink.Cinema.Theater
+  alias Timesink.Cinema.Exhibition
 
   @doc """
   ## Examples
