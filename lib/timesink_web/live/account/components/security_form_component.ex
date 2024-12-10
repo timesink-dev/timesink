@@ -23,6 +23,7 @@ defmodule TimesinkWeb.SecurityFormComponent do
               field={@security_form[:old_password]}
               type="password"
               placeholder="Password"
+              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
               class="w-full"
             />
             <.input
@@ -30,6 +31,7 @@ defmodule TimesinkWeb.SecurityFormComponent do
               field={@security_form[:new_password]}
               type="password"
               placeholder="Password"
+              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
               class="w-full"
             />
             <.input
@@ -37,6 +39,7 @@ defmodule TimesinkWeb.SecurityFormComponent do
               field={@security_form[:confirm_password]}
               type="password"
               placeholder="Password"
+              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
               class="w-full"
             />
           </div>
@@ -49,6 +52,14 @@ defmodule TimesinkWeb.SecurityFormComponent do
             </.button>
           </:actions>
         </.simple_form>
+      </div>
+      <div class="mt-48">
+        <h2 class="bg-neon-red-light bg-opacity-10 px-12 py-6 border-[0.4px] border-neon-red-light rounded text-neon-red-light text-xl font-brand">
+          Danger zone!
+        </h2>
+        <button class="mt-6 focus-none py-4 px-16 bg-backroom-black text-neon-red-light font-semibold border-neon-red-light border-[1px]">
+          Delete account
+        </button>
       </div>
     </section>
     """

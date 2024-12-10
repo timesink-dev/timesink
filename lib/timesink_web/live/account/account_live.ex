@@ -8,16 +8,16 @@ defmodule TimesinkWeb.Accounts.AccountLive do
         <button
           phx-click="profile"
           class={[
-            "rounded w-full text-mystery-white font-semibold mt-4 px-12 py-2.5 flex items-center justify-center",
-            @active_tab === :profile && "bg-neon-blue-lightest text-black focus-none"
+            "rounded w-full font-semibold mt-4 px-12 py-2.5 flex items-center justify-center",
+            @active_tab === :profile && "bg-neon-blue-lightest text-backroom-black"
           ]}
         >
           Profile
         </button>
         <button
           class={[
-            "rounded w-full text-mystery-white font-semibold mt-4 px-12 py-2.5 flex items-center justify-center",
-            @active_tab === :security && "bg-neon-blue-lightest text-black focus-none"
+            "rounded w-full font-semibold mt-4 px-12 py-2.5 flex items-center justify-center",
+            @active_tab === :security && "bg-neon-blue-lightest text-backroom-black"
           ]}
           phx-click="security"
         >
@@ -26,8 +26,8 @@ defmodule TimesinkWeb.Accounts.AccountLive do
         <button
           phx-click="activity"
           class={[
-            "rounded w-full text-mystery-white font-semibold mt-4 px-12 py-2.5 flex items-center justify-center",
-            @active_tab === :activity && "bg-neon-blue-lightest text-black focus-none"
+            "rounded w-full font-semibold mt-4 px-12 py-2.5 flex items-center justify-center",
+            @active_tab === :activity && "bg-neon-blue-lightest text-backroom-black"
           ]}
         >
           Activity
