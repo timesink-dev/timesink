@@ -50,8 +50,10 @@ defmodule Timesink.Cinema.Film do
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset(film :: t(), params :: %{optional(atom()) => term()}) ::
-          Ecto.Changeset.t()
+  @spec changeset(Timesink.Cinema.Film.t(), %{
+          optional(:__struct__) => none(),
+          optional(atom() | binary()) => any()
+        }) :: Ecto.Changeset.t()
   def changeset(film, params, _metadata \\ []) do
     film
     |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
