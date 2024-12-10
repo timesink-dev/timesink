@@ -8,6 +8,16 @@ alias Timesink.Accounts
 alias Timesink.Accounts.User
 alias Timesink.Accounts.Profile
 
+# Timesink.Cinema
+alias Timesink.Cinema
+alias Timesink.Cinema.Creative
+alias Timesink.Cinema.Exhibition
+alias Timesink.Cinema.Film
+alias Timesink.Cinema.FilmCreative
+alias Timesink.Cinema.Genre
+alias Timesink.Cinema.Showcase
+alias Timesink.Cinema.Theater
+
 # Timesink.Waitlist
 alias Timesink.Waitlist
 alias Timesink.Waitlist.Applicant
