@@ -72,4 +72,11 @@ defmodule Timesink.Factory do
       description: Faker.Lorem.paragraph(1..2)
     }
   end
+
+  def creative_factory do
+    %Timesink.Cinema.Creative{
+      first_name: Faker.Person.first_name(),
+      last_name: Faker.Person.last_name()
+    }
+  end
 end
