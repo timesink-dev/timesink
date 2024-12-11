@@ -67,7 +67,7 @@ defmodule TimesinkWeb.SecurityFormComponent do
 
   def mount(socket) do
     changeset =
-      User.edit_changeset(%User{})
+      User.changeset_update(%User{})
 
     {:ok, assign(socket, security_form: to_form(changeset))}
   end
