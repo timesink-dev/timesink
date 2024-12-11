@@ -1,6 +1,7 @@
 defmodule Timesink.Cinema.Film do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
+  use Timesink.Schema
   import Ecto.Changeset
 
   @type color ::
