@@ -1,5 +1,5 @@
 defmodule TimesinkWeb.ProfileFormComponent do
-  alias Timesink.Accounts.Profile
+  alias Timesink.Accounts
   alias Timesink.Accounts.User
   use TimesinkWeb, :live_component
 
@@ -15,12 +15,6 @@ defmodule TimesinkWeb.ProfileFormComponent do
           <label class="mb-2">Profile image</label>
           <img src={@user.profile.avatar_url} alt="Profile picture" class="rounded-full w-24 h-24" />
         </div>
-        <div>
-          <label class="mb-2">Bio</label>
-          <div class="rounded border-[0.1px] border-mystery-white px-12 py-8">
-            {@user.profile.bio}
-          </div>
-        </div>
       </div>
       <div>
         <.simple_form
@@ -31,11 +25,11 @@ defmodule TimesinkWeb.ProfileFormComponent do
           class="mt-8 mb-8 w-2/3"
         >
           <div>
-            <label class="mb-2">Bio</label>
             <.input
               field={@account_form[:bio]}
-              type="text"
-              class="rounded border-[0.1px] border-mystery-white px-12 py-8"
+              type="textarea"
+              input_class="w-full px-4 py-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              class=""
               label="Bio"
               value={@user.profile.bio}
             />
@@ -92,21 +86,22 @@ defmodule TimesinkWeb.ProfileFormComponent do
 
   def mount(socket) do
     changeset =
-      User.edit_changeset(%User{})
+      User.changeset_update(%User{})
 
     {:ok, assign(socket, account_form: to_form(changeset))}
   end
 
   def handle_event("save", %{"user" => account_params}, socket) do
-    User.update!(socket.assigns.user, account_params)
-    Profile.update!(socket.assigns.user.profile, account_params)
+    with {:ok, user} <- Accounts.update_me(socket.assigns.user.id, account_params) do
+      changeset = User.changeset_update(user, account_params)
 
-    socket
-    |> assign(:form, to_form(User.edit_changeset(socket.assigns.user, account_params)))
-    |> put_flash!(
-      :info,
-      "Successfully updated your account"
-    )
+      socket
+      |> assign(account_form: to_form(changeset))
+      |> put_flash!(
+        :info,
+        "Successfully updated your account"
+      )
+    end
 
     {:noreply, socket}
   end

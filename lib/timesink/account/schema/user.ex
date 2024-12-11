@@ -35,6 +35,8 @@ defmodule Timesink.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
+  @required_fields ~w(email username first_name last_name)a
+
   def changeset(struct, params, _metadata) do
     changeset(struct, params)
   end
@@ -53,7 +55,7 @@ defmodule Timesink.Accounts.User do
       :roles
     ])
     |> cast_assoc(:profile, required: true, with: &Accounts.Profile.changeset/2)
-    |> validate_required([:username, :email, :password_hash, :first_name, :last_name])
+    |> validate_required(@required_fields)
     |> validate_format(:email, ~r/@/)
     |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{2,32}$/)
     |> validate_length(:first_name, min: 2)
@@ -61,11 +63,7 @@ defmodule Timesink.Accounts.User do
     |> validate_length(:username, min: 1)
   end
 
-  def edit_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
-    profile = struct |> Timesink.Repo.preload(:profile)
-    IO.puts(~c"hello")
-    IO.inspect(profile)
-
+  def changeset_update(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> Timesink.Repo.preload(:profile)
     |> cast(params, [

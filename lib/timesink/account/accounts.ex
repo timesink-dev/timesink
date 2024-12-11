@@ -1,6 +1,7 @@
 defmodule Timesink.Accounts do
   alias Timesink.Accounts.Profile
   alias Timesink.Accounts.User
+  alias Timesink.Repo
 
   @moduledoc """
   The Accounts context.
@@ -19,13 +20,17 @@ defmodule Timesink.Accounts do
 
     user = User.get!(user_id) |> Timesink.Repo.preload(:profile)
 
-    # case user do
-    #   nil ->
-    #     {:error, "User not found"}
-
-    # user ->
-    #   profile = Profile.get_by!(user_id: user.id)
-
     {:ok, user}
+  end
+
+  def update_me(user_id, params) do
+    with {:ok, user} <- get_me(user_id) do
+      Repo.transaction(fn ->
+        User.update!(user, params)
+        Profile.update!(user.profile, params)
+      end)
+
+      {:ok, user}
+    end
   end
 end
