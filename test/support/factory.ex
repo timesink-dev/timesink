@@ -79,4 +79,17 @@ defmodule Timesink.Factory do
       last_name: Faker.Person.last_name()
     }
   end
+
+  def film_creative_factory(params) do
+    for field <- [:film, :creative] do
+      case params |> Map.get(field) do
+        item when is_map(item) -> item
+        item when is_nil(item) -> insert(item)
+      end
+    end
+
+    %Timesink.Cinema.FilmCreative{
+      role: Timesink.Cinema.FilmCreative.roles() |> Enum.random()
+    }
+  end
 end
