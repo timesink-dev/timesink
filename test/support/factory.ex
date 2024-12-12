@@ -92,4 +92,23 @@ defmodule Timesink.Factory do
       role: Timesink.Cinema.FilmCreative.roles() |> Enum.random()
     }
   end
+
+  def film_factory(params) do
+    genres =
+      case params |> Map.get(:genres) do
+        genres when is_list(genres) -> genres
+        genre when is_nil(genre) -> [insert(:genre)]
+      end
+
+    %Timesink.Cinema.Film{
+      title: Faker.Lorem.sentence(1..4),
+      year: 1900..2024 |> Enum.random(),
+      duration: 10..180 |> Enum.random(),
+      color: Timesink.Cinema.Film.colors() |> Enum.random(),
+      aspect_ratio: "4:3",
+      format: Timesink.Cinema.Film.formats() |> Enum.random(),
+      synopsis: Faker.Lorem.paragraph(),
+      genres: genres
+    }
+  end
 end
