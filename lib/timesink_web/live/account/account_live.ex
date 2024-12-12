@@ -3,12 +3,12 @@ defmodule TimesinkWeb.Accounts.AccountLive do
 
   def render(assigns) do
     ~H"""
-    <div id="user" class="relative">
-      <div class="absolute -left-56 top-16 flex flex-col gap-y-2">
+    <div id="user" class="sm:flex sm:justify-center sm:gap-x-32 sm:items-start sm:mt-16">
+      <div class="sm:ml-16 md:ml-32 sm:flex sm:flex-col gap-y-2 mt-24 basis-1/6">
         <button
           phx-click="profile"
           class={[
-            "rounded w-full font-semibold mt-4 px-12 py-2.5 flex items-center justify-center",
+            "rounded w-full font-semibold px-12 py-2.5 flex items-center justify-center",
             @active_tab === :profile && "bg-neon-blue-lightest text-backroom-black"
           ]}
         >
@@ -16,7 +16,7 @@ defmodule TimesinkWeb.Accounts.AccountLive do
         </button>
         <button
           class={[
-            "rounded w-full font-semibold mt-4 px-12 py-2.5 flex items-center justify-center",
+            "rounded w-full font-semibold px-12 py-2.5 flex items-center justify-center",
             @active_tab === :security && "bg-neon-blue-lightest text-backroom-black"
           ]}
           phx-click="security"
@@ -26,14 +26,14 @@ defmodule TimesinkWeb.Accounts.AccountLive do
         <button
           phx-click="activity"
           class={[
-            "rounded w-full font-semibold mt-4 px-12 py-2.5 flex items-center justify-center",
+            "rounded w-full font-semibold px-12 py-2.5 flex items-center justify-center",
             @active_tab === :activity && "bg-neon-blue-lightest text-backroom-black"
           ]}
         >
           Activity
         </button>
       </div>
-      <div class="user-section">
+      <div class="mt-8 sm:mt-0 account-info-section basis-5/6">
         <%= if @active_tab == :profile do %>
           <.live_component module={TimesinkWeb.ProfileFormComponent} id="profile_form" user={@user} />
         <% end %>

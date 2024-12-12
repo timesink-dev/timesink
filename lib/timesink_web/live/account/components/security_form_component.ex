@@ -4,7 +4,7 @@ defmodule TimesinkWeb.SecurityFormComponent do
 
   def render(assigns) do
     ~H"""
-    <section class="mt-16">
+    <section class="">
       <div class="mb-8">
         <h2 class="text-[2rem] font-semibold text-mystery-white">Security</h2>
         <span> Manage your account security settings </span>
@@ -54,7 +54,7 @@ defmodule TimesinkWeb.SecurityFormComponent do
         </.simple_form>
       </div>
       <div class="mt-48">
-        <h2 class="bg-neon-red-light bg-opacity-10 px-12 py-6 border-[0.4px] border-neon-red-light rounded text-neon-red-light text-xl font-brand">
+        <h2 class="w-2/3 bg-neon-red-light bg-opacity-10 px-12 py-6 border-[0.4px] border-neon-red-light rounded text-neon-red-light text-xl font-brand">
           Danger zone!
         </h2>
         <button class="mt-6 focus-none py-4 px-16 bg-backroom-black text-neon-red-light font-semibold border-neon-red-light border-[1px]">

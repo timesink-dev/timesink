@@ -5,7 +5,7 @@ defmodule TimesinkWeb.ProfileFormComponent do
 
   def render(assigns) do
     ~H"""
-    <section class="mt-16">
+    <section class="w-full">
       <div class="mb-8">
         <h2 class="text-[2rem] font-semibold text-mystery-white">Account</h2>
         <span> Manage your personal account and profile settings </span>

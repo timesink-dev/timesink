@@ -3,7 +3,7 @@ defmodule TimesinkWeb.ActivityComponent do
 
   def render(assigns) do
     ~H"""
-    <section class="mt-16">
+    <section class="">
       <div class="mb-8">
         <h2 class="text-[2rem] font-semibold text-mystery-white">Activity</h2>
         <span> Review your comments, interactions with other members, and film submissions </span>
