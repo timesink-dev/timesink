@@ -1,7 +1,8 @@
 defmodule TimesinkWeb.Accounts.ProfileLive do
   use TimesinkWeb, :live_view
-
+  import Ecto.Query
   alias Timesink.Accounts
+  alias Timesink.Accounts.Profile
 
   def render(assigns) do
     ~H"""
@@ -28,9 +29,19 @@ defmodule TimesinkWeb.Accounts.ProfileLive do
   end
 
   def mount(%{"profile_username" => profile_username}, _session, socket) do
-    {:ok, %{user: user, profile: profile}} =
-      Accounts.get_profile_by_username!(username: profile_username)
+    with {:ok, [user]} <-
+           Accounts.query_users(fn query ->
+             query
+             |> where([u], u.username == ^profile_username)
+             |> join(:inner, [u], p in Profile, on: p.user_id == u.id)
+             |> preload([u], profile: u)
+           end) do
+      {:ok, assign(socket, user: user, profile: user.profile)}
 
-    {:ok, assign(socket, user: user, profile: profile)}
+      # TODO: what happens if there's no user/profile for this username?
+      # Does it make sense to have an else block here to react this scenario?
+      # else
+      #   {:ok, []} -> {:ok, socket}
+    end
   end
 end
