@@ -33,6 +33,7 @@ defmodule Timesink.MixProject do
   defp deps do
     [
       {:waffle, "~> 1.1"},
+      {:waffle_ecto, "~> 0.0"},
       {:backpex, "~> 0.9.1"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:swiss_schema, "~> 0.6.0"},
