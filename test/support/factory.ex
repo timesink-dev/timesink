@@ -72,4 +72,43 @@ defmodule Timesink.Factory do
       description: Faker.Lorem.paragraph(1..2)
     }
   end
+
+  def creative_factory do
+    %Timesink.Cinema.Creative{
+      first_name: Faker.Person.first_name(),
+      last_name: Faker.Person.last_name()
+    }
+  end
+
+  def film_creative_factory(params) do
+    for field <- [:film, :creative] do
+      case params |> Map.get(field) do
+        item when is_map(item) -> item
+        item when is_nil(item) -> insert(item)
+      end
+    end
+
+    %Timesink.Cinema.FilmCreative{
+      role: Timesink.Cinema.FilmCreative.roles() |> Enum.random()
+    }
+  end
+
+  def film_factory(params) do
+    genres =
+      case params |> Map.get(:genres) do
+        genres when is_list(genres) -> genres
+        genre when is_nil(genre) -> [insert(:genre)]
+      end
+
+    %Timesink.Cinema.Film{
+      title: Faker.Lorem.sentence(1..4),
+      year: 1900..2024 |> Enum.random(),
+      duration: 10..180 |> Enum.random(),
+      color: Timesink.Cinema.Film.colors() |> Enum.random(),
+      aspect_ratio: "4:3",
+      format: Timesink.Cinema.Film.formats() |> Enum.random(),
+      synopsis: Faker.Lorem.paragraph(),
+      genres: genres
+    }
+  end
 end

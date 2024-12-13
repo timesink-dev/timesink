@@ -1,6 +1,7 @@
 defmodule Timesink.Waitlist.Applicant do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
+  use Timesink.Schema
   import Ecto.Changeset
 
   @type status :: :pending | :invited | :completed

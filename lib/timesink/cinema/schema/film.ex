@@ -1,6 +1,7 @@
 defmodule Timesink.Cinema.Film do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
+  use Timesink.Schema
   import Ecto.Changeset
 
   @type color ::
@@ -57,6 +58,7 @@ defmodule Timesink.Cinema.Film do
   def changeset(film, params, _metadata \\ []) do
     film
     |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
+    |> cast_assoc(:genres)
     |> validate_required([:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
     |> validate_length(:title, min: 1)
   end
