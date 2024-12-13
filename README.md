@@ -2,7 +2,6 @@
 
 > **️🚧 Work in Progress**: This document is a living, ongoing work in progress! We're constantly improving and updating it to better reflect our evolving understanding of the platform and its features. As we build and refine TimeSink, this documentation will dynamically change, so check back often for the latest updates and improvements. Your contributions and suggestions are always welcome as we shape this exciting project together!
 
-
 ## 🚰 What is TimeSink ?
 
 **TimeSink** is more than just a cinema; it’s a place where time is not lost, but held, preserved, and waiting. In the world of film, time has a cyclical nature—each story is a sequence of moments, captured, frozen, and woven into a narrative that defies the usual flow of time. Like drops filling a well, these moments accumulate within each film, creating a timeless reservoir. The TimeSink.
@@ -11,9 +10,7 @@ When a film plays, it allows those moments to live again, inviting the audience 
 
 The power of TimeSink lies in this continuity, in how each film remains alive as long as there is someone to witness it, a soul to animate the story. TimeSink captures this essence—a place where time flows and pauses, where films remain vibrant and re-watchable, and where each visit feels like a fresh discovery. It’s a reminder that time, in the hands of art, isn’t fleeting—it’s a wellspring, endlessly revisited, renewed, and re-experienced.
 
-
 ![AaronZomback_expressionist _with_a_film_projector_and_wheel _ma_47afc7bb-9491-4a5f-8abd-251a1b0e76ba copy](https://github.com/user-attachments/assets/f4bc42ae-0c64-4c1e-b0ac-f0765fe2b3c7)
-
 
 ## 🍸️ TimeSink Presents
 
@@ -23,10 +20,34 @@ This isn’t just a digital platform; it’s an imaginary world made real. TimeS
 
 ![AaronZomback_Fun_cinema_projected_lights_come_from_inside _Peop_b9320108-eaf2-4d4d-8427-c311c85ea1fa copy](https://github.com/user-attachments/assets/c0f6a6ac-cc87-43fe-88ec-23d633156202)
 
-
 Dive into our setup instructions below to get your environment up and running, and see our [glossary](./OVERVIEW.md) of cinema terms to make sure we're all on the same page!
 
 ## 🚀 Getting Started
+
+You'll need the following system dependencies:
+
+- [asdf](https://asdf-vm.com)
+- [Docker](https://www.docker.com) (with [Docker Compose](https://docs.docker.com/compose/))
+- [PostgreSQL](https://www.postgresql.org)
+
+You'll need to install the respective asdf plugins:
+
+```
+asdf plugin add erlang
+asdf plugin add elixir
+```
+
+Now, install Elixir and Erlang through asdf:
+
+```
+asdf install
+```
+
+MinIO is provided through a Docker Compose setup:
+
+```
+docker compose up -d
+```
 
 To start your Phoenix server:
 
