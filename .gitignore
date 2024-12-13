@@ -41,3 +41,7 @@ npm-debug.log
 
 # .iex.local.exs. https://dev.to/joeljuca/introducing-iex-local-exs-2bfk
 .iex.local.exs
+
+
+# Ignore docker related files.
+/_pgdata
