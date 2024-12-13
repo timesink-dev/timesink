@@ -1,16 +1,86 @@
-FROM elixir:latest
+ARG ELIXIR_VERSION
+ARG OTP_VERSION
+ARG ALPINE_VERSION
 
-EXPOSE 4000
+FROM hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-alpine-${ALPINE_VERSION} as build
 
-RUN apt-get update && \
-    apt-get install -y postgresql-client && \
-    apt-get install -y inotify-tools && \
-    apt-get install -y nodejs && \
-    curl -L https://npmjs.org/install.sh | sh && \
+ARG BUILD_RELEASE_FROM=master
+
+ENV MIX_ENV=prod
+
+WORKDIR /app
+
+RUN \
+    apk upgrade --no-cache && \
+    apk add \
+    --no-cache \
+    openssh-client \
+    build-base \
+    npm \
+    git \
+    python3 && \
     mix local.hex --force && \
-    mix archive.install hex phx_new --force && \
-    mix local.rebar --force
+    mix local.rebar --force && \
+    # @TODO Fix use of secrets in .env. Prefer to use instead docker secrets.
+    COPY .env /release/.env
+COPY ./.git /workspace
 
-ENV APP_HOME /app
-RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
+RUN \
+    git clone --local /workspace . && \
+    git checkout "${BUILD_RELEASE_FROM}" && \
+    ls -al && \
+    mix deps.get --only prod && \
+    npm --prefix ./assets ci --progress=false --no-audit --loglevel=error && \
+    npm run --prefix ./assets deploy && \
+    mix phx.digest && \
+    mix compile && \
+    mix release
+
+# Start a new build stage so that the final image will only contain
+# the compiled release and other runtime necessities
+FROM alpine:${ALPINE_VERSION} AS app
+
+ENV USER="phoenix"
+ENV HOME=/home/"${USER}"
+ENV APP_DIR="${HOME}/app"
+
+RUN \
+    apk upgrade --no-cache && \
+    apk add --no-cache \
+    openssl \
+    ncurses-libs && \
+    # Creates a unprivileged user to run the app
+    addgroup \
+    -g 1000 \
+    -S "${USER}" && \
+    adduser \
+    -s /bin/sh \
+    -u 1000 \
+    -G "${USER}" \
+    -h "${HOME}" \
+    -D "${USER}" && \
+    su "${USER}" sh -c "mkdir ${APP_DIR}"
+
+# Everything from this line onwards will run in the context of the unprivileged user.
+USER "${USER}"
+
+WORKDIR "${APP_DIR}"
+
+COPY --from=build --chown="${USER}":"${USER}" /app/_build/prod/rel/tasks ./
+
+ENTRYPOINT ["./bin/tasks"]
+
+# Docker Usage:
+#  * build: sudo docker build -t phoenix/tasks .
+#  * shell: sudo docker run --rm -it --entrypoint "" -p 80:4000 -p 443:4040 phoenix/tasks sh
+#  * run:   sudo docker run --rm -it -p 80:4000 -p 443:4040 --env-file .env --name tasks phoenix/tasks
+#  * exec:  sudo docker exec -it tasks sh
+#  * logs:  sudo docker logs --follow --tail 10 tasks
+#
+# Extract the production release to your host machine with:
+#
+# ```
+# sudo docker run --rm -it --entrypoint "" --user $(id -u) -v "$PWD/_build:/home/phoenix/_build"  phoenix/tasks sh -c "tar zcf /home/phoenix/_build/app.tar.gz ."
+# ls -al _build
+# ````
+CMD ["start"]
