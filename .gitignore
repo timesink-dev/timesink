@@ -46,6 +46,6 @@ npm-debug.log
 # Ignore docker related files.
 /_pgdata
 
-
-# Minio
+# Ignore minio related files.
 .minio
+

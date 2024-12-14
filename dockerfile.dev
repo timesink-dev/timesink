@@ -1,54 +1,27 @@
-ARG ELIXIR_VERSION
-ARG OTP_VERSION
-ARG ALPINE_VERSION
+ARG ELIXIR_VERSION=1.17.2
+ARG OTP_VERSION=27.0.1
+ARG ALPINE_VERSION=3.20.3
+
 
 FROM hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-alpine-${ALPINE_VERSION} as build
 
-ARG BUILD_RELEASE_FROM=master
+ARG MIX_ENV=dev
 
-ENV MIX_ENV=prod
+ENV MIX_ENV=${MIX_ENV}
 
-WORKDIR /app
+ENV USER="developer"
+ENV HOME=/home/"${USER}"
+ENV APP_DIR="${HOME}/workspace"
 
 RUN \
     apk upgrade --no-cache && \
     apk add \
     --no-cache \
+    inotify-tools \
     openssh-client \
     build-base \
     npm \
-    git \
-    python3 && \
-    mix local.hex --force && \
-    mix local.rebar --force && \
-    # @TODO Fix use of secrets in .env. Prefer to use instead docker secrets.
-    COPY .env /release/.env
-COPY ./.git /workspace
-
-RUN \
-    git clone --local /workspace . && \
-    git checkout "${BUILD_RELEASE_FROM}" && \
-    ls -al && \
-    mix deps.get --only prod && \
-    npm --prefix ./assets ci --progress=false --no-audit --loglevel=error && \
-    npm run --prefix ./assets deploy && \
-    mix phx.digest && \
-    mix compile && \
-    mix release
-
-# Start a new build stage so that the final image will only contain
-# the compiled release and other runtime necessities
-FROM alpine:${ALPINE_VERSION} AS app
-
-ENV USER="phoenix"
-ENV HOME=/home/"${USER}"
-ENV APP_DIR="${HOME}/app"
-
-RUN \
-    apk upgrade --no-cache && \
-    apk add --no-cache \
-    openssl \
-    ncurses-libs && \
+    git && \
     # Creates a unprivileged user to run the app
     addgroup \
     -g 1000 \
@@ -64,23 +37,17 @@ RUN \
 # Everything from this line onwards will run in the context of the unprivileged user.
 USER "${USER}"
 
+RUN \
+    mix local.hex --force && \
+    mix local.rebar --force
+
+ARG GIT_USER_DEPLOY_TOKEN
+
+RUN \
+    # @link https://github.com/elixir-lang/elixir/issues/3422#issuecomment-388188608
+    # @link https://gist.github.com/Kovrinic/ea5e7123ab5c97d451804ea222ecd78a
+    git config --global url."https://exadra37:${GIT_USER_DEPLOY_TOKEN}@gitlab.com".insteadOf git://gitlab.com
+
 WORKDIR "${APP_DIR}"
 
-COPY --from=build --chown="${USER}":"${USER}" /app/_build/prod/rel/tasks ./
-
-ENTRYPOINT ["./bin/tasks"]
-
-# Docker Usage:
-#  * build: sudo docker build -t phoenix/tasks .
-#  * shell: sudo docker run --rm -it --entrypoint "" -p 80:4000 -p 443:4040 phoenix/tasks sh
-#  * run:   sudo docker run --rm -it -p 80:4000 -p 443:4040 --env-file .env --name tasks phoenix/tasks
-#  * exec:  sudo docker exec -it tasks sh
-#  * logs:  sudo docker logs --follow --tail 10 tasks
-#
-# Extract the production release to your host machine with:
-#
-# ```
-# sudo docker run --rm -it --entrypoint "" --user $(id -u) -v "$PWD/_build:/home/phoenix/_build"  phoenix/tasks sh -c "tar zcf /home/phoenix/_build/app.tar.gz ."
-# ls -al _build
-# ````
-CMD ["start"]
+CMD ["sh"]

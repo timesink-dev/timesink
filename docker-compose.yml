@@ -1,32 +1,4 @@
 services:
-  minio:
-    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
-    volumes:
-      - ./.minio:/data
-    ports:
-      - 8000:8000
-      - 8001:8001
-    environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio-secret
-      MINIO_REGION_NAME: eu-central-1
-    command: server --console-address :8001 /data
-    restart: unless-stopped
-
-  createbuckets:
-    image: minio/mc:RELEASE.2023-04-12T02-21-51Z
-    depends_on:
-      - minio
-    entrypoint: >
-      sh -c "
-        sleep 3;
-        mc config host add s3 http://minio:8000 minio minio-secret;
-        mc mb -p s3/content;
-        mc policy set public s3/content;
-        exit 0;
-      "
-
-
   db:
     image: postgres:13.4-alpine
     environment:
@@ -36,3 +8,29 @@ services:
     restart: always
     volumes:
       - ./_pgdata:/var/lib/postgresql/data
+  minio:
+    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
+    volumes:
+      - ./.minio:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio-secret
+      MINIO_REGION_NAME: eu-west-3
+    command: server --console-address :9001 /data
+    restart: unless-stopped
+
+  createbuckets:
+    image: minio/mc:RELEASE.2023-04-12T02-21-51Z
+    depends_on:
+      - minio
+    entrypoint: >
+      sh -c "
+        sleep 3;
+        mc config host add s3 http://minio:9000 minio minio-secret;
+        mc mb -p s3/timesinkpresents;
+        mc policy set public s3/timesinkpresents;
+        exit 0;
+      "
