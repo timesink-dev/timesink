@@ -20,3 +20,17 @@ services:
         mc anonymous set public minio/timesink.prod/public;
         exit 0;
       "
+
+  postgres:
+    image: postgres:17.2-alpine3.21
+    ports:
+      - 55432:5432
+    environment:
+      POSTGRES_DB: timesink_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
