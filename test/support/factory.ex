@@ -95,4 +95,20 @@ defmodule Timesink.Factory do
       description: Faker.Lorem.sentence()
     }
   end
+
+  def exhibition_factory(params) do
+    [film, showcase, theater] =
+      for f <- [:film, :showcase, :theater] do
+        case params |> Map.get(f) do
+          field when is_struct(field) -> field
+          field when is_nil(field) -> insert(:f)
+        end
+      end
+
+    %Timesink.Cinema.Exhibition{
+      film: film,
+      showcase: showcase,
+      theater: theater
+    }
+  end
 end
