@@ -5,7 +5,6 @@ defmodule Timesink.Cinema.FilmCreative do
 
   @type role :: :director | :producer | :writer | :cast | :crew
   @roles [:director, :producer, :writer, :cast, :crew]
-  @spec roles() :: [:cast | :crew | :director | :producer | :writer, ...]
   def roles, do: @roles
 
   @type t :: %{
