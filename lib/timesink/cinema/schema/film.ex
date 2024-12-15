@@ -7,10 +7,6 @@ defmodule Timesink.Cinema.Film do
   @type color ::
           :color | :black_and_white | :sepia | :monochrome | :partially_colorized | :techinicolor
   @colors [:color, :black_and_white, :sepia, :monochrome, :partially_colorized, :technicolor]
-  @spec colors() :: [
-          :black_and_white | :color | :monochrome | :partially_colorized | :sepia | :technicolor,
-          ...
-        ]
   def colors, do: @colors
 
   @type format :: :digital | :"70mm" | :"65mm" | :"35mm" | :"16mm" | :"8mm"
@@ -51,10 +47,8 @@ defmodule Timesink.Cinema.Film do
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset(Timesink.Cinema.Film.t(), %{
-          optional(:__struct__) => none(),
-          optional(atom() | binary()) => any()
-        }) :: Ecto.Changeset.t()
+  @spec changeset(film :: t(), params :: %{optional(atom()) => term()}) ::
+          Ecto.Changeset.t()
   def changeset(film, params, _metadata \\ []) do
     film
     |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
