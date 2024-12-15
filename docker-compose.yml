@@ -17,6 +17,6 @@ services:
         sleep 3;
         mc config host add minio http://minio:9000 minioadmin minioadmin;
         mc mb -p minio/timesink.prod/public;
-        mc policy set public minio/timesink.prod/public;
+        mc anonymous set public minio/timesink.prod/public;
         exit 0;
       "
