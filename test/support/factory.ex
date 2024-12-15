@@ -88,4 +88,11 @@ defmodule Timesink.Factory do
       genres: genres
     }
   end
+
+  def theater_factory do
+    %Timesink.Cinema.Theater{
+      name: Faker.Cat.name(),
+      description: Faker.Lorem.sentence()
+    }
+  end
 end
