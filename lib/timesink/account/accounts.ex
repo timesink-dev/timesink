@@ -4,7 +4,6 @@ defmodule Timesink.Accounts do
   """
 
   alias Timesink.Accounts.User
-  alias Timesink.Accounts.Profile
 
   @doc """
   Query users through a function hook using the [Ecto.Query API](https://hexdocs.pm/ecto/Ecto.Query.html).
