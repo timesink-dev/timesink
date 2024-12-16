@@ -41,3 +41,6 @@ npm-debug.log
 
 # .iex.local.exs. https://dev.to/joeljuca/introducing-iex-local-exs-2bfk
 .iex.local.exs
+
+# Docker-related files
+.docker
