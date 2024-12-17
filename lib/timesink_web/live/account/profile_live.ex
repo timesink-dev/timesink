@@ -34,7 +34,7 @@ defmodule TimesinkWeb.Accounts.ProfileLive do
              query
              |> where([u], u.username == ^profile_username)
              |> join(:inner, [u], p in Profile, on: p.user_id == u.id)
-             |> preload([u], profile: u)
+             |> preload([u, p], profile: p)
            end) do
       {:ok, assign(socket, user: user, profile: user.profile)}
 
