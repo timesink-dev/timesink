@@ -27,12 +27,9 @@ defmodule TimesinkWeb.Router do
     live "/account", Accounts.MeLive
     live "/submit", FilmSubmissionLive
 
+    live "/archives", ArchiveLive
     live "/blog", BlogLive
-
-    # Static pages
-    get "/info", PageController, :info
-    get "/archives", ShowcaseController, :archives
-    get "/upcoming", ShowcaseController, :upcoming
+    live "/upcoming", UpcomingLive
 
     live "/:profile_username", Accounts.ProfileLive
   end
