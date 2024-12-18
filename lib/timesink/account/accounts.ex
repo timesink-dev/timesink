@@ -26,11 +26,12 @@ defmodule Timesink.Accounts do
   def update_me(user_id, params) do
     with {:ok, user} <- get_me(user_id) do
       Repo.transaction(fn ->
-        User.update!(user, params)
         Profile.update!(user.profile, params)
+        User.update!(user, params)
       end)
 
-      {:ok, user}
+      # Fetch the updated user from the database to ensure changes are reflected
+      get_me(user_id)
     end
   end
 end

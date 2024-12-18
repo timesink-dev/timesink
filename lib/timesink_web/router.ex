@@ -24,7 +24,7 @@ defmodule TimesinkWeb.Router do
     live "/join", WaitlistLive
     live "/signin", SignInLive
 
-    live "/account", Accounts.AccountLive
+    live "/me", Accounts.AccountLive
     live "/submit", FilmSubmissionLive
 
     # Static pages

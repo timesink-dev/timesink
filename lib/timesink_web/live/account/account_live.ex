@@ -68,4 +68,8 @@ defmodule TimesinkWeb.Accounts.AccountLive do
   def handle_event("activity", _params, socket) do
     {:noreply, assign(socket, active_tab: :activity)}
   end
+
+  def handle_info({:user_updated, updated_user}, socket) do
+    {:noreply, assign(socket, user: updated_user)}
+  end
 end

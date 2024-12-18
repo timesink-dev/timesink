@@ -91,18 +91,16 @@ defmodule TimesinkWeb.ProfileFormComponent do
     {:ok, assign(socket, account_form: to_form(changeset))}
   end
 
-  def handle_event("save", %{"user" => account_params}, socket) do
-    with {:ok, user} <- Accounts.update_me(socket.assigns.user.id, account_params) do
-      changeset = User.changeset_update(user, account_params)
+  def handle_event("save", %{"user" => user_params}, socket) do
+    with {:ok, updated_user} <- Accounts.update_me(socket.assigns.user.id, user_params) do
+      send(self(), {:user_updated, updated_user})
 
-      socket
-      |> assign(account_form: to_form(changeset))
-      |> put_flash!(
-        :info,
-        "Successfully updated your account"
-      )
+      socket =
+        socket
+        |> assign(user: updated_user, account_form: to_form(User.changeset_update(updated_user)))
+        |> put_flash!(:info, "Account updated successfully.")
+
+      {:noreply, socket}
     end
-
-    {:noreply, socket}
   end
 end
