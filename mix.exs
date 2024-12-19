@@ -34,6 +34,10 @@ defmodule Timesink.MixProject do
     [
       {:waffle, "~> 1.1"},
       {:waffle_ecto, "~> 0.0"},
+      {:ex_aws, "~> 2.5"},
+      {:ex_aws_s3, "~> 2.5"},
+      {:hackney, "~> 1.20"},
+      {:sweet_xml, "~> 0.7.4"},
       {:backpex, "~> 0.9.1"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:swiss_schema, "~> 0.6.0"},
