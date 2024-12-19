@@ -17,7 +17,7 @@ defmodule TimesinkWeb.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  import TimesinkWeb.Gettext
+  use Gettext, backend: TimesinkWeb.Gettext
 
   @doc """
   Renders a modal.
