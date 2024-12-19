@@ -44,6 +44,8 @@ defmodule TimesinkWeb.Router do
 
     backpex_routes()
 
+    get "/", RedirectController, :redirect_to_showcases
+
     live_session :default, on_mount: Backpex.InitAssigns do
       live_resources "/showcases", Admin.ShowcaseLive
       live_resources "/waitlist", Admin.WaitlistLive
