@@ -1,6 +1,7 @@
 defmodule Timesink.Cinema.FilmCreative do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
+  use Timesink.Schema
   import Ecto.Changeset
 
   @type role :: :director | :producer | :writer | :cast | :crew

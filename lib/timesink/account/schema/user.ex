@@ -1,6 +1,7 @@
 defmodule Timesink.Accounts.User do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
+  use Timesink.Schema
   import Ecto.Changeset
   alias Timesink.Accounts
 

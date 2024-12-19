@@ -7,20 +7,20 @@ defmodule TimesinkWeb.WaitlistLive do
       Process.send_after(self(), :reset_joined, 0)
     end
 
-    {:ok, assign(socket, joined: false)}
+    {:ok, assign(socket, joined: false), layout: {TimesinkWeb.Layouts, :empty}}
   end
 
   def render(assigns) do
     ~H"""
     <div class="mx-auto max-w-xl w-full flex flex-col justify-center min-h-screen">
-      <span class="flex flex-col -space-y-2.5 font-brand items-center">
+      <a class="flex flex-col -space-y-2.5 font-brand items-center" href={~p"/"}>
         <p class="text-[3rem] leading-10 tracking-tighter">
           TimeSink
         </p>
         <p class="pl-4 text-[2.6rem]">
           Presents
         </p>
-      </span>
+      </a>
       <h2 class="uppercase text-[2rem] mt-12 mb-2 tracking-tighter items-center">
         Welcome to the show.
       </h2>
