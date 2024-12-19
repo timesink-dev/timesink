@@ -32,6 +32,12 @@ defmodule Timesink.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:waffle, "~> 1.1"},
+      {:waffle_ecto, "~> 0.0"},
+      {:ex_aws, "~> 2.5"},
+      {:ex_aws_s3, "~> 2.5"},
+      {:hackney, "~> 1.20"},
+      {:sweet_xml, "~> 0.7.4"},
       {:backpex, "~> 0.10.0"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:resend, "~> 0.4.4"},
