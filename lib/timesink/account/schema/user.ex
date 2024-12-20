@@ -70,7 +70,8 @@ defmodule Timesink.Accounts.User do
     |> cast(params, [
       :email,
       :first_name,
-      :last_name
+      :last_name,
+      :username
     ])
     |> cast_assoc(:profile, with: &Accounts.Profile.changeset_update/2)
   end

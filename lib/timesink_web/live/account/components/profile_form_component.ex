@@ -25,6 +25,14 @@ defmodule TimesinkWeb.ProfileFormComponent do
           class="mt-8 mb-8 w-2/3"
         >
           <div>
+            <.input
+              label="Username"
+              field={@account_form[:username]}
+              placeholder="Username"
+              class="w-full"
+              value={"@#{@user.username}"}
+              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+            />
             <!-- Profile Nested Fields -->
             <.inputs_for :let={pf} field={@account_form[:profile]}>
               <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
