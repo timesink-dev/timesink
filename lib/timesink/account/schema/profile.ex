@@ -68,6 +68,5 @@ defmodule Timesink.Accounts.Profile do
       :bio
     ])
     |> cast_embed(:location)
-    |> IO.inspect(label: "Profile changeset")
   end
 end

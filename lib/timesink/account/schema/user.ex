@@ -66,7 +66,7 @@ defmodule Timesink.Accounts.User do
 
   def changeset_update(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
-    |> Timesink.Repo.preload(:profile)
+    |> Repo.preload(:profile)
     |> cast(params, [
       :email,
       :first_name,
