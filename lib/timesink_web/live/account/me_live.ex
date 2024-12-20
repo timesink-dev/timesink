@@ -4,20 +4,20 @@ defmodule TimesinkWeb.Accounts.MeLive do
   def render(assigns) do
     ~H"""
     <div id="user" class="sm:flex sm:justify-center sm:gap-x-32 sm:items-start sm:mt-16">
-      <div class="sm:ml-16 md:ml-32 sm:flex sm:flex-col gap-y-2 mt-24 basis-1/6">
+      <div class="sm:ml-16 md:ml-32 sm:flex sm:flex-col gap-y-6 mt-24 basis-1/6">
         <button
           phx-click="profile"
           class={[
-            "rounded w-full font-semibold px-12 py-2.5 flex items-center justify-center",
-            @active_tab === :profile && "bg-neon-blue-lightest text-backroom-black"
+            "rounded-sm w-full font-semibold px-12 py-2.5 flex items-center justify-center bg-backroom-black border-[0.5px] border-dark-theater-light hover:border-dark-theater-lightest",
+            @active_tab === :profile && "bg-backroom border-mystery-white hover:border-mystery-white"
           ]}
         >
           Profile
         </button>
         <button
           class={[
-            "rounded w-full font-semibold px-12 py-2.5 flex items-center justify-center",
-            @active_tab === :security && "bg-neon-blue-lightest text-backroom-black"
+            "rounded-sm w-full font-semibold px-12 py-2.5 flex items-center justify-center bg-backroom-black border-[0.5px] border-dark-theater-light hover:border-dark-theater-lightest",
+            @active_tab === :security && "bg-backroom border-mystery-white hover:border-mystery-white"
           ]}
           phx-click="security"
         >
@@ -26,8 +26,8 @@ defmodule TimesinkWeb.Accounts.MeLive do
         <button
           phx-click="activity"
           class={[
-            "rounded w-full font-semibold px-12 py-2.5 flex items-center justify-center",
-            @active_tab === :activity && "bg-neon-blue-lightest text-backroom-black"
+            "rounded-sm w-full font-semibold px-12 py-2.5 flex items-center justify-center bg-backroom-black border-[0.5px] border-dark-theater-light hover:border-dark-theater-lightest",
+            @active_tab === :activity && "bg-backroom border-mystery-white hover:border-mystery-white"
           ]}
         >
           Activity
@@ -50,7 +50,6 @@ defmodule TimesinkWeb.Accounts.MeLive do
 
   def mount(_params, _session, socket) do
     {:ok, user} = Timesink.Accounts.get_me()
-    # {:ok, %{user: user}} ->
     {:ok, assign(socket, user: user, active_tab: :profile)}
 
     # {:error, _} ->

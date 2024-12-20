@@ -25,14 +25,17 @@ defmodule TimesinkWeb.ProfileFormComponent do
           class="mt-8 mb-8 w-2/3"
         >
           <div>
-            <.input
-              field={@account_form[:bio]}
-              type="textarea"
-              input_class="w-full px-4 py-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-              class=""
-              label="Bio"
-              value={@user.profile.bio}
-            />
+            <!-- Profile Nested Fields -->
+            <.inputs_for :let={pf} field={@account_form[:profile]}>
+              <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
+              <.input
+                field={pf[:bio]}
+                type="textarea"
+                input_class="w-full px-4 py-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+                label="Bio"
+                value={@user.profile.bio}
+              />
+            </.inputs_for>
             <.input
               disabled
               field={@account_form[:locality]}
@@ -92,7 +95,7 @@ defmodule TimesinkWeb.ProfileFormComponent do
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
-    with {:ok, updated_user} <- Accounts.update_me(socket.assigns.user.id, user_params) do
+    with {:ok, updated_user} <- Accounts.update_me(socket.assigns.user, user_params) do
       send(self(), {:user_updated, updated_user})
 
       socket =

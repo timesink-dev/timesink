@@ -1,8 +1,4 @@
 defmodule Timesink.Accounts do
-  alias Timesink.Accounts.Profile
-  alias Timesink.Accounts.User
-  alias Timesink.Repo
-
   @moduledoc """
   The Accounts context.
   """
@@ -57,15 +53,9 @@ defmodule Timesink.Accounts do
     {:ok, user}
   end
 
-  def update_me(user_id, params) do
-    with {:ok, user} <- get_me(user_id) do
-      Repo.transaction(fn ->
-        Profile.update!(user.profile, params)
-        User.update!(user, params)
-      end)
-    end
-
-    # Fetch the updated user from the database to ensure changes are reflected
-    get_me(user_id)
+  def update_me(user, params) do
+    user
+    |> User.changeset_update(params)
+    |> Timesink.Repo.update()
   end
 end
