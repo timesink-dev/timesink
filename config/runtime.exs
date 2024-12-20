@@ -37,6 +37,13 @@ config :timesink, Timesink.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   socket_options: maybe_ipv6
 
+# ExAws defaults to local, Docker-based MinIO
+System.get_env("TIMESINK_S3_BASEURL", "http://localhost:9000")
+|> URI.parse()
+|> then(fn %{scheme: scheme, host: host, port: port} ->
+  config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
+end)
+
 if config_env() == :prod do
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you

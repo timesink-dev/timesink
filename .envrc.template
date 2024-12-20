@@ -1,5 +1,16 @@
 # direnv .envrc
 # https://direnv.net
 
+# Postgres
 # export DATABASE_URL="ecto://postgres:postgres@localhost/timesink_dev"
+
+
+# Mailer (Resend. https://resend.com)
 # export RESEND_API_KEY="resend_api_key"
+
+
+# Object storage (MinIO, S3-compatible)
+# export TIMESINK_S3_BASEURL="http://localhost:9000"
+# export TIMESINK_S3_ACCESS_KEY="minioadmin"
+# export TIMESINK_S3_ACCESS_SECRET="minioadmin"
+# export TIMESINK_S3_BUCKET="timesink-dev"
