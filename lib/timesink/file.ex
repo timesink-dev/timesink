@@ -1,0 +1,39 @@
+defmodule Timesink.File do
+  use Ecto.Schema
+  use SwissSchema, repo: Timesink.Repo
+  use Waffle.Ecto.Schema
+  use Timesink.Schema
+  import Ecto.Changeset
+
+  @type t :: %{
+          __struct__: __MODULE__,
+          user_id: :integer,
+          name: :string,
+          size: :integer,
+          content: :string,
+          user: Timesink.Accounts.User.t()
+        }
+
+  @primary_key {:id, :binary_id, autogenerate: true}
+
+  schema "file" do
+    belongs_to :user, Timesink.Accounts.User
+
+    field :name, :string
+    field :size, :integer
+    field :content, Timesink.FileWaffle.Type
+
+    timestamps(type: :utc_datetime)
+  end
+
+  @spec changeset(file :: t(), params :: %{optional(atom()) => term()}) ::
+          Ecto.Changeset.t()
+  def changeset(file, params) do
+    file
+    |> cast(params, [:name, :size])
+    |> cast_assoc(:user, with: &Timesink.Accounts.User.changeset/2)
+    |> cast_attachments(params, [:content])
+    |> validate_required([:name, :size, :content])
+    |> unique_constraint(:name)
+  end
+end
