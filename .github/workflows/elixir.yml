@@ -4,8 +4,8 @@ on:
   push:
 
 env:
-  OTP_VERSION: "27.1"
-  ELIXIR_VERSION: "1.17.3-otp-27"
+  OTP_VERSION: "27.2"
+  ELIXIR_VERSION: "1.18.0-otp-27"
 
 jobs:
   lint:

@@ -24,14 +24,16 @@ defmodule TimesinkWeb.Router do
     live "/join", WaitlistLive
     live "/signin", SignInLive
 
-    live "/me", Accounts.AccountLive
+    live "/me", Accounts.MeLive
+
     live "/submit", FilmSubmissionLive
+
+    live "/archives", ArchiveLive
+    live "/blog", BlogLive
+    live "/upcoming", UpcomingLive
 
     # Static pages
     get "/info", PageController, :info
-    get "/blog", BlogController, :index
-    get "/archives", ShowcaseController, :archives
-    get "/upcoming", ShowcaseController, :upcoming
 
     live "/:profile_username", Accounts.ProfileLive
   end
@@ -45,6 +47,8 @@ defmodule TimesinkWeb.Router do
     pipe_through :browser
 
     backpex_routes()
+
+    get "/", RedirectController, :redirect_to_showcases
 
     live_session :default, on_mount: Backpex.InitAssigns do
       live_resources "/showcases", Admin.ShowcaseLive

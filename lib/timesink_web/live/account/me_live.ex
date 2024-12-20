@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.Accounts.AccountLive do
+defmodule TimesinkWeb.Accounts.MeLive do
   use TimesinkWeb, :live_view
 
   def render(assigns) do
