@@ -1,4 +1,11 @@
 # direnv .envrc
 # https://direnv.net
 
+# Postgres
 # export DATABASE_URL="ecto://postgres:postgres@localhost/timesink_dev"
+
+# Object storage (MinIO, S3-compatible)
+export TIMESINK_S3_BUCKET="timesink-dev"
+export TIMESINK_S3_ASSET_HOST="http://localhost:9000"
+export TIMESINK_S3_ACCESS_KEY="minioadmin"
+export TIMESINK_S3_ACCESS_SECRET="minioadmin"
