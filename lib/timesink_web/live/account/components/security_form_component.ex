@@ -1,13 +1,16 @@
 defmodule TimesinkWeb.SecurityFormComponent do
+  alias String.Tokenizer.Security
   alias Timesink.Accounts.User
   use TimesinkWeb, :live_component
 
   def render(assigns) do
     ~H"""
     <section class="">
-      <div class="mb-8">
+      <div class="mb-8 flex justify-between">
+        <button phx-click="back">
+          <.icon name="hero-arrow-left" class=" h-5 w-5 opacity-100 group-hover:opacity-70 px-2 py-2" />
+        </button>
         <h2 class="text-[2rem] font-semibold text-mystery-white">Security</h2>
-        <span> Manage your account security settings </span>
       </div>
       <div>
         <.simple_form

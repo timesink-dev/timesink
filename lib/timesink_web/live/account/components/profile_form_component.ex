@@ -5,10 +5,12 @@ defmodule TimesinkWeb.ProfileFormComponent do
 
   def render(assigns) do
     ~H"""
-    <section class="w-full">
-      <div class="mb-8">
-        <h2 class="text-[2rem] font-semibold text-mystery-white">Account</h2>
-        <span> Manage your personal account and profile settings </span>
+    <section class="w-full mx-auto">
+      <div class="mb-8 flex justify-between">
+        <button phx-click="back">
+          <.icon name="hero-arrow-left" class=" h-5 w-5 opacity-100 group-hover:opacity-70 px-2 py-2" />
+        </button>
+        <h2 class="text-[2rem] font-semibold text-mystery-white">Profile</h2>
       </div>
       <div class="flex gap-x-12 justify-start items-end">
         <div>
@@ -38,6 +40,7 @@ defmodule TimesinkWeb.ProfileFormComponent do
               <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
               <.input
                 field={pf[:bio]}
+                placeholder="Tell the world about yourself"
                 type="textarea"
                 input_class="w-full px-4 py-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
                 label="Bio"
