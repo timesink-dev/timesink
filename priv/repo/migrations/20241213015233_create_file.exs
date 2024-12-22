@@ -11,9 +11,11 @@ defmodule Timesink.Repo.Migrations.CreateFile do
       add :name, :string, null: false
       add :size, :integer, null: false
       add :content_type, :string
+      add :content_hash, :string
       add :content, :string, null: false
     end
 
     create unique_index(:file, [:name])
+    create unique_index(:file, [:hash])
   end
 end
