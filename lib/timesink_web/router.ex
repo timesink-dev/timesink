@@ -1,6 +1,4 @@
 defmodule TimesinkWeb.Router do
-  alias String.Tokenizer.Security
-  alias TimesinkWeb.ProfileSettingsLive
   import Backpex.Router
   use TimesinkWeb, :router
 

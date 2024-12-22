@@ -16,7 +16,7 @@ defmodule TimesinkWeb.Accounts.MeLive do
           joined {Utils.format_date(@user.inserted_at)}
         </span>
       </div>
-      <.account_nav
+      <.me_page_item
         title="Account"
         items={[
           %{
@@ -31,7 +31,7 @@ defmodule TimesinkWeb.Accounts.MeLive do
           }
         ]}
       />
-      <.account_nav
+      <.me_page_item
         title="Activity"
         items={[
           %{
@@ -46,7 +46,7 @@ defmodule TimesinkWeb.Accounts.MeLive do
           }
         ]}
       />
-      <.account_nav
+      <.me_page_item
         title="Integrations"
         items={[
           %{

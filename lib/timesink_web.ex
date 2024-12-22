@@ -89,7 +89,7 @@ defmodule TimesinkWeb do
       import Phoenix.HTML
       # Core UI components and translation
       import TimesinkWeb.CoreComponents
-      import TimesinkWeb.AccountNavigation
+      import TimesinkWeb.MePageItem
       import TimesinkWeb.Gettext
 
       # Shortcut for generating JS commands

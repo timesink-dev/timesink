@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.AccountNavigation do
+defmodule TimesinkWeb.MePageItem do
   use Phoenix.Component
   import TimesinkWeb.CoreComponents, only: [icon: 1]
 
@@ -6,7 +6,7 @@ defmodule TimesinkWeb.AccountNavigation do
   attr :title, :string, default: nil
   attr :items, :list, default: []
 
-  def account_nav(assigns) do
+  def me_page_item(assigns) do
     ~H"""
     <section class={@class}>
       <h2 class="my-4">{@title}</h2>
