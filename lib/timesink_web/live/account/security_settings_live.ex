@@ -1,24 +1,22 @@
-defmodule TimesinkWeb.SecurityFormComponent do
-  alias String.Tokenizer.Security
+defmodule TimesinkWeb.Accounts.SecuritySettingsLive do
   alias Timesink.Accounts.User
-  use TimesinkWeb, :live_component
+  use TimesinkWeb, :live_view
 
   def render(assigns) do
     ~H"""
-    <section class="">
-      <div class="mb-8 flex justify-between">
-        <button phx-click="back">
-          <.icon name="hero-arrow-left" class=" h-5 w-5 opacity-100 group-hover:opacity-70 px-2 py-2" />
-        </button>
-        <h2 class="text-[2rem] font-semibold text-mystery-white">Security</h2>
+    <section class="w-1/2 mx-auto">
+      <div class="my-8">
+        <.back navigate={~p"/me"}></.back>
+        <h2 class="text-[1.5rem] font-semibold text-mystery-white flex justify-center">
+          Security settings
+        </h2>
       </div>
       <div>
         <.simple_form
           as="security"
-          phx-target={@myself}
           for={@security_form}
           phx-submit="save"
-          class="mt-8 mb-8 w-2/3"
+          class="mt-8 mb-8 w-full mx-auto"
         >
           <div class="w-full flex flex-col gap-y-2">
             <.input
@@ -56,8 +54,8 @@ defmodule TimesinkWeb.SecurityFormComponent do
           </:actions>
         </.simple_form>
       </div>
-      <div class="mt-48">
-        <h2 class="w-2/3 bg-neon-red-light bg-opacity-10 px-12 py-6 border-[0.4px] border-neon-red-light rounded text-neon-red-light text-xl font-brand">
+      <div class="mt-96">
+        <h2 class="w-full bg-neon-red-light bg-opacity-10 px-12 py-6 border-[0.4px] border-neon-red-light rounded text-neon-red-light text-xl font-brand">
           Danger zone!
         </h2>
         <button class="mt-6 focus-none py-4 px-16 bg-backroom-black text-neon-red-light font-semibold border-neon-red-light border-[1px]">
@@ -68,7 +66,7 @@ defmodule TimesinkWeb.SecurityFormComponent do
     """
   end
 
-  def mount(socket) do
+  def mount(_params, _session, socket) do
     changeset =
       User.changeset_update(%User{})
 

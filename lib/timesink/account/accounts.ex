@@ -47,7 +47,6 @@ defmodule Timesink.Accounts do
   """
   def get_me(user_id \\ @mock_current_user_id) do
     user_id = to_string(user_id)
-
     user = User.get!(user_id) |> Timesink.Repo.preload(:profile)
 
     {:ok, user}

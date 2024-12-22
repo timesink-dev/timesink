@@ -588,12 +588,12 @@ defmodule TimesinkWeb.CoreComponents do
 
   def back(assigns) do
     ~H"""
-    <div class="mt-16">
+    <div>
       <.link
         navigate={@navigate}
-        class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+        class="text-sm font-semibold leading-6 text-mystery-white hover:text-neon-blue-lightest"
       >
-        <.icon name="hero-arrow-left-solid" class="h-3 w-3" /> {render_slot(@inner_block)}
+        <.icon name="hero-arrow-left-solid" class="h-5 w-5" /> {render_slot(@inner_block)}
       </.link>
     </div>
     """
