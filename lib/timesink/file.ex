@@ -10,6 +10,7 @@ defmodule Timesink.File do
           user_id: :integer,
           name: :string,
           size: :integer,
+          content_type: :string,
           content: :string,
           user: Timesink.Accounts.User.t()
         }
@@ -21,6 +22,7 @@ defmodule Timesink.File do
 
     field :name, :string
     field :size, :integer
+    field :content_type, :string
     field :content, Timesink.FileWaffle.Type
 
     timestamps(type: :utc_datetime)

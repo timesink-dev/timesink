@@ -10,6 +10,7 @@ defmodule Timesink.Repo.Migrations.CreateFile do
       add :user_id, references(:user, type: :uuid, on_delete: :delete_all)
       add :name, :string, null: false
       add :size, :integer, null: false
+      add :content_type, :string
       add :content, :string, null: false
     end
 
