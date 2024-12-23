@@ -90,6 +90,7 @@ defmodule TimesinkWeb do
       # Core UI components and translation
       import TimesinkWeb.CoreComponents
       import TimesinkWeb.MePageItem
+      import TimesinkWeb.TopNav
       import TimesinkWeb.Gettext
 
       # Shortcut for generating JS commands

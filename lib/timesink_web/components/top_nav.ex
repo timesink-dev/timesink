@@ -1,0 +1,125 @@
+defmodule TimesinkWeb.TopNav do
+  import TimesinkWeb.CoreComponents, only: [icon: 1]
+  use Phoenix.Component
+  alias Phoenix.LiveView.JS
+
+  attr :class, :string, default: nil
+
+  def top_nav(assigns) do
+    ~H"""
+    <header class={["z-40 sticky bg-backgroom-black", @class]}>
+      <div class="md:hidden flex items-center justify-between border-gray-200 mt-2 text-sm z-40">
+        <p class="md:hidden bg-backroom-black font-brand rounded-xl px-2 font-medium leading-6">
+          TimeSink
+        </p>
+        <.hamburger_button />
+      </div>
+      <.open_hamburger />
+      <.top_nav_content />
+    </header>
+    """
+  end
+
+  defp top_nav_content(assigns) do
+    ~H"""
+    <nav id="top-nav" class="mt-2">
+      <div id="nav-container" class="hidden md:flex justify-between items-center">
+        <div id="nav-links" class="flex justify-between items-center gap-x-8">
+          <a href="/now-playing">Now Playing</a>
+          <a href="/blog">Blog</a>
+          <a href="/info">Info</a>
+        </div>
+        <a id="nav-logo" href="/">
+          Timesink Presents
+        </a>
+
+        <div id="nav-actions" class="flex justify-between items-center gap-x-8">
+          <a href="/signin">Sign In</a>
+          <a href="/join">Join Waitlist</a>
+        </div>
+      </div>
+    </nav>
+    """
+  end
+
+  defp hamburger_button(assigns) do
+    ~H"""
+    <div class="md:hidden">
+      <button phx-click={show_hamburger()}>
+        <.icon name="hero-ellipsis-vertical" />
+      </button>
+    </div>
+    """
+  end
+
+  defp open_hamburger(assigns) do
+    ~H"""
+    <div id="hamburger-container" class="hidden relative z-50">
+      <div id="hamburger-backdrop" class="fixed inset-0 bg-dark-backroom-black/10 transition-opacity">
+      </div>
+      <nav
+        id="hamburger-content"
+        class="fixed top-0 left-0 bottom-0 flex flex-col grow justify-between w-full py-2 bg-backroom-black border-rå overflow-y-auto"
+      >
+        <div>
+          <div class="flex items-center mb-4 place-content-between mx-4">
+            <div class="flex items-center gap-4">
+              <p class="font-brand rounded-xl px-2 font-medium leading-6">
+                Menu Du Jour
+              </p>
+            </div>
+            <button class="navbar-close" phx-click={hide_hamburger()}>
+              <.icon name="hero-x-mark-mini" />
+            </button>
+          </div>
+          <div>
+            <ul class="flex flex-col justify-start items-center gap-y-2">
+              <li><a href="/now-playing">Now Playing</a></li>
+              <li><a href="/blog">Blog</a></li>
+              <li><a href="/info">Info</a></li>
+              <li><a href="/signin">Sign In</a></li>
+              <li><a href="/join">Join Waitlist</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    """
+  end
+
+  defp show_hamburger(js \\ %JS{}) do
+    js
+    |> JS.show(
+      to: "#hamburger-content",
+      transition:
+        {"transition-all transform ease-in-out duration-300", "-translate-x-3/4", "translate-x-0"},
+      time: 300,
+      display: "flex"
+    )
+    |> JS.show(
+      to: "#hamburger-backdrop",
+      transition:
+        {"transition-all transform ease-in-out duration-300", "opacity-0", "opacity-100"}
+    )
+    |> JS.show(
+      to: "#hamburger-container",
+      time: 300
+    )
+    |> JS.add_class("overflow-hidden", to: "body")
+  end
+
+  defp hide_hamburger(js \\ %JS{}) do
+    js
+    |> JS.hide(
+      to: "#hamburger-backdrop",
+      transition: {"transition-all transform ease-in duration-200", "opacity-100", "opacity-0"}
+    )
+    |> JS.hide(
+      to: "#hamburger-content",
+      transition:
+        {"transition-all transform ease-in duration-200", "translate-x-0", "-translate-x-3/4"}
+    )
+    |> JS.hide(to: "#hamburger-container", transition: {"block", "block", "hidden"})
+    |> JS.remove_class("overflow-hidden", to: "body")
+  end
+end
