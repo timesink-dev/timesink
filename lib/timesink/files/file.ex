@@ -56,4 +56,18 @@ defmodule Timesink.File do
     |> then(&:crypto.hash(:md5, &1))
     |> Base.encode16(case: :lower)
   end
+
+  @doc """
+  Calculate a file content byte size.
+
+  ## Examples
+
+      iex> "José Valim" |> File.size()
+      11
+  """
+  @spec size(binary()) ::
+          non_neg_integer()
+  def size(content) when is_binary(content) do
+    :erlang.byte_size(content)
+  end
 end
