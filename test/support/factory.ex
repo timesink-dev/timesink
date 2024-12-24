@@ -1,6 +1,25 @@
 defmodule Timesink.Factory do
   use ExMachina.Ecto, repo: Timesink.Repo
 
+  # Files
+
+  def file_factory do
+    filename = Faker.File.file_name()
+    content = Faker.Lorem.sentences() |> Enum.join(" ")
+    size = Timesink.File.size(content)
+    hash = Timesink.File.hash(content)
+
+    %Timesink.File{
+      name: filename,
+      size: size,
+      content_type: "text/plain",
+      content_hash: hash,
+      content: content
+    }
+  end
+
+  # Accounts
+
   def applicant_factory do
     %Timesink.Waitlist.Applicant{
       first_name: Faker.Person.first_name(),
