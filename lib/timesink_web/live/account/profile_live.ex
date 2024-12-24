@@ -44,6 +44,25 @@ defmodule TimesinkWeb.Accounts.ProfileLive do
       # Does it make sense to have an else block here to react this scenario?
       # else
       #   {:ok, []} -> {:ok, socket}
+
+      %{
+        "user" => %{
+          "email" => "thebom@gmail.com",
+          "first_name" => "Deuce as assaasd",
+          "last_name" => "Baas",
+          "profile" => %{
+            "_persistent_id" => "0",
+            "bio" => "asasasas assa",
+            "id" => "4ca2928d-2e94-4bec-80a4-90595bc98d2c",
+            "location" => %{
+              "_persistent_id" => "0",
+              "id" => "4ca2928d-2e94-4bec-80a4-90595bc98d2c",
+              "locality" => "As"
+            }
+          },
+          "username" => "@@@@@@@@@@@@@@@@@@@@@purpleReignSeattle asasa s"
+        }
+      }
     end
   end
 end

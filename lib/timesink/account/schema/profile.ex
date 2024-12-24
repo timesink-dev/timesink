@@ -67,6 +67,6 @@ defmodule Timesink.Accounts.Profile do
       :org_position,
       :bio
     ])
-    |> cast_embed(:location)
+    |> cast_embed(:location, with: &Accounts.Location.changeset_update/2)
   end
 end

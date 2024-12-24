@@ -14,10 +14,39 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
       </div>
       <div>
         <.simple_form as="user" for={@account_form} phx-submit="save" class="mt-8 mb-8 w-full mx-auto">
-          <div class="flex flex-col justify-center items-center">
-            <label class="mb-2">Profile image</label>
-            <img src={@user.profile.avatar_url} alt="Profile picture" class="rounded-full w-24 h-24" />
-          </div>
+          <.inputs_for :let={pf} field={@account_form[:profile]}>
+            <span class="flex flex-col justify-center items-center mb-4">
+              <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
+              <label class="mb-2">Profile image</label>
+              <img
+                src={@user.profile.avatar_url}
+                alt="Profile picture"
+                class="rounded-full w-24 h-24"
+              />
+            </span>
+            <div>
+              <.inputs_for :let={loc} field={pf[:location]}>
+                <span class="flex items-center justify-center gap-x-1">
+                  <.icon name="hero-map-pin" class="text-dark-theater-primary" />
+                  <.input type="hidden" field={loc[:id]} value={@user.profile.location.id} />
+
+                  <.input
+                    field={loc[:locality]}
+                    input_class="w-full px-2 py-1 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+                    value={@user.profile.location.locality}
+                  />
+                </span>
+              </.inputs_for>
+            </div>
+            <.input
+              field={pf[:bio]}
+              placeholder="Tell the world about yourself"
+              type="textarea"
+              input_class="w-full px-4 py-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              label="Bio"
+              value={@user.profile.bio}
+            />
+          </.inputs_for>
           <div>
             <.input
               label="Username"
@@ -26,25 +55,6 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
               class="w-full"
               value={"@#{@user.username}"}
               input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-            />
-            <!-- Profile Nested Fields -->
-            <.inputs_for :let={pf} field={@account_form[:profile]}>
-              <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
-              <.input
-                field={pf[:bio]}
-                placeholder="Tell the world about yourself"
-                type="textarea"
-                input_class="w-full px-4 py-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-                label="Bio"
-                value={@user.profile.bio}
-              />
-            </.inputs_for>
-            <.input
-              disabled
-              field={@account_form[:locality]}
-              class="px-4 py-2"
-              label="Location"
-              value={@user.profile.location.locality <> ", " <> to_string(@user.profile.location.country)}
             />
           </div>
           <div class="w-full flex flex-col gap-y-2">
