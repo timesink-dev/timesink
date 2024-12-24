@@ -29,8 +29,8 @@ defmodule TimesinkWeb.TopNav do
           <a href="/blog">Blog</a>
           <a href="/info">Info</a>
         </div>
-        <a id="nav-logo" href="/">
-          Timesink Presents
+        <a id="nav-logo" href="/" class="font-brand">
+          TimeSink Presents
         </a>
 
         <div id="nav-actions" class="flex justify-between items-center gap-x-8">
@@ -46,7 +46,7 @@ defmodule TimesinkWeb.TopNav do
     ~H"""
     <div class="md:hidden">
       <button phx-click={show_hamburger()}>
-        <.icon name="hero-ellipsis-vertical" />
+        <.icon name="hero-bars-3" />
       </button>
     </div>
     """
