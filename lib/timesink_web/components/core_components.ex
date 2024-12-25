@@ -243,10 +243,13 @@ defmodule TimesinkWeb.CoreComponents do
       |> assign_new(:classes, fn ->
         case assigns.color do
           "primary" ->
-            "bg-neon-blue-lightest rounded"
+            "bg-neon-blue-lightest text-backroom-black"
 
           "secondary" ->
             "bg-backroom-black text-neon-blue-lightest border-neon-blue-lightest border-[1px]"
+
+          "tertiary" ->
+            "bg-dark-theater-primary text-mystery-white"
 
           # default styling
           _ ->
@@ -258,7 +261,7 @@ defmodule TimesinkWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded",
+        "phx-submit-loading:opacity-75 rounded px-4 py-2 rounded",
         @classes,
         @class
       ]}

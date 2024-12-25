@@ -26,7 +26,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
             </span>
             <div>
               <.inputs_for :let={loc} field={pf[:location]}>
-                <span class="flex items-center justify-center gap-x-1">
+                <span class="flex items-center justify-start gap-x-1 my-8">
                   <.icon name="hero-map-pin" class="text-dark-theater-primary" />
                   <.input type="hidden" field={loc[:id]} value={@user.profile.location.id} />
 
