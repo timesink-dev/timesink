@@ -7,6 +7,7 @@ alias Timesink.Repo
 alias Timesink.Accounts
 alias Timesink.Accounts.User
 alias Timesink.Accounts.Profile
+alias Timesink.Accounts.Location
 
 # Timesink.Cinema
 alias Timesink.Cinema
