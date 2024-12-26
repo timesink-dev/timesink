@@ -10,21 +10,22 @@ defmodule Timesink.File do
           user_id: :integer,
           name: :string,
           size: :integer,
-          content_type: :string,
-          content_hash: :string,
+          type: :string,
+          hash: :string,
           content: :string,
           user: Timesink.Accounts.User.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   schema "file" do
     belongs_to :user, Timesink.Accounts.User
 
     field :name, :string
     field :size, :integer
-    field :content_type, :string
-    field :content_hash, :string
+    field :type, :string
+    field :hash, :string
     field :content, Timesink.FileWaffle.Type
 
     timestamps(type: :utc_datetime)
@@ -34,10 +35,10 @@ defmodule Timesink.File do
           Ecto.Changeset.t()
   def changeset(file, params) do
     file
-    |> cast(params, [:name, :size])
-    |> cast_assoc(:user, with: &Timesink.Accounts.User.changeset/2)
+    |> cast(params, [:user_id, :name, :size, :type, :hash, :content])
     |> cast_attachments(params, [:content])
     |> validate_required([:name, :size, :content])
+    |> foreign_key_constraint(:user_id)
     |> unique_constraint(:name)
   end
 
