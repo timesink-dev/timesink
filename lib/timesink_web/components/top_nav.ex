@@ -58,7 +58,7 @@ defmodule TimesinkWeb.TopNav do
       <div id="hamburger-backdrop" class="fixed inset-0 bg-zinc-900/90 transition-opacity"></div>
       <nav
         id="hamburger-content"
-        class="rounded fixed top-0 right-0 bottom-0 flex flex-col grow justify-between w-5/6 md:1/2 py-2 bg-backroom-black overflow-y-auto"
+        class="rounded fixed top-0 right-0 bottom-0 flex flex-col grow justify-between w-5/6 md:w-1/2 py-2 bg-backroom-black overflow-y-auto"
       >
         <div class="mx-6">
           <div class="flex items-center mb-4 place-content-between pb-6 py-2 border-solid border-b-[0.5px] border-dark-theater-primary">
