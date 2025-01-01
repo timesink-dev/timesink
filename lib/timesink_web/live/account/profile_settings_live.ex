@@ -1,5 +1,4 @@
 defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
-  alias Timesink.Accounts
   alias Timesink.Accounts.User
   use TimesinkWeb, :live_view
 

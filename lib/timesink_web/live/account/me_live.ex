@@ -2,6 +2,8 @@ defmodule TimesinkWeb.Accounts.MeLive do
   use TimesinkWeb, :live_view
   alias TimesinkWeb.Utils
 
+  import TimesinkWeb.Accounts.MePageItem
+
   def render(assigns) do
     ~H"""
     <section id="user">

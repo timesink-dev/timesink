@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.MePageItem do
+defmodule TimesinkWeb.Accounts.MePageItem do
   use Phoenix.Component
   import TimesinkWeb.CoreComponents, only: [icon: 1]
 
