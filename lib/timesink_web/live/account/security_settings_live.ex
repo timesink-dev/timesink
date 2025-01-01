@@ -68,7 +68,7 @@ defmodule TimesinkWeb.Accounts.SecuritySettingsLive do
 
   def mount(_params, _session, socket) do
     changeset =
-      User.changeset_update(%User{})
+      User.changeset(%User{})
 
     {:ok, assign(socket, security_form: to_form(changeset))}
   end

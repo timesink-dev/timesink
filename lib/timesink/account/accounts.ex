@@ -53,10 +53,4 @@ defmodule Timesink.Accounts do
 
     {:ok, user}
   end
-
-  def update_me(user, params) do
-    user
-    |> User.changeset(params)
-    |> Repo.update()
-  end
 end

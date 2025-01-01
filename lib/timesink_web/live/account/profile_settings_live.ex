@@ -116,7 +116,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
-    with {:ok, updated_user} <- Accounts.update_me(socket.assigns.user, user_params) do
+    with {:ok, updated_user} <- User.update(socket.assigns.user, user_params) do
       socket =
         socket
         |> assign(user: updated_user, account_form: to_form(User.changeset(updated_user)))
