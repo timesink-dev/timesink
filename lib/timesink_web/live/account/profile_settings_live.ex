@@ -53,7 +53,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
               field={@account_form[:username]}
               placeholder="Username"
               class="w-full"
-              value={"@#{@user.username}"}
+              value={@user.username}
               input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
             />
           </div>
