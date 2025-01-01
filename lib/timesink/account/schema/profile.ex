@@ -53,20 +53,4 @@ defmodule Timesink.Accounts.Profile do
     |> validate_required([:user_id])
     |> unique_constraint(:user_id)
   end
-
-  @spec changeset_update(
-          Timesink.Accounts.Profile.t(),
-          :invalid | %{optional(:__struct__) => none(), optional(atom() | binary()) => any()}
-        ) :: Ecto.Changeset.t()
-  def changeset_update(%{__struct__: __MODULE__} = struct, params \\ %{}) do
-    struct
-    |> cast(params, [
-      :avatar_url,
-      :birthdate,
-      :org_name,
-      :org_position,
-      :bio
-    ])
-    |> cast_embed(:location, with: &Accounts.Location.changeset_update/2)
-  end
 end

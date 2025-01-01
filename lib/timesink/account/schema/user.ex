@@ -44,7 +44,7 @@ defmodule Timesink.Accounts.User do
 
   @spec changeset(user :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
-  def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
+  def changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> cast(params, [
       :is_active,
@@ -62,17 +62,5 @@ defmodule Timesink.Accounts.User do
     |> validate_length(:first_name, min: 2)
     |> validate_length(:last_name, min: 2)
     |> validate_length(:username, min: 1)
-  end
-
-  def changeset_update(%{__struct__: __MODULE__} = struct, params \\ %{}) do
-    struct
-    |> Repo.preload(:profile)
-    |> cast(params, [
-      :email,
-      :first_name,
-      :last_name,
-      :username
-    ])
-    |> cast_assoc(:profile, with: &Accounts.Profile.changeset_update/2)
   end
 end

@@ -22,21 +22,27 @@ defmodule TimesinkWeb.TopNav do
 
   defp top_nav_content(assigns) do
     ~H"""
-    <nav id="top-nav" class="mt-2">
+    <nav class="mt-2" aria-label="Main Navigation">
       <div id="nav-container" class="hidden md:flex justify-between items-center">
-        <div id="nav-links" class="flex justify-between items-center gap-x-8">
-          <a href="/now-playing">Now Playing</a>
-          <a href="/blog">Blog</a>
-          <a href="/info">Info</a>
+        <!-- Main navigation links -->
+        <ul id="nav-links" class="flex justify-between items-center gap-x-8">
+          <li><a href="/now-playing">Now Playing</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/info">Info</a></li>
+        </ul>
+        
+    <!-- Logo -->
+        <div>
+          <a id="nav-logo" href="/" class="font-brand">
+            TimeSink Presents
+          </a>
         </div>
-        <a id="nav-logo" href="/" class="font-brand">
-          TimeSink Presents
-        </a>
-
-        <div id="nav-actions" class="flex justify-between items-center gap-x-8">
-          <a href="/signin">Sign In</a>
-          <a href="/join">Join Waitlist</a>
-        </div>
+        
+    <!-- Actions -->
+        <ul id="nav-actions" class="flex justify-between items-center gap-x-8">
+          <li><a href="/signin">Sign In</a></li>
+          <li><a href="/join">Join Waitlist</a></li>
+        </ul>
       </div>
     </nav>
     """

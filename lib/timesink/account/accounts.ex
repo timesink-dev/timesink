@@ -4,6 +4,7 @@ defmodule Timesink.Accounts do
   """
 
   alias Timesink.Accounts.User
+  alias Timesink.Repo
 
   @doc """
   Query users through a function hook using the [Ecto.Query API](https://hexdocs.pm/ecto/Ecto.Query.html).
@@ -55,7 +56,7 @@ defmodule Timesink.Accounts do
 
   def update_me(user, params) do
     user
-    |> User.changeset_update(params)
-    |> Timesink.Repo.update()
+    |> User.changeset(params)
+    |> Repo.update()
   end
 end

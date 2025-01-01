@@ -106,7 +106,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
     {:ok, user} = Timesink.Accounts.get_me()
 
     changeset =
-      User.changeset_update(user)
+      User.changeset(user)
 
     socket =
       socket
@@ -119,7 +119,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
     with {:ok, updated_user} <- Accounts.update_me(socket.assigns.user, user_params) do
       socket =
         socket
-        |> assign(user: updated_user, account_form: to_form(User.changeset_update(updated_user)))
+        |> assign(user: updated_user, account_form: to_form(User.changeset(updated_user)))
         |> put_flash(:info, "Profile updated successfully")
 
       {:noreply, socket}

@@ -284,11 +284,4 @@ defmodule Timesink.Accounts.Location do
     |> validate_inclusion(:lat, -90..90)
     |> validate_inclusion(:lng, -180..180)
   end
-
-  def changeset_update(%{__struct__: __MODULE__} = struct, %{} = params) do
-    struct
-    |> cast(params, [:locality, :country, :lat, :lng])
-    |> validate_inclusion(:lat, -90..90)
-    |> validate_inclusion(:lng, -180..180)
-  end
 end
