@@ -12,7 +12,7 @@ defmodule TimesinkWeb.Accounts.MeLive do
           <img src={@user.profile.avatar_url} alt="Profile picture" class="rounded-full w-16 h-16" />
         </span>
         <span class="leading-4">
-          @{@user.username}
+          {"@" <> @user.username}
         </span>
         <span>
           joined {Utils.format_date(@user.inserted_at)}

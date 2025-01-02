@@ -52,7 +52,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
               field={@account_form[:username]}
               placeholder="Username"
               class="w-full"
-              value={@user.username}
+              value={"@" <> @user.username}
               input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
             />
           </div>
@@ -115,7 +115,11 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
-    with {:ok, updated_user} <- User.update(socket.assigns.user, user_params) do
+    username = String.trim_leading(user_params["username"], "@")
+
+    updated_params = Map.put(user_params, "username", username)
+
+    with {:ok, updated_user} <- User.update(socket.assigns.user, updated_params) do
       socket =
         socket
         |> assign(user: updated_user, account_form: to_form(User.changeset(updated_user)))
