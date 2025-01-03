@@ -67,5 +67,5 @@ import_config "#{config_env()}.exs"
 
 config :timesink, Oban,
   engine: Oban.Engines.Basic,
-  queues: [default: 10],
+  queues: [mailer: 10],
   repo: Timesink.Repo

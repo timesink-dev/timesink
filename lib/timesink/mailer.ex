@@ -1,6 +1,12 @@
 defmodule Timesink.Mailer do
   use Swoosh.Mailer, otp_app: :timesink
 
+  # inspired by:
+  # https://peterullrich.com/sending-emails-with-swoosh-and-oban
+
+  @doc """
+  Converts an Email struct to a map (intended for args passed into Oban workers).
+  """
   def to_map(%Swoosh.Email{} = email) do
     %{
       "to" => contact_to_map(email.to),
@@ -10,6 +16,10 @@ defmodule Timesink.Mailer do
     }
   end
 
+  @doc """
+  Converts a map to an Email struct (for Swoosh).
+  """
+  @spec from_map(map()) :: Swoosh.Email.t()
   def from_map(args) do
     %{
       "to" => to,

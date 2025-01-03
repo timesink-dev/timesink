@@ -1,13 +1,13 @@
 defmodule Timesink.EmailNotifications do
   import Swoosh.Email
   alias Timesink.Mailer
-  alias Timesink.Workers.SendEmail
+  alias Timesink.Workers
 
   defp deliver(recipient, subject, body) do
     email =
       new()
       |> to(recipient)
-      |> from({"Your Name", "your-email.com"})
+      |> from({"TimeSink Presents", "hello@timesinkpresents.com"})
       |> subject(subject)
       |> text_body(body)
 
@@ -19,7 +19,7 @@ defmodule Timesink.EmailNotifications do
 
   defp enqueue_worker(email) do
     %{email: email}
-    |> SendEmail.new()
+    |> Workers.SendEmail.new()
     |> Oban.insert()
   end
 
@@ -28,7 +28,7 @@ defmodule Timesink.EmailNotifications do
       to_email,
       "You're on the waitlist!",
       """
-      You're on the waitlist! We'll let you know when you can join.
+      You're on the waitlist! We'll let you know when you are the next one in line to join.
       """
     )
   end
