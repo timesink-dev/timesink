@@ -7,6 +7,8 @@ import Config
 # before starting your production server.
 config :timesink, TimesinkWeb.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 
+# Configures adapter for the mailer
+config :timesink, Timesink.Mailer, adapter: Resend.Swoosh.Adapter
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Timesink.Finch
 
