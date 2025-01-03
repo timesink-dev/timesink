@@ -6,4 +6,8 @@ defmodule TimesinkWeb.PageController do
     # so skip the default app layout.
     render(conn, :home, layout: false)
   end
+
+  def info(conn, _params) do
+    render(conn, :info)
+  end
 end

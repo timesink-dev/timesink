@@ -124,15 +124,14 @@ defmodule TimesinkWeb.CoreComponents do
           "animate-slide-in",
           @kind == :info && "bg-green-500 text-backroom-black",
           @kind == :error &&
-            "bg-neon-red-primary bg-opacity-10 border-[1px] border-neon-red-primary text-neon-red-light"
+            "bg-backroom-black border-[1px] border-neon-red-primary text-neon-red-primary"
         ]
       }
       {@rest}
     >
       <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6">
         <.icon :if={@kind == :info} name="hero-information-circle-mini" class="h-4 w-4" />
-        <.icon :if={@kind == :error} name="hero-exclamation-circle-mini" class="h-4 w-4" />
-        {@title}
+        <.icon :if={@kind == :error} name="hero-exclamation-circle-mini" class="h-4 w-4" /> {@title}
       </p>
       <p class="mt-2 text-sm leading-5">{msg}</p>
       <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>
@@ -244,10 +243,13 @@ defmodule TimesinkWeb.CoreComponents do
       |> assign_new(:classes, fn ->
         case assigns.color do
           "primary" ->
-            "bg-neon-blue-lightest rounded"
+            "bg-neon-blue-lightest text-backroom-black"
 
           "secondary" ->
             "bg-backroom-black text-neon-blue-lightest border-neon-blue-lightest border-[1px]"
+
+          "tertiary" ->
+            "bg-dark-theater-primary text-mystery-white"
 
           # default styling
           _ ->
@@ -259,7 +261,7 @@ defmodule TimesinkWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded",
+        "phx-submit-loading:opacity-75 rounded px-4 py-2 rounded",
         @classes,
         @class
       ]}
@@ -307,7 +309,7 @@ defmodule TimesinkWeb.CoreComponents do
   attr :type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file month number password
-               range search select tel text textarea time url week)
+               range search select tel text textarea time url week hidden)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -351,8 +353,7 @@ defmodule TimesinkWeb.CoreComponents do
           checked={@checked}
           class="rounded border-zinc-300 text-zinc-900 focus:ring-0"
           {@rest}
-        />
-        {@label}
+        /> {@label}
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
@@ -386,10 +387,9 @@ defmodule TimesinkWeb.CoreComponents do
         id={@id}
         name={@name}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 min-h-[6rem]",
+          @input_class,
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400",
-          @class
+          @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
@@ -591,13 +591,12 @@ defmodule TimesinkWeb.CoreComponents do
 
   def back(assigns) do
     ~H"""
-    <div class="mt-16">
+    <div>
       <.link
         navigate={@navigate}
-        class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+        class="text-sm font-semibold leading-6 text-mystery-white hover:text-neon-blue-lightest"
       >
-        <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
-        {render_slot(@inner_block)}
+        <.icon name="hero-arrow-left-solid" class="h-5 w-5" /> {render_slot(@inner_block)}
       </.link>
     </div>
     """

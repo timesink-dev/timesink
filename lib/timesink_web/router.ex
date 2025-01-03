@@ -24,12 +24,18 @@ defmodule TimesinkWeb.Router do
     live "/join", WaitlistLive
     live "/signin", SignInLive
 
-    live "/account", Accounts.MeLive
+    live "/me", Accounts.MeLive
+    live "/me/profile", Accounts.ProfileSettingsLive
+    live "/me/security", Accounts.SecuritySettingsLive
+
     live "/submit", FilmSubmissionLive
 
     live "/archives", ArchiveLive
     live "/blog", BlogLive
     live "/upcoming", UpcomingLive
+
+    # Static pages
+    get "/info", PageController, :info
 
     live "/:profile_username", Accounts.ProfileLive
   end

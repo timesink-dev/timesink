@@ -1,8 +1,10 @@
-<header class="px-4 sm:px-6 lg:px-8 font-brand"></header>
+<.top_nav class="h-[30px] mx-4" />
 <main class="px-4 sm:px-6 lg:px-8">
-  <.top_nav />
-  <div class="mx-auto max-w-2xl">
-    <.flash_group flash={@flash} />
-    {@inner_content}
+  <div class="min-h-[calc(100vh-60px)]">
+    <.flash_group flash={@flash} /> {@inner_content}
   </div>
 </main>
+<footer class="flex justify-start items-left flex-col mt-8 py-16 px-8 text-left text-mystery-white font-brand h-[150px]">
+  <p>&copy; {DateTime.utc_now().year} TimeSink Presents</p>
+  <p class="font-gangster font-light">hello@timesinkpresents.com</p>
+</footer>

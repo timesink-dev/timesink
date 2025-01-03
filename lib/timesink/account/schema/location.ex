@@ -273,12 +273,14 @@ defmodule Timesink.Accounts.Location do
     field :lng, :float
   end
 
+  @required_fields ~w(locality country lat lng)a
+
   @spec changeset(profile :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
     |> cast(params, [:locality, :country, :lat, :lng])
-    |> validate_required([:locality, :country, :lat, :lng])
+    |> validate_required(@required_fields)
     |> validate_inclusion(:lat, -90..90)
     |> validate_inclusion(:lng, -180..180)
   end
