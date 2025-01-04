@@ -20,7 +20,7 @@ defmodule Timesink.Waitlist do
   def join(params) do
     with {:ok, applicant} <-
            Applicant.create(params) do
-      Mail.send_waitlist_confirmation(applicant.email)
+      Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
       {:ok, applicant}
     end
   end

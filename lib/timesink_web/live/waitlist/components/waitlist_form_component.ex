@@ -2,7 +2,6 @@ defmodule TimesinkWeb.WaitlistFormComponent do
   use TimesinkWeb, :live_component
 
   alias Timesink.Waitlist.Applicant
-  alias Timesink.EmailNotifications
 
   def mount(socket) do
     changeset = Applicant.changeset(%Applicant{})
