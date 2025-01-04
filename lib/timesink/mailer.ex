@@ -54,4 +54,31 @@ defmodule Timesink.Mailer do
   defp map_to_contact(%{"name" => name, "email" => email}) do
     {name, email}
   end
+
+  defmacro __using__(_opts) do
+    quote do
+      import Swoosh.Email
+      alias Timesink.Workers.SendMail
+
+      def send_mail(recipient, subject, body) do
+        email =
+          new()
+          |> to(recipient)
+          |> from({"TimeSink Presents", "hello@timesinkpresents.com"})
+          |> subject(subject)
+          |> text_body(body)
+
+        with email_map <- Timesink.Mailer.to_map(email),
+             {:ok, _job} <- enqueue_worker(email_map) do
+          {:ok, email}
+        end
+      end
+
+      defp enqueue_worker(email) do
+        %{email: email}
+        |> SendMail.new()
+        |> Oban.insert()
+      end
+    end
+  end
 end

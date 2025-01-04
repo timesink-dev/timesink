@@ -62,11 +62,9 @@ defmodule TimesinkWeb.WaitlistFormComponent do
     """
   end
 
-  def handle_event("save", %{"applicant" => %{"email" => email} = applicant_params}, socket) do
+  def handle_event("save", %{"applicant" => applicant_params}, socket) do
     case Timesink.Waitlist.join(applicant_params) do
       {:ok, _applicant} ->
-        EmailNotifications.send_waitlist_confirmation(email)
-
         send(self(), :applicant_joined)
 
         socket =

@@ -1,4 +1,4 @@
-defmodule Timesink.Workers.SendEmail do
+defmodule Timesink.Workers.SendMail do
   use Oban.Worker, queue: :mailer
 
   @impl Oban.Worker
