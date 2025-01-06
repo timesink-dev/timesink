@@ -9,6 +9,7 @@ config :timesink, TimesinkWeb.Endpoint, cache_static_manifest: "priv/static/cach
 
 # Configures adapter for the mailer
 config :timesink, Timesink.Mailer, adapter: Resend.Swoosh.Adapter
+
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Timesink.Finch
 
