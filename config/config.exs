@@ -67,5 +67,13 @@ import_config "#{config_env()}.exs"
 
 config :timesink, Oban,
   engine: Oban.Engines.Basic,
-  queues: [mailer: 10],
-  repo: Timesink.Repo
+  repo: Timesink.Repo,
+  plugins: [
+    Oban.Plugins.Lifeline,
+    {Oban.Plugins.Pruner, max_age: 3600},
+
+    # Oban.Plugins.Reindexer requires the `CONCURRENT` option, which is only
+    # available in Postgres 12 and above.
+    {Oban.Plugins.Reindexer, schedule: "@weekly"}
+  ],
+  queues: [mailer: 10]
