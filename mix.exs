@@ -34,7 +34,7 @@ defmodule Timesink.MixProject do
     [
       {:backpex, "~> 0.9.1"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
-      {:resend, "~> 0.4.0"},
+      {:resend, "~> 0.4.4"},
       {:oban, "~> 2.17"},
       {:swiss_schema, "~> 0.6.0"},
       {:phoenix, "~> 1.7.14"},
