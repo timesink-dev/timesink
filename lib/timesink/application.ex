@@ -16,7 +16,6 @@ defmodule Timesink.Application do
       {Finch, name: Timesink.Finch},
       # Start a worker by calling: Timesink.Worker.start_link(arg)
       # {Timesink.Worker, arg},
-      # Start to serve requests, typically the last entry,
       {Oban, Application.fetch_env!(:timesink, Oban)},
       TimesinkWeb.Endpoint
     ]
