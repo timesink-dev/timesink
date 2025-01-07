@@ -57,6 +57,7 @@ jobs:
 
     env:
       DATABASE_URL: ecto://postgres:postgres@localhost/timesink_test
+      RESEND_API_KEY: "test"
 
     steps:
       - uses: actions/checkout@v4

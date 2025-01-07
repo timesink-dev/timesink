@@ -2,6 +2,7 @@
 alias Timesink.Application
 alias Timesink.Mailer
 alias Timesink.Repo
+alias Timesink.Workers
 
 # Timesink.Accounts
 alias Timesink.Accounts
