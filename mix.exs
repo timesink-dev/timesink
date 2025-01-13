@@ -32,7 +32,7 @@ defmodule Timesink.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:backpex, "~> 0.9.1"},
+      {:backpex, "~> 0.10.0"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:resend, "~> 0.4.4"},
       {:oban, "~> 2.17"},
