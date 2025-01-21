@@ -63,8 +63,8 @@ config :phoenix, :json_library, Jason
 
 config :ex_aws,
   json_codec: Jason,
-  access_key_id: [{:system, "TIMESINK_S3_ACCESS_KEY"}, :instance_role],
-  secret_access_key: [{:system, "TIMESINK_S3_ACCESS_SECRET"}, :instance_role]
+  access_key_id: [{:system, "TIMESINK_S3_ACCESS_KEY_ID"}, :instance_role],
+  secret_access_key: [{:system, "TIMESINK_S3_ACCESS_KEY_SECRET"}, :instance_role]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

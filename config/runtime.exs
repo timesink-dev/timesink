@@ -124,3 +124,34 @@ if config_env() == :prod do
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end
+
+#  Timesink.Storage (S3/MinIO)
+s3_uri = System.get_env("TIMESINK_S3_HOST", "http://localhost:9000") |> URI.parse()
+config :ex_aws, :s3, scheme: "#{s3_uri.scheme}://", host: s3_uri.host, port: s3_uri.port
+
+config :timesink, Timesink.Storage,
+  host: System.get_env("TIMESINK_S3_HOST", "http://localhost:9000"),
+  access_key_id: System.get_env("TIMESINK_S3_ACCESS_KEY_ID", "minioadmin"),
+  access_key_secret: System.get_env("TIMESINK_S3_ACCESS_KEY_SECRET", "minioadmin"),
+  bucket: System.get_env("TIMESINK_S3_BUCKET", "timesink"),
+  prefix: System.get_env("TIMESINK_S3_PREFIX", "blobs")
+
+if config_env() in [:test] do
+  s3_uri = System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000") |> URI.parse()
+  config :ex_aws, :s3, scheme: "#{s3_uri.scheme}://", host: s3_uri.host, port: s3_uri.port
+
+  config :timesink, Timesink.Storage,
+    host: System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000"),
+    access_key_id: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_ID", "minioadmin"),
+    access_key_secret: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_SECRET", "minioadmin"),
+    bucket: System.get_env("TIMESINK_TEST_S3_BUCKET", "timesink-dev"),
+    prefix: System.get_env("TIMESINK_TEST_S3_PREFIX", "blobs")
+end
+
+if config_env() in [:prod] do
+  config :timesink, Timesink.Storage,
+    # Require the following envs
+    host: System.fetch_env!("TIMESINK_S3_HOST"),
+    access_key_id: System.fetch_env!("TIMESINK_S3_ACCESS_KEY_ID"),
+    access_key_secret: System.fetch_env!("TIMESINK_S3_ACCESS_KEY_SECRET")
+end
