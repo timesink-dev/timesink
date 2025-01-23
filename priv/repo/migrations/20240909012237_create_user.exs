@@ -5,7 +5,6 @@ defmodule Timesink.Repo.Migrations.CreateUser do
     create table(:user, primary_key: false) do
       execute "CREATE EXTENSION IF NOT EXISTS citext", ""
 
-
       add :id, :uuid, null: false, primary_key: true
 
       timestamps type: :utc_datetime
@@ -19,7 +18,6 @@ defmodule Timesink.Repo.Migrations.CreateUser do
       add :roles, {:array, :string}, null: false, default: []
 
       add :confirmed_at, :utc_datetime
-
     end
 
     create unique_index(:user, [:email])
