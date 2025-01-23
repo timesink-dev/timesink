@@ -20,6 +20,8 @@ if System.get_env("PHX_SERVER") do
   config :timesink, TimesinkWeb.Endpoint, server: true
 end
 
+config :timesink, Timesink.Mailer, api_key: System.fetch_env!("RESEND_API_KEY")
+
 database_url =
   System.get_env("DATABASE_URL") ||
     raise """

@@ -4,6 +4,7 @@ defmodule Timesink.Waitlist do
   """
 
   alias Timesink.Waitlist.Applicant
+  alias Timesink.Waitlist.Mail
 
   @doc """
   Creates a new applicant and adds them to the waitlist.
@@ -19,6 +20,7 @@ defmodule Timesink.Waitlist do
   def join(params) do
     with {:ok, applicant} <-
            Applicant.create(params) do
+      Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
       {:ok, applicant}
     end
   end
