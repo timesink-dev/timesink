@@ -1,0 +1,86 @@
+defmodule Timesink.Auth do
+  @moduledoc """
+  The Auth context.
+  """
+
+  import Ecto.Changeset
+  import Ecto.Query, warn: false
+  alias Timesink.Accounts.User
+  alias Phoenix.Token
+
+  @spec password_auth(params :: %{email: String.t(), password: String.t()}) ::
+          {:ok, User.t()} | {:error, Ecto.Changeset.t() | term()}
+  def password_auth(%{} = params) do
+    changeset =
+      {%{}, %{email: :string, password: :string}}
+      |> cast(params, [:email, :password])
+      |> validate_required([:email, :password])
+
+    with {:ok, params} <- apply_action(changeset, :password_auth),
+         {:ok, user} <- User.get_by(email: params.email),
+         true <- User.valid_password?(user, params.password) do
+      {:ok, user}
+
+
+    end
+  end
+
+  # - [x] Fn to authenticate w/ user/pass; return user info & token
+  # - [ ] Fn to authenticate w/ token; return user info
+
+  @doc """
+  Authenticates a user by retrieving the user with the given email, and then verifying the password.
+
+  ## Examples
+
+      iex> authenticate("foo@example.com", "correct_password")
+      %User{}
+
+      iex> authenticate("foo@example.com", "invalid_password")
+      nil
+
+  """
+  @spec authenticate(%{email: binary(), password: binary()}) ::
+          {:ok, user :: User.t(), token :: binary()} | {:error, term()}
+  def authenticate(%{email: email, password: password})
+      when is_binary(email) and is_binary(password) do
+
+        with  {:ok, user} <- User.get_by(email: email),
+
+    if User.valid_password?(user, password), do: user
+  end
+
+  # - [ ] Plug to extract Bearer header; authenticate, inject on %Conn{}
+
+  # Change this to your own secret
+  @token_salt "user_auth_salt"
+  # 1 day in seconds
+  @max_age 86_400
+
+  def verify_token(token) do
+    Token.verify(TimeSinkWeb.Endpoint, @token_salt, token, max_age: @max_age)
+  end
+
+  # @spec token_auth(token_or_claims :: String.t() | %{}) ::
+  #         {:ok, User.t(), Guardian.Token.claims()} | {:error, :bad_credentials}
+  def token_auth(token) when is_binary(token) do
+    with {:ok, claims} <- verify_token(token) do
+      # token_auth(claims)
+    else
+      _error ->
+        # TODO: log error
+        {:error, :bad_credentials}
+    end
+  end
+
+  def token_auth(claims) when is_map(claims) do
+    with {:ok, :not_bad} <- BadToken.verify(claims),
+         {:ok, user} <- User.get(claims["sub"]) do
+      {:ok, user, claims}
+    else
+      _error ->
+        # TODO: log error
+        {:error, :bad_credentials}
+    end
+  end
+end
