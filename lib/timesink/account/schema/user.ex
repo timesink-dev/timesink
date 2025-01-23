@@ -35,7 +35,6 @@ defmodule Timesink.Accounts.User do
 
     has_one :profile, Accounts.Profile
 
-    field :confirmed_at, :utc_datetime
     timestamps(type: :utc_datetime)
   end
 
@@ -194,10 +193,7 @@ defmodule Timesink.Accounts.User do
     Argon2.verify_pass(password, password_hash)
   end
 
-  def valid_password?(_, _) do
-    Argon2.no_user_verify()
-    false
-  end
+  def valid_password?(_, _), do: Argon2.no_user_verify()
 
   @doc """
   Validates the current password otherwise adds an error to the changeset.
