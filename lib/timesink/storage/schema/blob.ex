@@ -54,16 +54,16 @@ defmodule Timesink.Storage.Blob do
   end
 
   @doc """
-  Hashes a binary into a lower-cased MD5.
+  Checksums a binary into a lower-cased MD5.
 
   ## Examples
 
-      iex> "José Valim" |> Blob.hash()
+      iex> "José Valim" |> Blob.checksum()
       "51e2b1c9fac3770b4aa432b7297551d6"
   """
-  @spec hash(binary()) ::
+  @spec checksum(binary()) ::
           binary()
-  def hash(content) when is_binary(content) do
+  def checksum(content) when is_binary(content) do
     content
     |> then(&:crypto.hash(:md5, &1))
     |> Base.encode16(case: :lower)
