@@ -25,7 +25,7 @@ defmodule TimesinkWeb.Router do
     live "/now-playing/:theater_slug", Cinema.TheaterLive
 
     live "/join", WaitlistLive
-    live "/signin", SignInLive
+    live "/sign_in", SignInLive
 
     live "/me", Accounts.MeLive
     live "/me/profile", Accounts.ProfileSettingsLive

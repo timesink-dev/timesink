@@ -4,9 +4,18 @@ defmodule Timesink.Auth do
   """
 
   import Ecto.Changeset
-  import Ecto.Query, warn: false
+  # import Ecto.Query, warn: false
   alias Timesink.Accounts.User
   alias Phoenix.Token
+
+  # Change this to your own secret
+  @token_salt "user_auth_salt"
+  # 1 day in seconds
+  @max_age 86_400
+
+  def generate_token(user) do
+    Token.sign(TimesinkWeb.Endpoint, @token_salt, %{id: user.id, role: user.roles})
+  end
 
   @spec password_auth(params :: %{email: String.t(), password: String.t()}) ::
           {:ok, User.t()} | {:error, Ecto.Changeset.t() | term()}
@@ -16,12 +25,16 @@ defmodule Timesink.Auth do
       |> cast(params, [:email, :password])
       |> validate_required([:email, :password])
 
+    IO.inspect(changeset, label: "changeset")
+
+    {:ok, user} = User.get_by(email: params.email)
+    IO.inspect(user, label: "user")
+
     with {:ok, params} <- apply_action(changeset, :password_auth),
          {:ok, user} <- User.get_by(email: params.email),
          true <- User.valid_password?(user, params.password) do
+      IO.inspect(user, label: "hiho")
       {:ok, user}
-
-
     end
   end
 
@@ -42,23 +55,18 @@ defmodule Timesink.Auth do
   """
   @spec authenticate(%{email: binary(), password: binary()}) ::
           {:ok, user :: User.t(), token :: binary()} | {:error, term()}
-  def authenticate(%{email: email, password: password})
-      when is_binary(email) and is_binary(password) do
+  def authenticate(params) do
+    email = params["email"]
+    password = params["password"]
 
-        with  {:ok, user} <- User.get_by(email: email),
-
-    if User.valid_password?(user, password), do: user
+    with {:ok, user} <- password_auth(%{email: email, password: password}) do
+      token = generate_token(user)
+      {:ok, user, token}
+    end
   end
 
-  # - [ ] Plug to extract Bearer header; authenticate, inject on %Conn{}
-
-  # Change this to your own secret
-  @token_salt "user_auth_salt"
-  # 1 day in seconds
-  @max_age 86_400
-
   def verify_token(token) do
-    Token.verify(TimeSinkWeb.Endpoint, @token_salt, token, max_age: @max_age)
+    Token.verify(TimesinkWeb.Endpoint, @token_salt, token, max_age: @max_age)
   end
 
   # @spec token_auth(token_or_claims :: String.t() | %{}) ::
