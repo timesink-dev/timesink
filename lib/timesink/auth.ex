@@ -10,11 +10,11 @@ defmodule Timesink.Auth do
 
   # Change this to your own secret
   @token_salt "user_auth_salt"
-  # 1 day in seconds
-  @max_age 86_400
+  # 7 days in seconds
+  @max_age 7 * 24 * 60 * 60
 
   def generate_token(user) do
-    Token.sign(TimesinkWeb.Endpoint, @token_salt, %{id: user.id, role: user.roles})
+    Token.sign(TimesinkWeb.Endpoint, @token_salt, %{user_id: user.id, role: user.roles})
   end
 
   @spec password_auth(params :: %{email: String.t(), password: String.t()}) ::
@@ -25,15 +25,14 @@ defmodule Timesink.Auth do
       |> cast(params, [:email, :password])
       |> validate_required([:email, :password])
 
-    IO.inspect(changeset, label: "changeset")
-
-    {:ok, user} = User.get_by(email: params.email)
-    IO.inspect(user, label: "user")
+    IO.inspect(params, label: "params in password_auth")
+    IO.inspect(changeset, label: "changeset in password_auth")
+    # {:ok, user} = User.get_by(email: params.email)
 
     with {:ok, params} <- apply_action(changeset, :password_auth),
          {:ok, user} <- User.get_by(email: params.email),
          true <- User.valid_password?(user, params.password) do
-      IO.inspect(user, label: "hiho")
+      IO.inspect(user, label: "user in password_auth")
       {:ok, user}
     end
   end
@@ -61,8 +60,12 @@ defmodule Timesink.Auth do
 
     with {:ok, user} <- password_auth(%{email: email, password: password}) do
       token = generate_token(user)
+      IO.inspect(token, label: "token in authenticate")
       {:ok, user, token}
     end
+
+    # else
+    #   _ -> {:error, :invalid_credentials}
   end
 
   def verify_token(token) do

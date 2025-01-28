@@ -1,12 +1,13 @@
 defmodule TimesinkWeb.SignInLive do
   use TimesinkWeb, :live_view
+
   alias Timesink.Auth
 
   def mount(_params, _session, socket) do
     email = Phoenix.Flash.get(socket.assigns.flash, :email)
     form = to_form(%{"email" => email}, as: "user")
 
-    {:ok, assign(socket, form: form),
+    {:ok, assign(socket, form: form, trigger_submit: false),
      temporary_assigns: [form: form], layout: {TimesinkWeb.Layouts, :empty}}
   end
 
@@ -23,7 +24,15 @@ defmodule TimesinkWeb.SignInLive do
         </:subtitle>
       </.header>
 
-      <.simple_form for={@form} as="user" id="sign_in_form" phx-submit="sign_in" phx-update="ignore">
+      <.simple_form
+        for={@form}
+        as="user"
+        id="sign_in_form"
+        method="post"
+        phx-update="ignore"
+        action={~p"/sign_in"}
+        trigger-action-submit={true}
+      >
         <.input field={@form[:email]} type="email" label="Email" required />
         <.input field={@form[:password]} type="password" label="Password" required />
 
@@ -44,18 +53,17 @@ defmodule TimesinkWeb.SignInLive do
   end
 
   def handle_event("sign_in", %{"user" => sign_in_params}, socket) do
-    with {:ok, user, _token} <- Auth.authenticate(sign_in_params) do
-      {:noreply,
-       socket
-       |> put_flash(:info, "Welcome back!")
-       |> redirect(to: ~p"/")}
+    IO.inspect(sign_in_params, label: "sign_in_params")
+
+    with {:ok, user, token} <- Auth.authenticate(sign_in_params) do
+      {:noreply, assign(socket, :trigger_submit, true)}
     else
       :error ->
         form =
           to_form(
             Auth.password_auth_changeset(%{}, sign_in_params),
             as: "user",
-            action: ~p"/users/log_in"
+            action: ~p"/sign_in"
           )
 
         {:noreply, assign(socket, form: form)}
