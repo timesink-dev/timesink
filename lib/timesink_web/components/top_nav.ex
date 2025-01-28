@@ -30,14 +30,14 @@ defmodule TimesinkWeb.TopNav do
           <li><a href="/blog">Blog</a></li>
           <li><a href="/info">Info</a></li>
         </ul>
-
+        
     <!-- Logo -->
         <div>
           <a id="nav-logo" href="/" class="font-brand">
             TimeSink Presents
           </a>
         </div>
-
+        
     <!-- Actions -->
         <ul id="nav-actions" class="flex justify-between items-center gap-x-8">
           <li><a href="/sign_in">Sign In</a></li>
@@ -94,7 +94,7 @@ defmodule TimesinkWeb.TopNav do
             </.button>
           </ul>
         </div>
-        <.form method="post" action={"/sign_out"}>
+        <.form method="post" action="/sign_out">
           <button type="submit" class="btn btn-danger text-mystery-white">Sign Out</button>
         </.form>
       </nav>

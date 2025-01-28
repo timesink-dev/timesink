@@ -26,6 +26,8 @@ defmodule TimesinkWeb.Router do
     plug TimesinkWeb.Plugs.AuthenticateAdmin
   end
 
+
+
   scope "/", TimesinkWeb do
     pipe_through :browser
     live "/", HomepageLive
@@ -44,24 +46,25 @@ defmodule TimesinkWeb.Router do
     # Static pages
     get "/info", PageController, :info
 
-    live "/me", Accounts.MeLive
-    live "/me/profile", Accounts.ProfileSettingsLive
-    live "/me/security", Accounts.SecuritySettingsLive
+    # live "/me", Accounts.MeLive
+    # live "/me/profile", Accounts.ProfileSettingsLive
+    # live "/me/security", Accounts.SecuritySettingsLive
 
-    live "/:profile_username", Accounts.ProfileLive
+    live "/members/:profile_username", Accounts.ProfileLive
 
     post "/sign_in", AuthController, :sign_in
     post "/sign_out", AuthController, :sign_out
   end
 
-  # Authenticated user routes
-  # scope "/", TimesinkWeb do
-  #   # pipe_through [:browser, :authenticate_user]
 
-  #   live "/me", Accounts.MeLive
-  #   live "/me/profile", Accounts.ProfileSettingsLive
-  #   live "/me/security", Accounts.SecuritySettingsLive
-  # end
+    # Authenticated user routes
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :authenticate_user]
+
+    live "/me", Accounts.MeLive
+    live "/me/profile", Accounts.ProfileSettingsLive
+    live "/me/security", Accounts.SecuritySettingsLive
+  end
 
   # Other scopes may use custom stacks.
   # scope "/api", TimesinkWeb do
@@ -72,7 +75,7 @@ defmodule TimesinkWeb.Router do
   scope "/admin", TimesinkWeb do
     # pipe_through [:http_auth_admin]
 
-    pipe_through :browser
+    pipe_through [:browser, :authenticate_admin]
 
     backpex_routes()
 
