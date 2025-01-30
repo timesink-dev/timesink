@@ -125,10 +125,6 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end
 
-#  Timesink.Storage (S3/MinIO)
-s3_uri = System.get_env("TIMESINK_S3_HOST", "http://localhost:9000") |> URI.parse()
-config :ex_aws, :s3, scheme: "#{s3_uri.scheme}://", host: s3_uri.host, port: s3_uri.port
-
 config :timesink, Timesink.Storage,
   host: System.get_env("TIMESINK_S3_HOST", "http://localhost:9000"),
   access_key_id: System.get_env("TIMESINK_S3_ACCESS_KEY_ID", "minioadmin"),
