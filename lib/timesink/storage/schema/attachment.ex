@@ -4,7 +4,7 @@ defmodule Timesink.Storage.Attachment do
   use Timesink.Schema
   import Ecto.Changeset
 
-  @type assoc_schema ::
+  @type schema ::
           :creative
           | :exhibition
           | :film_creative
@@ -14,7 +14,7 @@ defmodule Timesink.Storage.Attachment do
           | :showcase
           | :theater
           | :user
-  @assoc_schemas [
+  @schemas [
     :creative,
     :exhibition,
     :film_creative,
@@ -25,14 +25,15 @@ defmodule Timesink.Storage.Attachment do
     :theater,
     :user
   ]
-  def assoc_schemas, do: @assoc_schemas
+  def schemas, do: @schemas
 
   @type t :: %{
           __struct__: __MODULE__,
           blob_id: Ecto.UUID.t(),
           blob: Timesink.Storage.Blob.t(),
-          assoc_schema: atom(),
-          assoc_id: integer(),
+          schema: atom(),
+          field_name: String.t(),
+          field_id: Ecto.UUID.t(),
           metadata: map()
         }
 
@@ -42,8 +43,9 @@ defmodule Timesink.Storage.Attachment do
   schema "attachment" do
     belongs_to :blob, Timesink.Storage.Blob
 
-    field :assoc_schema, Ecto.Enum, values: @assoc_schemas
-    field :assoc_id, :binary_id
+    field :schema, Ecto.Enum, values: @schemas
+    field :field_name, :string
+    field :field_id, :binary_id
 
     field :metadata, :map, default: %{}
 
@@ -54,8 +56,9 @@ defmodule Timesink.Storage.Attachment do
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = att, %{} = params) do
     att
-    |> cast(params, [:blob_id, :assoc_schema, :assoc_id, :metadata])
-    |> validate_required([:blob_id, :assoc_schema, :assoc_id])
+    |> cast(params, [:blob_id, :schema, :field_name, :field_id, :metadata])
+    |> validate_required([:blob_id, :schema, :field_name, :field_id])
     |> foreign_key_constraint(:blob_id)
+    |> unique_constraint([:field_name, :field_id])
   end
 end
