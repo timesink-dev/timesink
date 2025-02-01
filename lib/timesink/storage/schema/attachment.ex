@@ -29,7 +29,7 @@ defmodule Timesink.Storage.Attachment do
 
   @type t :: %{
           __struct__: __MODULE__,
-          blob_id: :integer,
+          blob_id: Ecto.UUID.t(),
           blob: Timesink.Storage.Blob.t(),
           assoc_schema: atom(),
           assoc_id: integer(),
@@ -43,7 +43,7 @@ defmodule Timesink.Storage.Attachment do
     belongs_to :blob, Timesink.Storage.Blob
 
     field :assoc_schema, Ecto.Enum, values: @assoc_schemas
-    field :assoc_id, :integer
+    field :assoc_id, :binary_id
 
     field :metadata, :map, default: %{}
 

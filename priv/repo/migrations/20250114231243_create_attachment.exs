@@ -9,7 +9,7 @@ defmodule Timesink.Repo.Migrations.CreateAttachment do
 
       add :blob_id, references(:blob, type: :uuid, on_delete: :delete_all), null: false
       add :assoc_schema, :attachment_assoc_schema, null: false
-      add :assoc_id, :integer, null: false
+      add :assoc_id, :uuid, null: false
 
       add :metadata, :map, default: %{}
     end
