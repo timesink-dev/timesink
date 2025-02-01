@@ -11,7 +11,7 @@ defmodule Timesink.Storage.Blob do
           path: :string,
           size: :integer,
           mime: :string,
-          hash: :string
+          checksum: :string
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -23,7 +23,7 @@ defmodule Timesink.Storage.Blob do
     field :path, :string
     field :size, :integer
     field :mime, :string
-    field :hash, :string
+    field :checksum, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -32,7 +32,7 @@ defmodule Timesink.Storage.Blob do
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = blob, %{} = params) do
     blob
-    |> cast(params, [:id, :user_id, :path, :size, :mime, :hash])
+    |> cast(params, [:id, :user_id, :path, :size, :mime, :checksum])
     |> validate_required([:path, :size])
     |> foreign_key_constraint(:user_id)
     |> unique_constraint(:path)

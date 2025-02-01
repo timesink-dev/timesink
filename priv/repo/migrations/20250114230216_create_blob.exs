@@ -11,13 +11,13 @@ defmodule Timesink.Repo.Migrations.CreateBlob do
       add :path, :string, null: false
       add :size, :integer
       add :mime, :string
-      add :hash, :string
+      add :checksum, :string
     end
 
     create unique_index(:blob, [:path])
 
     create index(:blob, [:size])
     create index(:blob, [:mime])
-    create index(:blob, [:hash])
+    create index(:blob, [:checksum])
   end
 end
