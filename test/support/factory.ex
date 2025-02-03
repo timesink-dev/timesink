@@ -30,6 +30,19 @@ defmodule Timesink.Factory do
     }
   end
 
+  def attachment_factory(%{target_schema: schema, target_id: tid, name: name} = params) do
+    metadata = params |> Map.get(:metadata, %{})
+    blob = insert(:blob)
+
+    %Timesink.Storage.Attachment{
+      blob_id: blob.id,
+      target_schema: schema,
+      target_id: tid,
+      name: name,
+      metadata: metadata
+    }
+  end
+
   # Accounts
 
   def applicant_factory do
