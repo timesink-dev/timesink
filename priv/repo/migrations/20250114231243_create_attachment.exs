@@ -7,17 +7,20 @@ defmodule Timesink.Repo.Migrations.CreateAttachment do
 
       timestamps type: :utc_datetime
 
-      add :blob_id, references(:blob, type: :uuid, on_delete: :delete_all), null: false
-      add :schema, :attachment_assoc_schema, null: false
-      add :field_name, :string, null: false
-      add :field_id, :uuid, null: false
+      # Eg.: "picture", "file", "ticket_pdf", etc.
+      add :name, :string, null: false
 
-      add :metadata, :map, default: %{}
+      add :blob_id, references(:blob, type: :uuid), null: false
+
+      add :target_schema, :attachment_schema, null: false
+      add :target_id, :uuid, null: false
+
+      add :metadata, :map, null: false, default: %{}
     end
 
-    create unique_index(:attachment, [:field_name, :field_id])
+    create unique_index(:attachment, [:target_schema, :target_id, :name])
 
     create index(:attachment, [:blob_id])
-    create index(:attachment, [:schema, :field_name, :field_id])
+    create index(:attachment, [:target_schema, :name, :target_id])
   end
 end

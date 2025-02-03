@@ -31,9 +31,9 @@ defmodule Timesink.Storage.Attachment do
           __struct__: __MODULE__,
           blob_id: Ecto.UUID.t(),
           blob: Timesink.Storage.Blob.t(),
-          schema: atom(),
-          field_name: String.t(),
-          field_id: Ecto.UUID.t(),
+          target_schema: atom(),
+          target_id: Ecto.UUID.t(),
+          name: String.t(),
           metadata: map()
         }
 
@@ -43,9 +43,9 @@ defmodule Timesink.Storage.Attachment do
   schema "attachment" do
     belongs_to :blob, Timesink.Storage.Blob
 
-    field :schema, Ecto.Enum, values: @schemas
-    field :field_name, :string
-    field :field_id, :binary_id
+    field :target_schema, Ecto.Enum, values: @schemas
+    field :target_id, :binary_id
+    field :name, :string
 
     field :metadata, :map, default: %{}
 
@@ -56,9 +56,9 @@ defmodule Timesink.Storage.Attachment do
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = att, %{} = params) do
     att
-    |> cast(params, [:blob_id, :schema, :field_name, :field_id, :metadata])
-    |> validate_required([:blob_id, :schema, :field_name, :field_id])
+    |> cast(params, [:blob_id, :target_schema, :target_id, :name, :metadata])
+    |> validate_required([:blob_id, :target_schema, :target_id, :name])
     |> foreign_key_constraint(:blob_id)
-    |> unique_constraint([:field_name, :field_id])
+    |> unique_constraint([:target_schema, :target_id, :name])
   end
 end

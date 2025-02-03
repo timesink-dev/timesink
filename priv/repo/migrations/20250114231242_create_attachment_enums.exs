@@ -2,9 +2,8 @@ defmodule Timesink.Repo.Migrations.CreateAttachmentEnums do
   use Ecto.Migration
 
   def up do
-    # Create Postgres enum attachment_schema
     execute """
-      CREATE TYPE attachment_assoc_schema AS ENUM (
+      CREATE TYPE attachment_schema AS ENUM (
         'creative',
         'exhibition',
         'film_creative',
@@ -19,6 +18,6 @@ defmodule Timesink.Repo.Migrations.CreateAttachmentEnums do
   end
 
   def down do
-    execute "DROP TYPE attachment_assoc_schema"
+    execute "DROP TYPE attachment_schema"
   end
 end
