@@ -3,9 +3,10 @@ defmodule Timesink.Storage do
   The Storage context.
   """
 
-  # alias Timesink.Storage.Attachment
-  alias Timesink.Storage.Blob
   alias ExAws.S3
+  alias Timesink.Repo
+  alias Timesink.Storage.Attachment
+  alias Timesink.Storage.Blob
 
   @type config :: %{
           host: String.t(),
@@ -44,6 +45,55 @@ defmodule Timesink.Storage do
          {:ok, blob} <- Blob.create(blob_params) do
       {:ok, blob}
     end
+  end
+
+  @doc """
+  Create a new attachment from a Blob or a Plug.Upload.
+
+  ## Examples
+
+      iex> Storage.create_attachment(%Plug.Upload{...}, %{target_schema: :profile, target_id, profile.id, name: "picture"}, user_id: user.id)
+      {:ok, %Storage.Attachment{...}}
+
+      iex> Storage.create_attachment(%Blob{...}, %{target_schema: :profile, target_id, profile.id, name: "picture"}, user_id: user.id)
+      {:ok, %Storage.Attachment{...}}
+  """
+  @spec create_attachment(
+          upload_or_blob :: Plug.Upload.t() | Blob.t(),
+          params :: %{
+            :target_schema => String.t(),
+            :target_id => Ecto.UUID.t(),
+            :name => String.t(),
+            :metadata => map()
+          },
+          opts :: Keyword.t()
+        ) ::
+          {:ok, Attachment.t()} | {:error, Ecto.Changeset.t() | term()}
+  def create_attachment(upload_or_blob, params, opts \\ [])
+
+  def create_attachment(
+        %Plug.Upload{} = upload,
+        %{target_schema: _, target_id: _, name: _} = params,
+        opts
+      ) do
+    Repo.transaction(fn ->
+      with {:ok, %Blob{} = blob} <- create_blob(upload, opts),
+           {:ok, %Attachment{} = att} <- create_attachment(blob, params, opts) do
+        {:ok, att}
+      else
+        error ->
+          error = if !match?({:error, _}, error), do: error, else: error |> elem(1)
+          Repo.rollback(error)
+      end
+    end)
+  end
+
+  def create_attachment(
+        %Blob{id: blob_id} = _blob,
+        %{target_schema: _, target_id: _, name: _} = params,
+        _opts
+      ) do
+    params |> Map.put(:blob_id, blob_id) |> Attachment.create()
   end
 
   @spec config() :: config
