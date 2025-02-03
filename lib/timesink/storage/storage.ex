@@ -34,7 +34,7 @@ defmodule Timesink.Storage do
     blob_id = Ecto.UUID.generate()
 
     obj_path = "#{config.prefix}/#{upload.filename}"
-    obj_meta = [blob_id: blob_id, uploaded_at: 123]
+    obj_meta = [blob_id: blob_id, uploaded_at: System.os_time(:millisecond)]
 
     with {:ok, stats} <- File.stat(upload.path),
          stream <- S3.Upload.stream_file(upload.path),
