@@ -33,10 +33,6 @@ defmodule Timesink.Accounts.User do
 
     has_one :profile, Accounts.Profile
 
-    has_one :private_key, Timesink.Storage.Attachment,
-      foreign_key: :target_id,
-      where: [target_schema: :user, name: "private_key"]
-
     timestamps(type: :utc_datetime)
   end
 
