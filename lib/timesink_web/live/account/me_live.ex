@@ -9,10 +9,14 @@ defmodule TimesinkWeb.Accounts.MeLive do
     <section id="user">
       <div class="ml-6 mt-8 text-md text-dark-theater-lightest flex flex-col justify-center items-center w-full">
         <span class="mb-2">
-          <img src={@user.profile.avatar_url} alt="Profile picture" class="rounded-full w-16 h-16" />
+          <img
+            src={@current_user.profile.avatar_url}
+            alt="Profile picture"
+            class="rounded-full w-16 h-16"
+          />
         </span>
         <span class="leading-4">
-          {"@" <> @user.username}
+          {"@" <> @current_user.username}
         </span>
         <span>
           joined {Utils.format_date(@user.inserted_at)}
@@ -65,7 +69,8 @@ defmodule TimesinkWeb.Accounts.MeLive do
   def mount(_params, _session, socket) do
     # later we will simply set the user as the @current_user from authenticated live plug - so no need to fetch it here
     # i.e. user: socket.assigns.current_user
-    {:ok, user} = Timesink.Accounts.get_me()
-    {:ok, assign(socket, user: user)}
+    # {:ok, user} = Timesink.Accounts.get_me()
+    IO.inspect(socket.assigns[:current_user], label: "current_user in MeLive mount")
+    {:ok, assign(socket, current_user: socket.current_user)}
   end
 end

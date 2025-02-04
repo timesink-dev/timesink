@@ -1,0 +1,12 @@
+{application,ex_machina,
+             [{modules,['Elixir.ExMachina','Elixir.ExMachina.Ecto',
+                        'Elixir.ExMachina.EctoStrategy',
+                        'Elixir.ExMachina.Sequence',
+                        'Elixir.ExMachina.Strategy',
+                        'Elixir.ExMachina.UndefinedFactoryError']},
+              {optional_applications,[ecto,ecto_sql]},
+              {applications,[kernel,stdlib,elixir,logger,ecto,ecto_sql]},
+              {description,"A factory library by the creators of FactoryBot (née FactoryGirl)"},
+              {registered,[]},
+              {vsn,"2.8.0"},
+              {mod,{'Elixir.ExMachina',[]}}]}.

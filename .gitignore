@@ -44,3 +44,6 @@ npm-debug.log
 
 # Docker-related files
 .docker
+
+
+.elixir_ls/

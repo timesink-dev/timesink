@@ -4,6 +4,7 @@ defmodule Timesink.Accounts.User do
   use Timesink.Schema
   import Ecto.Changeset
   alias Timesink.Accounts
+  alias Timesink.Accounts.User
 
   @roles [:admin, :creator]
 
@@ -11,7 +12,7 @@ defmodule Timesink.Accounts.User do
           __struct__: __MODULE__,
           is_active: boolean(),
           email: String.t(),
-          password_hash: String.t(),
+          password: String.t(),
           username: String.t(),
           first_name: String.t(),
           last_name: String.t(),
@@ -24,7 +25,7 @@ defmodule Timesink.Accounts.User do
   schema "user" do
     field :is_active, :boolean, default: true
     field :email, :string
-    field :password_hash, :string, redact: true
+    field :password, :string, redact: true
     field :username, :string
     field :first_name, :string
     field :last_name, :string
@@ -36,7 +37,7 @@ defmodule Timesink.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
-  @required_fields ~w(email username first_name last_name)a
+  @required_fields ~w(email username first_name last_name password)a
 
   def changeset(struct, params, _metadata) do
     changeset(struct, params)
@@ -49,7 +50,7 @@ defmodule Timesink.Accounts.User do
     |> cast(params, [
       :is_active,
       :email,
-      :password_hash,
+      :password,
       :username,
       :first_name,
       :last_name,
@@ -63,4 +64,66 @@ defmodule Timesink.Accounts.User do
     |> validate_length(:last_name, min: 2)
     |> validate_length(:username, min: 1)
   end
+
+  # - [x] Fn to authenticate w/ user/pass; return user info & token
+  # - [ ] Fn to authenticate w/ token; return user info
+
+  @doc """
+  Authenticates a user by retrieving the user with the given email, and then verifying the password.
+
+  ## Examples
+
+      iex> authenticate("foo@example.com", "correct_password")
+      %User{}
+
+      iex> authenticate("foo@example.com", "invalid_password")
+      nil
+
+  """
+  @spec authenticate(%{email: binary(), password: binary()}) ::
+          {:ok, user :: User.t(), token :: binary()} | {:error, term()}
+  def authenticate(params) do
+    email = params["email"]
+    password = params["password"]
+
+    with {:ok, user} <- password_auth(%{email: email, password: password}) do
+      IO.inspect(user, label: "user in authenticate")
+      {:ok, user}
+    end
+
+    # else
+    #   _ -> {:error, :invalid_credentials}
+  end
+
+  @spec password_auth(params :: %{email: String.t(), password: String.t()}) ::
+          {:ok, User.t()} | {:error, Ecto.Changeset.t() | term()}
+  def password_auth(%{} = params) do
+    changeset =
+      {%{}, %{email: :string, password: :string}}
+      |> cast(params, [:email, :password])
+      |> validate_required([:email, :password])
+
+    IO.inspect(params, label: "params in password_auth")
+    IO.inspect(changeset, label: "changeset in password_auth")
+    # {:ok, user} = User.get_by(email: params.email)
+
+    with {:ok, params} <- apply_action(changeset, :password_auth),
+         {:ok, user} <- User.get_by(email: params.email),
+         true <- User.valid_password?(user, params.password) do
+      IO.inspect(user, label: "user in password_auth")
+      {:ok, user}
+    end
+  end
+
+  @doc """
+  Verifies the password.
+  If there is no user or the user doesn't have a password, we call
+  `Argon2.no_user_verify/0` to avoid timing attacks.
+  """
+  def valid_password?(%Timesink.Accounts.User{password: password_hash}, password)
+      when is_binary(password_hash) and byte_size(password) > 0 do
+    Argon2.verify_pass(password, password_hash)
+  end
+
+  def valid_password?(_, _), do: Argon2.no_user_verify()
 end

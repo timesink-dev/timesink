@@ -40,7 +40,7 @@ defmodule TimesinkWeb.TopNav do
         
     <!-- Actions -->
         <ul id="nav-actions" class="flex justify-between items-center gap-x-8">
-          <li><a href="/signin">Sign In</a></li>
+          <li><a href="/sign_in">Sign In</a></li>
           <li><a href="/join">Join Waitlist</a></li>
         </ul>
       </div>
@@ -82,18 +82,23 @@ defmodule TimesinkWeb.TopNav do
             <li><a href="/blog">Blog</a></li>
             <li><a href="/info">Info</a></li>
             <hr />
-            <.button class="w-full md:w-1/2">
-              <a href="/signin">
-                Sign In
+            <div class="w-full flex flex-col gap-y-4">
+              <a href="/sign_in">
+                <.button class="w-full md:w-1/2">
+                  Sign In
+                </.button>
               </a>
-            </.button>
-            <.button color="tertiary" class="w-full md:w-1/2">
               <a href="/join">
-                Join Waitlist
+                <.button color="tertiary" class="w-full md:w-1/2">
+                  Join Waitlist
+                </.button>
               </a>
-            </.button>
+            </div>
           </ul>
         </div>
+        <.form method="post" action="/sign_out" for={}>
+          <button type="submit" class="btn btn-danger text-mystery-white">Sign Out</button>
+        </.form>
       </nav>
     </div>
     """

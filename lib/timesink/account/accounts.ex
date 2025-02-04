@@ -39,7 +39,7 @@ defmodule Timesink.Accounts do
 
   # Mock implementation for development
   # TEMP: enter the user id you want to mock from your dev database
-  @mock_current_user_id ~c"5ca3328d-2e94-4bec-80a4-90595bc98d5b"
+  @mock_current_user_id ~c"3416d239-4c5b-414f-a838-2943d2898184"
 
   @doc """
   Retrieves the current user and their associated profile information.

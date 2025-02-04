@@ -37,3 +37,6 @@ config :phoenix_live_view,
   enable_expensive_runtime_checks: true
 
 config :timesink, Oban, testing: :inline
+
+# Only in tests, remove the complexity from the password hashing algorithm
+config :argon2_elixir, t_cost: 1, m_cost: 8

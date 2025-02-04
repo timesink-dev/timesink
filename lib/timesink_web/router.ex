@@ -1,5 +1,6 @@
 defmodule TimesinkWeb.Router do
   import Backpex.Router
+  import Timesink.Accounts.Auth
   use TimesinkWeb, :router
 
   pipeline :browser do
@@ -16,17 +17,31 @@ defmodule TimesinkWeb.Router do
   end
 
   scope "/", TimesinkWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{Timesink.Accounts.Auth, :ensure_authenticated}] do
+      live "/me", Accounts.MeLive
+      live "/me/profile", Accounts.ProfileSettingsLive
+      live "/me/security", Accounts.SecuritySettingsLive
+    end
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    live_session :redirect_if_user_is_authenticated,
+      on_mount: [{Timesink.Accounts.Auth, :redirect_if_user_is_authenticated}] do
+      live "/join", WaitlistLive
+      live "/sign_in", SignInLive
+    end
+  end
+
+  scope "/", TimesinkWeb do
     pipe_through :browser
     live "/", HomepageLive
     live "/now-playing", Cinema.ShowcaseLive
     live "/now-playing/:theater_slug", Cinema.TheaterLive
-
-    live "/join", WaitlistLive
-    live "/signin", SignInLive
-
-    live "/me", Accounts.MeLive
-    live "/me/profile", Accounts.ProfileSettingsLive
-    live "/me/security", Accounts.SecuritySettingsLive
 
     live "/submit", FilmSubmissionLive
 
@@ -38,6 +53,9 @@ defmodule TimesinkWeb.Router do
     get "/info", PageController, :info
 
     live "/:profile_username", Accounts.ProfileLive
+
+    post "/sign_in", AuthController, :sign_in
+    post "/sign_out", AuthController, :sign_out
   end
 
   # Other scopes may use custom stacks.
