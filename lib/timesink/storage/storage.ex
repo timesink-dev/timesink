@@ -64,7 +64,7 @@ defmodule Timesink.Storage do
             :target_schema => String.t(),
             :target_id => Ecto.UUID.t(),
             :name => String.t(),
-            :metadata => map()
+            optional(:metadata) => map()
           },
           opts :: Keyword.t()
         ) ::
@@ -82,18 +82,18 @@ defmodule Timesink.Storage do
         {:ok, att}
       else
         error ->
-          error = if !match?({:error, _}, error), do: error, else: error |> elem(1)
+          error = if not match?({:error, _}, error), do: error, else: error |> elem(1)
           Repo.rollback(error)
       end
     end)
   end
 
   def create_attachment(
-        %Blob{id: blob_id} = _blob,
+        %Blob{} = blob,
         %{target_schema: _, target_id: _, name: _} = params,
         _opts
       ) do
-    params |> Map.put(:blob_id, blob_id) |> Attachment.create()
+    params |> Map.put(:blob_id, blob.id) |> Attachment.create()
   end
 
   @spec config() :: config
