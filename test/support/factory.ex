@@ -1,5 +1,6 @@
 defmodule Timesink.Factory do
   use ExMachina.Ecto, repo: Timesink.Repo
+  alias Timesink.Storage
 
   # Blobs and Attachments
 
@@ -19,15 +20,12 @@ defmodule Timesink.Factory do
     }
   end
 
-  def blob_factory do
+  def blob_factory(params) do
     upload = build(:plug_upload)
+    user_id = params |> Map.get(:user_id)
 
-    stat = File.stat!(upload.path)
-
-    %Timesink.Storage.Blob{
-      path: upload.path,
-      size: stat.size
-    }
+    {:ok, blob} = Storage.create_blob(upload, user_id: user_id)
+    blob
   end
 
   def attachment_factory(%{target_schema: schema, target_id: tid, name: name} = params) do
