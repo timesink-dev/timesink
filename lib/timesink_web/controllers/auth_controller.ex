@@ -4,15 +4,19 @@ defmodule TimesinkWeb.AuthController do
   alias Timesink.Accounts.User
   alias Timesink.Accounts.Auth
 
+  @spec sign_in(any(), map()) ::
+          {:error, :invalid_credentials} | {:ok, nil | [map()] | %{optional(atom()) => any()}}
   def sign_in(conn, %{"user" => %{"email" => email, "password" => password}}) do
-    case User.authenticate(%{"email" => email, "password" => password}) do
-      {:ok, user} ->
-        user = user |> Timesink.Repo.preload(:profile)
+    with {:ok, user} <-
+           User.authenticate(%{email: email, password: password}) do
+      # user |> Timesink.Repo.preload(:profile)
 
-        conn
-        |> Auth.log_in_user(user)
+      conn
+      |> Auth.log_in_user(user)
 
-      :error ->
+      {:ok, user}
+    else
+      {:error, :invalid_credentials} ->
         conn
         |> put_flash(:error, "Invalid credentials")
         |> render("sign_in.html", email: email)

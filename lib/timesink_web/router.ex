@@ -49,6 +49,10 @@ defmodule TimesinkWeb.Router do
     live "/blog", BlogLive
     live "/upcoming", UpcomingLive
 
+    live "/me", Accounts.MeLive
+    live "/me/profile", Accounts.ProfileSettingsLive
+    live "/me/security", Accounts.SecuritySettingsLive
+
     # Static pages
     get "/info", PageController, :info
 

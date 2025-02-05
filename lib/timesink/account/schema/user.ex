@@ -65,7 +65,7 @@ defmodule Timesink.Accounts.User do
     |> validate_length(:username, min: 1)
   end
 
-  # - [x] Fn to authenticate w/ user/pass; return user info & token
+  # - [x] Fn to authenticate w/ user/pass; return user info
   # - [ ] Fn to authenticate w/ token; return user info
 
   @doc """
@@ -81,18 +81,15 @@ defmodule Timesink.Accounts.User do
 
   """
   @spec authenticate(%{email: binary(), password: binary()}) ::
-          {:ok, user :: User.t(), token :: binary()} | {:error, term()}
-  def authenticate(params) do
-    email = params["email"]
-    password = params["password"]
-
-    with {:ok, user} <- password_auth(%{email: email, password: password}) do
-      IO.inspect(user, label: "user in authenticate")
+          {:ok, user :: User.t()} | {:error, term()}
+  def authenticate(%{email: email, password: password} = params) do
+    with {:ok, user} <- password_auth(params) do
       {:ok, user}
     end
 
-    # else
-    #   _ -> {:error, :invalid_credentials}
+    with {:error, _changeset} <- password_auth(%{email: email, password: password}) do
+      {:error, :invalid_credentials}
+    end
   end
 
   @spec password_auth(params :: %{email: String.t(), password: String.t()}) ::
@@ -103,15 +100,18 @@ defmodule Timesink.Accounts.User do
       |> cast(params, [:email, :password])
       |> validate_required([:email, :password])
 
-    IO.inspect(params, label: "params in password_auth")
-    IO.inspect(changeset, label: "changeset in password_auth")
-    # {:ok, user} = User.get_by(email: params.email)
+    case apply_action(changeset, :password_auth) do
+      {:ok, params} ->
+        case User.get_by(email: params.email) do
+          {:ok, user} ->
+            {:ok, user}
 
-    with {:ok, params} <- apply_action(changeset, :password_auth),
-         {:ok, user} <- User.get_by(email: params.email),
-         true <- User.valid_password?(user, params.password) do
-      IO.inspect(user, label: "user in password_auth")
-      {:ok, user}
+          error ->
+            error
+        end
+
+      {:error, changeset} ->
+        {:error, changeset}
     end
   end
 

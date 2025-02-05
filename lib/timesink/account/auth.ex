@@ -166,10 +166,6 @@ defmodule Timesink.Accounts.Auth do
   def on_mount(:ensure_authenticated, _params, session, socket) do
     socket = mount_current_user(socket, session)
 
-    IO.inspect(socket.assigns,
-      label: "current_user in ensure_authenticated"
-    )
-
     if socket.assigns.current_user do
       {:cont, socket}
     else
@@ -186,6 +182,10 @@ defmodule Timesink.Accounts.Auth do
     socket = mount_current_user(socket, session)
 
     if socket.assigns.current_user do
+      IO.inspect(socket.assigns,
+        label: "current_user in redirect_if_user_is_authenticated"
+      )
+
       {:halt, Phoenix.LiveView.redirect(socket, to: signed_in_path(socket))}
     else
       {:cont, socket}
@@ -196,22 +196,13 @@ defmodule Timesink.Accounts.Auth do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
       if user_token = session["user_token"] do
         # Verify the token
-        result = Token.verify(TimesinkWeb.Endpoint, "user_auth_salt", user_token)
+        {:ok, claims} = Token.verify(TimesinkWeb.Endpoint, "user_auth_salt", user_token)
 
-        with {:ok, claims} <- result do
-          # If verification succeeds, find the user
-          IO.inspect(claims,
-            label: "claims in mount_current_user"
-          )
-
-          user = User.get!(Map.get(claims, :user_id)) |> Timesink.Repo.preload(:profile)
-
-          IO.inspect(user,
-            label: "user in mount_current_user"
-          )
-
-          # user
-        end
+        # with {:ok, claims} <- result do
+        # If verification succeeds, find the user
+        user = User.get!(Map.get(claims, :user_id)) |> Timesink.Repo.preload(:profile)
+        IO.inspect(user, label: "current_user in mount_current_user")
+        user
       end
     end)
   end
@@ -220,11 +211,11 @@ defmodule Timesink.Accounts.Auth do
   Used for routes that require the user to not be authenticated.
   """
   def redirect_if_user_is_authenticated(conn, _opts) do
-    IO.inspect(conn.assigns,
-      label: "current_user in redirect_if_user_is_authenticated"
-    )
-
     if conn.assigns[:current_user] do
+      IO.inspect(conn.assigns,
+        label: "current_user in redirect_if_user_is_authenticated"
+      )
+
       conn
       |> redirect(to: signed_in_path(conn))
       |> halt()
