@@ -20,12 +20,18 @@ defmodule Timesink.Factory do
     }
   end
 
-  def blob_factory(params) do
-    upload = build(:plug_upload)
-    user_id = params |> Map.get(:user_id)
+  def blob_factory do
+    config = Storage.config()
 
-    {:ok, blob} = Storage.create_blob(upload, user_id: user_id)
-    blob
+    upload = build(:plug_upload)
+    path = Path.join([config.prefix, upload.filename])
+
+    {:ok, %{status_code: 200}} = Storage.S3.put(upload, path)
+
+    %Timesink.Storage.Blob{
+      path: path,
+      size: File.stat!(upload.path).size
+    }
   end
 
   def attachment_factory(%{target_schema: schema, target_id: tid, name: name} = params) do
