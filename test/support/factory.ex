@@ -34,16 +34,17 @@ defmodule Timesink.Factory do
     }
   end
 
-  def attachment_factory(%{target_schema: schema, target_id: tid, name: name} = params) do
-    metadata = params |> Map.get(:metadata, %{})
+  def attachment_factory do
     blob = insert(:blob)
+
+    target_schema = Ecto.Enum.values(Storage.Attachment, :target_schema) |> Enum.random()
+    target_id = Ecto.UUID.generate()
 
     %Timesink.Storage.Attachment{
       blob_id: blob.id,
-      target_schema: schema,
-      target_id: tid,
-      name: name,
-      metadata: metadata
+      target_schema: target_schema,
+      target_id: target_id,
+      name: "test_attachment"
     }
   end
 
