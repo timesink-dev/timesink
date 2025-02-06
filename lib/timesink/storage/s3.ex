@@ -1,44 +1,64 @@
 defmodule Timesink.Storage.S3 do
   @moduledoc """
   S3-centric storage functions.
+
+  This module provides pre-configured, config-overwritable friendly functions to
+  perform basic CRUD ops in S3 objects.
   """
 
   alias Timesink.Storage
 
-  # - [x] def put
-  # - [x] def get
-  # - [x] def head
-  # - [ ] def del
-  # - [ ] def stream
-
-  @spec put(
-          upload :: Plug.Upload.t(),
-          params :: %{
-            :path => String.t(),
-            optional(:blob_id) => Ecto.UUID.t()
-          },
+  @spec head(
+          path :: String.t(),
           opts :: Keyword.t()
         ) ::
           {:ok, term()} | {:error, term()}
-  def put(%Plug.Upload{} = upload, %{} = params, opts \\ []) do
-    config = Storage.config()
-    blob_id = params |> Map.get(:blob_id)
+  def head(path, opts \\ []) do
+    config = merge_configs([Storage.config(), opts])
 
-    prefix = "#{Keyword.get(opts, :prefix) || config.prefix}"
-    obj_path = Path.join([prefix, params.path])
+    with op <- ExAws.S3.head_object(config.bucket, path),
+         {:ok, %{status_code: 200} = response} <- ExAws.request(op) do
+      {:ok, response}
+    else
+      error -> {:error, if(not match?({:error, _}, error), do: error, else: error |> elem(1))}
+    end
+  end
+
+  @spec get(
+          path :: String.t(),
+          opts :: Keyword.t()
+        ) ::
+          {:ok, term()} | {:error, term()}
+  def get(obj_path, opts \\ []) do
+    config = merge_configs([Storage.config(), opts])
+
+    with op <- ExAws.S3.get_object(config.bucket, obj_path),
+         {:ok, %{status_code: 200} = response} <- ExAws.request(op) do
+      {:ok, response}
+    else
+      error -> {:error, if(not match?({:error, _}, error), do: error, else: error |> elem(1))}
+    end
+  end
+
+  @spec put(
+          upload :: Plug.Upload.t(),
+          path :: String.t(),
+          opts :: Keyword.t()
+        ) ::
+          {:ok, term()} | {:error, term()}
+  def put(%Plug.Upload{} = upload, obj_path, opts \\ []) do
+    config = merge_configs([Storage.config(), opts])
+    meta = opts |> Keyword.get(:meta, [])
 
     obj_meta =
-      [blob_id: blob_id, uploaded_at: System.os_time(:millisecond)]
+      meta
+      |> Keyword.put(:uploaded_at, System.os_time(:second))
       |> Enum.filter(fn {_key, val} -> not is_nil(val) end)
 
     with {:ok, obj_body} <- File.read(upload.path),
          op <- ExAws.S3.put_object(config.bucket, obj_path, obj_body, meta: obj_meta),
          {:ok, %{status_code: 200} = response} <- ExAws.request(op) do
-      {:ok,
-       response
-       |> Map.put(:path, obj_path)
-       |> Map.put(:blob_id, obj_meta |> Keyword.get(:blob_id))
-       |> Map.put(:uploaded_at, obj_meta |> Keyword.get(:uploaded_at))}
+      {:ok, response}
     else
       error -> {:error, if(not match?({:error, _}, error), do: error, else: error |> elem(1))}
     end
@@ -46,22 +66,17 @@ defmodule Timesink.Storage.S3 do
 
   @spec stream(
           upload :: Plug.Upload.t(),
-          params :: %{
-            :path => String.t(),
-            optional(:blob_id) => Ecto.UUID.t()
-          },
+          path :: String.t(),
           opts :: Keyword.t()
         ) ::
           {:ok, term()} | {:error, term()}
-  def stream(%Plug.Upload{} = upload, %{} = params, opts \\ []) do
-    config = Storage.config()
-    blob_id = params |> Map.get(:blob_id)
-
-    prefix = "#{Keyword.get(opts, :prefix) || config.prefix}"
-    obj_path = Path.join([prefix, params.path])
+  def stream(%Plug.Upload{} = upload, obj_path, opts \\ []) do
+    config = merge_configs([Storage.config(), opts])
+    meta = opts |> Keyword.get(:meta, [])
 
     obj_meta =
-      [blob_id: blob_id, uploaded_at: System.os_time(:millisecond)]
+      meta
+      |> Keyword.put(:uploaded_at, System.os_time(:second))
       |> Enum.filter(fn {_key, val} -> not is_nil(val) end)
 
     with stream <- ExAws.S3.Upload.stream_file(upload.path),
@@ -73,42 +88,24 @@ defmodule Timesink.Storage.S3 do
     end
   end
 
-  @spec head(abs_path :: String.t()) ::
+  @spec delete(
+          path :: String.t(),
+          opts :: Keyword.t()
+        ) ::
           {:ok, term()} | {:error, term()}
-  def head(abs_path) do
-    config = Storage.config()
+  def delete(path, opts \\ []) do
+    config = merge_configs([Storage.config(), opts])
 
-    with op <- ExAws.S3.head_object(config.bucket, abs_path),
-         {:ok, %{status_code: 200} = response} <- ExAws.request(op) do
-      {:ok, response}
-    else
-      error -> {:error, if(not match?({:error, _}, error), do: error, else: error |> elem(1))}
-    end
-  end
-
-  @spec get(abs_path :: String.t()) ::
-          {:ok, term()} | {:error, term()}
-  def get(abs_path) do
-    config = Storage.config()
-
-    with op <- ExAws.S3.get_object(config.bucket, abs_path),
-         {:ok, %{status_code: 200} = response} <- ExAws.request(op) do
-      {:ok, response}
-    else
-      error -> {:error, if(not match?({:error, _}, error), do: error, else: error |> elem(1))}
-    end
-  end
-
-  @spec delete(abs_path :: String.t()) ::
-          {:ok, term()} | {:error, term()}
-  def delete(abs_path) do
-    config = Storage.config()
-
-    with op <- ExAws.S3.delete_object(config.bucket, abs_path),
+    with op <- ExAws.S3.delete_object(config.bucket, path),
          {:ok, %{status_code: 204} = response} <- ExAws.request(op) do
       {:ok, response}
     else
       error -> {:error, if(not match?({:error, _}, error), do: error, else: error |> elem(1))}
     end
+  end
+
+  defp merge_configs(configs) when is_list(configs) do
+    configs
+    |> Enum.reduce(%{}, fn item, acc -> Enum.into(item, acc) end)
   end
 end
