@@ -79,7 +79,7 @@ defmodule Timesink.Storage do
     Repo.transaction(fn ->
       with {:ok, %Blob{} = blob} <- create_blob(upload, opts),
            {:ok, %Attachment{} = att} <- create_attachment(blob, params, opts) do
-        {:ok, att}
+        att
       else
         error ->
           error = if not match?({:error, _}, error), do: error, else: error |> elem(1)
