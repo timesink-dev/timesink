@@ -38,6 +38,14 @@ defmodule TimesinkWeb.Router do
   scope "/", TimesinkWeb do
     pipe_through [:browser, :require_invite_token]
     live "/onboarding", OnboardingLive
+end
+
+  scope "/api", TimesinkWeb do
+    pipe_through :api
+
+    # Mux webhooks
+    get "/webhooks/mux.com", MuxController, :it_works
+    post "/webhooks/mux.com", MuxController, :webhook
   end
 
   scope "/", TimesinkWeb do
