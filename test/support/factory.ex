@@ -185,4 +185,14 @@ defmodule Timesink.Factory do
       theater: theater
     }
   end
+
+  # Timesink.Mux
+
+  def mux_upload_factory do
+    %Timesink.Storage.MuxUpload{
+      upload_id: Ecto.UUID.generate(),
+      asset_id: Ecto.UUID.generate(),
+      playback_id: Ecto.UUID.generate()
+    }
+  end
 end

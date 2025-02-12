@@ -15,6 +15,14 @@ defmodule TimesinkWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/api", TimesinkWeb do
+    pipe_through :api
+
+    # Mux webhooks
+    get "/webhooks/mux.com", MuxController, :it_works
+    post "/webhooks/mux.com", MuxController, :webhook
+  end
+
   scope "/", TimesinkWeb do
     pipe_through :browser
     live "/", HomepageLive
