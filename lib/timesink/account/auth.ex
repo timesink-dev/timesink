@@ -25,6 +25,7 @@ defmodule Timesink.Accounts.Auth do
     Token.verify(TimesinkWeb.Endpoint, @token_salt, token, max_age: @max_age)
   end
 
+  @spec log_in_user(Plug.Conn.t(), any()) :: Plug.Conn.t()
   @doc """
   Logs the user in.
 
@@ -43,6 +44,7 @@ defmodule Timesink.Accounts.Auth do
     conn
     |> renew_session()
     |> put_token_in_session(token)
+    |> put_current_user_in_assigns(user)
     |> maybe_write_remember_me_cookie(token, params)
     |> put_flash(:info, "Welcome back!")
     |> redirect(to: user_return_to || signed_in_path(conn))
@@ -171,7 +173,6 @@ defmodule Timesink.Accounts.Auth do
     else
       socket =
         socket
-        |> Phoenix.LiveView.put_flash(:error, "You must be signed in to access this page.")
         |> Phoenix.LiveView.redirect(to: ~p"/sign_in")
 
       {:halt, socket}
@@ -182,10 +183,6 @@ defmodule Timesink.Accounts.Auth do
     socket = mount_current_user(socket, session)
 
     if socket.assigns.current_user do
-      IO.inspect(socket.assigns,
-        label: "current_user in redirect_if_user_is_authenticated"
-      )
-
       {:halt, Phoenix.LiveView.redirect(socket, to: signed_in_path(socket))}
     else
       {:cont, socket}
@@ -195,14 +192,16 @@ defmodule Timesink.Accounts.Auth do
   defp mount_current_user(socket, session) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
       if user_token = session["user_token"] do
-        # Verify the token
-        {:ok, claims} = Token.verify(TimesinkWeb.Endpoint, "user_auth_salt", user_token)
+        case Token.verify(TimesinkWeb.Endpoint, "user_auth_salt", user_token) do
+          {:ok, claims} ->
+            user = Timesink.Repo.get!(User, claims[:user_id]) |> Timesink.Repo.preload(:profile)
+            user
 
-        # with {:ok, claims} <- result do
-        # If verification succeeds, find the user
-        user = User.get!(Map.get(claims, :user_id)) |> Timesink.Repo.preload(:profile)
-        IO.inspect(user, label: "current_user in mount_current_user")
-        user
+          {:error, _} ->
+            nil
+        end
+      else
+        nil
       end
     end)
   end
@@ -211,11 +210,11 @@ defmodule Timesink.Accounts.Auth do
   Used for routes that require the user to not be authenticated.
   """
   def redirect_if_user_is_authenticated(conn, _opts) do
-    if conn.assigns[:current_user] do
-      IO.inspect(conn.assigns,
-        label: "current_user in redirect_if_user_is_authenticated"
-      )
+    IO.inspect(conn.assigns[:current_user],
+      label: "current_user in plug redirect_if_user_is_authenticated"
+    )
 
+    if conn.assigns[:current_user] do
       conn
       |> redirect(to: signed_in_path(conn))
       |> halt()
@@ -231,15 +230,13 @@ defmodule Timesink.Accounts.Auth do
   they use the application at all, here would be a good place.
   """
   def require_authenticated_user(conn, _opts) do
-    IO.inspect(conn.assigns,
-      label: "current_user in require_authenticated_user"
-    )
+    IO.inspect(conn, label: "current_user in plug")
 
     if conn.assigns[:current_user] do
+      IO.inspect(conn.assigns[:current_user], label: "current_user in plug past")
       conn
     else
       conn
-      |> put_flash(:error, "You must be signed in to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/sign_in")
       |> halt()
@@ -283,4 +280,11 @@ defmodule Timesink.Accounts.Auth do
   #       {:error, :bad_credentials}
   #   end
   # end
+
+  defp put_current_user_in_assigns(conn, user) do
+    user = user |> Timesink.Repo.preload(:profile)
+
+    conn
+    |> assign(:current_user, user)
+  end
 end
