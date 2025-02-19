@@ -39,6 +39,11 @@ defmodule TimesinkWeb.Router do
 
   scope "/", TimesinkWeb do
     pipe_through :browser
+
+    # static routes
+
+    get "/info", PageController, :info
+
     live "/", HomepageLive
     live "/now-playing", Cinema.ShowcaseLive
     live "/now-playing/:theater_slug", Cinema.TheaterLive
@@ -49,14 +54,7 @@ defmodule TimesinkWeb.Router do
     live "/blog", BlogLive
     live "/upcoming", UpcomingLive
 
-    # live "/me", Accounts.MeLive
-    # live "/me/profile", Accounts.ProfileSettingsLive
-    # live "/me/security", Accounts.SecuritySettingsLive
-
-    # Static pages
-    get "/info", PageController, :info
-
-    live "/:profile_username", Accounts.ProfileLive
+    # live "/:profile_username", Accounts.ProfileLive
 
     post "/sign_in", AuthController, :sign_in
     post "/sign_out", AuthController, :sign_out

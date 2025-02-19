@@ -6,7 +6,7 @@ defmodule TimesinkWeb.SignInLive do
     form = to_form(%{"email" => email}, as: "user")
 
     {:ok, assign(socket, form: form, trigger_submit: false),
-     temporary_assigns: [form: form], layout: {TimesinkWeb.Layouts, :empty}}
+     layout: {TimesinkWeb.Layouts, :empty}}
   end
 
   def render(assigns) do

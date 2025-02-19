@@ -82,36 +82,29 @@ defmodule Timesink.Accounts.User do
   """
   @spec authenticate(%{email: binary(), password: binary()}) ::
           {:ok, user :: User.t()} | {:error, term()}
-  def authenticate(%{email: email, password: password} = params) do
+  def authenticate(params) do
     with {:ok, user} <- password_auth(params) do
       {:ok, user}
-    end
-
-    with {:error, _changeset} <- password_auth(%{email: email, password: password}) do
-      {:error, :invalid_credentials}
+    else
+      {:error, :invalid_credentials} -> {:error, :invalid_credentials}
     end
   end
 
   @spec password_auth(params :: %{email: String.t(), password: String.t()}) ::
-          {:ok, User.t()} | {:error, Ecto.Changeset.t() | term()}
+          {:ok, User.t()} | {:error, :invalid_credentials}
   def password_auth(%{} = params) do
     changeset =
       {%{}, %{email: :string, password: :string}}
       |> cast(params, [:email, :password])
       |> validate_required([:email, :password])
 
-    case apply_action(changeset, :password_auth) do
-      {:ok, params} ->
-        case User.get_by(email: params.email) do
-          {:ok, user} ->
-            {:ok, user}
-
-          error ->
-            error
-        end
-
-      {:error, changeset} ->
-        {:error, changeset}
+    with {:ok, params} <- apply_action(changeset, :password_auth),
+         {:ok, user} <- User.get_by(email: params.email),
+         {:ok, user} <- valid_password?(user, params.password) do
+      {:ok, user}
+    else
+      {:error, :not_found} -> {:error, :invalid_credentials}
+      {:error, _} -> {:error, :invalid_credentials}
     end
   end
 
@@ -120,9 +113,13 @@ defmodule Timesink.Accounts.User do
   If there is no user or the user doesn't have a password, we call
   `Argon2.no_user_verify/0` to avoid timing attacks.
   """
-  def valid_password?(%Timesink.Accounts.User{password: password_hash}, password)
+  def valid_password?(%Timesink.Accounts.User{password: password_hash} = user, password)
       when is_binary(password_hash) and byte_size(password) > 0 do
-    Argon2.verify_pass(password, password_hash)
+    with true <- Argon2.verify_pass(password, password_hash) do
+      {:ok, user}
+    else
+      _ -> {:error, :invalid_credentials}
+    end
   end
 
   def valid_password?(_, _), do: Argon2.no_user_verify()

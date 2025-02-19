@@ -44,7 +44,7 @@ defmodule TimesinkWeb.TopNav do
         <ul id="nav-actions" class="flex justify-between items-center gap-x-8">
           <%= if @current_user do %>
             <.form method="post" action="/sign_out" for={}>
-              <.button type="submit" color="tertiary" class="btn btn-danger text-mystery-white">
+              <.button type="submit" color="tertiary" class="text-mystery-white">
                 Sign Out
               </.button>
             </.form>

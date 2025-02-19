@@ -1,6 +1,8 @@
 defmodule TimesinkWeb.PageController do
   use TimesinkWeb, :controller
 
+  plug TimesinkWeb.Plugs.SetCurrentUser when action in [:info]
+
   def home(conn, _params) do
     # The home page is often custom made,
     # so skip the default app layout.
@@ -8,6 +10,6 @@ defmodule TimesinkWeb.PageController do
   end
 
   def info(conn, _params) do
-    render(conn, :info)
+    render(conn, :info, current_user: conn.assigns.current_user)
   end
 end

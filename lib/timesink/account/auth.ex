@@ -40,6 +40,7 @@ defmodule Timesink.Accounts.Auth do
   def log_in_user(conn, user, params \\ %{}) do
     token = generate_token(user)
     user_return_to = get_session(conn, :user_return_to)
+    IO.inspect(user_return_to, label: "user_return_to")
 
     conn
     |> renew_session()
@@ -250,10 +251,14 @@ defmodule Timesink.Accounts.Auth do
   end
 
   defp maybe_store_return_to(%{method: "GET"} = conn) do
+    IO.inspect(current_path(conn), label: "maybe_store_return_to")
     put_session(conn, :user_return_to, current_path(conn))
   end
 
-  defp maybe_store_return_to(conn), do: conn
+  defp maybe_store_return_to(conn) do
+    IO.inspect(conn, label: "maybe_store_return_to just conn")
+    put_session(conn, :user_return_to, current_path(conn))
+  end
 
   defp signed_in_path(_conn), do: ~p"/"
 
@@ -282,9 +287,13 @@ defmodule Timesink.Accounts.Auth do
   # end
 
   defp put_current_user_in_assigns(conn, user) do
-    user = user |> Timesink.Repo.preload(:profile)
+    user = loadProfile(user)
 
     conn
     |> assign(:current_user, user)
+  end
+
+  defp loadProfile(user) do
+    user |> Timesink.Repo.preload(:profile)
   end
 end
