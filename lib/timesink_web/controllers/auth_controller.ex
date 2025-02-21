@@ -2,7 +2,7 @@ defmodule TimesinkWeb.AuthController do
   use TimesinkWeb, :controller
 
   alias Timesink.Accounts.User
-  alias Timesink.Accounts.Auth
+  alias Timesink.Auth
 
   @spec sign_in(Plug.Conn, map()) ::
           {:error, :invalid_credentials} | {:ok, nil | [map()] | %{optional(atom()) => any()}}

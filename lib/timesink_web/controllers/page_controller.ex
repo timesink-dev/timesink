@@ -1,7 +1,8 @@
 defmodule TimesinkWeb.PageController do
   use TimesinkWeb, :controller
+  import TimesinkWeb.Auth
 
-  plug TimesinkWeb.Plugs.SetCurrentUser when action in [:info]
+  # plug :plug_check_logged_in when action in [:info]
 
   def home(conn, _params) do
     # The home page is often custom made,

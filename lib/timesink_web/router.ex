@@ -1,6 +1,5 @@
 defmodule TimesinkWeb.Router do
   import Backpex.Router
-  import Timesink.Accounts.Auth
   use TimesinkWeb, :router
 
   pipeline :browser do
@@ -16,45 +15,36 @@ defmodule TimesinkWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/me", TimesinkWeb do
-    pipe_through [:browser]
+  pipeline :put_current_user do
+    plug TimesinkWeb.Plugs.SetCurrentUser
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :put_current_user]
+
+    live "/join", WaitlistLive
+    live "/sign_in", SignInLive
+
+    live_session :default, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
+      live "/", HomepageLive
+      live "/submit", FilmSubmissionLive
+      live "/archives", ArchiveLive
+      live "/blog", BlogLive
+      live "/upcoming", UpcomingLive
+      live "/now-playing", Cinema.ShowcaseLive
+      live "/member/:profile_username", Accounts.ProfileLive
+    end
 
     live_session :authenticated,
-      on_mount: [{Timesink.Accounts.Auth, :ensure_authenticated}] do
-      live "/", Accounts.MeLive
-      live "/profile", Accounts.ProfileSettingsLive
-      live "/security", Accounts.SecuritySettingsLive
+      on_mount: {TimesinkWeb.Auth, :ensure_authenticated} do
+      live "/me", Accounts.MeLive
+      live "/me/profile", Accounts.ProfileSettingsLive
+      live "/me/security", Accounts.SecuritySettingsLive
+      live "/now-playing/:theater_slug", Cinema.TheaterLive
     end
-  end
-
-  scope "/", TimesinkWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
-
-    live_session :redirect_if_user_is_authenticated,
-      on_mount: [{Timesink.Accounts.Auth, :redirect_if_user_is_authenticated}] do
-      live "/join", WaitlistLive
-      live "/sign_in", SignInLive
-    end
-  end
-
-  scope "/", TimesinkWeb do
-    pipe_through :browser
 
     # static routes
-
     get "/info", PageController, :info
-
-    live "/", HomepageLive
-    live "/now-playing", Cinema.ShowcaseLive
-    live "/now-playing/:theater_slug", Cinema.TheaterLive
-
-    live "/submit", FilmSubmissionLive
-
-    live "/archives", ArchiveLive
-    live "/blog", BlogLive
-    live "/upcoming", UpcomingLive
-
-    # live "/:profile_username", Accounts.ProfileLive
 
     post "/sign_in", AuthController, :sign_in
     post "/sign_out", AuthController, :sign_out
@@ -72,7 +62,7 @@ defmodule TimesinkWeb.Router do
 
     get "/", RedirectController, :redirect_to_showcases
 
-    live_session :default, on_mount: Backpex.InitAssigns do
+    live_session :default_admin, on_mount: Backpex.InitAssigns do
       live_resources "/showcases", Admin.ShowcaseLive
       live_resources "/waitlist", Admin.WaitlistLive
       live_resources "/films", Admin.FilmLive

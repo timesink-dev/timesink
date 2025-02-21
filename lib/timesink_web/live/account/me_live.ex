@@ -67,9 +67,7 @@ defmodule TimesinkWeb.Accounts.MeLive do
   end
 
   def mount(_params, _session, socket) do
-    # later we will simply set the user as the @current_user from authenticated live plug - so no need to fetch it here
-    # i.e. user: socket.assigns.current_user
-    # {:ok, user} = Timesink.Accounts.get_me()
-    {:ok, assign(socket, current_user: socket.assigns.current_user)}
+    user = Timesink.Repo.preload(socket.assigns.current_user, [:profile])
+    {:ok, assign(socket, current_user: user)}
   end
 end

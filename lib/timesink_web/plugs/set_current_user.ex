@@ -7,6 +7,7 @@ defmodule TimesinkWeb.Plugs.SetCurrentUser do
 
   def call(conn, _opts) do
     user = get_user_from_session(conn)
+    IO.inspect(user, label: "user in call of plug set_current_user")
     assign(conn, :current_user, user)
   end
 
@@ -18,7 +19,7 @@ defmodule TimesinkWeb.Plugs.SetCurrentUser do
   defp get_user_by_session_token(user_token) do
     with {:ok, claims} <- Token.verify(TimesinkWeb.Endpoint, "user_auth_salt", user_token),
          user <- Timesink.Repo.get!(User, claims[:user_id]) do
-      user |> Timesink.Repo.preload(:profile)
+      user
     else
       _ -> nil
     end

@@ -1,12 +1,13 @@
 defmodule TimesinkWeb.TopNav do
   import TimesinkWeb.CoreComponents, only: [icon: 1, button: 1]
   use Phoenix.Component
-  alias Timesink.Accounts.User
   alias Phoenix.LiveView.JS
+  alias Timesink.Accounts.User
 
   attr :class, :string, default: nil
   attr :current_user, User, default: nil
 
+  @spec top_nav(map()) :: Phoenix.LiveView.Rendered.t()
   def top_nav(assigns) do
     ~H"""
     <header class={["z-40 sticky bg-backgroom-black", @class]}>
@@ -48,7 +49,7 @@ defmodule TimesinkWeb.TopNav do
                 Sign Out
               </.button>
             </.form>
-            <li><a href="/join">Submit film</a></li>
+            <li><a href="/submit">Submit film</a></li>
           <% else %>
             <li><a href="/sign_in">Sign in</a></li>
             <li><a href="/join">Join Waitlist</a></li>

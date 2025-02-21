@@ -1,8 +1,7 @@
 defmodule TimesinkWeb.HomepageLive do
   use TimesinkWeb, :live_view
 
-  on_mount {Timesink.Accounts.Auth, :mount_current_user}
-
+  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <div id="homepage">
