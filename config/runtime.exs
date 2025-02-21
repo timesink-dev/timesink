@@ -38,7 +38,7 @@ config :timesink, Timesink.Repo,
   socket_options: maybe_ipv6
 
 # ExAws defaults to local, Docker-based MinIO
-System.get_env("TIMESINK_S3_BASEURL", "http://localhost:9000")
+System.get_env("TIMESINK_S3_HOST", "http://localhost:9000")
 |> URI.parse()
 |> then(fn %{scheme: scheme, host: host, port: port} ->
   config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port

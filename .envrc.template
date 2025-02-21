@@ -2,10 +2,10 @@
 # https://direnv.net
 
 
-# The SECRET_KEY_BASE is a crucial security pillar of Phoenix, used to encrypt
+# The SECRET_KEY_BASE is a pillar for security in Phoenix, used to encrypt
 # authentication tokens (bearer, session, etc.) by Phoenix.Token, Plug.Crypto,
-# and some other community modules. It must be a protected secret, persisting
-# across multiple deployments.
+# and some other community modules. It is a production secret that must be
+# protected, persisting across multiple deployments.
 #
 # To generate a secure SECRET_KEY_BASE value, run: `mix phx.gen.secret`.
 #
