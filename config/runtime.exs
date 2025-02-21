@@ -37,13 +37,6 @@ config :timesink, Timesink.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   socket_options: maybe_ipv6
 
-# ExAws defaults to local, Docker-based MinIO
-System.get_env("TIMESINK_S3_HOST", "http://localhost:9000")
-|> URI.parse()
-|> then(fn %{scheme: scheme, host: host, port: port} ->
-  config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
-end)
-
 if config_env() == :prod do
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
@@ -125,6 +118,13 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end
 
+# ExAws defaults to local, Docker-based MinIO
+System.get_env("TIMESINK_S3_HOST", "http://localhost:9000")
+|> URI.parse()
+|> then(fn %{scheme: scheme, host: host, port: port} ->
+  config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
+end)
+
 config :timesink, Timesink.Storage,
   host: System.get_env("TIMESINK_S3_HOST", "http://localhost:9000"),
   access_key_id: System.get_env("TIMESINK_S3_ACCESS_KEY_ID", "minioadmin"),
@@ -133,8 +133,11 @@ config :timesink, Timesink.Storage,
   prefix: System.get_env("TIMESINK_S3_PREFIX", "blobs")
 
 if config_env() in [:test] do
-  s3_uri = System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000") |> URI.parse()
-  config :ex_aws, :s3, scheme: "#{s3_uri.scheme}://", host: s3_uri.host, port: s3_uri.port
+  System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000")
+  |> URI.parse()
+  |> then(fn %{scheme: scheme, host: host, port: port} ->
+    config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
+  end)
 
   config :timesink, Timesink.Storage,
     host: System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000"),
