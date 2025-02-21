@@ -164,6 +164,20 @@ defmodule Timesink.Auth do
     end
   end
 
+  defp get_user_from_session(conn) do
+    user_token = get_session(conn, :user_token)
+    user_token && get_user_by_session_token(user_token)
+  end
+
+  defp get_user_by_session_token(user_token) do
+    with {:ok, claims} <- Token.verify(TimesinkWeb.Endpoint, "user_auth_salt", user_token),
+         user <- Timesink.Repo.get!(User, claims[:user_id]) do
+      user
+    else
+      _ -> nil
+    end
+  end
+
   defp put_token_in_session(conn, token) do
     conn
     |> put_session(:user_token, token)

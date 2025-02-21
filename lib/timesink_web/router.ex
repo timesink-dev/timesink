@@ -19,6 +19,10 @@ defmodule TimesinkWeb.Router do
     plug TimesinkWeb.Plugs.SetCurrentUser
   end
 
+  pipeline :require_authenticated_user do
+    plug TimesinkWeb.Plugs.RequireAuthenticatedUser
+  end
+
   scope "/", TimesinkWeb do
     pipe_through [:browser, :put_current_user]
 
@@ -35,6 +39,16 @@ defmodule TimesinkWeb.Router do
       live "/member/:profile_username", Accounts.ProfileLive
     end
 
+    # static routes
+    get "/info", PageController, :info
+
+    post "/sign_in", AuthController, :sign_in
+    post "/sign_out", AuthController, :sign_out
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
     live_session :authenticated,
       on_mount: {TimesinkWeb.Auth, :ensure_authenticated} do
       live "/me", Accounts.MeLive
@@ -42,12 +56,6 @@ defmodule TimesinkWeb.Router do
       live "/me/security", Accounts.SecuritySettingsLive
       live "/now-playing/:theater_slug", Cinema.TheaterLive
     end
-
-    # static routes
-    get "/info", PageController, :info
-
-    post "/sign_in", AuthController, :sign_in
-    post "/sign_out", AuthController, :sign_out
   end
 
   # Other scopes may use custom stacks.

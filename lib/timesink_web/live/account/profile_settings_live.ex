@@ -100,9 +100,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
   end
 
   def mount(_params, _session, socket) do
-    # later we will simply set the user as the @current_user from authenticated live plug - so no need to fetch it here
-    # i.e. user: socket.assigns.current_user
-    {:ok, user} = Timesink.Accounts.get_me()
+    user = socket.assigns.current_user |> Timesink.Repo.preload(:profile)
 
     changeset =
       User.changeset(user)

@@ -8,19 +8,6 @@ defmodule TimesinkWeb.Auth do
   alias Timesink.Accounts.User
   use TimesinkWeb, :verified_routes
 
-  # def plug_check_logged_in(conn, _opts) do
-  #   user = get_user_from_session(conn)
-
-  #   if user do
-  #     conn
-  #     # |> assign(:current_user, user)
-  #     |> assign(:is_logged_in, true)
-  #   else
-  #     conn
-  #     |> assign(:is_logged_in, false)
-  #   end
-  # end
-
   @doc """
   Handles mounting and authenticating the current_user in LiveViews.
 
@@ -118,40 +105,6 @@ defmodule TimesinkWeb.Auth do
       _ -> nil
     end
   end
-
-  # @spec log_in_user(map()) :: Plug.Conn.t
-  # def log_in_user(conn, user) do
-  #   conn
-  #   |> put_session(:current_user_id, user.id)
-  # end
-
-  # @spec log_out_user(Plug.Conn.t) :: Plug.Conn.t
-  # def log_out_user(conn) do
-  #   conn
-  #   |> delete_session(:current_user_id)
-  # end
-
-  # @spec mount_current_user(Plug.Conn.t) :: Plug.Conn.t
-  # def mount_current_user(conn) do
-  #   case get_session(conn, :current_user_id) do
-  #     nil -> conn
-  #     user_id -> conn
-  #                 |> assign(:current_user, Timesink.Accounts.User.get_user(user_id))
-  #   end
-  # end
-
-  # def on_mount(:ensure_authenticated, _params, session, socket) do
-  #   case session["current_user"] do
-  #     nil ->
-  #       socket
-  #       |> put_flash(:error, "You must be signed in.")
-  #       |> Phoenix.LiveView.redirect(to: "/sign_in")
-  #       |> then(fn socket -> {:halt, socket} end)
-
-  #     user ->
-  #       {:cont, Phoenix.Component.assign(socket, :current_user, user)}
-  #   end
-  # end
 
   defp signed_in_path(_conn), do: ~p"/"
 end

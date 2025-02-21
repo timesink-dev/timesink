@@ -37,14 +37,10 @@ defmodule Timesink.Accounts do
     end
   end
 
-  # Mock implementation for development
-  # TEMP: enter the user id you want to mock from your dev database
-  @mock_current_user_id ~c"3416d239-4c5b-414f-a838-2943d2898184"
-
   @doc """
   Retrieves the current user and their associated profile information.
   """
-  def get_me(user_id \\ @mock_current_user_id) do
+  def get_me(user_id) do
     user_id = to_string(user_id)
     user = User.get!(user_id) |> Timesink.Repo.preload(:profile)
 
