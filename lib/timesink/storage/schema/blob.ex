@@ -39,21 +39,6 @@ defmodule Timesink.Storage.Blob do
   end
 
   @doc """
-  The path prefix (base dir) for blob storage.
-
-  ## Examples
-
-      iex> Blob.prefix()
-      "blobs"
-  """
-  @spec prefix() ::
-          String.t()
-  def prefix do
-    Application.fetch_env!(:timesink, Timesink.Storage)
-    |> Keyword.fetch!(:prefix)
-  end
-
-  @doc """
   Checksums a binary into a lower-cased MD5.
 
   ## Examples
