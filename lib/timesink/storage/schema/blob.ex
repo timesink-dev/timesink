@@ -81,5 +81,5 @@ defmodule Timesink.Storage.Blob do
           non_neg_integer()
   def size(binary) when is_binary(binary), do: :erlang.byte_size(binary)
 
-  def size(%Plug.Upload{} = upload), do: File.stat!(upload.path) |> Map.get(:size)
+  def size(%Plug.Upload{} = upload), do: File.stat!(upload.path).size
 end
