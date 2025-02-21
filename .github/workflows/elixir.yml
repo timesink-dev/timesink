@@ -58,17 +58,31 @@ jobs:
     env:
       DATABASE_URL: ecto://postgres:postgres@localhost/timesink_test
       RESEND_API_KEY: "test"
+      TIMESINK_S3_ACCESS_KEY_ID: minioadmin
+      TIMESINK_S3_ACCESS_KEY_SECRET: minioadmin
 
     steps:
       - uses: actions/checkout@v4
+      - uses: asdf-vm/actions/setup@v3
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ env.OTP_VERSION }}
           elixir-version: ${{ env.ELIXIR_VERSION }}
       - uses: actions/cache@v4
         with:
-          path: deps
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-asdf_${{ hashFiles('.tool-versions') }}-mix_${{ hashFiles('**/mix.lock') }}
+          path: |
+            deps
+            $HOME/.asdf
+
+      # Start a MinIO container on :9000
+      - run: docker run -d -p 9000:9000 --name minio minio/minio server /data && sleep 5
+
+      # MinIO basic setup
+      - run: asdf plugin add mc
+      - run: asdf install mc
+      - run: sleep 5; mc --debug --insecure config host add minio http://localhost:9000 minioadmin minioadmin
+      - run: sleep 1; mc --debug --insecure mb -p minio/timesink-dev
 
       - run: mix deps.get
       - run: mix compile

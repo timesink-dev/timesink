@@ -1,5 +1,54 @@
 defmodule Timesink.Factory do
   use ExMachina.Ecto, repo: Timesink.Repo
+  alias Timesink.Storage
+
+  # Blobs and Attachments
+
+  def plug_upload_factory do
+    tmpdir = "/tmp/timesink-tmp-#{Ecto.UUID.generate()}"
+    filename = "#{Ecto.UUID.generate()}.txt"
+    filepath = "#{tmpdir}/#{filename}"
+    content = Faker.Lorem.sentences() |> Enum.join(" ")
+
+    File.mkdir_p!(tmpdir)
+    File.write!(filepath, content)
+
+    %Plug.Upload{
+      content_type: "text/plain",
+      path: filepath,
+      filename: filename
+    }
+  end
+
+  def blob_factory do
+    config = Storage.config()
+
+    upload = build(:plug_upload)
+    path = Path.join([config.prefix, upload.filename])
+
+    {:ok, %{status_code: 200}} = Storage.S3.put(upload, path)
+
+    %Timesink.Storage.Blob{
+      path: path,
+      size: File.stat!(upload.path).size
+    }
+  end
+
+  def attachment_factory do
+    blob = insert(:blob)
+
+    target_schema = Ecto.Enum.values(Storage.Attachment, :target_schema) |> Enum.random()
+    target_id = Ecto.UUID.generate()
+
+    %Timesink.Storage.Attachment{
+      blob_id: blob.id,
+      target_schema: target_schema,
+      target_id: target_id,
+      name: "test_attachment"
+    }
+  end
+
+  # Accounts
 
   def applicant_factory do
     %Timesink.Waitlist.Applicant{

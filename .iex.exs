@@ -3,6 +3,11 @@ alias Timesink.Mailer
 alias Timesink.Repo
 alias Timesink.Workers
 
+# Timesink.Storage
+alias Timesink.Storage
+alias Timesink.Storage.Blob
+alias Timesink.Storage.Attachment
+
 # Timesink.Accounts
 alias Timesink.Accounts
 alias Timesink.Accounts.User
