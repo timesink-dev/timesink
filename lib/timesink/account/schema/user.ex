@@ -78,8 +78,6 @@ defmodule Timesink.Accounts.User do
       |> cast(params, [:email, :password])
       |> validate_required([:email, :password])
 
-    IO.inspect(params.password, label: "here password")
-
     with {:ok, params} <- apply_action(changeset, :password_auth),
          {:ok, user} <- User.get_by(email: params.email),
          {:ok, user} <- valid_password?(user, params.password) do

@@ -30,12 +30,12 @@ defmodule Timesink.Auth do
     Token.sign(TimesinkWeb.Endpoint, @token_salt, %{user_id: user.id, role: user.roles})
   end
 
-  @spec verify_token(binary()) :: {:error, :expired | :invalid | :missing} | {:ok, any()}
   @doc """
   Verifies the given token and returns the token claims if valid.
 
   Returns `{:ok, claims}` if valid, otherwise `{:error, reason}`.
   """
+  @spec verify_token(binary()) :: {:error, :expired | :invalid | :missing} | {:ok, any()}
   def verify_token(token) do
     Token.verify(TimesinkWeb.Endpoint, @token_salt, token, max_age: @max_age)
   end
