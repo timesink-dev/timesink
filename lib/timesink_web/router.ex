@@ -16,18 +16,26 @@ defmodule TimesinkWeb.Router do
   end
 
   pipeline :put_current_user do
-    plug TimesinkWeb.Plugs.SetCurrentUser
+    plug TimesinkWeb.Plugs.PutCurrentUser
   end
 
   pipeline :require_authenticated_user do
     plug TimesinkWeb.Plugs.RequireAuthenticatedUser
   end
 
+  pipeline :require_admin do
+    plug TimesinkWeb.Plugs.RequireAdmin
+  end
+
   scope "/", TimesinkWeb do
-    pipe_through [:browser, :put_current_user]
+    pipe_through :browser
 
     live "/join", WaitlistLive
     live "/sign_in", SignInLive
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :put_current_user]
 
     live_session :default, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
       live "/", HomepageLive
@@ -64,13 +72,13 @@ defmodule TimesinkWeb.Router do
   # end
 
   scope "/admin", TimesinkWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_admin]
 
     backpex_routes()
 
     get "/", RedirectController, :redirect_to_showcases
 
-    live_session :default_admin, on_mount: Backpex.InitAssigns do
+    live_session :admin, on_mount: Backpex.InitAssigns do
       live_resources "/showcases", Admin.ShowcaseLive
       live_resources "/waitlist", Admin.WaitlistLive
       live_resources "/films", Admin.FilmLive

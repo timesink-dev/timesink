@@ -1,6 +1,5 @@
 defmodule TimesinkWeb.PageController do
   use TimesinkWeb, :controller
-  import TimesinkWeb.Auth
 
   # plug :plug_check_logged_in when action in [:info]
 
@@ -12,5 +11,11 @@ defmodule TimesinkWeb.PageController do
 
   def info(conn, _params) do
     render(conn, :info, current_user: conn.assigns.current_user)
+  end
+
+  def not_found(conn, _params) do
+    conn
+    |> put_status(:not_found)
+    |> render("404.html")
   end
 end

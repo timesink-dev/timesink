@@ -1,14 +1,13 @@
 defmodule TimesinkWeb.AuthController do
   use TimesinkWeb, :controller
 
-  alias Timesink.Accounts.User
-  alias Timesink.Auth
+  alias TimesinkWeb.Auth
 
   @spec sign_in(Plug.Conn, map()) ::
           {:error, :invalid_credentials} | {:ok, nil | [map()] | %{optional(atom()) => any()}}
   def sign_in(conn, %{"user" => %{"email" => email, "password" => password}}) do
     with {:ok, user} <-
-           User.authenticate(%{email: email, password: password}) do
+           Auth.authenticate_user(%{email: email, password: password}) do
       conn
       |> Auth.log_in_user(user)
 

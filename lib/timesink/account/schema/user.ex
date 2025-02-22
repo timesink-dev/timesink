@@ -65,34 +65,14 @@ defmodule Timesink.Accounts.User do
     |> validate_length(:username, min: 1)
   end
 
-  # - [x] Fn to authenticate w/ user/pass; return user info
-  # - [ ] Fn to authenticate w/ token; return user info
-
   @doc """
-  Authenticates a user by retrieving the user with the given email, and then verifying the password.
-
-  ## Examples
-
-      iex> authenticate("foo@example.com", "correct_password")
-      %User{}
-
-      iex> authenticate("foo@example.com", "invalid_password")
-      nil
-
+  Validates the User's credentials
+  Both `email` and `password` are required
+  Uses the email to confirm existence of User, and then validates the password
   """
-  @spec authenticate(%{email: binary(), password: binary()}) ::
-          {:ok, user :: User.t()} | {:error, term()}
-  def authenticate(params) do
-    with {:ok, user} <- password_auth(params) do
-      {:ok, user}
-    else
-      {:error, :invalid_credentials} -> {:error, :invalid_credentials}
-    end
-  end
-
-  @spec password_auth(params :: %{email: String.t(), password: String.t()}) ::
+  @spec check_credentials(params :: %{email: String.t(), password: String.t()}) ::
           {:ok, User.t()} | {:error, :invalid_credentials}
-  def password_auth(%{} = params) do
+  def check_credentials(%{} = params) do
     changeset =
       {%{}, %{email: :string, password: :string}}
       |> cast(params, [:email, :password])
@@ -113,7 +93,8 @@ defmodule Timesink.Accounts.User do
   If there is no user or the user doesn't have a password, we call
   `Argon2.no_user_verify/0` to avoid timing attacks.
   """
-  def valid_password?(%Timesink.Accounts.User{password: password_hash} = user, password)
+
+  def valid_password?(%User{password: password_hash} = user, password)
       when is_binary(password_hash) and byte_size(password) > 0 do
     with true <- Argon2.verify_pass(password, password_hash) do
       {:ok, user}
