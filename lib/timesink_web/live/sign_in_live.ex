@@ -13,7 +13,7 @@ defmodule TimesinkWeb.SignInLive do
     ~H"""
     <div class="min-h-screen flex items-center justify-center bg-backroom-black">
       <!-- Card container for the sign in form -->
-      <div class="bg-backroom-black bg-opacity-70 border border-dark-theater-medium rounded-lg shadow-lg p-8 w-full max-w-md">
+      <div class="bg-backroom-black bg-opacity-70  rounded-lg shadow-lg p-8 w-full max-w-md h-[600px]">
         <!-- Logo and title -->
         <a class="flex flex-col items-center mb-6" href={~p"/"}>
           <p class="text-3xl font-brand leading-10 tracking-tighter text-white">
@@ -34,14 +34,14 @@ defmodule TimesinkWeb.SignInLive do
           <.input
             field={@form[:email]}
             type="email"
-            placeholder="Enter email"
+            placeholder="Email"
             input_class="w-full p-2 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
             required
           />
           <.input
             field={@form[:password]}
             type="password"
-            placeholder="Enter password"
+            placeholder="Password"
             input_class="w-full p-2 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
             required
           />

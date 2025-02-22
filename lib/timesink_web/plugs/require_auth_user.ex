@@ -1,4 +1,7 @@
 defmodule TimesinkWeb.Plugs.RequireAuthenticatedUser do
+  @moduledoc """
+  Used for routes that require the user to be authenticated.
+  """
   import Plug.Conn
   import Phoenix.Controller
   import TimesinkWeb.Plugs.Helpers

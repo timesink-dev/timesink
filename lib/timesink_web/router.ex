@@ -27,11 +27,23 @@ defmodule TimesinkWeb.Router do
     plug TimesinkWeb.Plugs.RequireAdmin
   end
 
+  pipeline :redirect_if_user_is_authenticated do
+    plug TimesinkWeb.Plugs.RedirectIfUserIsAuthenticated
+  end
+
   scope "/", TimesinkWeb do
     pipe_through :browser
 
     live "/join", WaitlistLive
-    live "/sign_in", SignInLive
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    live_session :redirect_if_user_is_authenticated,
+      on_mount: [{TimesinkWeb.Auth, :redirect_if_user_is_authenticated}] do
+      live "/sign_in", SignInLive
+    end
   end
 
   scope "/", TimesinkWeb do

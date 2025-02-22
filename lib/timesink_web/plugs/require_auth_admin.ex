@@ -1,4 +1,7 @@
 defmodule TimesinkWeb.Plugs.RequireAdmin do
+  @moduledoc """
+  Used for routes that require the user to be an admin.
+  """
   import Plug.Conn
   import Phoenix.Controller
   import TimesinkWeb.Plugs.Helpers

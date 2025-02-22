@@ -1,4 +1,7 @@
 defmodule TimesinkWeb.Plugs.PutCurrentUser do
+  @moduledoc """
+   Fetches the current user from the session and assigns it to the connection, i.e. `Plug.Conn`
+  """
   import Plug.Conn
   import TimesinkWeb.Plugs.Helpers
 

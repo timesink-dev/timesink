@@ -16,6 +16,7 @@ defmodule TimesinkWeb.Auth do
     - `fetch_current_user/2`: Retrieves the current user from the session or cookies.
     - `require_authenticated_user/2`: A plug that enforces authentication for protected routes.
     - `authenticate_user/1`: Authenticates a user by checking credentials.
+    - 'on_mount/4':
   """
 
   import Plug.Conn
