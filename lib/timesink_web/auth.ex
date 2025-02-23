@@ -13,7 +13,6 @@ defmodule TimesinkWeb.Auth do
     - `log_in_user/3`: Logs the user in by generating a token, renewing the session,
       and storing the token in the session and (optionally) a cookie.
     - `log_out_user/1`: Logs the user out by clearing the session and cookies.
-    - `fetch_current_user/2`: Retrieves the current user from the session or cookies.
     - `require_authenticated_user/2`: A plug that enforces authentication for protected routes.
     - `authenticate_user/1`: Authenticates a user by checking credentials.
     - 'on_mount/4':

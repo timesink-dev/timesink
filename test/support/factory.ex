@@ -62,7 +62,7 @@ defmodule Timesink.Factory do
   def user_factory do
     %Timesink.Accounts.User{
       email: Faker.Internet.email(),
-      password: Ecto.UUID.generate(),
+      password: Argon2.hash_pwd_salt("password"),
       username: Faker.Internet.user_name(),
       first_name: Faker.Person.first_name(),
       last_name: Faker.Person.last_name(),
