@@ -15,7 +15,7 @@ defmodule TimesinkWeb.Auth do
     - `log_out_user/1`: Logs the user out by clearing the session and cookies.
     - `require_authenticated_user/2`: A plug that enforces authentication for protected routes.
     - `authenticate_user/1`: Authenticates a user by checking credentials.
-    - 'on_mount/4':
+    - `on_mount/4`: Handles mounting and authenticating the current_user in LiveViews.
   """
 
   import Plug.Conn
