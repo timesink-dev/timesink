@@ -47,26 +47,6 @@ defmodule TimesinkWeb.Router do
   end
 
   scope "/", TimesinkWeb do
-    pipe_through [:browser, :put_current_user]
-
-    live_session :default, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
-      live "/", HomepageLive
-      live "/submit", FilmSubmissionLive
-      live "/archives", ArchiveLive
-      live "/blog", BlogLive
-      live "/upcoming", UpcomingLive
-      live "/now-playing", Cinema.ShowcaseLive
-      live "/member/:profile_username", Accounts.ProfileLive
-    end
-
-    # static routes
-    get "/info", PageController, :info
-
-    post "/sign_in", AuthController, :sign_in
-    post "/sign_out", AuthController, :sign_out
-  end
-
-  scope "/", TimesinkWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :authenticated,
@@ -100,6 +80,26 @@ defmodule TimesinkWeb.Router do
       live_resources "/members", Admin.UserLive
       live_resources "/creatives", Admin.CreativeLive
       live_resources "/film_creatives", Admin.FilmCreativeLive
+    end
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :put_current_user]
+
+    # static routes
+    get "/info", PageController, :info
+
+    post "/sign_in", AuthController, :sign_in
+    post "/sign_out", AuthController, :sign_out
+
+    live_session :default, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
+      live "/", HomepageLive
+      live "/submit", FilmSubmissionLive
+      live "/archives", ArchiveLive
+      live "/blog", BlogLive
+      live "/upcoming", UpcomingLive
+      live "/now-playing", Cinema.ShowcaseLive
+      live "/:profile_username", Accounts.ProfileLive
     end
   end
 
