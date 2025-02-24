@@ -13,7 +13,7 @@ defmodule TimesinkWeb.SignInLive do
     ~H"""
     <div class="min-h-screen flex items-center justify-center bg-backroom-black">
       <!-- Card container for the sign in form -->
-      <div class="bg-obsidian bg-opacity-70 border border-dark-theater-medium   rounded-lg shadow-lg p-8 w-full max-w-md">
+      <div class="bg-obsidian bg-opacity-60 border border-dark-theater-medium rounded-lg shadow-lg p-8 w-full max-w-md">
         <!-- Logo and title -->
         <a class="flex flex-col items-center mb-6" href={~p"/"}>
           <p class="text-3xl font-brand leading-10 tracking-tighter text-white">
