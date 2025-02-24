@@ -37,7 +37,7 @@ defmodule TimesinkWeb.TopNav do
     <!-- Logo -->
         <div>
           <a id="nav-logo" href="/" class="font-brand">
-            TimeSink Presents
+            TimeSink
           </a>
         </div>
         
