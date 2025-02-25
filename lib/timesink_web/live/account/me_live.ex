@@ -22,46 +22,48 @@ defmodule TimesinkWeb.Accounts.MeLive do
           joined {Utils.format_date(@current_user.inserted_at)}
         </span>
       </div>
-      <.me_page_item
-        title="Account"
-        items={[
-          %{
-            title: "Profile",
-            icon: "hero-identification",
-            link: ~p"/me/profile"
-          },
-          %{
-            title: "Security",
-            icon: "hero-lock-closed",
-            link: ~p"/me/security"
-          }
-        ]}
-      />
-      <.me_page_item
-        title="Activity"
-        items={[
-          %{
-            title: "Notifications",
-            icon: "hero-bolt",
-            coming_soon: true
-          },
-          %{
-            title: "Film submissions",
-            icon: "hero-film",
-            coming_soon: true
-          }
-        ]}
-      />
-      <.me_page_item
-        title="Integrations"
-        items={[
-          %{
-            title: "Tips",
-            icon: "hero-currency-dollar",
-            coming_soon: true
-          }
-        ]}
-      />
+      <div class="max-w-2xl mx-auto">
+        <.me_page_item
+          title="Account"
+          items={[
+            %{
+              title: "Profile",
+              icon: "hero-identification",
+              link: ~p"/me/profile"
+            },
+            %{
+              title: "Security",
+              icon: "hero-lock-closed",
+              link: ~p"/me/security"
+            }
+          ]}
+        />
+        <.me_page_item
+          title="Activity"
+          items={[
+            %{
+              title: "Notifications",
+              icon: "hero-bolt",
+              coming_soon: true
+            },
+            %{
+              title: "Film submissions",
+              icon: "hero-film",
+              coming_soon: true
+            }
+          ]}
+        />
+        <.me_page_item
+          title="Integrations"
+          items={[
+            %{
+              title: "Tips",
+              icon: "hero-currency-dollar",
+              coming_soon: true
+            }
+          ]}
+        />
+      </div>
     </section>
     """
   end
