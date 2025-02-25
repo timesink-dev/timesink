@@ -40,7 +40,7 @@ defmodule TimesinkWeb.TopNav do
         
     <!-- Actions -->
         <ul id="nav-actions" class="flex justify-between items-center gap-x-8">
-          <li><a href="/signin">Sign In</a></li>
+          <li><a href="/sign_in">Sign In</a></li>
           <li><a href="/join">Join Waitlist</a></li>
         </ul>
       </div>
@@ -83,7 +83,7 @@ defmodule TimesinkWeb.TopNav do
             <li><a href="/info">Info</a></li>
             <hr />
             <.button class="w-full md:w-1/2">
-              <a href="/signin">
+              <a href="/sign_in">
                 Sign In
               </a>
             </.button>

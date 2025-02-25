@@ -1,8 +1,9 @@
-defmodule TimesinkWeb.HomepageLive do
+defmodule TimesinkWeb.NowPlayingLive do
   alias TimesinkWeb.NowPlayingListComponent
   use TimesinkWeb, :live_view
 
   def mount(_params, _session, socket) do
+    # Dummy data for theaters
     theaters = [
       %{
         id: 1,
@@ -51,24 +52,26 @@ defmodule TimesinkWeb.HomepageLive do
       }
     ]
 
-    socket = socket |> assign(:theaters, theaters) |> assign(:current_theater_id, nil)
+    socket =
+      socket
+      |> assign(:theaters, theaters)
+      |> assign(:current_theater_id, 1)
 
     {:ok, socket}
   end
 
   def render(assigns) do
     ~H"""
-    <div id="hero" class="h-screen flex flex-col items-center justify-center text-center">
-      <h1>Welcome to TimeSink</h1>
-      <p>Scroll down to explore cinema</p>
+    <div id="now-playing">
+      <div id="now-playing-section">
+        <.live_component
+          module={NowPlayingListComponent}
+          id="now_playing_list_now"
+          current_theater_id={@current_theater_id}
+          theaters={@theaters}
+        />
+      </div>
     </div>
-
-    <.live_component
-      module={NowPlayingListComponent}
-      id="now_playing_list"
-      current_theater_id={@current_theater_id}
-      theaters={@theaters}
-    />
     """
   end
 

@@ -18,11 +18,12 @@ defmodule TimesinkWeb.Router do
   scope "/", TimesinkWeb do
     pipe_through :browser
     live "/", HomepageLive
-    live "/now-playing", Cinema.ShowcaseLive
-    live "/now-playing/:theater_slug", Cinema.TheaterLive
 
     live "/join", WaitlistLive
-    live "/signin", SignInLive
+    live "/sign_in", SignInLive
+
+    live "/now-playing", Cinema.ShowcaseLive
+    live "/now-playing/:theater_slug", Cinema.TheaterLive
 
     live "/me", Accounts.MeLive
     live "/me/profile", Accounts.ProfileSettingsLive
