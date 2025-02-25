@@ -61,6 +61,24 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :ex_aws,
+  json_codec: Jason,
+  access_key_id: [{:system, "TIMESINK_S3_ACCESS_KEY_ID"}, :instance_role],
+  secret_access_key: [{:system, "TIMESINK_S3_ACCESS_KEY_SECRET"}, :instance_role]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
+
+config :timesink, Oban,
+  engine: Oban.Engines.Basic,
+  repo: Timesink.Repo,
+  plugins: [
+    Oban.Plugins.Lifeline,
+    {Oban.Plugins.Pruner, max_age: 3600},
+
+    # Oban.Plugins.Reindexer requires the `CONCURRENT` option, which is only
+    # available in Postgres 12 and above.
+    {Oban.Plugins.Reindexer, schedule: "@weekly"}
+  ],
+  queues: [mailer: 10]

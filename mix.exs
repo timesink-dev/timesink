@@ -5,7 +5,7 @@ defmodule Timesink.MixProject do
     [
       app: :timesink,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -32,8 +32,14 @@ defmodule Timesink.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:backpex, "~> 0.8.0"},
+      {:ex_aws, "~> 2.5"},
+      {:ex_aws_s3, "~> 2.5"},
+      {:hackney, "~> 1.20"},
+      {:sweet_xml, "~> 0.7.4"},
+      {:backpex, "~> 0.10.0"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:resend, "~> 0.4.4"},
+      {:oban, "~> 2.17"},
       {:swiss_schema, "~> 0.6.0"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
@@ -51,7 +57,7 @@ defmodule Timesink.MixProject do
       {:faker, "~> 0.18", only: [:dev, :test]},
       {:heroicons,
        github: "tailwindlabs/heroicons",
-       tag: "v2.1.1",
+       tag: "v2.2.0",
        sparse: "optimized",
        app: false,
        compile: false,
@@ -63,7 +69,8 @@ defmodule Timesink.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:timex, "~> 3.7"}
     ]
   end
 

@@ -20,6 +20,8 @@ if System.get_env("PHX_SERVER") do
   config :timesink, TimesinkWeb.Endpoint, server: true
 end
 
+config :timesink, Timesink.Mailer, api_key: System.fetch_env!("RESEND_API_KEY")
+
 database_url =
   System.get_env("DATABASE_URL") ||
     raise """
@@ -114,4 +116,41 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+end
+
+# ExAws defaults to local, Docker-based MinIO
+System.get_env("TIMESINK_S3_HOST", "http://localhost:9000")
+|> URI.parse()
+|> then(fn %{scheme: scheme, host: host, port: port} ->
+  config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
+end)
+
+config :timesink, Timesink.Storage,
+  host: System.get_env("TIMESINK_S3_HOST", "http://localhost:9000"),
+  access_key_id: System.get_env("TIMESINK_S3_ACCESS_KEY_ID", "minioadmin"),
+  access_key_secret: System.get_env("TIMESINK_S3_ACCESS_KEY_SECRET", "minioadmin"),
+  bucket: System.get_env("TIMESINK_S3_BUCKET", "timesink"),
+  prefix: System.get_env("TIMESINK_S3_PREFIX", "blobs")
+
+if config_env() in [:test] do
+  System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000")
+  |> URI.parse()
+  |> then(fn %{scheme: scheme, host: host, port: port} ->
+    config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
+  end)
+
+  config :timesink, Timesink.Storage,
+    host: System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000"),
+    access_key_id: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_ID", "minioadmin"),
+    access_key_secret: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_SECRET", "minioadmin"),
+    bucket: System.get_env("TIMESINK_TEST_S3_BUCKET", "timesink-dev"),
+    prefix: System.get_env("TIMESINK_TEST_S3_PREFIX", "blobs")
+end
+
+if config_env() in [:prod] do
+  config :timesink, Timesink.Storage,
+    # Require the following envs
+    host: System.fetch_env!("TIMESINK_S3_HOST"),
+    access_key_id: System.fetch_env!("TIMESINK_S3_ACCESS_KEY_ID"),
+    access_key_secret: System.fetch_env!("TIMESINK_S3_ACCESS_KEY_SECRET")
 end

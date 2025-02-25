@@ -10,8 +10,4 @@ defmodule TimesinkWeb.PageController do
   def info(conn, _params) do
     render(conn, :info)
   end
-
-  def blog(conn, _params) do
-    render(conn, :blog)
-  end
 end

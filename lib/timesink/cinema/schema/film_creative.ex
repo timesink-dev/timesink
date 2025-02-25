@@ -1,11 +1,11 @@
 defmodule Timesink.Cinema.FilmCreative do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
+  use Timesink.Schema
   import Ecto.Changeset
 
   @type role :: :director | :producer | :writer | :cast | :crew
   @roles [:director, :producer, :writer, :cast, :crew]
-  @spec roles() :: [:cast | :crew | :director | :producer | :writer, ...]
   def roles, do: @roles
 
   @type t :: %{

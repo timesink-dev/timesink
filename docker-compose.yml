@@ -1,0 +1,35 @@
+services:
+  minio:
+    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
+    volumes:
+      - .docker/minio/data:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    command: server --console-address :9001 /data
+
+  minio_autosetup:
+    image: minio/mc:RELEASE.2024-11-17T19-35-25Z
+    depends_on:
+      - minio
+    entrypoint: >
+      sh -c "
+        sleep 3;
+        mc config host add minio http://minio:9000 minioadmin minioadmin;
+        mc mb -p minio/timesink-dev;
+        exit 0;
+      "
+
+  postgres:
+    image: postgres:17.2-alpine3.21
+    ports:
+      - 55432:5432
+    environment:
+      POSTGRES_DB: timesink_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

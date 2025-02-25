@@ -18,16 +18,27 @@ defmodule TimesinkWeb.Router do
   scope "/", TimesinkWeb do
     pipe_through :browser
     live "/", HomepageLive
-    live "/now-playing", NowPlayingLive
 
     live "/join", WaitlistLive
-    live "/sign-in", SignInLive
+    live "/sign_in", SignInLive
+
+    live "/now-playing", Cinema.ShowcaseLive
+    live "/now-playing/:theater_slug", Cinema.TheaterLive
 
     live "/me", Accounts.MeLive
+    live "/me/profile", Accounts.ProfileSettingsLive
+    live "/me/security", Accounts.SecuritySettingsLive
+
+    live "/submit", FilmSubmissionLive
+
+    live "/archives", ArchiveLive
+    live "/blog", BlogLive
+    live "/upcoming", UpcomingLive
 
     # Static pages
     get "/info", PageController, :info
-    get "/blog", PageController, :blog
+
+    live "/:profile_username", Accounts.ProfileLive
   end
 
   # Other scopes may use custom stacks.
@@ -39,6 +50,8 @@ defmodule TimesinkWeb.Router do
     pipe_through :browser
 
     backpex_routes()
+
+    get "/", RedirectController, :redirect_to_showcases
 
     live_session :default, on_mount: Backpex.InitAssigns do
       live_resources "/showcases", Admin.ShowcaseLive

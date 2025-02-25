@@ -1,25 +1,10 @@
-<header class="px-4 sm:px-6 lg:px-8 font-brand"></header>
-<main class="">
-  <!-- Navigation Bar -->
-  <nav id="main-nav" class="mt-2 mx-12">
-    <div id="nav-container" class="flex justify-between items-center">
-      <div id="nav-links" class="flex justify-between items-center gap-x-8">
-        <a href={~p"/now-playing"}>Now Playing</a>
-        <a href={~p"/blog"}>Blog</a>
-        <a href={~p"/info"}>Info</a>
-      </div>
-      <a href={~p"/"} id="nav-logo">
-        Timesink Presents
-      </a>
-
-      <div id="nav-actions" class="flex justify-between items-center gap-x-8">
-        <a href={~p"/sign-in"}>Sign In</a>
-        <a href={~p"/join"}>Join Waitlist</a>
-      </div>
-    </div>
-  </nav>
-  <div>
-    <.flash_group flash={@flash} />
-    {@inner_content}
+<.top_nav class="h-[30px] mx-4" />
+<main class="px-4 sm:px-6 lg:px-8">
+  <div class="min-h-[calc(100vh-60px)]">
+    <.flash_group flash={@flash} /> {@inner_content}
   </div>
 </main>
+<footer class="flex justify-start items-left flex-col mt-8 py-16 px-8 text-left text-mystery-white font-brand h-[150px]">
+  <p>&copy; {DateTime.utc_now().year} TimeSink Presents</p>
+  <p class="font-gangster font-light">hello@timesinkpresents.com</p>
+</footer>
