@@ -1,0 +1,32 @@
+name: Deploy Staging to Fly.io
+
+on:
+  push:
+    branches:
+      - staging  # Triggers deployment when pushing to the 'staging' branch
+
+jobs:
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Elixir and Erlang
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.18.0-otp-27"  # Update to your version
+          otp-version: "27.2"       # Update to your version
+
+      - name: Install Fly.io CLI
+        run: |
+          curl -L https://fly.io/install.sh | sh
+          export PATH=$HOME/.fly/bin:$PATH
+
+      - name: Authenticate with Fly.io
+        run: fly auth token ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Deploy to Fly.io
+        run: fly deploy --app timesink-staging --remote-only
