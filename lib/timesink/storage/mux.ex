@@ -26,7 +26,7 @@ defmodule Timesink.Storage.Mux do
       mux_client = Mux.client(key_id, key_secret)
 
       with {:ok, resp, _} <- Mux.Video.Uploads.create(mux_client, upload_params),
-           blob_params <- %{upload_id: resp["id"], meta: %{"response" => resp}},
+           blob_params <- %{mux_id: resp["id"], meta: %{"response" => resp}},
            {:ok, mux_upload} <- MuxUpload.create(blob_params) do
         mux_upload
       else

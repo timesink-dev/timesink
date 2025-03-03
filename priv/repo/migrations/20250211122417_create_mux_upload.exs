@@ -7,8 +7,8 @@ defmodule Timesink.Repo.Migrations.CreateMuxUpload do
 
       timestamps type: :utc_datetime
 
+      add :mux_id, :string, null: false
       add :status, :mux_upload_status, null: false, default: "waiting"
-      add :upload_id, :string, null: false
       add :asset_id, :string
       add :playback_id, :string
       add :meta, :map

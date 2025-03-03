@@ -29,7 +29,7 @@ defmodule Timesink.Factory do
     {:ok, %{status_code: 200}} = Storage.S3.put(upload, path)
 
     %Timesink.Storage.Blob{
-      path: path,
+      uri: path,
       size: File.stat!(upload.path).size
     }
   end
@@ -193,7 +193,7 @@ defmodule Timesink.Factory do
 
   def mux_upload_factory do
     %Timesink.Storage.MuxUpload{
-      upload_id: Ecto.UUID.generate(),
+      mux_id: Ecto.UUID.generate(),
       asset_id: Ecto.UUID.generate(),
       playback_id: Ecto.UUID.generate()
     }
