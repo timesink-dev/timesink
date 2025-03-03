@@ -125,7 +125,13 @@ System.get_env("TIMESINK_S3_HOST", "http://localhost:9000")
   config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
 end)
 
-config :timesink, Timesink.Storage,
+# Storage.Mux
+config :timesink, Timesink.Storage.Mux,
+  access_key_id: System.get_env("TIMESINK_MUX_ACCESS_KEY_ID"),
+  access_key_secret: System.get_env("TIMESINK_MUX_ACCESS_KEY_SECRET")
+
+# Storage.S3
+config :timesink, Timesink.Storage.S3,
   host: System.get_env("TIMESINK_S3_HOST", "http://localhost:9000"),
   access_key_id: System.get_env("TIMESINK_S3_ACCESS_KEY_ID", "minioadmin"),
   access_key_secret: System.get_env("TIMESINK_S3_ACCESS_KEY_SECRET", "minioadmin"),
@@ -139,7 +145,7 @@ if config_env() in [:test] do
     config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
   end)
 
-  config :timesink, Timesink.Storage,
+  config :timesink, Timesink.Storage.S3,
     host: System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000"),
     access_key_id: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_ID", "minioadmin"),
     access_key_secret: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_SECRET", "minioadmin"),
@@ -148,7 +154,7 @@ if config_env() in [:test] do
 end
 
 if config_env() in [:prod] do
-  config :timesink, Timesink.Storage,
+  config :timesink, Timesink.Storage.S3,
     # Require the following envs
     host: System.fetch_env!("TIMESINK_S3_HOST"),
     access_key_id: System.fetch_env!("TIMESINK_S3_ACCESS_KEY_ID"),
