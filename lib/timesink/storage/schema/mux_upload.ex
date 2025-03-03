@@ -15,7 +15,7 @@ defmodule Timesink.Storage.MuxUpload do
   @type t :: %{
           __struct__: __MODULE__,
           status: status(),
-          upload_id: :string,
+          mux_id: :string,
           asset_id: :string,
           playback_id: :string
         }
@@ -28,7 +28,7 @@ defmodule Timesink.Storage.MuxUpload do
       values: [:waiting, :asset_created, :errored, :timed_out, :cancelled],
       default: :waiting
 
-    field :upload_id, :string
+    field :mux_id, :string
     field :asset_id, :string
     field :playback_id, :string
     field :meta, :map
@@ -40,7 +40,7 @@ defmodule Timesink.Storage.MuxUpload do
           Ecto.Changeset.t()
   def changeset(%{} = struct, %{} = params) do
     struct
-    |> cast(params, [:status, :upload_id, :asset_id, :playback_id, :meta])
-    |> validate_required([:status, :upload_id])
+    |> cast(params, [:status, :mux_id, :asset_id, :playback_id, :meta])
+    |> validate_required([:status, :mux_id])
   end
 end
