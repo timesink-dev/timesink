@@ -20,6 +20,14 @@ jobs:
           elixir-version: '1.15'  # Update to your version
           otp-version: '26'       # Update to your version
 
+      - name: Install Node.js and Dependencies
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # Use latest stable Node.js
+      - run: |
+          cd assets
+          npm ci  # Installs dependencies from package-lock.json for reproducibility
+
       - name: Install Fly.io CLI
         run: |
           curl -L https://fly.io/install.sh | sh

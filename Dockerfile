@@ -24,8 +24,15 @@ FROM ${BUILDER_IMAGE} as builder
 RUN apt-get update -y && apt-get install -y build-essential git \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
+
+WORKDIR /app/assets
+RUN npm install
+
 # prepare build dir
 WORKDIR /app
+
+
+
 
 # install hex + rebar
 RUN mix local.hex --force && \
