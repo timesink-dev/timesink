@@ -1,7 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>timesink-dev/.github"],
   "enabledManagers": ["mix", "npm"],
+    "extends": [
+    "config:base",
+    "schedule:weekly",
+    "group:allNonMajor",
+    "group:linters",
+    ":rebaseStalePrs",
+    ":semanticCommits",
+    ":semanticCommitScope(deps)",
+    "docker:enableMajor"
+  ],
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "dependencyDashboard": true,
   "packageRules": [
     {
       "matchManagers": ["mix"],
