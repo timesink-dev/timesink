@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>timesink-dev/.github"],
+  "enabledManagers": ["mix", "npm"],
+  "packageRules": [
+    {
+      "matchManagers": ["mix"],
+      "groupName": "Elixir Dependencies",
+      "schedule": ["weekly"]
+    },
+    {
+      "matchManagers": ["mix"],
+      "matchPackagePatterns": ["ecto", "phoenix", "plug"],
+      "groupName": "Core Phoenix Dependencies",
+      "schedule": ["weekly"]
+    },
+     {
+      "matchManagers": ["mix"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+        {
+      "matchManagers": ["npm"],
+      "groupName": "JS Dependencies",
+      "schedule": ["weekly"]
+    }
+  ],
+  "rebaseWhen": "never",
+  "ignorePaths": ["**/node_modules/**"]
+}
