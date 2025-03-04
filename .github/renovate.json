@@ -5,14 +5,12 @@
   "packageRules": [
     {
       "matchManagers": ["mix"],
-      "groupName": "Elixir Dependencies",
-      "schedule": ["weekly"]
+      "groupName": "Elixir Dependencies"
     },
     {
       "matchManagers": ["mix"],
       "matchPackagePatterns": ["ecto", "phoenix", "plug"],
-      "groupName": "Core Phoenix Dependencies",
-      "schedule": ["weekly"]
+      "groupName": "Core Phoenix Dependencies"
     },
      {
       "matchManagers": ["mix"],
@@ -21,8 +19,7 @@
     },
         {
       "matchManagers": ["npm"],
-      "groupName": "JS Dependencies",
-      "schedule": ["weekly"]
+      "groupName": "JS Dependencies"
     }
   ],
   "rebaseWhen": "never",
