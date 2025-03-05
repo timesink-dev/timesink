@@ -23,6 +23,7 @@ defmodule Timesink.Waitlist.Applicant do
     field :last_name, :string
     field :email, :string
     field :status, Ecto.Enum, values: @statuses, default: :pending
+    has_one :token, Timesink.Token
 
     timestamps(type: :utc_datetime)
   end
