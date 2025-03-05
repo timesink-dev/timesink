@@ -10,7 +10,7 @@ defmodule Timesink.Repo.Migrations.AddTokenTable do
       add :status, :token_status, default: "active"
       add :expires_at, :utc_datetime
       add :user_id, references(:user, type: :uuid, on_delete: :delete_all)
-      add :applicant_id, references(:applicant, type: :uuid, on_delete: :delete_all)
+      add :waitlist_id, references(:waitlist, type: :uuid, on_delete: :delete_all)
 
       timestamps type: :utc_datetime
     end
