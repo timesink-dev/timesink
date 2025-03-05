@@ -68,4 +68,12 @@ defmodule Timesink.Token do
   def token_expired?(token) do
     token.expires_at && DateTime.compare(token.expires_at, DateTime.utc_now()) == :lt
   end
+
+  def validate_invite(token) do
+    with {:ok, %Timesink.Token{}} <- Timesink.Token.get_by(secret: token, status: :active) do
+      {:ok, token}
+    else
+      _ -> {:error, :invalid}
+    end
+  end
 end
