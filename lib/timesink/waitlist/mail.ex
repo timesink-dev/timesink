@@ -1,7 +1,7 @@
 defmodule Timesink.Waitlist.Mail do
   use Timesink.Mailer
 
-  @base_url "https://timesinkpresents.com"
+  @base_url Application.compile_env(:timesink, :base_url)
 
   def send_waitlist_confirmation(to_email, first_name) do
     send_mail(
