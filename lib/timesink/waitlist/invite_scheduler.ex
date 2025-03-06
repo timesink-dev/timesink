@@ -7,23 +7,12 @@ defmodule Timesink.Waitlist.InviteScheduler do
     delay_seconds = Enum.random(24..72) * 3600
     scheduled_at = DateTime.add(DateTime.utc_now(), delay_seconds, :second)
 
-    with {
-           :ok,
-           %Oban.Job{
-             id: job_id,
-             scheduled_at: _scheduled_at
-           }
-         } <-
-           Oban.insert(%Oban.Job{
-             queue: :waitlist_invites,
-             worker: SendInvite,
-             args: %{"applicant_id" => applicant_id},
-             scheduled_at: scheduled_at
-           }) do
-      {:ok, job_id}
-    else
-      _ ->
-        {:error, "Failed to schedule invite"}
+    # Use the worker's new/2 function
+    job = SendInvite.new(%{"applicant_id" => applicant_id}, scheduled_at: scheduled_at)
+
+    case Oban.insert(job) do
+      {:ok, job} -> {:ok, job.id}
+      {:error, _} -> {:error, "Failed to schedule invite"}
     end
   end
 end

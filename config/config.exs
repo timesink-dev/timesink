@@ -81,10 +81,10 @@ config :timesink, Oban,
     # available in Postgres 12 and above.
     {Oban.Plugins.Reindexer, schedule: "@weekly"},
     {Oban.Plugins.Cron,
-     jobs: [
+     crontab: [
        # Runs every 12 hours
        # Runs every 3 minutes
-       {"*/3 * * * *", Timesink.Workers.ProcessWaitlist}
+       {"*/1 * * * *", Timesink.Workers.ProcessWaitlist}
      ]}
   ],
   queues: [mailer: 10, waitlist_invites: 10, waitlist_processing: 10]

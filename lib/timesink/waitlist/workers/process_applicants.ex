@@ -14,7 +14,7 @@ defmodule Timesink.Workers.ProcessWaitlist do
     applicants =
       Repo.all(
         from a in Applicant,
-          where: a.status == "pending",
+          where: a.status == ^:pending,
           order_by: a.inserted_at,
           limit: @batch_size
       )
