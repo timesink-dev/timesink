@@ -21,6 +21,7 @@ defmodule Timesink.Waitlist do
     with {:ok, applicant} <-
            Applicant.create(params) do
       Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
+      Mail.send_invite_code(applicant.email, applicant.first_name, applicant.code)
       {:ok, applicant}
     end
   end
