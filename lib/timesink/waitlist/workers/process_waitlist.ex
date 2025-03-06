@@ -3,17 +3,17 @@ defmodule Timesink.Workers.ProcessWaitlist do
 
   import Ecto.Query
   alias Timesink.Repo
-  alias Timesink.Waitlist.Applicant
+  alias Timesink.Waitlist
   alias Timesink.Waitlist.InviteScheduler
 
   # Number of users invited per batch
-  @batch_size 10
+  @batch_size 5
 
   @impl Oban.Worker
   def perform(_job) do
     applicants =
       Repo.all(
-        from a in Applicant,
+        from a in Waitlist.Applicant,
           where: a.status == ^:pending,
           order_by: a.inserted_at,
           limit: @batch_size

@@ -14,8 +14,8 @@ defmodule Timesink.Workers.SendInvite do
     end
   end
 
-  defp send_invite(%Applicant{id: applicant_id, email: email, first_name: first_name}) do
-    with {:ok, token} <- generate_and_store_token(applicant_id),
+  defp send_invite(%Applicant{email: email, first_name: first_name} = applicant) do
+    with {:ok, token} <- generate_and_store_token(applicant),
          {:ok, _} <- Mail.send_invite_code(email, first_name, token.secret) do
       {:ok, token}
     else
@@ -23,20 +23,24 @@ defmodule Timesink.Workers.SendInvite do
     end
   end
 
-  defp generate_and_store_token(applicant_id) do
+  defp generate_and_store_token(applicant) do
     token = Ecto.UUID.generate()
+
     # 7 days expiry
     expires_at = DateTime.utc_now() |> DateTime.add(7 * 24 * 60 * 60, :second)
 
     token_params = %{
       kind: :invite,
       secret: token,
-      waitlist_id: applicant_id,
+      waitlist_id: applicant.id,
       expires_at: expires_at
     }
 
-    case Token.create(token_params) do
-      {:ok, token} -> {:ok, token}
+    with {:ok, token} <- Token.create(token_params),
+         {:ok, %Applicant{}} <-
+           Applicant.update(applicant, %{status: :invited}) do
+      {:ok, token}
+    else
       {:error, changeset} -> {:error, Ecto.Changeset.traverse_errors(changeset, & &1)}
     end
   end

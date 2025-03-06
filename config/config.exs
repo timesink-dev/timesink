@@ -82,9 +82,10 @@ config :timesink, Oban,
     {Oban.Plugins.Reindexer, schedule: "@weekly"},
     {Oban.Plugins.Cron,
      crontab: [
-       # Runs every 12 hours
-       # Runs every 3 minutes
-       {"*/1 * * * *", Timesink.Workers.ProcessWaitlist}
+       {"@daily", Timesink.Workers.ProcessWaitlist}
+
+       # Runs every 1 minute for dev env
+       #  {"*/1 * * * *", Timesink.Workers.ProcessWaitlist}
      ]}
   ],
   queues: [mailer: 10, waitlist_invites: 10, waitlist_processing: 10]
