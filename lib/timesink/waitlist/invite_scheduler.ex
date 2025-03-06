@@ -1,6 +1,5 @@
-defmodule TimeSink.InviteScheduler do
-  alias TimeSink.Repo
-  alias TimeSink.Workers.SendInvite
+defmodule Timesink.Waitlist.InviteScheduler do
+  alias Timesink.Workers.SendInvite
   alias Oban
 
   def schedule_invite(applicant_id) do

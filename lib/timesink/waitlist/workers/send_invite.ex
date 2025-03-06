@@ -1,4 +1,4 @@
-defmodule TimeSink.Workers.SendInvite do
+defmodule Timesink.Workers.SendInvite do
   use Oban.Worker, queue: :waitlist_invites, max_attempts: 3
 
   alias Timesink.Waitlist.Applicant
