@@ -9,7 +9,7 @@ defmodule Timesink.Waitlist do
   alias Timesink.Waitlist.Applicant
   import Ecto.Query, only: [from: 2]
 
-  @max_wave_size 5
+  @max_wave_size 8
 
   @doc """
   Returns the number of spots remaining in the current wave.
@@ -25,8 +25,7 @@ defmodule Timesink.Waitlist do
     pending_applicants =
       Repo.aggregate(from(a in Applicant, where: a.status == ^:pending), :count, :id)
 
-    spots_remaining = max(@max_wave_size, @max_wave_size - pending_applicants)
-
+    spots_remaining = max(0, @max_wave_size - pending_applicants)
     spots_remaining
   end
 

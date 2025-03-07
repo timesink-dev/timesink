@@ -58,9 +58,7 @@ defmodule TimesinkWeb.WaitlistLive do
           module={WaitlistFormComponent}
           id="waitlist_form"
           joined={@joined}
-          message={@message}
           spots_remaining={@spots_remaining}
-          wait_time={@wait_time}
         />
       <% end %>
     </div>
