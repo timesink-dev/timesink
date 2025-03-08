@@ -112,6 +112,9 @@ defmodule TimesinkWeb.Router do
       live "/now-playing", Cinema.ShowcaseLive
       live "/:profile_username", Accounts.ProfileLive
     end
+
+    # Redirects
+    get "/invite/:token", InvitationController, :validate_invite
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
