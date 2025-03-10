@@ -22,3 +22,4 @@
 # export TIMESINK_TEST_S3_ACCESS_KEY_SECRET="minioadmin"
 # export TIMESINK_TEST_S3_BUCKET="timesink-test"
 # export TIMESINK_TEST_S3_PREFIX="blobs"
+# export AUTH_TOKEN_SALT="example_auth_token_salt"

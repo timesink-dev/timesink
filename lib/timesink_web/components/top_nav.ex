@@ -2,9 +2,12 @@ defmodule TimesinkWeb.TopNav do
   import TimesinkWeb.CoreComponents, only: [icon: 1, button: 1]
   use Phoenix.Component
   alias Phoenix.LiveView.JS
+  alias Timesink.Accounts.User
 
   attr :class, :string, default: nil
+  attr :current_user, User, default: nil
 
+  @spec top_nav(map()) :: Phoenix.LiveView.Rendered.t()
   def top_nav(assigns) do
     ~H"""
     <header class={["z-40 sticky bg-backgroom-black", @class]}>
@@ -14,8 +17,8 @@ defmodule TimesinkWeb.TopNav do
         </p>
         <.hamburger_button />
       </div>
-      <.open_hamburger />
-      <.top_nav_content />
+      <.open_hamburger current_user={@current_user} />
+      <.top_nav_content current_user={@current_user} />
     </header>
     """
   end
@@ -34,14 +37,23 @@ defmodule TimesinkWeb.TopNav do
     <!-- Logo -->
         <div>
           <a id="nav-logo" href="/" class="font-brand">
-            TimeSink Presents
+            TimeSink
           </a>
         </div>
         
     <!-- Actions -->
         <ul id="nav-actions" class="flex justify-between items-center gap-x-8">
-          <li><a href="/signin">Sign In</a></li>
-          <li><a href="/join">Join Waitlist</a></li>
+          <%= if @current_user do %>
+            <.form method="post" action="/sign_out" for={}>
+              <.button type="submit" color="tertiary" class="text-mystery-white">
+                Sign Out
+              </.button>
+            </.form>
+            <li><a href="/submit">Submit film</a></li>
+          <% else %>
+            <li><a href="/sign_in">Sign in</a></li>
+            <li><a href="/join">Join Waitlist</a></li>
+          <% end %>
         </ul>
       </div>
     </nav>
@@ -82,16 +94,29 @@ defmodule TimesinkWeb.TopNav do
             <li><a href="/blog">Blog</a></li>
             <li><a href="/info">Info</a></li>
             <hr />
-            <.button class="w-full md:w-1/2">
-              <a href="/signin">
-                Sign In
-              </a>
-            </.button>
-            <.button color="tertiary" class="w-full md:w-1/2">
-              <a href="/join">
-                Join Waitlist
-              </a>
-            </.button>
+            <div class="w-full flex flex-col gap-y-4">
+              <%= if @current_user do %>
+                <.form method="post" action="/sign_out" for={}>
+                  <.button type="submit" color="tertiary" class="w-full md:w-1/2">
+                    Sign Out
+                  </.button>
+                </.form>
+                <.button color="primary" class="w-full md:w-1/2">
+                  Submit film
+                </.button>
+              <% else %>
+                <a href="/sign_in">
+                  <.button class="w-full md:w-1/2">
+                    Sign In
+                  </.button>
+                </a>
+                <a href="/join">
+                  <.button color="tertiary" class="w-full md:w-1/2">
+                    Join Waitlist
+                  </.button>
+                </a>
+              <% end %>
+            </div>
           </ul>
         </div>
       </nav>

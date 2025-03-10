@@ -67,7 +67,7 @@ defmodule TimesinkWeb.Accounts.SecuritySettingsLive do
   end
 
   def mount(_params, _session, socket) do
-    {:ok, user} = Timesink.Accounts.get_me()
+    user = socket.assigns.current_user |> Timesink.Repo.preload(:profile)
 
     changeset =
       User.changeset(user)
