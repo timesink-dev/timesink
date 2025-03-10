@@ -38,15 +38,12 @@ defmodule TimesinkWeb.Router do
   scope "/", TimesinkWeb do
     pipe_through [:browser, :require_invite_token]
     live "/onboarding", OnboardingLive
-    # Redirects
-    get "/invite/:token", InvitationController, :validate_invite
   end
 
   scope "/", TimesinkWeb do
     pipe_through :browser
 
     live "/join", WaitlistLive
-
     get "/invite/:token", InvitationController, :validate_invite
   end
 

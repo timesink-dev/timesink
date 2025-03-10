@@ -6,7 +6,6 @@ defmodule TimesinkWeb.OnboardingLive do
     StepVerifyEmailComponent,
     StepNameComponent,
     StepLocationComponent,
-    StepAvatarComponent,
     StepUsernameComponent
   }
 
