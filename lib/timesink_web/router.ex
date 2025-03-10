@@ -38,6 +38,8 @@ defmodule TimesinkWeb.Router do
   scope "/", TimesinkWeb do
     pipe_through [:browser, :require_invite_token]
     live "/onboarding", OnboardingLive
+    # Redirects
+    get "/invite/:token", InvitationController, :validate_invite
   end
 
   scope "/", TimesinkWeb do
@@ -112,9 +114,6 @@ defmodule TimesinkWeb.Router do
       live "/now-playing", Cinema.ShowcaseLive
       live "/:profile_username", Accounts.ProfileLive
     end
-
-    # Redirects
-    get "/invite/:token", InvitationController, :validate_invite
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
