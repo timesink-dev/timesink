@@ -16,9 +16,9 @@ defmodule Timesink.Auth do
   alias Phoenix.Token
   use TimesinkWeb, :verified_routes
 
-  # should we use secret key base here instead as a salt?
-  @token_salt "user_auth_salt"
+  @token_salt System.get_env("AUTH_TOKEN_SALT")
 
+  # 7 days
   @max_age 7 * 60 * 24 * 60
 
   @doc """
