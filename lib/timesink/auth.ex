@@ -16,7 +16,7 @@ defmodule Timesink.Auth do
   alias Phoenix.Token
   use TimesinkWeb, :verified_routes
 
-  @token_salt System.get_env("AUTH_TOKEN_SALT")
+  @token_salt System.get_env("AUTH_TOKEN_SALT") || "auth_token_salt_fallback"
 
   # 7 days
   @max_age 7 * 60 * 24 * 60
