@@ -4,7 +4,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
   def mount(socket) do
     {:ok,
      assign(socket,
-       user_data: %{:email => "aaronzomback@gmail.com"},
+       user_data: socket.assigns[:user_data],
        code: ["", "", "", "", "", ""]
      )}
   end

@@ -10,13 +10,20 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
           Let’s Get You Set Up. Just a few quick steps before you’re in.
         </p>
 
-        <form class="mt-6 space-y-4" phx-submit="send_verification_email">
+        <.simple_form
+          class="mt-6 space-y-4"
+          phx-submit="send_verification_email"
+          for={@user_data}
+          as="user_data"
+        >
           <div>
             <label class="block text-sm font-medium text-gray-300">Email</label>
             <.input
               type="email"
               name="email"
+              required
               value=""
+              input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
               error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
               placeholder="Enter your email"
             />
@@ -47,11 +54,12 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
               placeholder="Confirm your password"
             />
           </div>
-
-          <div class="mt-6">
-            <.button color="secondary" class="w-full py-3 text-lg">Continue</.button>
-          </div>
-        </form>
+          <:actions>
+            <div class="mt-6">
+              <.button color="secondary" class="w-full py-3 text-lg">Continue</.button>
+            </div>
+          </:actions>
+        </.simple_form>
 
         <p class="text-gray-400 text-center text-sm mt-6">
           Your email will be used to confirm your account and notify you about new screenings.
