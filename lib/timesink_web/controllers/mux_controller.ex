@@ -25,10 +25,6 @@ defmodule TimesinkWeb.MuxController do
 
   It's the main entrypoint for any webhook coming from Mux. It will handle
   different types of events and act accordingly.
-
-  - [x] create a Blob out of a MuxUpload that's completed
-  - [ ] update the MuxUpload with new status
-  - [ ] handle asset deletions (type: "video.asset.deleted")
   """
   @spec handle_webhook(params :: map()) ::
           term()
