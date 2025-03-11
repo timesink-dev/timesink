@@ -1,0 +1,39 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "enabledManagers": ["mix", "npm"],
+    "extends": [
+    "config:base",
+    "schedule:weekly",
+    "group:allNonMajor",
+    "group:linters",
+    ":rebaseStalePrs",
+    ":semanticCommits",
+    ":semanticCommitScope(deps)",
+    "docker:enableMajor"
+  ],
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "dependencyDashboard": true,
+  "packageRules": [
+    {
+      "matchManagers": ["mix"],
+      "groupName": "Elixir Dependencies"
+    },
+    {
+      "matchManagers": ["mix"],
+      "matchPackagePatterns": ["ecto", "phoenix", "plug"],
+      "groupName": "Core Phoenix Dependencies"
+    },
+     {
+      "matchManagers": ["mix"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+        {
+      "matchManagers": ["npm"],
+      "groupName": "JS Dependencies"
+    }
+  ],
+  "rebaseWhen": "never",
+  "ignorePaths": ["**/node_modules/**"]
+}

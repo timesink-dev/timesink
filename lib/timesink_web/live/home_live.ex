@@ -1,6 +1,7 @@
 defmodule TimesinkWeb.HomepageLive do
   use TimesinkWeb, :live_view
 
+  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <div id="homepage">

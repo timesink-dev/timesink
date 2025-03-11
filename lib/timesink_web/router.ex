@@ -15,6 +15,22 @@ defmodule TimesinkWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :put_current_user do
+    plug TimesinkWeb.Plugs.PutCurrentUser
+  end
+
+  pipeline :require_authenticated_user do
+    plug TimesinkWeb.Plugs.RequireAuthenticatedUser
+  end
+
+  pipeline :require_admin do
+    plug TimesinkWeb.Plugs.RequireAdmin
+  end
+
+  pipeline :redirect_if_user_is_authenticated do
+    plug TimesinkWeb.Plugs.RedirectIfUserIsAuthenticated
+  end
+
   scope "/api", TimesinkWeb do
     pipe_through :api
 
@@ -25,27 +41,29 @@ defmodule TimesinkWeb.Router do
 
   scope "/", TimesinkWeb do
     pipe_through :browser
-    live "/", HomepageLive
-    live "/now-playing", Cinema.ShowcaseLive
-    live "/now-playing/:theater_slug", Cinema.TheaterLive
 
     live "/join", WaitlistLive
-    live "/signin", SignInLive
+  end
 
-    live "/me", Accounts.MeLive
-    live "/me/profile", Accounts.ProfileSettingsLive
-    live "/me/security", Accounts.SecuritySettingsLive
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
 
-    live "/submit", FilmSubmissionLive
+    live_session :redirect_if_user_is_authenticated,
+      on_mount: [{TimesinkWeb.Auth, :redirect_if_user_is_authenticated}] do
+      live "/sign_in", SignInLive
+    end
+  end
 
-    live "/archives", ArchiveLive
-    live "/blog", BlogLive
-    live "/upcoming", UpcomingLive
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :require_authenticated_user]
 
-    # Static pages
-    get "/info", PageController, :info
-
-    live "/:profile_username", Accounts.ProfileLive
+    live_session :authenticated,
+      on_mount: {TimesinkWeb.Auth, :ensure_authenticated} do
+      live "/me", Accounts.MeLive
+      live "/me/profile", Accounts.ProfileSettingsLive
+      live "/me/security", Accounts.SecuritySettingsLive
+      live "/now-playing/:theater_slug", Cinema.TheaterLive
+    end
   end
 
   # Other scopes may use custom stacks.
@@ -54,13 +72,13 @@ defmodule TimesinkWeb.Router do
   # end
 
   scope "/admin", TimesinkWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_admin]
 
     backpex_routes()
 
     get "/", RedirectController, :redirect_to_showcases
 
-    live_session :default, on_mount: Backpex.InitAssigns do
+    live_session :admin, on_mount: Backpex.InitAssigns do
       live_resources "/showcases", Admin.ShowcaseLive
       live_resources "/waitlist", Admin.WaitlistLive
       live_resources "/films", Admin.FilmLive
@@ -70,6 +88,26 @@ defmodule TimesinkWeb.Router do
       live_resources "/members", Admin.UserLive
       live_resources "/creatives", Admin.CreativeLive
       live_resources "/film_creatives", Admin.FilmCreativeLive
+    end
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :put_current_user]
+
+    # static routes
+    get "/info", PageController, :info
+
+    post "/sign_in", AuthController, :sign_in
+    post "/sign_out", AuthController, :sign_out
+
+    live_session :default, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
+      live "/", HomepageLive
+      live "/submit", FilmSubmissionLive
+      live "/archives", ArchiveLive
+      live "/blog", BlogLive
+      live "/upcoming", UpcomingLive
+      live "/now-playing", Cinema.ShowcaseLive
+      live "/:profile_username", Accounts.ProfileLive
     end
   end
 

@@ -32,3 +32,6 @@
 # Mux (test-specific; customize if needed)
 # export TIMESINK_TEST_MUX_ACCESS_KEY_ID=
 # export TIMESINK_TEST_MUX_ACCESS_KEY_SECRET=
+
+
+# export AUTH_TOKEN_SALT="example_auth_token_salt"

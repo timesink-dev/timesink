@@ -15,8 +15,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        "obsidian": "#0B1215",
         "mystery-white": "#F5F7F9",
-        "backroom-black": "#000000",
+        "backroom-black": "#0C0C0C",
         "dark-theater-primary": "#222222",
         "dark-theater-medium": "#3B3B3B",
         "dark-theater-light": "#545454",
