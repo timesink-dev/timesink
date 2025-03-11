@@ -3,8 +3,6 @@ defmodule TimesinkWeb.InvitationController do
   alias Timesink.Token
 
   def validate_invite(conn, %{"token" => token}) do
-    IO.inspect(token, label: "token")
-
     with {:ok, token} <- Token.validate_invite(token) do
       conn
       |> put_session(:invite_token, token)
