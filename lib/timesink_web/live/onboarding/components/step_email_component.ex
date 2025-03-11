@@ -5,9 +5,9 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
     ~H"""
     <div class="flex flex-col items-center justify-center min-h-screen bg-backroom-black px-6">
       <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-8 text-white">
-        <h1 class="text-3xl font-bold text-center">Let’s Get You Set Up</h1>
+        <h1 class="text-3xl font-bold text-center">Welcome to TimeSink</h1>
         <p class="text-gray-400 text-center mt-2">
-          Welcome to TimeSink. Just a few quick steps before you’re in.
+          Let’s Get You Set Up. Just a few quick steps before you’re in.
         </p>
 
         <form class="mt-6 space-y-4" phx-submit="send_verification_email">
@@ -16,10 +16,8 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
             <.input
               type="email"
               name="email"
-              required
               value=""
               error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
-              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
               placeholder="Enter your email"
             />
           </div>
@@ -32,7 +30,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
               value=""
               required
               error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
-              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
               placeholder="Create a password"
             />
           </div>
@@ -45,7 +43,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
               value=""
               required
               error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
-              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
               placeholder="Confirm your password"
             />
           </div>

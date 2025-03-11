@@ -55,4 +55,35 @@ Hooks.BackpexThemeSelector = {
   },
 };
 
+Hooks.AutoFocus = {
+  mounted() {
+    this.el.addEventListener("input", (e) => {
+      let index = parseInt(this.el.getAttribute("phx-value-index"));
+      let nextInput = document.querySelector(`[phx-value-index="${index + 1}"]`);
+      if (nextInput && e.target.value !== "") {
+        nextInput.focus();
+      }
+    });
+
+    this.el.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && e.target.value === "") {
+        let index = parseInt(this.el.getAttribute("phx-value-index"));
+        let prevInput = document.querySelector(`[phx-value-index="${index - 1}"]`);
+        if (prevInput) {
+          prevInput.focus();
+        }
+      }
+    });
+  }
+}
+
+Hooks.PasteHandler = {
+    mounted() {
+    this.el.addEventListener("paste", (e) => {
+      let pastedData = e.clipboardData.getData("text");
+      this.pushEvent("paste_code", { value: pastedData });
+    });
+  }
+}
+
 export default Hooks;
