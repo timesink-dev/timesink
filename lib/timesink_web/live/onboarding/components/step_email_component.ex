@@ -1,5 +1,6 @@
 defmodule TimesinkWeb.Onboarding.StepEmailComponent do
   use TimesinkWeb, :live_component
+  alias Timesink.Accounts
 
   def render(assigns) do
     ~H"""
@@ -13,6 +14,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
         <.simple_form
           class="mt-6 space-y-4"
           phx-submit="send_verification_email"
+          phx-target={@myself}
           for={@user_data}
           as="user_data"
         >
@@ -67,5 +69,36 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
       </div>
     </div>
     """
+  end
+
+  def handle_event(
+        "send_verification_email",
+        %{
+          "email" => email,
+          "password" => password,
+          "password_confirmation" => password_confirmation
+        },
+        socket
+      ) do
+    with {:ok, :matched} <- Accounts.verify_password_conformity(password, password_confirmation),
+         {:ok, :sent} <- Accounts.send_email_verification(email) do
+      send(self(), {:update_user_data, %{email: email, password: password}})
+      send(self(), {:go_to_step, "verify_email"})
+      {:noreply, socket}
+    else
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, reason)}
+    end
+  end
+
+  def handle_event("validate_password_strength", _unsigned_params, _socket) do
+    # Passwords should conform to the following rules
+    # - At least 8 characters
+    # - At least 1 uppercase letter
+    # - At least 1 lowercase letter
+    # - At least 1 special character
+
+    # The following regex pattern enforces the above rules
+    # ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$
   end
 end

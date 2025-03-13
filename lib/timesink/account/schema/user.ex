@@ -60,6 +60,8 @@ defmodule Timesink.Accounts.User do
     |> cast_assoc(:profile, required: true, with: &Accounts.Profile.changeset/2)
     |> validate_required(@required_fields)
     |> validate_format(:email, ~r/@/)
+    |> unique_constraint(:email, message: "Email already exists")
+    |> validate_length(:password, min: 8)
     |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{2,32}$/)
     |> validate_length(:first_name, min: 2)
     |> validate_length(:last_name, min: 2)

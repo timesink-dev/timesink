@@ -101,12 +101,52 @@ defmodule Timesink.Accounts do
     end
   end
 
+  def validate_email_verification_code(code, user_id) do
+    # Check if the code exists in the database and is associated with the current user's email and hasn't expired
+    with {:ok, token} <-
+           Token.get_by(%{
+             secret: code,
+             kind: :email_verification,
+             status: :active,
+             #  expires_at: DateTime.utc_now(),
+             user_id: user_id
+           }) do
+      # invalidate the token
+      Token.update(token, %{
+        status: :used
+      })
+
+      {:ok, token}
+    else
+      _ -> {:error, :invalid_or_expired}
+    end
+  end
+
+  def validate_email_verification_code(code) do
+    with {:ok, token} <-
+           Token.get_by(%{
+             secret: code,
+             kind: :email_verification,
+             status: :active
+             # expires_at: DateTime.utc_now()
+           }) do
+      # invalidate the token
+      Token.update(token, %{
+        status: :used
+      })
+
+      {:ok, token}
+    else
+      _ -> {:error, :invalid_or_expired}
+    end
+  end
+
   def verify_password_conformity(password, password_confirmation) do
     # Check if the password and password_confirmation match and conform to the password policy TBD
     if password == password_confirmation do
       {:ok, :matched}
     else
-      {:error, :mismatch}
+      {:error, :password_mismatch}
     end
   end
 end
