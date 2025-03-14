@@ -70,7 +70,7 @@ defmodule Timesink.Token do
   end
 
   def validate_invite(token) do
-    with {:ok, %Timesink.Token{}} <- Timesink.Token.get_by(secret: token, status: :active) do
+    with {:ok, token} <- Timesink.Token.get_by(secret: token, status: :valid) do
       {:ok, token}
     else
       _ -> {:error, :invalid}
