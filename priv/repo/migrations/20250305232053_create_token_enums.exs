@@ -4,8 +4,8 @@ defmodule Timesink.Repo.Migrations.CreateTokenEnums do
   def up do
     execute """
       CREATE TYPE token_status AS ENUM (
-        'active',
-        'used'
+        'valid',
+        'invalid',
       )
     """
 
