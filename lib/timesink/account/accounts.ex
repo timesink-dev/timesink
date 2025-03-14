@@ -69,7 +69,8 @@ defmodule Timesink.Accounts do
            Token.create(%{
              kind: :email_verification,
              secret: code,
-             expires_at: expires_at
+             expires_at: expires_at,
+             email: email
            }) do
       Mail.send_email_verification(email, code)
       {:ok, :sent}
@@ -86,7 +87,7 @@ defmodule Timesink.Accounts do
         where:
           t.kind == :email_verification and
             t.secret == ^entered_code and
-            t.status == :active and
+            t.status == :valid and
             t.expires_at > ^DateTime.utc_now(),
         select: t
 
@@ -101,38 +102,39 @@ defmodule Timesink.Accounts do
     end
   end
 
-  def validate_email_verification_code(code, user_id) do
-    # Check if the code exists in the database and is associated with the current user's email and hasn't expired
+  # def validate_email_verification_code(code, user_id) do
+  #   # Check if the code exists in the database and is associated with the current user's email and hasn't expired
+  #   with {:ok, token} <-
+  #          Token.get_by(%{
+  #            secret: code,
+  #            kind: :email_verification,
+  #            status: :active,
+  #            #  expires_at: DateTime.utc_now(),
+  #            user_id: user_id
+  #          }) do
+  #     # invalidate the token
+  #     Token.update(token, %{
+  #       status: :used
+  #     })
+
+  #     {:ok, token}
+  #   else
+  #     _ -> {:error, :invalid_or_expired}
+  #   end
+  # end
+
+  def validate_email_verification_code(code, email) do
     with {:ok, token} <-
            Token.get_by(%{
              secret: code,
              kind: :email_verification,
-             status: :active,
-             #  expires_at: DateTime.utc_now(),
-             user_id: user_id
-           }) do
-      # invalidate the token
-      Token.update(token, %{
-        status: :used
-      })
-
-      {:ok, token}
-    else
-      _ -> {:error, :invalid_or_expired}
-    end
-  end
-
-  def validate_email_verification_code(code) do
-    with {:ok, token} <-
-           Token.get_by(%{
-             secret: code,
-             kind: :email_verification,
-             status: :active
+             status: :valid,
+             email: email
              # expires_at: DateTime.utc_now()
            }) do
       # invalidate the token
       Token.update(token, %{
-        status: :used
+        status: :invalid
       })
 
       {:ok, token}
@@ -142,10 +144,12 @@ defmodule Timesink.Accounts do
   end
 
   def verify_password_conformity(password, password_confirmation) do
+    IO.inspect({password, password_confirmation}, label: "Password check")
     # Check if the password and password_confirmation match and conform to the password policy TBD
     if password == password_confirmation do
       {:ok, :matched}
     else
+      IO.inspect({password, password_confirmation}, label: "Password Mismatch")
       {:error, :password_mismatch}
     end
   end

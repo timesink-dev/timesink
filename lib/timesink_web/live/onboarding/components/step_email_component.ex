@@ -87,7 +87,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
       {:noreply, socket}
     else
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, reason)}
+        {:noreply, put_flash!(socket, :error, reason)}
     end
   end
 

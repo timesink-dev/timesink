@@ -98,7 +98,8 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
       ) do
     verification_code = Enum.join([digit_1, digit_2, digit_3, digit_4, digit_5, digit_6])
 
-    with {:ok, :valid_code} <- valid_verification_code?(verification_code) do
+    with {:ok, :valid_code} <-
+           valid_verification_code?(verification_code, socket.assigns[:user_data][:email]) do
       send(self(), {:email_verified})
       send(self(), {:go_to_step, "name"})
       {:noreply, socket}
@@ -126,8 +127,10 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
   # end
 
   # Replace with your actual verification logic
-  defp valid_verification_code?(code) do
-    with {:ok, _token} <- Accounts.validate_email_verification_code(code) do
+  defp valid_verification_code?(code, email) do
+    IO.inspect({code, email}, label: "Validating Code")
+
+    with {:ok, _token} <- Accounts.validate_email_verification_code(code, email) do
       {:ok, :valid_code}
     else
       _ -> {:error, :invalid_or_expired}
