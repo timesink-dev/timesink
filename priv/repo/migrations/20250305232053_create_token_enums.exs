@@ -5,7 +5,7 @@ defmodule Timesink.Repo.Migrations.CreateTokenEnums do
     execute """
       CREATE TYPE token_status AS ENUM (
         'valid',
-        'invalid',
+        'invalid'
       )
     """
 
