@@ -80,28 +80,6 @@ defmodule Timesink.Accounts do
     end
   end
 
-  @spec verify_email(any()) :: {:error, :invalid_or_expired} | {:ok, :verified}
-  def verify_email(entered_code) do
-    query =
-      from t in Token,
-        where:
-          t.kind == :email_verification and
-            t.secret == ^entered_code and
-            t.status == :valid and
-            t.expires_at > ^DateTime.utc_now(),
-        select: t
-
-    with {:ok, token} <- Token.get(query) do
-      Token.update(token, %{
-        status: :used
-      })
-
-      {:ok, :verified}
-    else
-      _ -> {:error, :invalid_or_expired}
-    end
-  end
-
   # def validate_email_verification_code(code, user_id) do
   #   # Check if the code exists in the database and is associated with the current user's email and hasn't expired
   #   with {:ok, token} <-
@@ -144,13 +122,32 @@ defmodule Timesink.Accounts do
   end
 
   def verify_password_conformity(password, password_confirmation) do
-    IO.inspect({password, password_confirmation}, label: "Password check")
-    # Check if the password and password_confirmation match and conform to the password policy TBD
     if password == password_confirmation do
       {:ok, :matched}
     else
-      IO.inspect({password, password_confirmation}, label: "Password Mismatch")
       {:error, :password_mismatch}
+    end
+  end
+
+  @doc """
+  Creates a new user with the given parameters.
+  For now this is called at the end of the onboarding process.
+  """
+  def create_user(params) do
+    with {:ok, user} <- User.create(params) do
+      {:ok, user}
+    else
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
+
+  def is_username_available?(username) do
+    with {:ok, _user} <- User.get_by(username: username) do
+      {:error, :username_taken}
+    else
+      {:error, :not_found} -> {:ok, :available}
+      {:error, _} -> {:error, :unknown}
     end
   end
 end

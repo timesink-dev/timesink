@@ -93,4 +93,10 @@ defmodule Timesink.Waitlist do
       {:ok, applicant}
     end
   end
+
+  def set_status(applicant, status) do
+    applicant
+    |> Applicant.changeset(%{status: status})
+    |> Repo.update()
+  end
 end

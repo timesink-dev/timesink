@@ -19,17 +19,31 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
           for={@user_data}
           as="user_data"
         >
-          <div>
-            <label class="block text-sm font-medium text-gray-300">Full name</label>
-            <.input
-              type="text"
-              name="full_name"
-              required
-              value=""
-              input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-              error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
-              placeholder="Enter your full name"
-            />
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-300">First name</label>
+              <.input
+                type="text"
+                name="first_name"
+                required
+                value=""
+                input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+                error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
+                placeholder="Enter your first name"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300">Last name</label>
+              <.input
+                type="text"
+                name="last_name"
+                required
+                value=""
+                input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+                error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
+                placeholder="Enter your last name"
+              />
+            </div>
           </div>
 
           <:actions>

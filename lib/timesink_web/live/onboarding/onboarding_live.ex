@@ -10,11 +10,18 @@ defmodule TimesinkWeb.OnboardingLive do
     StepUsernameComponent
   }
 
-  def mount(params, _session, socket) do
+  def mount(params, session, socket) do
     step_from_url = Map.get(params, "step", "email") |> String.to_existing_atom()
 
-    {:ok, assign(socket, step: step_from_url, verified_email: false, user_data: %{}),
-     layout: {TimesinkWeb.Layouts, :empty}}
+    invite_token = session["invite_token"]
+
+    {:ok,
+     assign(socket,
+       invite_token: invite_token,
+       step: step_from_url,
+       verified_email: false,
+       user_data: %{}
+     ), layout: {TimesinkWeb.Layouts, :empty}}
   end
 
   def render(assigns) do
@@ -58,6 +65,15 @@ defmodule TimesinkWeb.OnboardingLive do
 
   def handle_info({:update_user_data, user_data}, socket) do
     {:noreply, assign(socket, user_data: user_data)}
+  end
+
+  def handle_info(:complete_onboarding, socket) do
+    # invalidate the invite token
+    # set the applicant (if present on waitlist) status to :completed
+    # create a new session for the user with auth token and user id
+    # redirect to the home page
+
+    {:noreply, socket}
   end
 
   def handle_params(params, _uri, socket) do

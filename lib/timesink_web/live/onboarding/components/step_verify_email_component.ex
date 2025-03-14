@@ -40,7 +40,14 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
               />
             <% end %>
           </div>
-
+          <%= if @verification_error do %>
+            <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light">
+              <.icon name="hero-exclamation-circle-mini" class="h-6 w-6" />
+              <p class="text-md mt-2">
+                {@verification_error}
+              </p>
+            </span>
+          <% end %>
           <.button color="secondary" class="w-full py-3 mt-6 text-lg">
             Verify & Continue
           </.button>
@@ -128,8 +135,6 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
 
   # Replace with your actual verification logic
   defp valid_verification_code?(code, email) do
-    IO.inspect({code, email}, label: "Validating Code")
-
     with {:ok, _token} <- Accounts.validate_email_verification_code(code, email) do
       {:ok, :valid_code}
     else
