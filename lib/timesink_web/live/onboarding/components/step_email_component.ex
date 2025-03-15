@@ -2,6 +2,10 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
   use TimesinkWeb, :live_component
   alias Timesink.Accounts
 
+  def mount(socket) do
+    {:ok, assign(socket, user_data: socket.assigns[:user_data], email: "", error: nil)}
+  end
+
   def render(assigns) do
     ~H"""
     <div class="flex flex-col items-center justify-center min-h-screen bg-backroom-black px-6">
@@ -23,8 +27,10 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
             <.input
               type="email"
               name="email"
+              phx-debounce="700"
+              phx-change="validate_email"
               required
-              value=""
+              value={@email}
               input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
               error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
               placeholder="Enter your email"
@@ -56,6 +62,19 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
               placeholder="Confirm your password"
             />
           </div>
+          <%= if @email != "" && @error == nil do %>
+            <.icon name="hero-check-circle-mini" class="h-6 w-6 text-green-500" />
+          <% end %>
+
+          <%= if @email != "" && @error do %>
+            <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light">
+              <.icon name="hero-exclamation-circle-mini" class="h-6 w-6" />
+              <p class="text-md mt-2">
+                {@error}
+              </p>
+            </span>
+          <% end %>
+
           <:actions>
             <div class="mt-6">
               <.button color="secondary" class="w-full py-3 text-lg">Continue</.button>
@@ -88,6 +107,19 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
     else
       {:error, reason} ->
         {:noreply, put_flash!(socket, :error, reason)}
+    end
+  end
+
+  def handle_event("validate_email", %{"email" => email}, socket) do
+    with {:ok, :available} <- Accounts.is_email_available?(email) do
+      {:noreply, assign(socket, email: email, error: nil)}
+    else
+      {:error, :email_taken} ->
+        {:noreply,
+         assign(socket,
+           email: email,
+           error: "This email is already being used. Please try another."
+         )}
     end
   end
 

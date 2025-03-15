@@ -11,7 +11,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
     <div class="flex flex-col items-center justify-center min-h-screen bg-backroom-black px-6">
       <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-8 text-white">
         <p class="text-gray-400 text-center mt-2">
-          Lastly, claim a unique handle. This will be your identity on TimeSink.
+          Lastly, claim a unique handle. This will be your public identity on TimeSink.
         </p>
         <.simple_form
           class="mt-6 space-y-4 w-full"
@@ -52,7 +52,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
           <:actions>
             <div class="mt-6">
               <.button color="secondary" class="w-full py-2 text-lg">
-                Let's Go In! <.icon name="hero-arrow-right" class="ml-1 h-5 w-5" />
+                Take me in ! <.icon name="hero-arrow-right" class="ml-1 h-5 w-5" />
               </.button>
             </div>
           </:actions>

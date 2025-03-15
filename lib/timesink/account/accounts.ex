@@ -150,4 +150,13 @@ defmodule Timesink.Accounts do
       {:error, _} -> {:error, :unknown}
     end
   end
+
+  def is_email_available?(email) do
+    with {:ok, _user} <- User.get_by(email: email) do
+      {:error, :email_taken}
+    else
+      {:error, :not_found} -> {:ok, :available}
+      {:error, _} -> {:error, :unknown}
+    end
+  end
 end
