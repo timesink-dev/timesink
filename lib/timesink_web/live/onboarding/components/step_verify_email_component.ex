@@ -5,7 +5,6 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
   def mount(socket) do
     {:ok,
      assign(socket,
-       user_data: socket.assigns[:user_data],
        digits: ["", "", "", "", "", ""],
        verification_code: nil,
        verification_error: nil
@@ -19,7 +18,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
       <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-8 text-white text-center">
         <h1 class="text-2xl font-bold">Enter Your Verification Code</h1>
         <p class="text-gray-400 mt-2">
-          We sent a 6-digit code to <strong>aaronzomback@gmail.com</strong>.
+          We sent a 6-digit code to <strong>{@data["email"]}</strong>.
           Enter it below to verify your email.
         </p>
 
@@ -104,11 +103,14 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
         socket
       ) do
     verification_code = Enum.join([digit_1, digit_2, digit_3, digit_4, digit_5, digit_6])
+    email = socket.assigns[:data]["email"]
+    IO.inspect(email, label: "Email in verify")
+    IO.inspect(socket.assigns[:data], label: "User Data in verify")
 
     with {:ok, :valid_code} <-
-           valid_verification_code?(verification_code, socket.assigns[:user_data][:email]) do
-      send(self(), {:email_verified})
-      send(self(), {:go_to_step, "name"})
+           valid_verification_code?(verification_code, email) do
+      send(self(), :email_verified)
+      send(self(), {:go_to_step, :next})
       {:noreply, socket}
     else
       {:error, :invalid_or_expired} ->

@@ -1,79 +1,72 @@
 defmodule TimesinkWeb.OnboardingLive do
   use TimesinkWeb, :live_view
 
+  alias TimesinkWeb.Components.Stepper
+
   alias TimesinkWeb.Onboarding.{
     StepEmailComponent,
     StepVerifyEmailComponent,
     StepNameComponent,
     StepLocationComponent,
-    StepAvatarComponent,
     StepUsernameComponent
   }
 
-  def mount(params, session, socket) do
-    step_from_url = Map.get(params, "step", "email") |> String.to_existing_atom()
+  # Define step order and component mappings
+  @step_order [:email, :verify_email, :name, :location, :username]
+  @steps %{
+    email: StepEmailComponent,
+    verify_email: StepVerifyEmailComponent,
+    name: StepNameComponent,
+    location: StepLocationComponent,
+    username: StepUsernameComponent
+  }
 
+  def mount(_params, session, socket) do
     invite_token = session["invite_token"]
 
+    user_data = %{
+      "email" => "",
+      "password" => "",
+      "first_name" => "",
+      "last_name" => "",
+      "profile" => %{
+        "avatar_url" => nil,
+        "bio" => "Film enthusiast and creator.",
+        "org_name" => "Film Society",
+        "org_position" => "Director",
+        "birthdate" => "1990-05-14",
+        "location" => %{
+          "locality" => "Los Angeles",
+          # Must be a valid ISO 3166 country code
+          "country" => "USA",
+          "lat" => "34.0522",
+          "lng" => "-118.2437"
+        }
+      },
+      "username" => ""
+    }
+
     {:ok,
-     assign(socket,
+     socket
+     |> assign(
        invite_token: invite_token,
-       step: step_from_url,
+       step: :email,
        verified_email: false,
-       user_data: %{}
+       user_data: user_data,
+       steps: @steps
      ), layout: {TimesinkWeb.Layouts, :empty}}
   end
 
   def render(assigns) do
     ~H"""
-    <div class="onboarding-container">
-      <%= case @step do %>
-        <% :email -> %>
-          <.live_component module={StepEmailComponent} id="email_step" user_data={@user_data} />
-        <% :verify_email -> %>
-          <.live_component
-            module={StepVerifyEmailComponent}
-            id="verify_email_step"
-            user_data={@user_data}
-          />
-        <% :name -> %>
-          <.live_component module={StepNameComponent} id="name_step" user_data={@user_data} />
-        <% :location -> %>
-          <.live_component module={StepLocationComponent} id="location_step" user_data={@user_data} />
-        <% :avatar -> %>
-          <.live_component module={StepAvatarComponent} id="avatar_step" user_data={@user_data} />
-        <% :username -> %>
-          <.live_component module={StepUsernameComponent} id="username_step" user_data={@user_data} />
-      <% end %>
-    </div>
+    <.live_component
+      module={Stepper}
+      id="stepper"
+      steps={@steps}
+      current_step={@step}
+      data={@user_data}
+    />
     """
-  end
-
-  def handle_info({:go_to_step, step}, socket) do
-    step_atom = String.to_existing_atom(step)
-
-    {:noreply,
-     socket
-     |> assign(step: step_atom)
-     |> push_patch(to: "/onboarding?step=#{step}")}
-  end
-
-  def handle_info({:email_verified}, socket) do
-    socket = assign(socket, verified_email: true)
-    {:noreply, socket}
-  end
-
-  def handle_info({:update_user_data, user_data}, socket) do
-    {:noreply, assign(socket, user_data: user_data)}
-  end
-
-  def handle_info(:complete_onboarding, socket) do
-    # invalidate the invite token
-    # set the applicant (if present on waitlist) status to :completed
-    # create a new session for the user with auth token and user id
-    # redirect to the home page
-
-    {:noreply, socket}
   end
 
   def handle_params(params, _uri, socket) do
@@ -84,27 +77,51 @@ defmodule TimesinkWeb.OnboardingLive do
         step -> String.to_existing_atom(step)
       end
 
-    # ✅ Prevent users from going back to verify_email if they are already verified
-    if step_from_url == :verify_email and socket.assigns.verified_email do
-      socket = assign(socket, step: :name)
-      {:noreply, push_patch(socket, to: "/onboarding?step=name")}
-    else
-      {:noreply,
-       assign(socket,
-         step: enforce_step_progression(step_from_url, socket.assigns.verified_email)
-       )}
+    # Prevent users from manually going back to verify_email if already verified
+    new_step =
+      case {step_from_url, socket.assigns.verified_email} do
+        {:verify_email, true} -> :name
+        _ -> step_from_url
+      end
+
+    {:noreply, assign(socket, step: new_step)}
+  end
+
+  def handle_info({:go_to_step, direction}, socket) do
+    new_step = determine_step(socket.assigns.step, direction, socket.assigns.verified_email)
+    {:noreply, assign(socket, step: new_step) |> push_patch(to: "/onboarding?step=#{new_step}")}
+  end
+
+  def handle_info({:update_user_data, %{params: params}}, socket) do
+    socket = assign(socket, user_data: Map.merge(socket.assigns.user_data, params))
+    IO.inspect(socket.assigns.user_data, label: "Updated user_data")
+
+    {:noreply, socket}
+  end
+
+  def handle_info(:email_verified, socket) do
+    socket = socket |> assign(verified_email: true)
+    {:noreply, socket}
+  end
+
+  defp determine_step(current_step, :next, verified_email) do
+    next_step_index = Enum.find_index(@step_order, &(&1 == current_step)) + 1
+
+    case Enum.at(@step_order, next_step_index) do
+      # Skip verify_email if already verified
+      :verify_email when verified_email -> :name
+      step when not is_nil(step) -> step
+      # Stay on the last step if already there
+      _ -> current_step
     end
   end
 
-  # ✅ No need for `get_session/2` inside this function
-  defp enforce_step_progression(:email, _verified), do: :email
-  defp enforce_step_progression(:verify_email, _), do: :verify_email
-  defp enforce_step_progression(:verify_email, true), do: :name
-  defp enforce_step_progression(:name, false), do: :email
-  defp enforce_step_progression(:name, true), do: :name
-  defp enforce_step_progression(:location, _), do: :location
-  defp enforce_step_progression(:avatar, _), do: :avatar
-  defp enforce_step_progression(:username, _), do: :username
-  # Default to email if unknown
-  defp enforce_step_progression(_, _), do: :email
+  defp determine_step(current_step, :back, _verified_email) do
+    prev_step_index = Enum.find_index(@step_order, &(&1 == current_step)) - 1
+
+    # Prevent stepping back before first step
+    Enum.at(@step_order, max(prev_step_index, 0))
+  end
+
+  defp determine_step(_, step, _), do: String.to_existing_atom(step)
 end

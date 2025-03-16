@@ -1,9 +1,12 @@
 defmodule TimesinkWeb.Onboarding.StepEmailComponent do
   use TimesinkWeb, :live_component
   alias Timesink.Accounts
+  alias Timesink.Accounts.User
 
   def mount(socket) do
-    {:ok, assign(socket, user_data: socket.assigns[:user_data], email: "", error: nil)}
+    changeset = Accounts.User.email_password_changeset(%User{})
+
+    {:ok, assign(socket, form: to_form(changeset), error: nil)}
   end
 
   def render(assigns) do
@@ -19,8 +22,8 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
           class="mt-6 space-y-4"
           phx-submit="send_verification_email"
           phx-target={@myself}
-          for={@user_data}
-          as="user_data"
+          for={@form}
+          as="data"
         >
           <div>
             <label class="block text-sm font-medium text-gray-300">Email</label>
@@ -30,9 +33,8 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
               phx-debounce="700"
               phx-change="validate_email"
               required
-              value={@email}
-              input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-              error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
+              field={@form[:email]}
+              input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
               placeholder="Enter your email"
             />
           </div>
@@ -42,10 +44,9 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
             <.input
               type="password"
               name="password"
-              value=""
+              field={@form[:password]}
               required
-              error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
-              input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
               placeholder="Create a password"
             />
           </div>
@@ -57,16 +58,16 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
               name="password_confirmation"
               value=""
               required
-              error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
-              input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
               placeholder="Confirm your password"
             />
           </div>
-          <%= if @email != "" && @error == nil do %>
+
+          <%= if @form[:email] != "" && @error == nil do %>
             <.icon name="hero-check-circle-mini" class="h-6 w-6 text-green-500" />
           <% end %>
 
-          <%= if @email != "" && @error do %>
+          <%= if @form[:email] != "" && @error do %>
             <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light">
               <.icon name="hero-exclamation-circle-mini" class="h-6 w-6" />
               <p class="text-md mt-2">
@@ -99,10 +100,16 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
         },
         socket
       ) do
+    changeset =
+      Accounts.User.email_password_changeset(%Accounts.User{}, %{
+        "email" => email,
+        "password" => password
+      })
+
     with {:ok, :matched} <- Accounts.verify_password_conformity(password, password_confirmation),
          {:ok, :sent} <- Accounts.send_email_verification(email) do
-      send(self(), {:update_user_data, %{email: email, password: password}})
-      send(self(), {:go_to_step, "verify_email"})
+      send(self(), {:update_user_data, to_form(changeset)})
+      send(self(), {:go_to_step, :next})
       {:noreply, socket}
     else
       {:error, reason} ->
@@ -111,13 +118,18 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
   end
 
   def handle_event("validate_email", %{"email" => email}, socket) do
+    IO.inspect(email, label: "validate email")
+
+    changeset = Accounts.User.email_password_changeset(%User{}, %{"email" => email})
+
     with {:ok, :available} <- Accounts.is_email_available?(email) do
+      send(self(), {:update_user_data, to_form(changeset)})
+
       {:noreply, assign(socket, email: email, error: nil)}
     else
       {:error, :email_taken} ->
         {:noreply,
          assign(socket,
-           email: email,
            error: "This email is already being used. Please try another."
          )}
     end

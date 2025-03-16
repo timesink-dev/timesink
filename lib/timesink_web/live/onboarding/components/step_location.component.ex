@@ -16,8 +16,8 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
           class="mt-6 space-y-4 w-full"
           phx-submit="save_location"
           phx-target={@myself}
-          for={@user_data}
-          as="user_data"
+          for={@data}
+          as="data"
         >
           <div>
             <label class="block text-sm font-medium text-gray-300">Where are you?</label>
@@ -25,7 +25,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
               type="text"
               name="location"
               required
-              value=""
+              value={@data["location"]["locality"] || ""}
               input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
               error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
               placeholder="Enter your location (e.g. New York, NY)"
@@ -38,14 +38,22 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
             </div>
           </:actions>
         </.simple_form>
+        <.button class="mt-6" phx-click="go_back" phx-target={@myself}>
+          <.icon name="hero-arrow-left-circle" class="h-6 w-6" />
+        </.button>
       </div>
     </div>
     """
   end
 
   def handle_event("save_location", params, socket) do
-    send(self(), {:update_user_data, params})
-    send(self(), {:go_to_step, "username"})
+    # send(self(), {:update_user_data, to_form(params)})
+    send(self(), {:go_to_step, :next})
+    {:noreply, socket}
+  end
+
+  def handle_event("go_back", _unsigned_params, socket) do
+    send(self(), {:go_to_step, :back})
     {:noreply, socket}
   end
 end

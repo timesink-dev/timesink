@@ -1,10 +1,6 @@
 defmodule TimesinkWeb.Onboarding.StepNameComponent do
   use TimesinkWeb, :live_component
 
-  def mount(socket) do
-    {:ok, socket}
-  end
-
   def render(assigns) do
     ~H"""
     <div class="flex flex-col items-center justify-center min-h-screen bg-backroom-black px-6">
@@ -16,8 +12,8 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
           class="mt-6 space-y-4 w-full"
           phx-submit="save_name"
           phx-target={@myself}
-          for={@user_data}
-          as="user_data"
+          for={@data}
+          as="data"
         >
           <div class="space-y-4">
             <div>
@@ -26,9 +22,8 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
                 type="text"
                 name="first_name"
                 required
-                value=""
-                input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-                error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
+                value={@data["first_name"]}
+                input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
                 placeholder="Enter your first name"
               />
             </div>
@@ -38,9 +33,8 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
                 type="text"
                 name="last_name"
                 required
-                value=""
-                input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-                error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
+                value={@data["last_name"]}
+                input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
                 placeholder="Enter your last name"
               />
             </div>
@@ -57,9 +51,14 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
     """
   end
 
-  def handle_event("save_name", params, socket) do
-    send(self(), {:update_user_data, params})
-    send(self(), {:go_to_step, "location"})
+  def handle_event("save_name", name_params, socket) do
+    send(self(), {:update_user_data, to_form(name_params)})
+    send(self(), {:go_to_step, :next})
+    {:noreply, socket}
+  end
+
+  def handle_event("go_back", _unsigned_params, socket) do
+    send(self(), {:go_to_step, :back})
     {:noreply, socket}
   end
 end

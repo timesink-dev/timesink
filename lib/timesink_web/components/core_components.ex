@@ -232,7 +232,7 @@ defmodule TimesinkWeb.CoreComponents do
   """
   attr :type, :string, default: nil
   attr :class, :string, default: nil
-  attr :color, :string, default: "primary"
+  attr :color, :string, default: nil
   attr :rest, :global, include: ~w(disabled form name value)
 
   slot :inner_block, required: true
@@ -251,7 +251,6 @@ defmodule TimesinkWeb.CoreComponents do
           "tertiary" ->
             "bg-dark-theater-primary text-mystery-white"
 
-          # default styling
           _ ->
             ""
         end
@@ -261,7 +260,7 @@ defmodule TimesinkWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded px-4 py-2 rounded",
+        "phx-submit-loading:opacity-75 rounded rounded",
         @classes,
         @class
       ]}

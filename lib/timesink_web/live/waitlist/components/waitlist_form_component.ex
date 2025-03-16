@@ -46,6 +46,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
           </div>
           <:actions>
             <.button
+              color="primary"
               phx-disable-with="Joining..."
               class="w-full text-backroom-black font-semibold mt-4 px-6 py-4 hover:bg-neon-blue-lightest focus:ring-2 focus:bg-neon-blue-light flex items-center justify-center"
             >
@@ -77,6 +78,8 @@ defmodule TimesinkWeb.WaitlistFormComponent do
   end
 
   def handle_event("save", %{"applicant" => applicant_params}, socket) do
+    IO.inspect(applicant_params, label: "applicant params")
+
     case Timesink.Waitlist.join(applicant_params) do
       {:ok, _applicant} ->
         send(self(), :applicant_joined)

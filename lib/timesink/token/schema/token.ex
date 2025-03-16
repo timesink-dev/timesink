@@ -39,7 +39,7 @@ defmodule Timesink.Token do
     field :kind, Ecto.Enum, values: @kind
 
     # the secret field is the actual token value
-    field :secret, :string
+    field :secret, :string, redact: true
 
     field :status, Ecto.Enum, values: @status, default: :valid
     field :expires_at, :utc_datetime

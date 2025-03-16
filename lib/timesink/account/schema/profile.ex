@@ -48,9 +48,8 @@ defmodule Timesink.Accounts.Profile do
       :org_position,
       :bio
     ])
-    |> cast_embed(:location)
+    |> cast_embed(:location, required: false)
     |> cast_assoc(:user, with: &Accounts.User.changeset/2)
-    |> validate_required([:user_id])
-    |> unique_constraint(:user_id)
+    |> tap(fn changeset -> IO.inspect(changeset.errors, label: "❌ Changeset Errors") end)
   end
 end
