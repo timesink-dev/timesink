@@ -2,6 +2,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
   use TimesinkWeb, :live_component
   alias Timesink.Accounts
   alias Timesink.Accounts.User
+  import Ecto.Changeset
 
   def mount(socket) do
     changeset = Accounts.User.email_password_changeset(%User{})
@@ -106,20 +107,32 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
         "password" => password
       })
 
-    with {:ok, :matched} <- Accounts.verify_password_conformity(password, password_confirmation),
+    with {:ok, _validated_data} <- apply_action(changeset, :validate),
+         {:ok, :matched} <-
+           Accounts.verify_password_conformity(password, password_confirmation),
          {:ok, :sent} <- Accounts.send_email_verification(email) do
       send(self(), {:update_user_data, to_form(changeset)})
       send(self(), {:go_to_step, :next})
       {:noreply, socket}
     else
+      {:error, %Ecto.Changeset{} = changeset} ->
+        error_message =
+          changeset
+          |> Ecto.Changeset.traverse_errors(&translate_error/1)
+          |> Enum.map(fn {field, messages} -> "#{field}: #{Enum.join(messages, ", ")}" end)
+          |> Enum.join(". ")
+
+        {:noreply, assign(socket, form: to_form(changeset)) |> put_flash(:error, error_message)}
+
+      {:error, :password_mismatch} ->
+        {:noreply, put_flash(socket, :error, "Passwords do not match.")}
+
       {:error, reason} ->
-        {:noreply, put_flash!(socket, :error, reason)}
+        {:noreply, put_flash(socket, :error, to_string(reason))}
     end
   end
 
   def handle_event("validate_email", %{"email" => email}, socket) do
-    IO.inspect(email, label: "validate email")
-
     changeset = Accounts.User.email_password_changeset(%User{}, %{"email" => email})
 
     with {:ok, :available} <- Accounts.is_email_available?(email) do

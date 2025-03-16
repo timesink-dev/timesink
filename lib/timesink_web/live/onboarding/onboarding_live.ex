@@ -1,6 +1,8 @@
 defmodule TimesinkWeb.OnboardingLive do
   use TimesinkWeb, :live_view
 
+  alias Timesink.Accounts
+
   alias TimesinkWeb.Components.Stepper
 
   alias TimesinkWeb.Onboarding.{
@@ -29,6 +31,7 @@ defmodule TimesinkWeb.OnboardingLive do
       "password" => "",
       "first_name" => "",
       "last_name" => "",
+      "username" => "",
       "profile" => %{
         "avatar_url" => nil,
         "bio" => "Film enthusiast and creator.",
@@ -42,8 +45,7 @@ defmodule TimesinkWeb.OnboardingLive do
           "lat" => "34.0522",
           "lng" => "-118.2437"
         }
-      },
-      "username" => ""
+      }
     }
 
     {:ok,
@@ -102,6 +104,17 @@ defmodule TimesinkWeb.OnboardingLive do
   def handle_info(:email_verified, socket) do
     socket = socket |> assign(verified_email: true)
     {:noreply, socket}
+  end
+
+  def handle_info({:complete_onboarding, %{params: user_create_params}}, socket) do
+    with {:ok, _} <- Accounts.create_user(user_create_params) do
+      {:noreply, redirect(socket, to: "/")}
+    else
+      {:error, changeset} ->
+        IO.inspect(changeset.errors, label: "❌ User Creation Error")
+
+        {:noreply, socket |> put_flash(:error, "Something went wrong. Please try again.")}
+    end
   end
 
   defp determine_step(current_step, :next, verified_email) do

@@ -68,8 +68,6 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
   end
 
   def handle_event("update-digit", params, socket) do
-    IO.inspect(params, label: "Received Params")
-
     # Extract only the keys that match "digit-#" pattern
     digit_params =
       params
@@ -84,8 +82,6 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
 
     # Ensure the list has exactly 6 elements, filling with "" if necessary
     updated_digits = digit_params ++ List.duplicate("", max(0, 6 - length(digit_params)))
-
-    IO.inspect(updated_digits, label: "Updated Digits")
 
     {:noreply, assign(socket, digits: updated_digits)}
   end
@@ -104,8 +100,6 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
       ) do
     verification_code = Enum.join([digit_1, digit_2, digit_3, digit_4, digit_5, digit_6])
     email = socket.assigns[:data]["email"]
-    IO.inspect(email, label: "Email in verify")
-    IO.inspect(socket.assigns[:data], label: "User Data in verify")
 
     with {:ok, :valid_code} <-
            valid_verification_code?(verification_code, email) do

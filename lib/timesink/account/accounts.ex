@@ -134,22 +134,6 @@ defmodule Timesink.Accounts do
   For now this is called at the end of the onboarding process.
   """
   def create_user(params) do
-    IO.inspect(params, label: "✅ Submitting to User.create()")
-
-    # Timesink.Repo.transaction(fn ->
-    #   IO.inspect(params, label: "✅ Inside Transaction - Attempting User Creation")
-
-    #   case User.create(params) do
-    #     {:ok, user} ->
-    #       IO.inspect(user, label: "🎉 Transaction Success: User Created")
-    #       user
-
-    #     {:error, changeset} ->
-    #       IO.inspect(changeset.errors, label: "❌ Transaction Failed - Changeset Errors")
-    #       Timesink.Repo.rollback(changeset)
-    #   end
-    # end)
-
     with {:ok, user} <- User.create(params) do
       {:ok, user}
     else
