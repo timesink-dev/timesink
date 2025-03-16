@@ -5,7 +5,6 @@ defmodule Timesink.Accounts do
 
   alias Timesink.Accounts.User
   alias Timesink.Accounts.Mail
-  import Ecto.Query
   alias Timesink.Token
 
   @code_expiration_minutes 15

@@ -2,6 +2,7 @@ defmodule TimesinkWeb.OnboardingLive do
   use TimesinkWeb, :live_view
 
   alias Timesink.Accounts
+  alias Timesink.Token
 
   alias TimesinkWeb.Components.Stepper
 
@@ -72,21 +73,36 @@ defmodule TimesinkWeb.OnboardingLive do
   end
 
   def handle_params(params, _uri, socket) do
-    step_from_url =
-      params["step"]
-      |> case do
-        nil -> :email
-        step -> String.to_existing_atom(step)
-      end
+    # check if invite token is valid
 
-    # Prevent users from manually going back to verify_email if already verified
-    new_step =
-      case {step_from_url, socket.assigns.verified_email} do
-        {:verify_email, true} -> :name
-        _ -> step_from_url
-      end
+    invite_token = socket.assigns.invite_token
 
-    {:noreply, assign(socket, step: new_step)}
+    IO.inspect(invite_token, label: "here is the invite token")
+
+    if Token.is_valid?(invite_token) do
+      IO.inspect("is valid token")
+
+      step_from_url =
+        params["step"]
+        |> case do
+          nil -> :email
+          step -> String.to_existing_atom(step)
+        end
+
+      # Prevent users from manually going back to verify_email if already verified
+      new_step =
+        case {step_from_url, socket.assigns.verified_email} do
+          {:verify_email, true} -> :name
+          _ -> step_from_url
+        end
+
+      {:noreply, assign(socket, step: new_step)}
+    else
+      {:noreply,
+       socket
+       |> put_flash(:error, "Invalid invite token. Please check the link and try again.")
+       |> redirect(to: "/")}
+    end
   end
 
   def handle_info({:go_to_step, direction}, socket) do

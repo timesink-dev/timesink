@@ -62,7 +62,11 @@ defmodule Timesink.Token do
   end
 
   def is_valid?(token) do
-    token.status == :valid && !token_expired?(token)
+    with {:ok, fetched_token} <- get(token.id) do
+      fetched_token.status == :valid && !token_expired?(fetched_token)
+    else
+      _ -> false
+    end
   end
 
   def token_expired?(token) do

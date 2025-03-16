@@ -11,7 +11,6 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
      )}
   end
 
-  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <div class="flex flex-col items-center justify-center min-h-screen bg-backroom-black px-6">
