@@ -12,51 +12,76 @@ defmodule TimesinkWeb.WaitlistFormComponent do
   def render(assigns) do
     ~H"""
     <div>
-      <.simple_form
-        as="applicant"
-        for={@form}
-        phx-submit="save"
-        phx-target={@myself}
-        class="mt-8 mb-8 w-full md:flex md:justify-center gap-x-4 h-full md:items-end"
-      >
-        <div class="w-full flex flex-col gap-y-2">
-          <div class="flex gap-x-2">
+      <div class="py-2.5 text-center">
+        <.simple_form
+          as="applicant"
+          for={@form}
+          phx-submit="save"
+          phx-target={@myself}
+          class="mt-8 mb-8 w-full md:flex md:justify-center gap-x-4 h-full md:items-end"
+        >
+          <div class="w-full flex flex-col gap-y-2">
+            <div class="flex gap-x-2">
+              <.input
+                field={@form[:first_name]}
+                placeholder="First name"
+                class="w-full"
+                input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              />
+              <.input
+                field={@form[:last_name]}
+                placeholder="Last name"
+                class="w-full"
+                input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              />
+            </div>
             <.input
-              field={@form[:first_name]}
-              placeholder="First name"
-              class="w-full"
-              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-            />
-            <.input
-              field={@form[:last_name]}
-              placeholder="Last name"
-              class="w-full"
+              field={@form[:email]}
+              type="email"
+              placeholder="Enter your email"
+              class="md:relative"
+              error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
               input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
             />
           </div>
-          <.input
-            field={@form[:email]}
-            type="email"
-            placeholder="Enter your email"
-            class="md:relative"
-            error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
-            input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-          />
-        </div>
-        <:actions>
-          <.button
-            phx-disable-with="Joining..."
-            class="w-full text-backroom-black font-semibold mt-4 px-6 py-4 hover:bg-neon-blue-lightest focus:ring-2 focus:bg-neon-blue-light flex items-center justify-center"
-          >
-            <%= if @joined do %>
-              <.icon name="hero-check-circle-mini" class="mt-0.5 h-5 w-5 mr-2 flex-none" />
-              You’re on the List!
-            <% else %>
-              Join the Waitlist
-            <% end %>
-          </.button>
-        </:actions>
-      </.simple_form>
+          <:actions>
+            <.button
+              phx-disable-with="Joining..."
+              class="w-full text-backroom-black font-semibold mt-4 px-6 py-4 hover:bg-neon-blue-lightest focus:ring-2 focus:bg-neon-blue-light flex items-center justify-center"
+            >
+              <%= if @joined do %>
+                <.icon name="hero-check-circle-mini" class="mt-0.5 h-5 w-5 mr-2 flex-none" />
+                You’re on the List!
+              <% else %>
+                Join the Waitlist
+              <% end %>
+            </.button>
+          </:actions>
+        </.simple_form>
+        <%= if @spots_remaining > 0 do %>
+          <span>
+            <p>Access is released in limited drops.</p>
+            <p>Join now to become part of the next drop in the ticket queue!</p>
+          </span>
+        <% else %>
+          <span>
+            <p>
+              Missed this round? No worries!
+            </p>
+            <p>
+              Secure your spot on the waitlist now and be first in line when the next batch opens!
+            </p>
+          </span>
+        <% end %>
+        <p class="mt-2.5 text-lg">
+          <strong>{if @spots_remaining == 0, do: "No", else: @spots_remaining}</strong> {if @spots_remaining ==
+                                                                                              1,
+                                                                                            do:
+                                                                                              "spot",
+                                                                                            else:
+                                                                                              "spots"} remaining
+        </p>
+      </div>
     </div>
     """
   end
@@ -85,6 +110,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
 
         socket =
           socket
+          |> assign(:email, applicant_params["email"])
           |> assign(:form, to_form(changeset))
           |> put_flash!(:error, error_message)
 
