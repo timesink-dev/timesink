@@ -59,11 +59,19 @@ defmodule TimesinkWeb.WaitlistFormComponent do
           </:actions>
         </.simple_form>
         <%= if @spots_remaining > 0 do %>
-          <p>Access is released by luck in limited drops</p>
+          <span>
+            <p>Access is released in limited drops.</p>
+            <p>Join now to become part of the next drop in the ticket queue!</p>
+          </span>
         <% else %>
-          <p>Reserve your place now for the next drop...</p>
+          <p>
+            Missed this round? No worries!
+          </p>
+          <p>
+            Secure your spot on the waitlist now and be first in line when the next batch opens!
+          </p>
         <% end %>
-        <p>
+        <p class="mt-2.5 text-lg">
           <strong>{if @spots_remaining == 0, do: "No", else: @spots_remaining}</strong> {if @spots_remaining ==
                                                                                               1,
                                                                                             do:
