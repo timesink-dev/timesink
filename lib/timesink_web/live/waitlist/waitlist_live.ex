@@ -24,7 +24,6 @@ defmodule TimesinkWeb.WaitlistLive do
      ), layout: {TimesinkWeb.Layouts, :empty}}
   end
 
-  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <div class="mx-auto max-w-xl w-full flex flex-col justify-center min-h-screen">
