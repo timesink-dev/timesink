@@ -4,14 +4,11 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
   alias Timesink.Accounts
   import Phoenix.HTML.Form
 
-  def mount(socket) do
-    changeset = Accounts.User.username_changeset(%Accounts.User{})
-    form_data = to_form(changeset)
-    username_value = form_data[:username]
-    IO.inspect(username_value, label: "username_value")
-
-    {:ok, assign(socket, form: form_data, error: nil, username: username_value)}
-    {:ok, assign(socket, form: to_form(changeset), error: nil)}
+  def update(assigns, socket) do
+    data = assigns[:data] || %{}
+    username = Map.get(data, "username", "")
+    changeset = Accounts.User.username_changeset(%Accounts.User{}, %{"username" => username})
+    {:ok, assign(socket, form: to_form(changeset), error: nil, data: data)}
   end
 
   def render(assigns) do
@@ -95,12 +92,13 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
 
   def handle_event("validate", %{"username" => username} = username_params, socket) do
     changeset = Accounts.User.username_changeset(%Accounts.User{}, username_params)
+    IO.inspect(input_value(to_form(changeset), :username), label: "username val")
 
     with {:ok, :available} <- Accounts.is_username_available?(username),
          {:ok, _validated_data} <- apply_action(changeset, :validate) do
       send(self(), {:update_user_data, to_form(changeset)})
 
-      {:noreply, assign(socket, username: username, error: nil)}
+      {:noreply, assign(socket, form: to_form(changeset), error: nil)}
     else
       {:error, %Ecto.Changeset{} = changeset} ->
         error_message =

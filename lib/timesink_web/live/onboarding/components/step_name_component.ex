@@ -1,5 +1,21 @@
 defmodule TimesinkWeb.Onboarding.StepNameComponent do
   use TimesinkWeb, :live_component
+  alias Timesink.Accounts.User
+
+  def update(assigns) do
+    data = %{
+      "first_name" => assigns[:data]["first_name"] || "",
+      "last_name" => assigns[:data]["last_name"] || ""
+    }
+
+    first_name = Map.get(data, "first_name", "")
+    last_name = Map.get(data, "last_name", "")
+
+    changeset =
+      User.name_changeset(%User{}, %{"first_name" => first_name, "last_name" => last_name})
+
+    {:ok, assign(assigns, data: data, form: to_form(changeset))}
+  end
 
   def render(assigns) do
     ~H"""

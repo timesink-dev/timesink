@@ -80,4 +80,10 @@ defmodule Timesink.Token do
       _ -> {:error, :invalid}
     end
   end
+
+  def invalidate_token(token) do
+    update(token, %{
+      status: :invalid
+    })
+  end
 end

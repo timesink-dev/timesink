@@ -1,12 +1,13 @@
 defmodule TimesinkWeb.Onboarding.StepEmailComponent do
   use TimesinkWeb, :live_component
+
+  import Phoenix.HTML.Form
   alias Timesink.Accounts
   alias Timesink.Accounts.User
   import Ecto.Changeset
 
   def mount(socket) do
     changeset = Accounts.User.email_password_changeset(%User{})
-
     {:ok, assign(socket, form: to_form(changeset), error: nil)}
   end
 
@@ -64,11 +65,11 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
             />
           </div>
 
-          <%= if @form[:email] != "" && @error == nil do %>
+          <%= if input_value(@form, :email) != "" && @error == nil do %>
             <.icon name="hero-check-circle-mini" class="h-6 w-6 text-green-500" />
           <% end %>
 
-          <%= if @form[:email] != "" && @error do %>
+          <%= if input_value(@form, :email) !== "" && @error do %>
             <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light">
               <.icon name="hero-exclamation-circle-mini" class="h-6 w-6" />
               <p class="text-md mt-2">
@@ -113,7 +114,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
          {:ok, :sent} <- Accounts.send_email_verification(email) do
       send(self(), {:update_user_data, to_form(changeset)})
       send(self(), {:go_to_step, :next})
-      {:noreply, socket}
+      {:noreply, assign(socket, form: to_form(changeset), error: nil)}
     else
       {:error, %Ecto.Changeset{} = changeset} ->
         error_message =
@@ -138,7 +139,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
     with {:ok, :available} <- Accounts.is_email_available?(email) do
       send(self(), {:update_user_data, to_form(changeset)})
 
-      {:noreply, assign(socket, email: email, error: nil)}
+      {:noreply, assign(socket, form: to_form(changeset), error: nil)}
     else
       {:error, :email_taken} ->
         {:noreply,

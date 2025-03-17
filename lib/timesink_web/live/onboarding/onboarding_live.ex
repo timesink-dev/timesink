@@ -53,7 +53,7 @@ defmodule TimesinkWeb.OnboardingLive do
      socket
      |> assign(
        invite_token: invite_token,
-       step: :email,
+       step: @step_order |> hd(),
        verified_email: false,
        user_data: user_data,
        steps: @steps
@@ -73,19 +73,13 @@ defmodule TimesinkWeb.OnboardingLive do
   end
 
   def handle_params(params, _uri, socket) do
-    # check if invite token is valid
-
     invite_token = socket.assigns.invite_token
 
-    IO.inspect(invite_token, label: "here is the invite token")
-
     if Token.is_valid?(invite_token) do
-      IO.inspect("is valid token")
-
       step_from_url =
         params["step"]
         |> case do
-          nil -> :email
+          nil -> @step_order |> hd()
           step -> String.to_existing_atom(step)
         end
 
@@ -123,8 +117,9 @@ defmodule TimesinkWeb.OnboardingLive do
   end
 
   def handle_info({:complete_onboarding, %{params: user_create_params}}, socket) do
-    with {:ok, _} <- Accounts.create_user(user_create_params) do
-      {:noreply, redirect(socket, to: "/")}
+    with {:ok, _} <- Accounts.create_user(user_create_params),
+         {:ok, _token} <- Token.invalidate_token(socket.assigns.invite_token) do
+      {:noreply, redirect(socket, to: "/") |> put_flash(:info, "Welcome to Timesink!")}
     else
       {:error, changeset} ->
         IO.inspect(changeset.errors, label: "❌ User Creation Error")
