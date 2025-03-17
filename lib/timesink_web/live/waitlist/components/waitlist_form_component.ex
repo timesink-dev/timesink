@@ -64,12 +64,14 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             <p>Join now to become part of the next drop in the ticket queue!</p>
           </span>
         <% else %>
-          <p>
-            Missed this round? No worries!
-          </p>
-          <p>
-            Secure your spot on the waitlist now and be first in line when the next batch opens!
-          </p>
+          <span>
+            <p>
+              Missed this round? No worries!
+            </p>
+            <p>
+              Secure your spot on the waitlist now and be first in line when the next batch opens!
+            </p>
+          </span>
         <% end %>
         <p class="mt-2.5 text-lg">
           <strong>{if @spots_remaining == 0, do: "No", else: @spots_remaining}</strong> {if @spots_remaining ==
