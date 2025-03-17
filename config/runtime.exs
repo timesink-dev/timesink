@@ -154,3 +154,12 @@ if config_env() in [:prod] do
     access_key_id: System.fetch_env!("TIMESINK_S3_ACCESS_KEY_ID"),
     access_key_secret: System.fetch_env!("TIMESINK_S3_ACCESS_KEY_SECRET")
 end
+
+base_url =
+  case config_env() do
+    :dev -> System.get_env("DEV_URL") || "http://localhost:4000"
+    :prod -> System.get_env("PROD_URL") || "https://timesinkpresents.com"
+    :test -> "http://localhost:4001"
+  end
+
+config :timesink, base_url: base_url

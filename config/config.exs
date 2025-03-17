@@ -79,6 +79,13 @@ config :timesink, Oban,
 
     # Oban.Plugins.Reindexer requires the `CONCURRENT` option, which is only
     # available in Postgres 12 and above.
-    {Oban.Plugins.Reindexer, schedule: "@weekly"}
+    {Oban.Plugins.Reindexer, schedule: "@weekly"},
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"@daily", Timesink.Workers.ProcessWaitlist}
+
+       # Runs every 1 minute for dev env
+       #  {"*/1 * * * *", Timesink.Workers.ProcessWaitlist}
+     ]}
   ],
-  queues: [mailer: 10]
+  queues: [mailer: 10, waitlist_invites: 10, waitlist_processing: 10]
