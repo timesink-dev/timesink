@@ -46,7 +46,6 @@ defmodule TimesinkWeb.WaitlistFormComponent do
           </div>
           <:actions>
             <.button
-              color="primary"
               phx-disable-with="Joining..."
               class="w-full text-backroom-black font-semibold mt-4 px-6 py-4 hover:bg-neon-blue-lightest focus:ring-2 focus:bg-neon-blue-light flex items-center justify-center"
             >
@@ -60,11 +59,21 @@ defmodule TimesinkWeb.WaitlistFormComponent do
           </:actions>
         </.simple_form>
         <%= if @spots_remaining > 0 do %>
-          <p>Access is released by luck in limited drops</p>
+          <span>
+            <p>Access is released in limited drops.</p>
+            <p>Join now to become part of the next drop in the ticket queue!</p>
+          </span>
         <% else %>
-          <p>Reserve your place now for the next drop...</p>
+          <span>
+            <p>
+              Missed this round? No worries!
+            </p>
+            <p>
+              Secure your spot on the waitlist now to be first in line when the next batch opens!
+            </p>
+          </span>
         <% end %>
-        <p>
+        <p class="mt-2.5 text-lg">
           <strong>{if @spots_remaining == 0, do: "No", else: @spots_remaining}</strong> {if @spots_remaining ==
                                                                                               1,
                                                                                             do:
@@ -78,8 +87,6 @@ defmodule TimesinkWeb.WaitlistFormComponent do
   end
 
   def handle_event("save", %{"applicant" => applicant_params}, socket) do
-    IO.inspect(applicant_params, label: "applicant params")
-
     case Timesink.Waitlist.join(applicant_params) do
       {:ok, _applicant} ->
         send(self(), :applicant_joined)

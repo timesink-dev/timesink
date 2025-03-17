@@ -44,6 +44,7 @@ defmodule TimesinkWeb.Router do
     pipe_through :browser
 
     live "/join", WaitlistLive
+
     get "/invite/:token", InvitationController, :validate_invite
   end
 

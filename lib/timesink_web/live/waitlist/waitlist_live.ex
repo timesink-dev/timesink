@@ -24,17 +24,16 @@ defmodule TimesinkWeb.WaitlistLive do
      ), layout: {TimesinkWeb.Layouts, :empty}}
   end
 
-  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <div class="mx-auto max-w-xl w-full flex flex-col justify-center min-h-screen">
       <%= if @joined || @message do %>
         <div class="flex flex-col items-center">
-          <h1 class="text-3xl">You've joined the line! 🍿</h1>
+          <h1 class="text-3xl">You've joined the line!</h1>
           <p class="py-1.5">{@message}</p>
-          <p><strong>Estimated Invite:</strong> {@wait_time}</p>
-          <.button color="secondary" class="mt-8 px-4 py-1.5 border-[1px]">
-            <a href="/">Go to homepage</a>
+          <p><strong>Estimated time until ticket invitation:</strong> {@wait_time}</p>
+          <.button color="secondary" class="mt-8 px-4 py-2 border-[1px]">
+            <a href="/">Go back outside</a>
           </.button>
         </div>
       <% else %>
