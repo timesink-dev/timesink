@@ -3,7 +3,7 @@ defmodule TimesinkWeb.OnboardingLive do
 
   alias Timesink.Accounts
   alias Timesink.Token
-
+  alias Timesink.Auth, as: CoreAuth
   alias TimesinkWeb.Components.Stepper
 
   alias TimesinkWeb.Onboarding.{
@@ -117,9 +117,14 @@ defmodule TimesinkWeb.OnboardingLive do
   end
 
   def handle_info({:complete_onboarding, %{params: user_create_params}}, socket) do
-    with {:ok, _} <- Accounts.create_user(user_create_params),
+    with {:ok, user} <- Accounts.create_user(user_create_params),
          {:ok, _token} <- Token.invalidate_token(socket.assigns.invite_token) do
-      {:noreply, redirect(socket, to: "/") |> put_flash(:info, "Welcome to Timesink!")}
+      token = CoreAuth.generate_token(user)
+
+      {:noreply,
+       push_navigate(socket,
+         to: ~p"/auth/complete_onboarding?token=#{token}"
+       )}
     else
       {:error, changeset} ->
         IO.inspect(changeset.errors, label: "❌ User Creation Error")

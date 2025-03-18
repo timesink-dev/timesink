@@ -100,6 +100,7 @@ defmodule TimesinkWeb.Router do
     # static routes
     get "/info", PageController, :info
 
+    get "/auth/complete_onboarding", AuthController, :complete_onboarding
     post "/sign_in", AuthController, :sign_in
     post "/sign_out", AuthController, :sign_out
 
