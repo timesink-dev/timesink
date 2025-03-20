@@ -74,7 +74,7 @@ defmodule TimesinkWeb.MuxController do
 
     with {:ok, mux_up} <- MuxUpload.get_by(mux_id: asset["id"]),
          {:ok, _} <- MuxUpload.update(mux_up, %{status: new_status}) do
-      Logger.log("MuxUpload status updated",
+      Logger.info("MuxUpload status updated",
         service: :mux,
         params: params,
         mux_upload_id: mux_up.id,
@@ -85,12 +85,12 @@ defmodule TimesinkWeb.MuxController do
     end
   end
 
-  def handle_webhook(%{"type" => t} = params) when t in ["video.asset.errored"] do
-    Logger.log("Mux: video asset error", service: :mux, params: params)
+  def handle_webhook(%{"type" => "video.asset.errored"} = params) do
+    Logger.error("Mux: video asset error", service: :mux, params: params)
   end
 
   def handle_webhook(%{"type" => "video.asset.warning"} = params) do
-    Logger.log("Mux: video asset warning", service: :mux, params: params)
+    Logger.warning("Mux: video asset warning", service: :mux, params: params)
   end
 
   def handle_webhook(_params), do: :ok
