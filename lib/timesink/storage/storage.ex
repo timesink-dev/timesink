@@ -27,7 +27,7 @@ defmodule Timesink.Storage do
   @spec create_blob(upload :: Plug.Upload.t(), opts :: Keyword.t()) ::
           {:ok, Blob.t()} | {:error, Ecto.Changeset.t() | term()}
   def create_blob(%Plug.Upload{} = upload, opts \\ []) do
-    config = config()
+    config = config() |> dbg
     uid = Keyword.get(opts, :user_id)
 
     # The blob ID (UUID) is generated upront so we can attach it to S3 objects
