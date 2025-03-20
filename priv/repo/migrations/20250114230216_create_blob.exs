@@ -8,15 +8,13 @@ defmodule Timesink.Repo.Migrations.CreateBlob do
       timestamps type: :utc_datetime
 
       add :user_id, references(:user, type: :uuid, on_delete: :delete_all)
-      add :service, :blob_service, null: false, default: "s3"
-      add :uri, :string, null: false
+      add :path, :string, null: false
       add :size, :integer
       add :mime, :string
       add :checksum, :string
-      add :metadata, :map
     end
 
-    create unique_index(:blob, [:uri])
+    create unique_index(:blob, [:path])
 
     create index(:blob, [:size])
     create index(:blob, [:mime])
