@@ -24,6 +24,8 @@
 # export TIMESINK_TEST_S3_ACCESS_KEY_SECRET="minioadmin"
 # export TIMESINK_TEST_S3_BUCKET="timesink-test"
 # export TIMESINK_TEST_S3_PREFIX="blobs"
+
+
 #
 # Mux (https://mux.com)
 # export TIMESINK_MUX_ACCESS_KEY_ID=
@@ -35,3 +37,9 @@
 
 
 # export AUTH_TOKEN_SALT="example_auth_token_salt"
+
+
+# Base URLs
+# export PROD_URL
+# export DEV_URL
+# export STAGING_URL

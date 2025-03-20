@@ -37,7 +37,7 @@ defmodule Timesink.MixProject do
       {:ex_aws_s3, "~> 2.5"},
       {:hackney, "~> 1.23"},
       {:sweet_xml, "~> 0.7.5"},
-      {:argon2_elixir, "~> 3.0"},
+      {:argon2_elixir, "~> 4.1"},
       {:backpex, "~> 0.10.0"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:resend, "~> 0.4.4"},

@@ -31,6 +31,10 @@ defmodule TimesinkWeb.Router do
     plug TimesinkWeb.Plugs.RedirectIfUserIsAuthenticated
   end
 
+  pipeline :require_invite_token do
+    plug TimesinkWeb.Plugs.RequireInviteToken
+  end
+
   scope "/api", TimesinkWeb do
     pipe_through :api
 
@@ -40,9 +44,16 @@ defmodule TimesinkWeb.Router do
   end
 
   scope "/", TimesinkWeb do
+    pipe_through [:browser, :require_invite_token]
+    live "/onboarding", OnboardingLive
+  end
+
+  scope "/", TimesinkWeb do
     pipe_through :browser
 
     live "/join", WaitlistLive
+
+    get "/invite/:token", InvitationController, :validate_invite
   end
 
   scope "/", TimesinkWeb do
