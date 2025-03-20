@@ -2,6 +2,7 @@ defmodule TimesinkWeb.AuthTest do
   use ExUnit.Case, async: true
   use Timesink.DataCase
 
+  alias Timesink.Accounts.User
   alias TimesinkWeb.Auth
 
   import Timesink.Factory
@@ -48,24 +49,27 @@ defmodule TimesinkWeb.AuthTest do
   describe "authenticate_user/1" do
     test "when the email is invalid - it returns an invalid credentials error" do
       password_hash = Argon2.hash_pwd_salt("password")
-      user = insert(:user, password: password_hash)
+      insert(:user, password: password_hash)
+
       params = %{"email" => "test@example.com", "password" => "password"}
       assert {:error, :invalid_credentials} = Auth.authenticate_user(params)
     end
 
     test "when the password is invalid - it returns an invalid credentials error" do
       email = "test@example.com"
-      user = insert(:user, email: email)
       params = %{"email" => email, "password" => "wrong_password"}
+      insert(:user, email: email)
+
       assert {:error, :invalid_credentials} = Auth.authenticate_user(params)
     end
 
     test "when both the password and email are valid" do
-      password_hash = Argon2.hash_pwd_salt("correct_password")
       email = "test@example.com"
+      password_hash = Argon2.hash_pwd_salt("correct_password")
       params = %{"email" => email, "password" => "correct_password"}
-      user = insert(:user, email: email, password: password_hash)
-      assert {:ok, user} = Auth.authenticate_user(params)
+      insert(:user, email: email, password: password_hash)
+
+      assert {:ok, %User{email: ^email}} = Auth.authenticate_user(params)
     end
   end
 end
