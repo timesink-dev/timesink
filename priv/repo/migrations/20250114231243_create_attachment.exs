@@ -15,7 +15,7 @@ defmodule Timesink.Repo.Migrations.CreateAttachment do
       add :target_schema, :attachment_schema, null: false
       add :target_id, :uuid, null: false
 
-      add :metadata, :map
+      add :metadata, :map, null: false, default: %{}
     end
 
     create unique_index(:attachment, [:target_schema, :target_id, :name])
