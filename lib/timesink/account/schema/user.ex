@@ -49,11 +49,13 @@ defmodule Timesink.Accounts.User do
   def changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> cast(params, [
+      :is_active,
       :email,
       :password,
       :username,
       :first_name,
-      :last_name
+      :last_name,
+      :roles
     ])
     |> cast_assoc(:profile,
       required: true,
