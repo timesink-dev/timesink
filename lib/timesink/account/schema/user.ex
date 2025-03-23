@@ -44,7 +44,7 @@ defmodule Timesink.Accounts.User do
     changeset(struct, params)
   end
 
-  @spec changeset(user :: t(), params :: %{optional(atom()) => term()}) ::
+  @spec changeset(user :: %__MODULE__{}, params :: %{optional(key :: atom()) => term()}) ::
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
@@ -63,7 +63,7 @@ defmodule Timesink.Accounts.User do
     |> validate_required(@required_fields)
     |> validate_format(:email, ~r/@/)
     |> unique_constraint(:email, message: "Email already exists")
-    |> validate_length(:password, min: 8)
+    |> validate_length(:password, min: 8, message: "Password must be at least 8 characters")
     |> validate_length(:first_name, min: 1)
     |> validate_length(:last_name, min: 1)
     |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{3,32}$/, message: "Invalid username format")
@@ -142,25 +142,5 @@ defmodule Timesink.Accounts.User do
     |> cast(params, [:location])
     |> cast_embed(:location, with: &Accounts.Location.changeset/2)
     |> validate_required([:location])
-  end
-
-  def full_registration_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
-    struct
-    |> cast(params, [
-      :is_active,
-      :email,
-      :password,
-      :username,
-      :first_name,
-      :last_name,
-      :roles
-    ])
-    |> cast_assoc(:profile, required: true, with: &Accounts.Profile.changeset/2)
-    |> validate_required([:email, :password, :username, :first_name, :last_name])
-    |> validate_format(:email, ~r/@/, message: "Invalid email format")
-    |> unique_constraint(:email, message: "Email already exists")
-    |> validate_length(:password, min: 8)
-    |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{3,32}$/, message: "Invalid username format")
-    |> unique_constraint(:username, message: "Username is already taken")
   end
 end

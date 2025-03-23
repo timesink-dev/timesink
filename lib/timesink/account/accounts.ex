@@ -133,6 +133,10 @@ defmodule Timesink.Accounts do
   For now this is called at the end of the onboarding process.
   """
   def create_user(params) do
+    password = params["password"]
+    hashed_password = Argon2.hash_pwd_salt(password)
+    params = Map.put(params, "password", hashed_password)
+
     with {:ok, user} <- User.create(params) do
       {:ok, user}
     else

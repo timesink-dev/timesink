@@ -1,13 +1,14 @@
 defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
   use TimesinkWeb, :live_component
   import Ecto.Changeset
+  alias Timesink.Accounts.User
   alias Timesink.Accounts
   import Phoenix.HTML.Form
 
   def update(assigns, socket) do
     data = assigns[:data] || %{}
     username = Map.get(data, "username", "")
-    changeset = Accounts.User.username_changeset(%Accounts.User{}, %{"username" => username})
+    changeset = User.username_changeset(%User{}, %{"username" => username})
     {:ok, assign(socket, form: to_form(changeset), error: nil, data: data)}
   end
 
@@ -56,7 +57,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
           <:actions>
             <div class="mt-6">
               <.button color="secondary" class="w-full py-2 text-lg">
-                Take me in ! <.icon name="hero-arrow-right" class="ml-1 h-6 w-6" />
+                Take me in! <.icon name="hero-arrow-right" class="ml-1 h-6 w-6" />
               </.button>
             </div>
           </:actions>
@@ -74,7 +75,9 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
       socket.assigns.data
       |> Map.merge(username_params)
 
-    user_create_changeset = Accounts.User.changeset(%Accounts.User{}, user_create_params)
+    # make user_create_params into atom keys
+
+    user_create_changeset = User.username_changeset(%User{}, user_create_params)
 
     if user_create_changeset.valid? do
       send(self(), {:complete_onboarding, to_form(user_create_changeset)})
@@ -91,8 +94,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
   end
 
   def handle_event("validate", %{"username" => username} = username_params, socket) do
-    changeset = Accounts.User.username_changeset(%Accounts.User{}, username_params)
-    IO.inspect(input_value(to_form(changeset), :username), label: "username val")
+    changeset = User.username_changeset(%User{}, username_params)
 
     with {:ok, :available} <- Accounts.is_username_available?(username),
          {:ok, _validated_data} <- apply_action(changeset, :validate) do

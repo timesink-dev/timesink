@@ -46,7 +46,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
     """
   end
 
-  def handle_event("save_location", params, socket) do
+  def handle_event("save_location", _params, socket) do
     # send(self(), {:update_user_data, to_form(params)})
     send(self(), {:go_to_step, :next})
     {:noreply, socket}

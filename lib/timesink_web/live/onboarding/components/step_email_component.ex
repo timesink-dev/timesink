@@ -7,7 +7,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
   import Ecto.Changeset
 
   def mount(socket) do
-    changeset = Accounts.User.email_password_changeset(%User{})
+    changeset = User.email_password_changeset(%User{})
     {:ok, assign(socket, form: to_form(changeset), error: nil)}
   end
 
@@ -103,7 +103,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
         socket
       ) do
     changeset =
-      Accounts.User.email_password_changeset(%Accounts.User{}, %{
+      User.email_password_changeset(%Accounts.User{}, %{
         "email" => email,
         "password" => password
       })
@@ -134,7 +134,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
   end
 
   def handle_event("validate_email", %{"email" => email}, socket) do
-    changeset = Accounts.User.email_password_changeset(%User{}, %{"email" => email})
+    changeset = User.email_password_changeset(%User{}, %{"email" => email})
 
     with {:ok, :available} <- Accounts.is_email_available?(email) do
       send(self(), {:update_user_data, to_form(changeset)})
