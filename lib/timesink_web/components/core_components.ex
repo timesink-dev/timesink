@@ -251,8 +251,7 @@ defmodule TimesinkWeb.CoreComponents do
           "tertiary" ->
             "bg-dark-theater-primary text-mystery-white"
 
-          # default styling
-          _ ->
+          "none" ->
             ""
         end
       end)

@@ -3,6 +3,9 @@ defmodule TimesinkWeb.InvitationController do
   alias Timesink.Token
 
   def validate_invite(conn, %{"token" => token}) do
+    # clear any open session (reset) before continuing
+    conn = configure_session(conn, renew: true)
+
     with {:ok, token} <- Token.validate_invite(token) do
       conn
       |> put_session(:invite_token, token)

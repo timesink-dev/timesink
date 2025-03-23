@@ -22,4 +22,13 @@ defmodule TimesinkWeb.AuthController do
     |> Auth.log_out_user()
     |> put_flash(:info, "You have logged out succesfully.")
   end
+
+  @spec complete_onboarding(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def complete_onboarding(conn, %{"token" => token}) do
+    conn
+    |> put_session(:user_token, token)
+    |> configure_session(renew: true)
+    |> put_flash(:info, "Welcome to Timesink!")
+    |> redirect(to: "/")
+  end
 end

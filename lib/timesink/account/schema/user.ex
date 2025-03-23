@@ -44,7 +44,7 @@ defmodule Timesink.Accounts.User do
     changeset(struct, params)
   end
 
-  @spec changeset(user :: t(), params :: %{optional(atom()) => term()}) ::
+  @spec changeset(user :: %__MODULE__{}, params :: %{optional(key :: atom()) => term()}) ::
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
@@ -57,13 +57,20 @@ defmodule Timesink.Accounts.User do
       :last_name,
       :roles
     ])
-    |> cast_assoc(:profile, required: true, with: &Accounts.Profile.changeset/2)
+    |> cast_assoc(:profile,
+      required: true,
+      with: &Accounts.Profile.changeset/2,
+      message: "Profile is required"
+    )
     |> validate_required(@required_fields)
     |> validate_format(:email, ~r/@/)
-    |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{2,32}$/)
-    |> validate_length(:first_name, min: 2)
-    |> validate_length(:last_name, min: 2)
-    |> validate_length(:username, min: 1)
+    |> unique_constraint(:email, message: "Email already exists")
+    |> validate_length(:password, min: 8, message: "Password must be at least 8 characters")
+    |> validate_length(:first_name, min: 1)
+    |> validate_length(:last_name, min: 1)
+    |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{3,32}$/, message: "Invalid username format")
+    |> unique_constraint(:username, message: "Username is already taken")
+    |> validate_length(:username, min: 3)
   end
 
   @doc """
@@ -105,4 +112,37 @@ defmodule Timesink.Accounts.User do
   end
 
   def valid_password?(_, _), do: Argon2.no_user_verify()
+
+  def email_password_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
+    struct
+    |> cast(params, [:email, :password])
+    |> validate_required([:email, :password])
+    |> validate_format(:email, ~r/@/, message: "Invalid email format")
+    |> unique_constraint(:email, message: "Email already exists")
+    |> validate_length(:password, min: 8, message: "Password must be at least 8 characters")
+  end
+
+  def name_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
+    struct
+    |> cast(params, [:first_name, :last_name])
+    |> validate_required([:first_name, :last_name])
+    |> validate_length(:first_name, min: 1)
+    |> validate_length(:last_name, min: 1)
+  end
+
+  def username_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
+    struct
+    |> cast(params, [:username])
+    |> validate_required([:username])
+    |> validate_length(:username, min: 3, max: 32)
+    |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{3,32}$/, message: "Invalid username format")
+    |> unique_constraint(:username, message: "Username is already taken")
+  end
+
+  def location_changeset(%Accounts.Profile{} = struct, params \\ %{}) do
+    struct
+    |> cast(params, [:location])
+    |> cast_embed(:location, with: &Accounts.Location.changeset/2)
+    |> validate_required([:location])
+  end
 end
