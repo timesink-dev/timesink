@@ -41,7 +41,7 @@ defmodule Timesink.Storage do
          stream <- S3.Upload.stream_file(upload.path),
          op <- S3.upload(stream, config.bucket, obj_path, meta: obj_meta),
          {:ok, %{status_code: 200, body: %{key: path}}} <- ExAws.request(op),
-         blob_params <- %{id: blob_id, user_id: uid, path: path, size: stats.size},
+         blob_params <- %{id: blob_id, user_id: uid, uri: path, size: stats.size},
          {:ok, blob} <- Blob.create(blob_params) do
       {:ok, blob}
     end
@@ -98,6 +98,6 @@ defmodule Timesink.Storage do
 
   @spec config() :: config
   def config do
-    Application.get_env(:timesink, Timesink.Storage) |> Enum.into(%{})
+    Application.get_env(:timesink, Timesink.Storage.S3) |> Enum.into(%{})
   end
 end

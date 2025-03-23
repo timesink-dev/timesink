@@ -23,7 +23,7 @@ defmodule Timesink.StorageTest do
       assert blob.size == upload_stat.size
 
       assert {:ok, %{status_code: 200, headers: headers}} =
-               S3.head_object(config.bucket, blob.path) |> ExAws.request()
+               S3.head_object(config.bucket, blob.uri) |> ExAws.request()
 
       obj_content_length =
         headers

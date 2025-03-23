@@ -4,14 +4,18 @@ defmodule Timesink.Storage.Blob do
   use Timesink.Schema
   import Ecto.Changeset
 
+  @type service :: :s3 | :mux
+
   @type t :: %{
           __struct__: __MODULE__,
           user_id: :integer,
           user: Timesink.Accounts.User.t(),
-          path: :string,
+          service: service(),
+          uri: :string,
           size: :integer,
           mime: :string,
-          checksum: :string
+          checksum: :string,
+          metadata: :map
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -20,10 +24,12 @@ defmodule Timesink.Storage.Blob do
   schema "blob" do
     belongs_to :user, Timesink.Accounts.User
 
-    field :path, :string
+    field :service, Ecto.Enum, values: [:s3, :mux], default: :s3
+    field :uri, :string
     field :size, :integer
     field :mime, :string
     field :checksum, :string
+    field :metadata, :map
 
     timestamps(type: :utc_datetime)
   end
@@ -32,10 +38,13 @@ defmodule Timesink.Storage.Blob do
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = blob, %{} = params) do
     blob
-    |> cast(params, [:id, :user_id, :path, :size, :mime, :checksum])
-    |> validate_required([:path, :size])
+    |> cast(params, [:id, :user_id, :uri, :size, :mime, :checksum, :metadata])
+    |> validate_required([:uri])
+    |> validate_change(:metadata, fn _, value ->
+      if is_map(value), do: [], else: [metadata: "must be a map"]
+    end)
     |> foreign_key_constraint(:user_id)
-    |> unique_constraint(:path)
+    |> unique_constraint(:uri)
   end
 
   @doc """
