@@ -91,3 +91,5 @@ config :timesink, Oban,
   queues: [mailer: 10, waitlist_invites: 10, waitlist_processing: 10]
 
 config :tesla, adapter: {Tesla.Adapter.Finch, name: Timesink.Finch}
+
+config :timesink, :here_maps_api_key, System.get_env("HERE_MAPS_API_KEY")

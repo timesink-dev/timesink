@@ -85,3 +85,5 @@ config :phoenix_live_view,
 config :swoosh, :api_client, false
 
 config :timesink, base_url: "http://localhost:4000"
+
+config :timesink, :here_maps_api_key, System.get_env("HERE_MAPS_API_KEY")

@@ -18,7 +18,7 @@ defmodule Timesink.Application do
       # {Timesink.Worker, arg},
       {Oban, Application.fetch_env!(:timesink, Oban)},
       TimesinkWeb.Endpoint,
-      Timesink.Locations.Cache,
+      {Timesink.Locations.Cache, name: Timesink.Locations.Cache},
       {Task.Supervisor, name: Timesink.TaskSupervisor}
     ]
 

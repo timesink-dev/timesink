@@ -1,61 +1,59 @@
-# defmodule Timesink.Locations.HereMaps do
-#   alias Timesink.Locations.Result
+defmodule Timesink.Locations.HereMaps do
+  @behaviour Timesink.Locations.Backend
+  alias Timesink.Locations.Result
 
-#   @behaviour Timesink.Locations.Backend
+  @endpoint "https://autocomplete.search.hereapi.com/v1/autocomplete"
+  @api_key Application.compile_env(:timesink, :here_maps_api_key)
 
-#   @base_discover "https://discover.search.hereapi.com/v1/discover"
-#   @base_geocode "https://geocode.search.hereapi.com/v1/geocode"
+  def name, do: "here_maps"
 
-#   @impl true
-#   def name, do: "here_maps"
+  def compute(query, _opts \\ []) do
+    query_params =
+      URI.encode_query(%{
+        q: query,
+        apiKey: @api_key,
+        types: "city",
+        limit: 5
+      })
 
-#   @impl true
-#   def compute(query_str, point, _opts) do
-#     fetch(query_str, point)
-#     |> build_results()
-#   end
+    case Finch.build(:get, "#{@endpoint}?#{query_params}")
+         |> Finch.request(Timesink.Finch) do
+      {:ok, %Finch.Response{status: 200, body: body}} ->
+        body
+        |> Jason.decode!()
+        |> parse_response()
 
-#   defp fetch(query, point) do
-#     url(query, point)
-#     |> HTTPoison.get()
-#     |> handle_response()
-#   end
+      _ ->
+        []
+    end
+  end
 
-#   defp url(query, point) do
-#     query = URI.encode_query(q: query, apiKey: api_key()) <> "&in=countryCode:COL"
+  defp parse_response(%{"items" => items}) do
+    locations =
+      Enum.map(items, fn item ->
+        address = item["address"]
 
-#     if String.length(point) > 0 do
-#       "#{@base_discover}?#{query}&at=#{point}"
-#     else
-#       "#{@base_geocode}?#{query}"
-#     end
-#   end
+        %{
+          # Full formatted label
+          label: address["label"],
+          # City (e.g., "Los Angeles")
+          city: address["city"],
+          # Full state name (e.g., "California")
+          state: address["state"],
+          # Abbreviated (e.g., "CA")
+          state_code: address["stateCode"],
+          # Full country name
+          country: address["countryName"],
+          # ISO code (e.g., "USA")
+          country_code: address["countryCode"],
+          place_id: item["id"],
+          lat: "34.5",
+          lng: "32.3"
+        }
+      end)
 
-#   defp api_key, do: Application.fetch_env!(:timesink, :here_maps)[:apikey]
+    [%Result{backend: __MODULE__, locations: locations}]
+  end
 
-#   defp handle_response({:ok, %{status_code: status_code, body: body}}) do
-#     {
-#       status_code |> check_for_error(),
-#       body |> Poison.Parser.parse!()
-#     }
-#   end
-
-#   def check_for_error(200), do: :ok
-#   def check_for_error(_), do: :error
-
-#   defp build_results({:ok, %{"items" => items}}) do
-#     locations =
-#       items
-#       |> Enum.map(fn item ->
-#         %{
-#           address: item["address"],
-#           position: item["position"],
-#           title: item["title"]
-#         }
-#       end)
-
-#     [%Result{backend: __MODULE__, locations: locations}]
-#   end
-
-#   defp build_results(_response), do: []
-# end
+  defp parse_response(_), do: []
+end
