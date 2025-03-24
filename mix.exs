@@ -49,7 +49,7 @@ defmodule Timesink.MixProject do
       {:postgrex, ">= 0.20.0"},
       {:phoenix_html, "~> 4.2"},
       {:phoenix_live_reload, "~> 1.5", only: :dev},
-      {:phoenix_live_view, "~> 1.0.5", override: true},
+      {:phoenix_live_view, "~> 1.0.7", override: true},
       {:floki, ">= 0.37.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.6"},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
