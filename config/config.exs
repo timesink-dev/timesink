@@ -89,3 +89,5 @@ config :timesink, Oban,
      ]}
   ],
   queues: [mailer: 10, waitlist_invites: 10, waitlist_processing: 10]
+
+config :tesla, adapter: {Tesla.Adapter.Finch, name: Timesink.Finch}
