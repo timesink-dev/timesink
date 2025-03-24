@@ -84,4 +84,12 @@ config :phoenix_live_view,
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
+here_maps_apikey =
+  System.get_env("HERE_MAPS_API_KEY") ||
+    raise """
+    environment variable HERE_MAPS_APIKEY is missing.
+    """
+
+config :timesink, :here_maps, apikey: here_maps_apikey
+
 config :timesink, base_url: "http://localhost:4000"

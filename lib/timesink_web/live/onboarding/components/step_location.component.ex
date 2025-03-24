@@ -1,8 +1,48 @@
 defmodule TimesinkWeb.Onboarding.StepLocationComponent do
   use TimesinkWeb, :live_component
+  import Ecto.Changeset
 
-  def mount(socket) do
-    {:ok, socket}
+  alias Timesink.Locations
+
+  def update(_assigns, socket) do
+    {:ok,
+     assign(socket,
+       place: "",
+       places: [
+         %{
+           title: "Los Angeles, CA",
+           position: "34.0522,-118.2437"
+         },
+         %{
+           title: "New York, NY",
+           position: "40.7128,-74.0060"
+         },
+         %{
+           title: "Chicago, IL",
+           position: "41.8781,-87.6298"
+         },
+         %{
+           title: "San Francisco, CA",
+           position: "37.7749,-122.4194"
+         },
+         %{
+           title: "Miami, FL",
+           position: "25.7617,-80.1918"
+         },
+         %{
+           title: "Austin, TX",
+           position: "30.2672,-97.7431"
+         },
+         %{
+           title: "Seattle, WA",
+           position: "47.6062,-122.3321"
+         },
+         %{
+           title: "Portland, OR",
+           position: "45.5051,-122.6750"
+         }
+       ]
+     )}
   end
 
   def render(assigns) do
@@ -12,32 +52,33 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
         <p class="text-gray-400 text-center mt-2">
           As we build the world of TimeSink together, we want to know where you are all coming from.
         </p>
-        <.simple_form
+        <form
           class="mt-6 space-y-4 w-full"
+          phx-change="suggest"
           phx-submit="save_location"
           phx-target={@myself}
-          for={@data}
-          as="data"
         >
           <div>
             <label class="block text-sm font-medium text-gray-300">Where are you?</label>
-            <.input
+            <input
               type="text"
-              name="location"
               required
-              value={@data["location"]["locality"] || ""}
-              input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-              error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
+              autocomplete="off"
+              list="places"
+              phx-debounce="700"
               placeholder="Enter your location (e.g. New York, NY)"
             />
+            <datalist id="places">
+              <%= for place <- @places do %>
+                <option value={place.title}>{place.title}</option>
+              <% end %>
+            </datalist>
           </div>
 
-          <:actions>
-            <div class="mt-6">
-              <.button color="secondary" class="w-full py-2 text-lg">Continue</.button>
-            </div>
-          </:actions>
-        </.simple_form>
+          <div class="mt-6">
+            <button color="secondary" class="w-full py-2 text-lg">Continue</button>
+          </div>
+        </form>
         <.button color="none" class="mt-6" phx-click="go_back" phx-target={@myself}>
           <.icon name="hero-arrow-left-circle" class="h-6 w-6" />
         </.button>
@@ -50,6 +91,22 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
     # send(self(), {:update_user_data, to_form(params)})
     send(self(), {:go_to_step, :next})
     {:noreply, socket}
+  end
+
+  def handle_event("suggest", params, socket) do
+    %{
+      "place" => place,
+      "position" => position
+    } = params
+
+    places =
+      Locations.get_locations(place, position)
+
+    {:noreply,
+     assign(socket,
+       places: places,
+       place: place
+     )}
   end
 
   def handle_event("go_back", _unsigned_params, socket) do

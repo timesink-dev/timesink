@@ -55,6 +55,8 @@ defmodule Timesink.MixProject do
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:ex_machina, "~> 2.8.0", only: [:dev, :test]},
       {:faker, "~> 0.18", only: [:dev, :test]},
+      {:httpoison, "~> 2.2.2"},
+      {:poison, "~> 6.0"},
       {:heroicons,
        github: "tailwindlabs/heroicons",
        tag: "v2.2.0",
