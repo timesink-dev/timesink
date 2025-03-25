@@ -1,4 +1,22 @@
 defmodule Timesink.Locations.Cache do
+  @moduledoc """
+  A simple in-memory caching layer for storing geolocation search results.
+
+  Backed by ETS (`:ets`), this cache:
+  - Supports named tables for safe concurrent access.
+  - Periodically clears itself every 10 minutes to avoid stale data.
+  - Is used by `Timesink.Locations` to reduce unnecessary API calls.
+
+  ## Example
+
+      # Store a result
+      Cache.put({MyProvider.name(), "Los Angeles", 5}, result)
+
+      # Fetch a result
+      Cache.fetch({MyProvider.name(), "Los Angeles", 5})
+
+  This GenServer runs as part of Timesink's application supervision tree.
+  """
   use GenServer
 
   @clear_interval :timer.minutes(10)

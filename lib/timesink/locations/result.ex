@@ -1,12 +1,12 @@
 defmodule Timesink.Locations.Result do
   @moduledoc """
-  Struct that wraps backend autocomplete results.
+  Struct that wraps provider autocomplete results.
   """
 
-  defstruct backend: nil, locations: []
+  defstruct provider: nil, locations: []
 
   @type t :: %__MODULE__{
-          backend: module(),
+          provider: module(),
           locations: list(map())
         }
 end

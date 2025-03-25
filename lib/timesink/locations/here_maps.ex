@@ -1,5 +1,28 @@
 defmodule Timesink.Locations.HereMaps do
-  @behaviour Timesink.Locations.Backend
+  @moduledoc """
+  A location autocomplete provider using the HERE Maps API.
+
+  This module implements the `Timesink.Locations.Provider` behaviour and is responsible for:
+
+  - Sending city-level autocomplete queries to HERE Maps.
+  - Decoding and normalizing the API responses into a structured format.
+  - Returning results wrapped in a `%Locations.Result{}` struct for compatibility with the broader `Locations` system.
+
+  ## Configuration
+
+  You must set your API key in your config (e.g. `config/dev.exs`):
+
+      config :timesink, here_maps_api_key: "your-api-key"
+
+  ## Example
+
+      iex> HereMaps.compute("Los Ange")
+      [%Locations.Result{provider: Timesink.Locations.HereMaps, locations: [%{city: ..., country_code: ..., ...}]}]
+
+  Note: `lat` and `lng` are currently stubbed until full geocoding is implemented.
+  """
+
+  @behaviour Timesink.Locations.Provider
   alias Timesink.Locations.Result
 
   @endpoint "https://autocomplete.search.hereapi.com/v1/autocomplete"
@@ -52,7 +75,7 @@ defmodule Timesink.Locations.HereMaps do
         }
       end)
 
-    [%Result{backend: __MODULE__, locations: locations}]
+    [%Result{provider: __MODULE__, locations: locations}]
   end
 
   defp parse_response(_), do: []
