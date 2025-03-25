@@ -25,7 +25,8 @@ defmodule Timesink.Locations.HereMaps do
   @behaviour Timesink.Locations.Provider
   alias Timesink.Locations.Result
 
-  @endpoint "https://autocomplete.search.hereapi.com/v1/autocomplete"
+  @suggest_endpoint "https://autocomplete.search.hereapi.com/v1/autocomplete"
+  @lookup_endpoint "https://lookup.search.hereapi.com/v1/lookup"
   @api_key Application.compile_env(:timesink, :here_maps_api_key)
 
   def name, do: "here_maps"
@@ -39,7 +40,7 @@ defmodule Timesink.Locations.HereMaps do
         limit: 5
       })
 
-    case Finch.build(:get, "#{@endpoint}?#{query_params}")
+    case Finch.build(:get, "#{@suggest_endpoint}?#{query_params}")
          |> Finch.request(Timesink.Finch) do
       {:ok, %Finch.Response{status: 200, body: body}} ->
         body
@@ -48,6 +49,31 @@ defmodule Timesink.Locations.HereMaps do
 
       _ ->
         []
+    end
+  end
+
+  def lookup(place_id) do
+    query =
+      URI.encode_query(%{
+        id: place_id,
+        apiKey: @api_key
+      })
+
+    IO.inspect(query, label: "lookup query")
+    IO.inspect("#{@lookup_endpoint}?#{query}", label: "lookup url")
+
+    case Finch.build(:get, "#{@lookup_endpoint}?#{query}")
+         |> Finch.request(Timesink.Finch) do
+      {:ok, %Finch.Response{status: 200, body: body}} ->
+        with %{"position" => %{"lat" => lat, "lng" => lng}} <- Jason.decode!(body) do
+          IO.inspect({lat, lng}, label: "lat/lng")
+          {:ok, %{lat: lat, lng: lng}}
+        else
+          _ -> {:error, :invalid_response}
+        end
+
+      _ ->
+        {:error, :request_failed}
     end
   end
 

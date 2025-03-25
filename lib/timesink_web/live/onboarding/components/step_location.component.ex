@@ -2,6 +2,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
   use TimesinkWeb, :live_component
 
   alias Timesink.Locations
+  alias Timesink.Locations.HereMaps
   import Phoenix.HTML.Form
 
   def update(assigns, socket) do
@@ -80,33 +81,52 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
     #   {:noreply, assign(socket, results: [], query: query)}
     # else
     with {:ok, results} <- Locations.get_locations(query) do
-      IO.inspect(results, label: "here results")
       {:noreply, assign(socket, results: results, query: query)}
     end
   end
 
   def handle_event(
         "select",
-        %{
-          "label" => label,
-          "city" => city,
-          "state_code" => state_code,
-          "country_code" => country_code,
-          "lat" => lat,
-          "lng" => lng
-        },
+        params,
         socket
       ) do
-    location = %{
-      "locality" => city,
-      "state_code" => state_code,
-      "country_code" => country_code,
-      "label" => label,
-      "lat" => lat,
-      "lng" => lng
-    }
+    IO.inspect(params, label: "Trigger select: Selected")
 
-    {:noreply, assign(socket, selected_location: location, results: [], query: label)}
+    place_id = Map.get(params, "id")
+    city = Map.get(params, "city")
+    state_code = Map.get(params, "state_code")
+    country_code = Map.get(params, "country_code")
+    label = Map.get(params, "label")
+
+    with {:ok, %{lat: lat, lng: lng}} <- HereMaps.lookup(place_id) do
+      IO.inspect({lat, lng}, label: "after lookup lat/lng")
+
+      location = %{
+        "locality" => city,
+        "state_code" => state_code,
+        "country_code" => country_code,
+        "label" => label,
+        "lat" => lat,
+        "lng" => lng
+      }
+
+      IO.inspect(location, label: "Location with lat and lng")
+
+      {:noreply, assign(socket, selected_location: location, results: [], query: label)}
+    else
+      _ ->
+        # Fallback if lookup fails (no lat/lng)
+        location = %{
+          "locality" => city,
+          "state_code" => state_code,
+          "country_code" => country_code,
+          "label" => label,
+          "lat" => nil,
+          "lng" => nil
+        }
+
+        {:noreply, assign(socket, selected_location: location, results: [], query: label)}
+    end
   end
 
   def handle_event("continue", _params, socket) do
