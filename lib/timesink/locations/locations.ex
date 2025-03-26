@@ -1,18 +1,41 @@
 defmodule Timesink.Locations do
   @moduledoc """
-  Provides a unified interface for performing location autocomplete lookups using pluggable data providers.
+  The `Timesink.Locations` module provides a unified and cache-optimized interface for
+  performing location-based lookups using configurable data providers.
 
-  This module handles:
-  - Querying one or more `LocationProvider` modules (e.g. `HereMaps`)
-  - Concurrently executing provider requests using `Task.Supervisor`
-  - Caching results for performance via ETS (`Timesink.Locations.Cache`)
+  It supports both:
 
-  ## Example:
+  * **Autocomplete queries** for cities (via `get_locations/2`)
+  * **Detailed geolocation lookups** (lat/lng) by `place_id` (via `lookup_place/1`)
 
-      iex> Timesink.Locations.get_locations("Los An")
-      {:ok, [%{city: "Los Angeles", country_code: "USA", ...}, ...]}
+  ## Features
 
-  You can configure different backends/providers (like HERE, Mapbox, etc.) by implementing the `Timesink.Locations.Provider` behaviour.
+  - Plug-and-play backend system using the `Timesink.Locations.Provider` behaviour.
+  - Concurrent query execution across providers using `Task.Supervisor`.
+  - In-memory ETS caching for performance and reduced API calls (via `Timesink.Locations.Cache`).
+
+  ## Examples
+
+  Autocomplete cities:
+
+    iex> Timesink.Locations.get_locations("New Yo")
+    {:ok, [%{label: "New York, NY, United States", city: "New York", ...}]}
+
+  Get precise latitude and longitude:
+
+    iex> Timesink.Locations.lookup_place("here:cm:namedplace:123456")
+    {:ok, %{lat: 40.7128, lng: -74.006}}
+
+  Cached results are returned instantly if available.
+
+  ## Default Provider
+
+  By default, the module uses:
+
+  * `Timesink.Locations.HereMaps` — a HERE Maps-based autocomplete and lookup provider.
+
+   You can configure different providers (like HERE, Mapbox, etc.) by implementing the `Timesink.Locations.Provider` behaviour.and adding them to the `@provider` list.
+
   """
   alias Timesink.Locations.{Cache, Result, HereMaps}
   @provider [HereMaps]
