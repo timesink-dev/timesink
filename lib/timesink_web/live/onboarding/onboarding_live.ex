@@ -108,7 +108,6 @@ defmodule TimesinkWeb.OnboardingLive do
 
   def handle_info({:update_user_data, %{params: params}}, socket) do
     socket = assign(socket, user_data: Map.merge(socket.assigns.user_data, params))
-    IO.inspect(socket.assigns.user_data, label: "Updated user_data")
 
     {:noreply, socket}
   end

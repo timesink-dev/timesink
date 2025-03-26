@@ -2,19 +2,21 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
   use TimesinkWeb, :live_component
 
   alias Timesink.Locations
+  alias Timesink.Accounts.Location
 
   def update(assigns, socket) do
-    data = assigns[:data] || %{}
-    location = Map.get(data["profile"] || %{}, "location", %{})
+    location_data = get_in(assigns.data, ["profile", "location"]) || %{}
 
-    label = location["label"]
+    changeset = Timesink.Accounts.Location.changeset(%Timesink.Accounts.Location{}, location_data)
+    form = to_form(changeset, as: "location")
 
     socket =
       socket
       |> assign(assigns)
-      |> assign(:query, label || "")
+      |> assign(:form, form)
+      |> assign(:query, location_data["label"] || "")
       |> assign(:results, [])
-      |> assign(:selected_location, location)
+      |> assign(:selected_location, location_data)
 
     {:ok, socket}
   end
@@ -28,13 +30,21 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
           We're building TimeSink together. Knowing where our community comes from helps shape our world and future screenings.
         </p>
 
-        <form class="mt-6 space-y-4" phx-change="search" phx-target={@myself} phx-submit="continue">
+        <.simple_form
+          for={@form}
+          as="location"
+          phx-change="search"
+          phx-submit="save_location"
+          phx-target={@myself}
+          class="mt-6 space-y-4"
+        >
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">City</label>
             <input
               type="text"
               name="query"
               value={@query}
+              required
               phx-debounce="300"
               placeholder="Start typing your city (e.g., Los Angeles)"
               class="w-full p-3 rounded text-white border-none bg-dark-theater-primary"
@@ -61,11 +71,12 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
               {result.label}
             </li>
           </ul>
-
-          <.button class="mt-6 w-full py-3 text-lg" color="secondary">
-            Continue
-          </.button>
-        </form>
+          <:actions>
+            <.button class="mt-6 w-full py-3 text-lg" color="secondary">
+              Continue
+            </.button>
+          </:actions>
+        </.simple_form>
 
         <.button color="none" class="mt-6 p-0" phx-click="go_back" phx-target={@myself}>
           <.icon name="hero-arrow-left-circle" class="h-6 w-6" />
@@ -81,21 +92,19 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
     end
   end
 
-  def handle_event(
-        "select",
-        %{
-          "id" => id,
-          "city" => city,
-          "country_code" => country_code,
-          "country" => country,
-          "label" => label
-        } = params,
-        socket
-      ) do
+  def handle_event("select", params, socket) do
+    %{
+      "id" => id,
+      "city" => city,
+      "country_code" => country_code,
+      "country" => country,
+      "label" => label
+    } = params
+
     state_code = params["state_code"] || nil
 
     with {:ok, %{lat: lat, lng: lng}} <- Locations.lookup_place(id) do
-      location = %{
+      selected_location = %{
         "locality" => city,
         "state_code" => state_code,
         "country_code" => country_code,
@@ -105,46 +114,44 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
         "lng" => lng
       }
 
-      data = socket.assigns.data
+      form = to_form(Location.changeset(%Location{}, selected_location), as: "location")
 
-      updated_data =
-        update_in(data["profile"]["location"], fn _ -> location end)
-
-      send(self(), {:update_user_data, %{params: updated_data}})
-
-      {:noreply, assign(socket, selected_location: location, results: [], query: label)}
+      {:noreply,
+       assign(socket,
+         selected_location: selected_location,
+         form: form,
+         query: label,
+         results: []
+       )}
     else
       _ ->
-        # Fallback if lookup fails (no lat/lng)
-        location = %{
-          "locality" => city,
-          "state_code" => state_code,
-          "country_code" => country_code,
-          "country" => country,
-          "label" => label,
-          "lat" => nil,
-          "lng" => nil
-        }
-
-        {:noreply, assign(socket, selected_location: location, results: [], query: label)}
+        {:noreply,
+         socket
+         |> put_flash(:error, "Failed to retrieve full location info. Try again.")}
     end
   end
 
-  def handle_event("continue", _params, socket) do
-    data = socket.assigns.data
+  def handle_event("save_location", _params, socket) do
     location = socket.assigns.selected_location
+    changeset = Timesink.Accounts.Location.changeset(%Location{}, location)
 
-    if location do
-      updated_data =
-        update_in(data["profile"]["location"], fn _ -> location end)
+    if changeset.valid? do
+      updated_location =
+        socket.assigns.data
+        |> Map.update("profile", %{"location" => location}, fn profile ->
+          Map.put(profile, "location", location)
+        end)
 
-      send(self(), {:update_user_data, %{params: updated_data}})
+      send(self(), {:update_user_data, %{params: updated_location}})
       send(self(), {:go_to_step, :next})
       {:noreply, socket}
     else
+      form = to_form(changeset, as: "location")
+
       {:noreply,
        socket
-       |> put_flash(:error, "Please select a location before continuing.")}
+       |> assign(:form, form)
+       |> put_flash(:error, "Please select a valid location before continuing.")}
     end
   end
 

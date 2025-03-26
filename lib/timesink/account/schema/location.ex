@@ -281,8 +281,6 @@ defmodule Timesink.Accounts.Location do
 
   @required_fields ~w(locality country_code lat lng label)a
 
-  @spec changeset(profile :: t(), params :: %{optional(atom()) => term()}) ::
-          Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
     |> cast(params, [:locality, :country_code, :country, :lat, :lng, :label, :state_code])
