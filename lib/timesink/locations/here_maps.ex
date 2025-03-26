@@ -26,8 +26,10 @@ defmodule Timesink.Locations.HereMaps do
   @api_key Application.compile_env(:timesink, :here_maps_api_key)
   @http Application.compile_env!(:timesink, :http_client)
 
+  @impl true
   def name, do: "here_maps"
 
+  @impl true
   def compute(query, _opts \\ []) do
     query_params =
       URI.encode_query(%{
@@ -51,6 +53,8 @@ defmodule Timesink.Locations.HereMaps do
     end
   end
 
+  @spec lookup(any()) ::
+          {:error, :invalid_response | :request_failed} | {:ok, %{lat: any(), lng: any()}}
   def lookup(place_id) do
     query_params =
       URI.encode_query(%{
