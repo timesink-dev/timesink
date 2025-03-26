@@ -23,13 +23,14 @@ defmodule Timesink.Locations.Cache do
 
   def put(name \\ __MODULE__, key, value) do
     true = :ets.insert(tab_name(name), {key, value})
+    IO.inspect(tab_name(name), label: "put to cache tab_name")
     :ok
   end
 
   def fetch(name \\ __MODULE__, key) do
     {:ok, :ets.lookup_element(tab_name(name), key, 2)}
   rescue
-    ArgumentError -> :error
+    ArgumentError -> :miss
   end
 
   def start_link(opts) do

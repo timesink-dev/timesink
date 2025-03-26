@@ -15,7 +15,7 @@ defmodule TimesinkWeb.OnboardingLive do
   }
 
   # Define step order and component mappings
-  @step_order [:location, :email, :verify_email, :name, :username]
+  @step_order [:email, :verify_email, :name, :location, :username]
   @steps %{
     email: StepEmailComponent,
     verify_email: StepVerifyEmailComponent,
@@ -40,11 +40,13 @@ defmodule TimesinkWeb.OnboardingLive do
         "org_position" => "Director",
         "birthdate" => "1990-05-14",
         "location" => %{
-          "locality" => "Los Angeles",
-          # Must be a valid ISO 3166 country code
-          "country" => "USA",
-          "lat" => "34.0522",
-          "lng" => "-118.2437"
+          "locality" => "",
+          "country_code" => "",
+          "state_code" => "",
+          "label" => "",
+          "country" => "",
+          "lat" => "",
+          "lng" => ""
         }
       }
     }

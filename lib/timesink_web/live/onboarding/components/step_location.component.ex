@@ -2,17 +2,17 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
   use TimesinkWeb, :live_component
 
   alias Timesink.Locations
-  alias Timesink.Locations.HereMaps
-  import Phoenix.HTML.Form
 
   def update(assigns, socket) do
     data = assigns[:data] || %{}
     location = Map.get(data["profile"] || %{}, "location", %{})
 
+    label = location["label"]
+
     socket =
       socket
       |> assign(assigns)
-      |> assign(:query, location["locality"] || "")
+      |> assign(:query, label || "")
       |> assign(:results, [])
       |> assign(:selected_location, location)
 
@@ -54,8 +54,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
               phx-value-city={result.city}
               phx-value-state_code={result.state_code}
               phx-value-country_code={result.country_code}
-              phx-value-lat={result.lat}
-              phx-value-lng={result.lng}
+              phx-value-country={result.country}
               phx-target={@myself}
               class="cursor-pointer px-4 py-2 hover:bg-zinc-700"
             >
@@ -77,9 +76,6 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
   end
 
   def handle_event("search", %{"query" => query}, socket) do
-    # if String.length(query) < 2 do
-    #   {:noreply, assign(socket, results: [], query: query)}
-    # else
     with {:ok, results} <- Locations.get_locations(query) do
       {:noreply, assign(socket, results: results, query: query)}
     end
@@ -87,30 +83,34 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
 
   def handle_event(
         "select",
-        params,
+        %{
+          "id" => id,
+          "city" => city,
+          "country_code" => country_code,
+          "country" => country,
+          "label" => label
+        } = params,
         socket
       ) do
-    IO.inspect(params, label: "Trigger select: Selected")
+    state_code = params["state_code"] || nil
 
-    place_id = Map.get(params, "id")
-    city = Map.get(params, "city")
-    state_code = Map.get(params, "state_code")
-    country_code = Map.get(params, "country_code")
-    label = Map.get(params, "label")
-
-    with {:ok, %{lat: lat, lng: lng}} <- HereMaps.lookup(place_id) do
-      IO.inspect({lat, lng}, label: "after lookup lat/lng")
-
+    with {:ok, %{lat: lat, lng: lng}} <- Locations.lookup_place(id) do
       location = %{
         "locality" => city,
         "state_code" => state_code,
         "country_code" => country_code,
+        "country" => country,
         "label" => label,
         "lat" => lat,
         "lng" => lng
       }
 
-      IO.inspect(location, label: "Location with lat and lng")
+      data = socket.assigns.data
+
+      updated_data =
+        update_in(data["profile"]["location"], fn _ -> location end)
+
+      send(self(), {:update_user_data, %{params: updated_data}})
 
       {:noreply, assign(socket, selected_location: location, results: [], query: label)}
     else
@@ -120,6 +120,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
           "locality" => city,
           "state_code" => state_code,
           "country_code" => country_code,
+          "country" => country,
           "label" => label,
           "lat" => nil,
           "lng" => nil

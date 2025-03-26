@@ -28,6 +28,7 @@ defmodule Timesink.Locations.HereMaps do
   @suggest_endpoint "https://autocomplete.search.hereapi.com/v1/autocomplete"
   @lookup_endpoint "https://lookup.search.hereapi.com/v1/lookup"
   @api_key Application.compile_env(:timesink, :here_maps_api_key)
+  @http Application.compile_env!(:timesink, :http_client)
 
   def name, do: "here_maps"
 
@@ -40,8 +41,10 @@ defmodule Timesink.Locations.HereMaps do
         limit: 5
       })
 
-    case Finch.build(:get, "#{@suggest_endpoint}?#{query_params}")
-         |> Finch.request(Timesink.Finch) do
+    url = "#{@suggest_endpoint}?#{query_params}"
+    req = Finch.build(:get, url)
+
+    case @http.request(req) do
       {:ok, %Finch.Response{status: 200, body: body}} ->
         body
         |> Jason.decode!()
@@ -53,20 +56,18 @@ defmodule Timesink.Locations.HereMaps do
   end
 
   def lookup(place_id) do
-    query =
+    query_params =
       URI.encode_query(%{
         id: place_id,
         apiKey: @api_key
       })
 
-    IO.inspect(query, label: "lookup query")
-    IO.inspect("#{@lookup_endpoint}?#{query}", label: "lookup url")
+    url = "#{@lookup_endpoint}?#{query_params}"
+    req = Finch.build(:get, url)
 
-    case Finch.build(:get, "#{@lookup_endpoint}?#{query}")
-         |> Finch.request(Timesink.Finch) do
+    case @http.request(req) do
       {:ok, %Finch.Response{status: 200, body: body}} ->
         with %{"position" => %{"lat" => lat, "lng" => lng}} <- Jason.decode!(body) do
-          IO.inspect({lat, lng}, label: "lat/lng")
           {:ok, %{lat: lat, lng: lng}}
         else
           _ -> {:error, :invalid_response}
@@ -83,21 +84,14 @@ defmodule Timesink.Locations.HereMaps do
         address = item["address"]
 
         %{
-          # Full formatted label
           label: address["label"],
-          # City (e.g., "Los Angeles")
           city: address["city"],
-          # Full state name (e.g., "California")
-          state: address["state"],
-          # Abbreviated (e.g., "CA")
           state_code: address["stateCode"],
-          # Full country name
           country: address["countryName"],
-          # ISO code (e.g., "USA")
           country_code: address["countryCode"],
           place_id: item["id"],
-          lat: "34.5",
-          lng: "32.3"
+          lat: nil,
+          lng: nil
         }
       end)
 

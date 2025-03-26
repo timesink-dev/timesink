@@ -25,6 +25,18 @@ defmodule Timesink.Locations do
     end
   end
 
+  def lookup_place(place_id) do
+    with {:ok, result} <- Cache.fetch({:lookup, place_id}) do
+      {:ok, result}
+    else
+      :miss ->
+        with {:ok, coords} <- HereMaps.lookup(place_id) do
+          :ok = Cache.put({:lookup, place_id}, coords)
+          {:ok, coords}
+        end
+    end
+  end
+
   defp do_lookup(query, opts) do
     limit = Keyword.get(opts, :limit, 5)
     timeout = Keyword.get(opts, :timeout, 5_000)
@@ -51,7 +63,7 @@ defmodule Timesink.Locations do
 
       case Cache.fetch(key) do
         {:ok, result} -> {uncached, [result | acc]}
-        :error -> {[provider | uncached], acc}
+        :miss -> {[provider | uncached], acc}
       end
     end)
   end
