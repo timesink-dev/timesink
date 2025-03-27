@@ -126,5 +126,6 @@ module.exports = {
    **/
   daisyui: {
     themes: ["dark", "luxury", "sunset"],
+    logs: false
   },
 };
