@@ -23,6 +23,12 @@ defmodule TimesinkWeb.Admin.UserLive do
   def can?(_assigns, :index, _item), do: true
 
   @impl Backpex.LiveResource
+  def can?(_assigns, :show, _item), do: true
+
+  @impl Backpex.LiveResource
+  def can?(_assigns, :edit, _item), do: true
+
+  @impl Backpex.LiveResource
   def can?(_assigns, _action, _item), do: false
 
   @impl Backpex.LiveResource
@@ -31,10 +37,6 @@ defmodule TimesinkWeb.Admin.UserLive do
       email: %{
         module: Backpex.Fields.Text,
         label: "Email"
-      },
-      password: %{
-        module: Backpex.Fields.Text,
-        label: "Password"
       },
       username: %{
         module: Backpex.Fields.Text,
@@ -49,12 +51,14 @@ defmodule TimesinkWeb.Admin.UserLive do
         label: "Last Name"
       },
       roles: %{
-        module: Backpex.Fields.Select,
+        module: Backpex.Fields.MultiSelect,
         label: "Roles",
-        options: [
-          {"Admin", :admin},
-          {"Creator", :creator}
-        ]
+        options: fn _assigns ->
+          [
+            {"Admin", :admin},
+            {"Creator", :creator}
+          ]
+        end
       }
     ]
   end

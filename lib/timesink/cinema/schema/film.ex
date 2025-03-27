@@ -36,7 +36,7 @@ defmodule Timesink.Cinema.Film do
     field :format, Ecto.Enum, values: @formats
     field :synopsis, :string
 
-    many_to_many :genres, Timesink.Cinema.Genre, join_through: "film_genre"
+    many_to_many :genre, Timesink.Cinema.Genre, join_through: "film_genre"
 
     has_many :directors, Timesink.Cinema.FilmCreative, where: [role: :director]
     has_many :producers, Timesink.Cinema.FilmCreative, where: [role: :producer]
@@ -52,7 +52,6 @@ defmodule Timesink.Cinema.Film do
   def changeset(film, params, _metadata \\ []) do
     film
     |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
-    |> cast_assoc(:genres)
     |> validate_required([:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
     |> validate_length(:title, min: 1)
   end
