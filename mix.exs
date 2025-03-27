@@ -70,7 +70,8 @@ defmodule Timesink.MixProject do
       {:jason, "~> 1.4"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.6"},
-      {:timex, "~> 3.7"}
+      {:timex, "~> 3.7"},
+      {:mox, "~> 1.0", only: :test}
     ]
   end
 

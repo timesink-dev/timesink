@@ -24,6 +24,9 @@
 # export TIMESINK_TEST_S3_PREFIX="blobs"
 # export AUTH_TOKEN_SALT="example_auth_token_salt"
 
+# Location API
+# export HERE_MAPS_API_KEY
+
 
 # Base URLs
 # export PROD_URL

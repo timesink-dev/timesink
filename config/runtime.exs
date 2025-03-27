@@ -163,3 +163,5 @@ base_url =
   end
 
 config :timesink, base_url: base_url
+
+config :timesink, :here_maps_api_key, System.get_env("HERE_MAPS_API_KEY")

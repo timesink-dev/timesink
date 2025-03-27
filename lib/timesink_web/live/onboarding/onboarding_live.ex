@@ -40,11 +40,13 @@ defmodule TimesinkWeb.OnboardingLive do
         "org_position" => "Director",
         "birthdate" => "1990-05-14",
         "location" => %{
-          "locality" => "Los Angeles",
-          # Must be a valid ISO 3166 country code
-          "country" => "USA",
-          "lat" => "34.0522",
-          "lng" => "-118.2437"
+          "locality" => "",
+          "country_code" => "",
+          "state_code" => "",
+          "label" => "",
+          "country" => "",
+          "lat" => "",
+          "lng" => ""
         }
       }
     }
@@ -106,7 +108,6 @@ defmodule TimesinkWeb.OnboardingLive do
 
   def handle_info({:update_user_data, %{params: params}}, socket) do
     socket = assign(socket, user_data: Map.merge(socket.assigns.user_data, params))
-    IO.inspect(socket.assigns.user_data, label: "Updated user_data")
 
     {:noreply, socket}
   end
