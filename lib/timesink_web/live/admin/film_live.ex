@@ -38,7 +38,7 @@ defmodule TimesinkWeb.Admin.FilmLive do
         module: Backpex.Fields.Number,
         label: "Duration (min)"
       },
-      genre: %{
+      genres: %{
         module: Backpex.Fields.HasMany,
         label: "Genres",
         display_field: :name,
