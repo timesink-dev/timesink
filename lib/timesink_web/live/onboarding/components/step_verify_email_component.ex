@@ -164,7 +164,6 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
     end
   end
 
-  # Replace with your actual verification logic
   defp valid_verification_code?(code, email) do
     with {:ok, _token} <- Accounts.validate_email_verification_code(code, email) do
       {:ok, :valid_code}
