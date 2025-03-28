@@ -7,8 +7,37 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
      assign(socket,
        digits: ["", "", "", "", "", ""],
        verification_code: nil,
-       verification_error: nil
+       verification_error: nil,
+       resend_disabled_until: nil,
+       resend_timer: nil,
+       id: "verify_email_step"
      )}
+  end
+
+  def update(%{tick: true}, socket) do
+    with n when is_integer(n) and n > 1 <- socket.assigns.resend_timer do
+      Process.send_after(self(), :tick, 1000)
+      {:ok, assign(socket, :resend_timer, n - 1)}
+    else
+      1 ->
+        {:ok,
+         socket
+         |> assign(:resend_timer, nil)
+         |> assign(:resend_disabled_until, nil)}
+
+      _ ->
+        {:ok, socket}
+    end
+  end
+
+  def update(assigns, socket) do
+    socket =
+      socket
+      |> assign_new(:resend_disabled_until, fn -> nil end)
+      |> assign_new(:resend_timer, fn -> nil end)
+      |> assign(assigns)
+
+    {:ok, socket}
   end
 
   def render(assigns) do
@@ -51,16 +80,17 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
           </.button>
         </form>
 
-        <p class="text-gray-400 text-sm mt-6">
-          Didn't receive a code?
-          <button
-            phx-click="send_verification_email"
-            phx-value-email="aaronzomback@gmail.com"
-            class="text-neon-blue-lightest hover:underline"
-          >
-            Resend Code
-          </button>
-        </p>
+    <p class="text-gray-400 text-sm mt-6">
+    Didn't receive a code?
+    <button
+    phx-click="send_verification_email"
+    phx-target={@myself}
+    class={"text-neon-blue-lightest hover:underline #{if @resend_timer, do: "opacity-50 pointer-events-none"}"}
+    disabled={@resend_timer}
+    >
+    Resend Code<%= if @resend_timer, do: " (#{@resend_timer})" %>
+    </button>
+    </p>
       </div>
     </div>
     """
@@ -111,22 +141,29 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
     end
   end
 
-  # if String.length(verification_code) == 6 &&
-  #      Enum.all?(socket.assigns.digits, fn digit -> digit != "" end) do
-  #   # Here you would check if the verification code is valid
-  #   # For example, by checking against a stored code in your database
-  #   valid_code = valid_verification_code?(verification_code)
+  def handle_event("send_verification_email", _params, socket) do
+    email = socket.assigns.data["email"]
 
-  #   if valid_code do
-  #     # Mark the email as verified in your database
-  #     # Redirect to a success page or dashboard
-  #     {:noreply, push_redirect(socket, to: "/verified")}
-  #   else
-  #     {:noreply, assign(socket, verification_error: "Invalid verification code")}
-  #   end
-  # else
-  #   {:noreply, assign(socket, verification_error: "Please enter all 6 digits")}
-  # end
+    if email != "" do
+      with {:ok, :sent} <- Accounts.send_email_verification(email) do
+        disabled_until = DateTime.add(DateTime.utc_now(), 60, :second)
+        Process.send_after(self(), :tick, 1000)
+
+        socket =
+          socket
+          |> assign(:resend_disabled_until, disabled_until)
+          |> assign(:resend_timer, 60)
+
+        {:noreply, socket}
+      else
+        false ->
+          {:noreply, put_flash(socket, :error, "Missing email address.")}
+
+        {:error, reason} ->
+          {:noreply, put_flash(socket, :error, "Could not resend code: #{inspect(reason)}")}
+      end
+    end
+  end
 
   # Replace with your actual verification logic
   defp valid_verification_code?(code, email) do

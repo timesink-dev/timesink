@@ -51,7 +51,8 @@ defmodule Timesink.Accounts do
     {:ok, user}
   end
 
-  def send_email_verification(email) do
+  def send_email_verification(email) when is_binary(email) do
+    IO.inspect(email, label: "Toot Email")
     # Generate a 6-digit random code
     code = :rand.uniform(999_999) |> Integer.to_string() |> String.pad_leading(6, "0")
 
