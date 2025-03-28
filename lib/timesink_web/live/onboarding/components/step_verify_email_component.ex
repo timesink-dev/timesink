@@ -88,8 +88,8 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
             class={"text-neon-blue-lightest hover:underline #{if @resend_timer, do: "opacity-50 pointer-events-none"}"}
             disabled={@resend_timer}
           >
-    Resend Code<%= if @resend_timer, do: " (#{@resend_timer})" %>
-    </button>
+            Resend Code{if @resend_timer, do: " (#{@resend_timer})"}
+          </button>
         </p>
       </div>
     </div>
