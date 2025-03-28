@@ -80,17 +80,17 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
           </.button>
         </form>
 
-    <p class="text-gray-400 text-sm mt-6">
-    Didn't receive a code?
-    <button
-    phx-click="send_verification_email"
-    phx-target={@myself}
-    class={"text-neon-blue-lightest hover:underline #{if @resend_timer, do: "opacity-50 pointer-events-none"}"}
-    disabled={@resend_timer}
-    >
+        <p class="text-gray-400 text-sm mt-6">
+          Didn't receive a code?
+          <button
+            phx-click="send_verification_email"
+            phx-target={@myself}
+            class={"text-neon-blue-lightest hover:underline #{if @resend_timer, do: "opacity-50 pointer-events-none"}"}
+            disabled={@resend_timer}
+          >
     Resend Code<%= if @resend_timer, do: " (#{@resend_timer})" %>
     </button>
-    </p>
+        </p>
       </div>
     </div>
     """
