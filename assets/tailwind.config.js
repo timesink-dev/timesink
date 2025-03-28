@@ -11,6 +11,8 @@ module.exports = {
     "../lib/timesink_web.ex",
     "../lib/timesink_web/**/*.*ex",
     "../deps/backpex/**/*.*ex",
+    "../deps/backpex/assets/js/**/*.*js",
+
   ],
   theme: {
     extend: {
@@ -124,5 +126,6 @@ module.exports = {
    **/
   daisyui: {
     themes: ["dark", "luxury", "sunset"],
+    logs: false
   },
 };
