@@ -156,12 +156,11 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
 
         {:noreply, socket}
       else
-        false ->
-          {:noreply, put_flash(socket, :error, "Missing email address.")}
-
         {:error, reason} ->
           {:noreply, put_flash(socket, :error, "Could not resend code: #{inspect(reason)}")}
       end
+    else
+      {:noreply, put_flash(socket, :error, "Missing email address.")}
     end
   end
 

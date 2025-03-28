@@ -58,13 +58,6 @@ defmodule Timesink.Accounts do
 
     expires_at = DateTime.add(DateTime.utc_now(), @code_expiration_minutes * 60, :second)
 
-    # token_changeset =
-    #   Token.changeset(%Token{}, %{
-    #     kind: :email_verification,
-    #     secret: code,
-    #     expires_at: expires_at
-    #   })
-
     with {:ok, _token} <-
            Token.create(%{
              kind: :email_verification,
@@ -80,27 +73,6 @@ defmodule Timesink.Accounts do
     end
   end
 
-  # def validate_email_verification_code(code, user_id) do
-  #   # Check if the code exists in the database and is associated with the current user's email and hasn't expired
-  #   with {:ok, token} <-
-  #          Token.get_by(%{
-  #            secret: code,
-  #            kind: :email_verification,
-  #            status: :active,
-  #            #  expires_at: DateTime.utc_now(),
-  #            user_id: user_id
-  #          }) do
-  #     # invalidate the token
-  #     Token.update(token, %{
-  #       status: :used
-  #     })
-
-  #     {:ok, token}
-  #   else
-  #     _ -> {:error, :invalid_or_expired}
-  #   end
-  # end
-
   def validate_email_verification_code(code, email) do
     with {:ok, token} <-
            Token.get_by(%{
@@ -108,12 +80,9 @@ defmodule Timesink.Accounts do
              kind: :email_verification,
              status: :valid,
              email: email
-             # expires_at: DateTime.utc_now()
-           }) do
-      # invalidate the token
-      Token.update(token, %{
-        status: :invalid
-      })
+           }),
+         false <- Token.is_expired?(token) do
+      Token.invalidate_token(token)
 
       {:ok, token}
     else
