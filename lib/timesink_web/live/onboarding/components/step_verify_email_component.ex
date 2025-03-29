@@ -167,12 +167,4 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
       _ -> {:error, :invalid_or_expired}
     end
   end
-
-  # defp maybe_preserve(socket, key, assigns) do
-  #   if Map.has_key?(assigns, key) do
-  #     assign(socket, key, Map.get(assigns, key))
-  #   else
-  #     socket
-  #   end
-  # end
 end
