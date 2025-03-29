@@ -155,9 +155,6 @@ Hooks.CodeInputs =  {
     // Create the FormData
     const formData = new FormData(form);
     formData.append("_target", input.name);
-        // // Push change event to LiveView
-    // this.pushEventTo(form, "update-digit", Object.fromEntries(formData));
-
   },
   
   submitFormIfComplete() {
