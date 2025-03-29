@@ -5,7 +5,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
   def mount(socket) do
     {:ok,
      assign(socket,
-       digits: ["", "", "", "", "", ""],
+       digits: List.duplicate("", 6),
        verification_code: nil,
        verification_error: nil,
        resend_disabled_until: nil,
@@ -14,27 +14,26 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
      )}
   end
 
-  def update(%{tick: true}, socket) do
-    with n when is_integer(n) and n > 1 <- socket.assigns.resend_timer do
-      Process.send_after(self(), :tick, 1000)
-      {:ok, assign(socket, :resend_timer, n - 1)}
-    else
-      1 ->
-        {:ok,
-         socket
-         |> assign(:resend_timer, nil)
-         |> assign(:resend_disabled_until, nil)}
-
-      _ ->
-        {:ok, socket}
-    end
+  def update(%{tick: true}, %{assigns: %{resend_timer: 1}} = socket) do
+    {:ok,
+     socket
+     |> assign(:resend_timer, nil)
+     |> assign(:resend_disabled_until, nil)}
   end
 
+  def update(%{tick: true}, %{assigns: %{resend_timer: n}} = socket)
+      when is_integer(n) and n > 1 do
+    Process.send_after(self(), :tick, 1000)
+
+    {:ok, assign(socket, :resend_timer, n - 1)}
+  end
+
+  def update(%{tick: true}, socket), do: {:ok, socket}
+
+  # Fallback: any regular assigns from parent (first-time mount, etc)
   def update(assigns, socket) do
     socket =
       socket
-      |> assign_new(:resend_disabled_until, fn -> nil end)
-      |> assign_new(:resend_timer, fn -> nil end)
       |> assign(assigns)
 
     {:ok, socket}
@@ -50,7 +49,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
           Enter it below to verify your email.
         </p>
 
-        <form class="w-full" phx-submit="verify_code" phx-target={@myself}>
+        <form class="w-full" phx-submit="verify_code" phx-change="update-digit" phx-target={@myself}>
           <div class="flex gap-2 my-6" phx-hook="CodeInputs" id="code-entry">
             <%= for {digit, index} <- Enum.with_index(@digits) do %>
               <input
@@ -171,4 +170,12 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
       _ -> {:error, :invalid_or_expired}
     end
   end
+
+  # defp maybe_preserve(socket, key, assigns) do
+  #   if Map.has_key?(assigns, key) do
+  #     assign(socket, key, Map.get(assigns, key))
+  #   else
+  #     socket
+  #   end
+  # end
 end

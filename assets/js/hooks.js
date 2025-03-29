@@ -119,7 +119,7 @@ Hooks.CodeInputs =  {
         // Give a short delay to ensure the last input's change has propagated
         setTimeout(() => {
           form.requestSubmit();
-        }, 100);
+        }, 400);
       }
     }
   },
