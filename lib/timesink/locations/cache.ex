@@ -23,7 +23,6 @@ defmodule Timesink.Locations.Cache do
 
   def put(name \\ __MODULE__, key, value) do
     true = :ets.insert(tab_name(name), {key, value})
-    IO.inspect(tab_name(name), label: "put to cache tab_name")
     :ok
   end
 

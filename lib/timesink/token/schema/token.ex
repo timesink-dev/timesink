@@ -63,13 +63,13 @@ defmodule Timesink.Token do
 
   def is_valid?(token) do
     with {:ok, fetched_token} <- get(token.id) do
-      fetched_token.status == :valid && !token_expired?(fetched_token)
+      fetched_token.status == :valid && !is_expired?(fetched_token)
     else
       _ -> false
     end
   end
 
-  def token_expired?(token) do
+  def is_expired?(token) do
     token.expires_at && DateTime.compare(token.expires_at, DateTime.utc_now()) == :lt
   end
 
