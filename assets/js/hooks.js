@@ -10,6 +10,58 @@ Hooks.HideFlash = {
 };
 
 
+
+Hooks.Countdown = {
+mounted() {
+  this.started = false
+
+  this.handleEvent("start_countdown", ({ to, duration }) => {
+    if (this.el.id === to) {
+      this.startCountdown(duration)
+    }
+  })
+},
+  startCountdown(duration = 60) {
+    if (this.started) return
+    this.started = true
+
+    const el = this.el
+    const span = el.querySelector("[data-role='countdown-timer']")
+    const originalText = el.dataset.originalText || el.innerText
+
+    let remaining = duration
+
+    el.disabled = true
+    el.classList.add("opacity-50", "pointer-events-none")
+
+    const update = () => {
+      if (remaining <= 0) {
+        clearInterval(this._interval)
+        el.innerText = originalText
+        el.disabled = false
+        this.started = false
+        el.classList.remove("opacity-50", "pointer-events-none")
+      } else {
+        if (span) {
+          span.innerText = remaining
+        } else {
+          el.innerText = `${originalText} (${remaining}s)`
+        }
+        remaining--
+      }
+    }
+
+    this._interval = setInterval(update, 1000)
+    update()
+  },
+
+  destroyed() {
+    clearInterval(this._interval)
+  }
+}
+
+
+
 Hooks.AutoFocus = {
   mounted() {
     this.el.addEventListener("input", (e) => {
@@ -103,9 +155,9 @@ Hooks.CodeInputs =  {
     // Create the FormData
     const formData = new FormData(form);
     formData.append("_target", input.name);
-    
-    // Push change event to LiveView
-    this.pushEventTo(form, "update-digit", Object.fromEntries(formData));
+        // // Push change event to LiveView
+    // this.pushEventTo(form, "update-digit", Object.fromEntries(formData));
+
   },
   
   submitFormIfComplete() {

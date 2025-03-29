@@ -134,15 +134,6 @@ defmodule TimesinkWeb.OnboardingLive do
     end
   end
 
-  def handle_info(:tick, socket) do
-    send_update(TimesinkWeb.Onboarding.StepVerifyEmailComponent,
-      id: "verify_email_step",
-      tick: true
-    )
-
-    {:noreply, socket}
-  end
-
   defp determine_step(current_step, :next, verified_email) do
     next_step_index = Enum.find_index(@step_order, &(&1 == current_step)) + 1
 

@@ -7,34 +7,8 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
      assign(socket,
        digits: List.duplicate("", 6),
        verification_code: nil,
-       verification_error: nil,
-       resend_timer_count: nil,
-       id: "verify_email_step"
+       verification_error: nil
      )}
-  end
-
-  def update(%{tick: true}, %{assigns: %{resend_timer_count: 1}} = socket) do
-    {:ok,
-     socket
-     |> assign(:resend_timer_count, nil)}
-  end
-
-  def update(%{tick: true}, %{assigns: %{resend_timer_count: n}} = socket)
-      when is_integer(n) and n > 1 do
-    Process.send_after(self(), :tick, 1000)
-
-    {:ok, assign(socket, :resend_timer_count, n - 1)}
-  end
-
-  def update(%{tick: true}, socket), do: {:ok, socket}
-
-  # Fallback: any regular assigns from parent (first-time mount, etc)
-  def update(assigns, socket) do
-    socket =
-      socket
-      |> assign(assigns)
-
-    {:ok, socket}
   end
 
   def render(assigns) do
@@ -47,7 +21,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
           Enter it below to verify your email.
         </p>
 
-        <form class="w-full" phx-submit="verify_code" phx-change="update-digit" phx-target={@myself}>
+        <form class="w-full" phx-submit="verify_code" phx-target={@myself}>
           <div class="flex gap-2 my-6" phx-hook="CodeInputs" id="code-entry">
             <%= for {digit, index} <- Enum.with_index(@digits) do %>
               <input
@@ -80,36 +54,20 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
         <p class="text-gray-400 text-sm mt-6">
           Didn't receive a code?
           <button
+            id="resend-btn"
             phx-click="send_verification_email"
             phx-target={@myself}
-            class={"text-neon-blue-lightest hover:underline #{if @resend_timer_count, do: "opacity-50 pointer-events-none"}"}
-            disabled={@resend_timer_count}
+            phx-hook="Countdown"
+            data-original-text="Resend Code"
+            data-countdown="60"
+            class="text-neon-blue-lightest hover:underline"
           >
-            Resend Code{if @resend_timer_count, do: " (#{@resend_timer_count})"}
+            Resend Code
           </button>
         </p>
       </div>
     </div>
     """
-  end
-
-  def handle_event("update-digit", params, socket) do
-    # Extract only the keys that match "digit-#" pattern
-    digit_params =
-      params
-      |> Enum.filter(fn {key, _value} -> Regex.match?(~r/^digit-\d+$/, key) end)
-      |> Enum.sort_by(fn {key, _} ->
-        # Extract the digit index from "digit-#" key and convert to integer for sorting
-        [_, index] = Regex.run(~r/digit-(\d+)/, key)
-        String.to_integer(index)
-      end)
-      # Extract just the digit value
-      |> Enum.map(fn {_key, value} -> String.slice(value, 0, 1) end)
-
-    # Ensure the list has exactly 6 elements, filling with "" if necessary
-    updated_digits = digit_params ++ List.duplicate("", max(0, 6 - length(digit_params)))
-
-    {:noreply, assign(socket, digits: updated_digits)}
   end
 
   def handle_event(
@@ -143,12 +101,8 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
 
     if email != "" do
       with {:ok, :sent} <- Accounts.send_email_verification(email) do
-        disabled_until = DateTime.add(DateTime.utc_now(), 60, :second)
-        Process.send_after(self(), :tick, 1000)
-
         socket =
-          socket
-          |> assign(:resend_timer_count, 60)
+          socket |> push_event("start_countdown", %{to: "resend-btn", duration: 60})
 
         {:noreply, socket}
       else
