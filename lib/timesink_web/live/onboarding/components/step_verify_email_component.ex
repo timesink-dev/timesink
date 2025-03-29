@@ -8,24 +8,22 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
        digits: List.duplicate("", 6),
        verification_code: nil,
        verification_error: nil,
-       resend_disabled_until: nil,
-       resend_timer: nil,
+       resend_timer_count: nil,
        id: "verify_email_step"
      )}
   end
 
-  def update(%{tick: true}, %{assigns: %{resend_timer: 1}} = socket) do
+  def update(%{tick: true}, %{assigns: %{resend_timer_count: 1}} = socket) do
     {:ok,
      socket
-     |> assign(:resend_timer, nil)
-     |> assign(:resend_disabled_until, nil)}
+     |> assign(:resend_timer_count, nil)}
   end
 
-  def update(%{tick: true}, %{assigns: %{resend_timer: n}} = socket)
+  def update(%{tick: true}, %{assigns: %{resend_timer_count: n}} = socket)
       when is_integer(n) and n > 1 do
     Process.send_after(self(), :tick, 1000)
 
-    {:ok, assign(socket, :resend_timer, n - 1)}
+    {:ok, assign(socket, :resend_timer_count, n - 1)}
   end
 
   def update(%{tick: true}, socket), do: {:ok, socket}
@@ -84,10 +82,10 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
           <button
             phx-click="send_verification_email"
             phx-target={@myself}
-            class={"text-neon-blue-lightest hover:underline #{if @resend_timer, do: "opacity-50 pointer-events-none"}"}
-            disabled={@resend_timer}
+            class={"text-neon-blue-lightest hover:underline #{if @resend_timer_count, do: "opacity-50 pointer-events-none"}"}
+            disabled={@resend_timer_count}
           >
-            Resend Code{if @resend_timer, do: " (#{@resend_timer})"}
+            Resend Code{if @resend_timer_count, do: " (#{@resend_timer_count})"}
           </button>
         </p>
       </div>
@@ -150,8 +148,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
 
         socket =
           socket
-          |> assign(:resend_disabled_until, disabled_until)
-          |> assign(:resend_timer, 60)
+          |> assign(:resend_timer_count, 60)
 
         {:noreply, socket}
       else
