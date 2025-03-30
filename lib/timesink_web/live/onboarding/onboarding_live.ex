@@ -27,39 +27,17 @@ defmodule TimesinkWeb.OnboardingLive do
   def mount(_params, session, socket) do
     invite_token = session["invite_token"]
 
-    user_data = %{
-      "email" => "",
-      "password" => "",
-      "first_name" => "",
-      "last_name" => "",
-      "username" => "",
-      "profile" => %{
-        "avatar_url" => nil,
-        "bio" => "Film enthusiast and creator.",
-        "org_name" => "Film Society",
-        "org_position" => "Director",
-        "birthdate" => "1990-05-14",
-        "location" => %{
-          "locality" => "",
-          "country_code" => "",
-          "state_code" => "",
-          "label" => "",
-          "country" => "",
-          "lat" => "",
-          "lng" => ""
-        }
-      }
-    }
+    socket =
+      socket
+      |> assign_new(:user_data, fn -> initial_user_data() end)
+      |> assign_new(:verified_email, fn -> false end)
+      |> assign(:invite_token, invite_token)
+      |> assign(:steps, @steps)
+      |> assign(:step, hd(@step_order))
 
-    {:ok,
-     socket
-     |> assign(
-       invite_token: invite_token,
-       step: @step_order |> hd(),
-       verified_email: false,
-       user_data: user_data,
-       steps: @steps
-     ), layout: {TimesinkWeb.Layouts, :empty}}
+    IO.inspect(socket.assigns.user_data, label: "❌ User Data")
+
+    {:ok, socket, layout: {TimesinkWeb.Layouts, :empty}}
   end
 
   def render(assigns) do
@@ -76,28 +54,36 @@ defmodule TimesinkWeb.OnboardingLive do
 
   def handle_params(params, _uri, socket) do
     invite_token = socket.assigns.invite_token
+    user_data = socket.assigns.user_data
 
-    if Token.is_valid?(invite_token) do
-      step_from_url =
-        params["step"]
-        |> case do
-          nil -> @step_order |> hd()
-          step -> String.to_existing_atom(step)
-        end
+    current_step =
+      case params["step"] do
+        nil -> :email
+        step -> String.to_existing_atom(step)
+      end
 
-      # Prevent users from manually going back to verify_email if already verified
-      new_step =
-        case {step_from_url, socket.assigns.verified_email} do
-          {:verify_email, true} -> :name
-          _ -> step_from_url
-        end
-
-      {:noreply, assign(socket, step: new_step)}
+    with true <- Token.is_valid?(invite_token),
+         false <- missing_data?(user_data),
+         step <- get_step_from_params(params, socket.assigns.verified_email) do
+      {:noreply, assign(socket, step: step)}
     else
-      {:noreply,
-       socket
-       |> put_flash(:error, "Invalid invite token. Please check the link and try again.")
-       |> redirect(to: "/")}
+      # invalid token
+      false ->
+        {:noreply,
+         socket
+         |> put_flash(
+           :error,
+           "Invalid or expired invite token. Please check the link and try again."
+         )
+         |> redirect(to: "/")}
+
+      # missing data and not already on first step
+      true when current_step != hd(@step_order) ->
+        {:noreply, push_patch(socket, to: "/onboarding?step=#{hd(@step_order)}")}
+
+      # missing data but already on the first step
+      true ->
+        {:noreply, assign(socket, step: hd(@step_order))}
     end
   end
 
@@ -139,7 +125,7 @@ defmodule TimesinkWeb.OnboardingLive do
 
     case Enum.at(@step_order, next_step_index) do
       # Skip verify_email if already verified
-      :verify_email when verified_email -> :name
+      :verify_email when verified_email -> Enum.at(@step_order, next_step_index + 1)
       step when not is_nil(step) -> step
       # Stay on the last step if already there
       _ -> current_step
@@ -154,4 +140,43 @@ defmodule TimesinkWeb.OnboardingLive do
   end
 
   defp determine_step(_, step, _), do: String.to_existing_atom(step)
+
+  defp get_step_from_params(%{"step" => step}, true) when step == "verify_email",
+    do: :name
+
+  defp get_step_from_params(%{"step" => step}, _verified_email),
+    do: String.to_existing_atom(step)
+
+  defp get_step_from_params(_params, _verified_email),
+    do: :email
+
+  defp missing_data?(%{"email" => email}) when is_binary(email),
+    do: String.trim(email) == ""
+
+  defp missing_data?(_), do: true
+
+  defp initial_user_data do
+    %{
+      "email" => "",
+      "password" => "",
+      "first_name" => "",
+      "last_name" => "",
+      "username" => "",
+      "profile" => %{
+        "bio" => nil,
+        "org_name" => nil,
+        "org_position" => nil,
+        "birthdate" => nil,
+        "location" => %{
+          "locality" => "",
+          "country_code" => "",
+          "state_code" => "",
+          "label" => "",
+          "country" => "",
+          "lat" => "",
+          "lng" => ""
+        }
+      }
+    }
+  end
 end
