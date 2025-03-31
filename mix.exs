@@ -37,7 +37,7 @@ defmodule Timesink.MixProject do
       {:hackney, "~> 1.23"},
       {:sweet_xml, "~> 0.7.5"},
       {:argon2_elixir, "~> 4.1"},
-      {:backpex, "~> 0.11.0"},
+      {:backpex, "~> 0.12.0"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:resend, "~> 0.4.4"},
       {:oban, "~> 2.19"},
@@ -49,7 +49,7 @@ defmodule Timesink.MixProject do
       {:phoenix_html, "~> 4.2"},
       {:phoenix_live_reload, "~> 1.5", only: :dev},
       {:phoenix_live_view, "~> 1.0.5", override: true},
-      {:floki, ">= 0.37.0", only: :test},
+      {:floki, ">= 0.37.1", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.6"},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
@@ -65,13 +65,13 @@ defmodule Timesink.MixProject do
       {:swoosh, "~> 1.18"},
       {:finch, "~> 0.19"},
       {:telemetry_metrics, "~> 1.1"},
-      {:telemetry_poller, "~> 1.1"},
+      {:telemetry_poller, "~> 1.2"},
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.4"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.6"},
       {:timex, "~> 3.7"},
-      {:mox, "~> 1.0", only: :test}
+      {:mox, "~> 1.2", only: :test}
     ]
   end
 
