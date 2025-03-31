@@ -318,6 +318,7 @@ defmodule TimesinkWeb.CoreComponents do
   attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
   attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
+  slot :addon_icon_right, doc: "Icon slot displayed inside the right edge of the input"
 
   attr :rest, :global,
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
@@ -400,20 +401,29 @@ defmodule TimesinkWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div class={@class}>
+    <div class={["relative", @class]}>
       <.label for={@id}>{@label}</.label>
-      <input
-        type={@type}
-        name={@name}
-        id={@id}
-        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-        class={[
-          @input_class,
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
-        ]}
-        {@rest}
-      />
+
+      <div class="relative">
+        <input
+          type={@type}
+          name={@name}
+          id={@id}
+          value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+          class={[
+            @input_class,
+            @errors == [] && "border-zinc-300 focus:border-zinc-400",
+            @errors != [] && "border-rose-400 focus:border-rose-400",
+            @addon_icon_right != [] && "pr-10"
+          ]}
+          {@rest}
+        />
+
+        <div :if={@addon_icon_right != []} class="absolute inset-y-0 right-3 flex items-center">
+          {render_slot(@addon_icon_right)}
+        </div>
+      </div>
+
       <.error :for={msg <- @errors} class={@error_class}>{msg}</.error>
     </div>
     """
@@ -441,7 +451,7 @@ defmodule TimesinkWeb.CoreComponents do
 
   def error(assigns) do
     ~H"""
-    <p class={["mt-1 flex gap-3 text-sm leading-6 text-neon-red-primary", @class]}>
+    <p class={["mt-1 flex gap-3 text-sm leading-6 text-neon-red-light", @class]}>
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
       {render_slot(@inner_block)}
     </p>
