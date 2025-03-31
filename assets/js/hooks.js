@@ -11,6 +11,31 @@ Hooks.HideFlash = {
 
 
 
+Hooks.DigitsOnlyAutoTab = {
+  mounted() {
+    this.el.addEventListener("keydown", (e) => {
+      const allowed = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete"]
+      if (!/^\d$/.test(e.key) && !allowed.includes(e.key)) {
+        e.preventDefault()
+      }
+    })
+
+    this.el.addEventListener("input", (e) => {
+      // Optional: auto-tab on max length
+      const maxLength = this.el.getAttribute("maxlength")
+      if (maxLength && e.target.value.length >= parseInt(maxLength)) {
+        const form = this.el.form
+        const elements = Array.from(form.elements)
+        const index = elements.indexOf(this.el)
+        if (index !== -1 && elements[index + 1]) {
+          elements[index + 1].focus()
+        }
+      }
+    })
+  }
+}
+
+
 Hooks.Countdown = {
 mounted() {
   this.started = false

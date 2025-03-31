@@ -27,25 +27,36 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
           for={@form}
           as="data"
         >
-          <div>
-            <label class="block text-sm font-medium text-gray-300">@</label>
+          <div class="relative">
+            <label class="block text-sm font-medium text-gray-300">Username</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-mystery-white text-lg z-20">
+                @
+              </span>
+              <.input
+                type="text"
+                name="username"
+                phx-debounce="700"
+                required
+                field={@form[:username]}
+                input_class="w-full pl-9 pr-10 py-3 text-mystery-white border-none bg-dark-theater-primary rounded"
+                error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
+                placeholder="Claim your unique handle"
+              >
+                <:addon_icon_right :if={username_valid?(@form, @error)}>
+                  <.icon name="hero-check-circle-mini" class="h-5 w-5 text-green-500" />
+                </:addon_icon_right>
+              </.input>
+            </div>
 
-            <.input
-              type="text"
-              name="username"
-              phx-debounce="700"
-              required
-              field={@form[:username]}
-              input_class="w-full p-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-              error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
-              placeholder="Claim your username (e.g. @tspresents)"
-            />
-
-            <%= if input_value(@form, :username) != "" && @error == nil do %>
-              <.icon name="hero-check-circle-mini" class="h-6 w-6 text-green-500" />
-            <% end %>
+            <p
+              class="text-sm mt-2 text-left text-dark-theater-lightest truncate w-full overflow-hidden whitespace-nowrap"
+              title={"timesinkpresents.com/@" <> (input_value(@form, :username) || "yourhandle")}
+            >
+              timesinkpresents.com/@{input_value(@form, :username) || "yourhandle"}
+            </p>
             <%= if input_value(@form, :username) != "" && @error do %>
-              <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light">
+              <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light mt-2">
                 <.icon name="hero-exclamation-circle-mini" class="h-6 w-6" />
                 <p class="text-md mt-2">
                   {@error}
@@ -62,8 +73,9 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
             </div>
           </:actions>
         </.simple_form>
+
         <.button color="none" class="mt-6 p-0" phx-click="go_back" phx-target={@myself}>
-          <.icon name="hero-arrow-left-circle" class="h-6 w-6" />
+          ← Back
         </.button>
       </div>
     </div>
@@ -122,5 +134,11 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
   def handle_event("go_back", _unsigned_params, socket) do
     send(self(), {:go_to_step, :back})
     {:noreply, socket}
+  end
+
+  defp username_valid?(form, error) do
+    input_value(form, :username) != "" and
+      error == nil and
+      !Keyword.has_key?(form.source.errors, :username)
   end
 end

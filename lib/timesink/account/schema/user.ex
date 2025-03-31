@@ -62,6 +62,7 @@ defmodule Timesink.Accounts.User do
       with: &Accounts.Profile.changeset/2,
       message: "Profile is required"
     )
+    |> trim_fields([:email, :username, :first_name, :last_name])
     |> validate_required(@required_fields)
     |> validate_format(:email, ~r/@/)
     |> unique_constraint(:email, message: "Email already exists")
@@ -76,6 +77,7 @@ defmodule Timesink.Accounts.User do
   def email_password_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> cast(params, [:email, :password])
+    |> trim_fields([:email, :password])
     |> validate_required([:email, :password])
     |> validate_format(:email, ~r/@/, message: "Invalid email format")
     |> unique_constraint(:email, message: "Email already exists")
@@ -85,6 +87,7 @@ defmodule Timesink.Accounts.User do
   def name_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> cast(params, [:first_name, :last_name])
+    |> trim_fields([:first_name, :last_name])
     |> validate_required([:first_name, :last_name])
     |> validate_length(:first_name, min: 1)
     |> validate_length(:last_name, min: 1)
@@ -93,6 +96,7 @@ defmodule Timesink.Accounts.User do
   def username_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> cast(params, [:username])
+    |> trim_fields([:username])
     |> validate_required([:username])
     |> validate_length(:username, min: 3, max: 32)
     |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{3,32}$/, message: "Invalid username format")
@@ -144,4 +148,10 @@ defmodule Timesink.Accounts.User do
   end
 
   def valid_password?(_, _), do: Argon2.no_user_verify()
+
+  defp trim_fields(changeset, fields) do
+    Enum.reduce(fields, changeset, fn field, acc ->
+      update_change(acc, field, fn val -> String.trim(val || "") end)
+    end)
+  end
 end

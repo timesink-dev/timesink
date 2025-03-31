@@ -10,16 +10,17 @@ defmodule TimesinkWeb.OnboardingLive do
     StepEmailComponent,
     StepVerifyEmailComponent,
     StepNameComponent,
+    StepBirthdateComponent,
     StepLocationComponent,
     StepUsernameComponent
   }
 
-  # Define step order and component mappings
-  @step_order [:email, :verify_email, :name, :location, :username]
+  @step_order [:birthdate, :location, :username]
   @steps %{
     email: StepEmailComponent,
     verify_email: StepVerifyEmailComponent,
     name: StepNameComponent,
+    birthdate: StepBirthdateComponent,
     location: StepLocationComponent,
     username: StepUsernameComponent
   }
@@ -93,6 +94,7 @@ defmodule TimesinkWeb.OnboardingLive do
   end
 
   def handle_info({:update_user_data, %{params: params}}, socket) do
+    IO.inspect(params, label: "❌ User Data Update")
     socket = assign(socket, user_data: Map.merge(socket.assigns.user_data, params))
 
     {:noreply, socket}

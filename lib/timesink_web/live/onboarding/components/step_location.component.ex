@@ -79,7 +79,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
         </.simple_form>
 
         <.button color="none" class="mt-6 p-0" phx-click="go_back" phx-target={@myself}>
-          <.icon name="hero-arrow-left-circle" class="h-6 w-6" />
+          ← Back
         </.button>
       </div>
     </div>
