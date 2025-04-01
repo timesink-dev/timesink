@@ -39,7 +39,7 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
                 name="first_name"
                 required
                 value={@data["first_name"]}
-                input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
+                input_class="w-full p-3 rounded text-mystery-white border-none"
                 placeholder="Enter your first name"
               />
             </div>
@@ -50,7 +50,7 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
                 name="last_name"
                 required
                 value={@data["last_name"]}
-                input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
+                input_class="w-full p-3 rounded text-mystery-white border-none"
                 placeholder="Enter your last name"
               />
             </div>

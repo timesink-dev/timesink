@@ -47,7 +47,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
               required
               phx-debounce="300"
               placeholder="Start typing your city (e.g., Los Angeles)"
-              class="w-full p-3 rounded text-white border-none bg-dark-theater-primary"
+              class="w-full p-3 rounded text-white border-none"
               autocomplete="off"
             />
           </div>

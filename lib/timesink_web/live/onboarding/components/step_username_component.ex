@@ -39,7 +39,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
                 phx-debounce="700"
                 required
                 field={@form[:username]}
-                input_class="w-full pl-9 pr-10 py-3 text-mystery-white border-none bg-dark-theater-primary rounded"
+                input_class="w-full pl-9 pr-10 py-3 text-mystery-white border-none"
                 error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
                 placeholder="Claim your unique handle"
               >

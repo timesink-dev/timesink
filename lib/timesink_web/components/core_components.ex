@@ -414,7 +414,8 @@ defmodule TimesinkWeb.CoreComponents do
             @input_class,
             @errors == [] && "border-zinc-300 focus:border-zinc-400",
             @errors != [] && "border-rose-400 focus:border-rose-400",
-            @addon_icon_right != [] && "pr-10"
+            @addon_icon_right != [] && "pr-10",
+            "rounded-lg"
           ]}
           {@rest}
         />

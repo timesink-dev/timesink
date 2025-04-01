@@ -34,7 +34,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
             phx-change="validate_email"
             required
             field={@form[:email]}
-            input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
+            input_class="w-full p-3 rounded text-mystery-white border-none"
             placeholder="Enter your email"
           >
             <:addon_icon_right :if={email_valid?(@form, @error)}>
@@ -49,7 +49,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
               name="password"
               field={@form[:password]}
               required
-              input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
+              input_class="w-full p-3 rounded text-mystery-white border-none"
               placeholder="Create a password"
             />
           </div>
@@ -61,7 +61,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
               name="password_confirmation"
               value=""
               required
-              input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
+              input_class="w-full p-3 rounded text-mystery-white border-none"
               placeholder="Confirm your password"
             />
           </div>
@@ -160,14 +160,14 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
       !Keyword.has_key?(form.source.errors, :email)
   end
 
-  def handle_event("validate_password_strength", _unsigned_params, _socket) do
-    # Passwords should conform to the following rules
-    # - At least 8 characters
-    # - At least 1 uppercase letter
-    # - At least 1 lowercase letter
-    # - At least 1 special character
+  # def handle_event("validate_password_strength", _unsigned_params, _socket) do
+  # Passwords should conform to the following rules
+  # - At least 8 characters
+  # - At least 1 uppercase letter
+  # - At least 1 lowercase letter
+  # - At least 1 special character
 
-    # The following regex pattern enforces the above rules
-    # ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$
-  end
+  # The following regex pattern enforces the above rules
+  # ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$
+  # end
 end

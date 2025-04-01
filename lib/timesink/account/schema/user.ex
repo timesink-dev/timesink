@@ -99,7 +99,10 @@ defmodule Timesink.Accounts.User do
     |> trim_fields([:username])
     |> validate_required([:username])
     |> validate_length(:username, min: 3, max: 32)
-    |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{3,32}$/, message: "Invalid username format")
+    |> validate_format(:username, ~r/^[a-zA-Z0-9_-]{3,32}$/,
+      message:
+        "Invalid username format. Special characters like @, #, $, %, etc. are not allowed."
+    )
     |> unique_constraint(:username, message: "Username is already taken")
   end
 

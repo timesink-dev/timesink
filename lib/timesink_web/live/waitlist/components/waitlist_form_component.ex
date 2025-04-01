@@ -14,8 +14,8 @@ defmodule TimesinkWeb.WaitlistFormComponent do
     <div class="min-h-screen bg-backroom-black flex flex-col items-center justify-center px-4 pt-16 pb-24 space-y-6">
       <!-- Card Container -->
       <div class="w-full max-w-2xl rounded-2xl bg-backroom-black bg-opacity-70 border border-dark-theater-medium p-10">
-
-        <!-- Logo / Tagline -->
+        
+    <!-- Logo / Tagline -->
         <div class="text-center mb-8">
           <a href={~p"/"}>
             <h1 class="text-4xl font-brand text-white tracking-tight leading-none">
@@ -23,11 +23,12 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             </h1>
           </a>
           <p class="text-sm text-mystery-white mt-2 max-w-lg mx-auto">
-            We sift through the noise. You get the signal. <br />  Access opens in carefully curated waves.
+            We sift through the noise. You get the signal. <br />
+            Access opens in carefully curated waves.
           </p>
         </div>
-
-        <!-- Waitlist Form -->
+        
+    <!-- Waitlist Form -->
         <.simple_form
           as="applicant"
           for={@form}
@@ -80,14 +81,16 @@ defmodule TimesinkWeb.WaitlistFormComponent do
           </p>
         </div> --%>
       </div>
-
-      <!-- Status Block Outside Card -->
+      
+    <!-- Status Block Outside Card -->
       <div class="text-center text-mystery-white text-sm space-y-1 max-w-lg px-4">
         <%= if @spots_remaining > 0 do %>
           <p>
-            🎟️ <strong class="text-mystery-white">
-              <%= @spots_remaining %> spot<%= if @spots_remaining > 1, do: "s" %>
-            </strong> remaining in this drop.
+            🎟️
+            <strong class="text-mystery-white">
+              {@spots_remaining} spot{if @spots_remaining > 1, do: "s"}
+            </strong>
+            remaining in this drop.
           </p>
           <p>
             Join now to secure your place in this next wave of invites.

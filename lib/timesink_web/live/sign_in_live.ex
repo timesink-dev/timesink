@@ -18,8 +18,8 @@ defmodule TimesinkWeb.SignInLive do
           <p class="text-4xl font-brand text-white tracking-tight">TimeSink</p>
           <p class="text-center text-sm text-dark-theater-lightest mt-2">Welcome back</p>
         </a>
-
-        <!-- Sign-in Form -->
+        
+    <!-- Sign-in Form -->
         <.simple_form
           for={@form}
           as="user"
@@ -44,10 +44,7 @@ defmodule TimesinkWeb.SignInLive do
             required
           />
           <div class="flex justify-between text-sm">
-            <.link
-              navigate="/forgot_password"
-              class="text-brand hover:underline"
-            >
+            <.link navigate="/forgot_password" class="text-brand hover:underline">
               Forgot password?
             </.link>
           </div>
@@ -60,8 +57,8 @@ defmodule TimesinkWeb.SignInLive do
             </.button>
           </:actions>
         </.simple_form>
-
-        <!-- Footer -->
+        
+    <!-- Footer -->
         <div class="text-center mt-6 text-sm text-dark-theater-lightest">
           Not a member?
           <.link navigate={~p"/join"} class="text-brand hover:underline">

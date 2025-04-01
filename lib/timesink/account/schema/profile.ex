@@ -55,15 +55,13 @@ defmodule Timesink.Accounts.Profile do
   def birthdate_changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
     |> cast(params, [:birthdate])
-    |> validate_birthdate()
+    |> validate_required([:birthdate])
+    |> validate_date()
   end
 
-  defp validate_birthdate(changeset) do
+  defp validate_date(changeset) do
     validate_change(changeset, :birthdate, fn :birthdate, date ->
       cond do
-        is_nil(date) ->
-          [birthdate: "Birthdate is required"]
-
         Date.compare(date, Date.utc_today()) == :gt ->
           [birthdate: "You can’t be born in the future — unless you're in a sci-fi film."]
 
