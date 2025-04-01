@@ -1,7 +1,6 @@
 defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
   use TimesinkWeb, :live_component
 
-  import Phoenix.HTML.Form
   alias Timesink.Accounts.Profile
   import Ecto.Changeset
 
