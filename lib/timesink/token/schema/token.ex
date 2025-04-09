@@ -39,7 +39,7 @@ defmodule Timesink.Token do
     field :kind, Ecto.Enum, values: @kind
 
     # the secret field is the actual token value
-    field :secret, :string
+    field :secret, :string, redact: true
 
     field :status, Ecto.Enum, values: @status, default: :valid
     field :expires_at, :utc_datetime
@@ -62,10 +62,14 @@ defmodule Timesink.Token do
   end
 
   def is_valid?(token) do
-    token.status == :valid && !token_expired?(token)
+    with {:ok, fetched_token} <- get(token.id) do
+      fetched_token.status == :valid && !is_expired?(fetched_token)
+    else
+      _ -> false
+    end
   end
 
-  def token_expired?(token) do
+  def is_expired?(token) do
     token.expires_at && DateTime.compare(token.expires_at, DateTime.utc_now()) == :lt
   end
 
@@ -75,5 +79,11 @@ defmodule Timesink.Token do
     else
       _ -> {:error, :invalid}
     end
+  end
+
+  def invalidate_token(token) do
+    update(token, %{
+      status: :invalid
+    })
   end
 end

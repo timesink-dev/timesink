@@ -261,27 +261,31 @@ defmodule Timesink.Accounts.Location do
   @type t :: %{
           __struct__: __MODULE__,
           locality: String.t(),
-          country: atom(),
+          country_code: atom(),
+          country: String.t(),
+          state_code: String.t(),
+          label: String.t(),
           lat: float(),
           lng: float()
         }
 
   embedded_schema do
     field :locality, :string
-    field :country, Ecto.Enum, values: @iso3166_countries
+    field :country_code, Ecto.Enum, values: @iso3166_countries
+    field :state_code, :string
     field :lat, :float
     field :lng, :float
+    field :country, :string
+    field :label, :string
   end
 
-  @required_fields ~w(locality country lat lng)a
+  @required_fields ~w(locality country_code lat lng label)a
 
-  @spec changeset(profile :: t(), params :: %{optional(atom()) => term()}) ::
-          Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
-    |> cast(params, [:locality, :country, :lat, :lng])
+    |> cast(params, [:locality, :country_code, :country, :lat, :lng, :label, :state_code])
     |> validate_required(@required_fields)
-    |> validate_inclusion(:lat, -90..90)
-    |> validate_inclusion(:lng, -180..180)
+    |> validate_number(:lat, greater_than_or_equal_to: -90, less_than_or_equal_to: 90)
+    |> validate_number(:lng, greater_than_or_equal_to: -180, less_than_or_equal_to: 180)
   end
 end

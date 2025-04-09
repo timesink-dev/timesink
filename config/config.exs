@@ -89,3 +89,9 @@ config :timesink, Oban,
      ]}
   ],
   queues: [mailer: 10, waitlist_invites: 10, waitlist_processing: 10]
+
+config :timesink, :finch, Timesink.Finch
+
+config :timesink, :http_client, Timesink.HTTP.FinchClient
+
+config :timesink, :here_maps_api_key, System.get_env("HERE_MAPS_API_KEY")

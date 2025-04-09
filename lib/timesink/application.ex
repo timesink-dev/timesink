@@ -17,7 +17,9 @@ defmodule Timesink.Application do
       # Start a worker by calling: Timesink.Worker.start_link(arg)
       # {Timesink.Worker, arg},
       {Oban, Application.fetch_env!(:timesink, Oban)},
-      TimesinkWeb.Endpoint
+      TimesinkWeb.Endpoint,
+      {Timesink.Locations.Cache, name: Timesink.Locations.Cache},
+      {Task.Supervisor, name: Timesink.TaskSupervisor}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

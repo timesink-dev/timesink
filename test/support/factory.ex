@@ -73,7 +73,10 @@ defmodule Timesink.Factory do
   def location_factory do
     %Timesink.Accounts.Location{
       locality: Faker.Address.city(),
-      country: Enum.random(Timesink.Accounts.Location.iso3166_countries()),
+      country: Faker.Address.country(),
+      country_code: Enum.random(Timesink.Accounts.Location.iso3166_countries()),
+      state_code: Faker.Address.state_abbr(),
+      label: "#{Faker.Address.city()}, #{Faker.Address.state_abbr()}, #{Faker.Address.country()}",
       lat: Faker.Address.latitude(),
       lng: Faker.Address.longitude()
     }

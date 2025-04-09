@@ -69,7 +69,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
               Missed this round? No worries!
             </p>
             <p>
-              Secure your spot on the waitlist now and be first in line when the next batch opens!
+              Secure your spot on the waitlist now to be first in line when the next batch opens!
             </p>
           </span>
         <% end %>
