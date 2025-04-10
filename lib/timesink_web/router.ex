@@ -40,7 +40,7 @@ defmodule TimesinkWeb.Router do
 
     # Mux webhooks
     get "/webhooks/mux.com", MuxController, :it_works
-    post "/webhooks/mux.com", MuxController, :webhook
+    post "/webhooks/mux.com/:webhook_key", MuxController, :webhook
   end
 
   scope "/", TimesinkWeb do
