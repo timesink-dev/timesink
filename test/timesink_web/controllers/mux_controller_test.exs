@@ -4,7 +4,22 @@ defmodule TimesinkWeb.MuxControllerTest do
   alias Timesink.Storage.Blob
   alias Timesink.Storage.MuxUpload
 
-  describe "POST /webhooks/mux.com" do
+  @webhook_key "MUX_WEBHOOK_KEY/DEV"
+
+  describe "POST /webhooks/mux.com/:webhook_key" do
+    test "requires a valid webhook key", %{conn: conn} do
+      params = %{
+        "type" => "video.asset.created",
+        "data" => %{
+          "id" => Ecto.UUID.generate()
+        }
+      }
+
+      conn = post(conn, ~p"/api/webhooks/mux.com/#{Ecto.UUID.generate()}", params)
+
+      assert %Plug.Conn{status: 403} = conn
+    end
+
     test "creates a new Blob on 'video.asset.created'", %{conn: conn} do
       asset_id = Ecto.UUID.generate()
 
@@ -15,7 +30,7 @@ defmodule TimesinkWeb.MuxControllerTest do
         }
       }
 
-      conn = post(conn, ~p"/api/webhooks/mux.com", params)
+      conn = post(conn, ~p"/api/webhooks/mux.com/#{@webhook_key}", params)
 
       assert %Plug.Conn{status: 200} = conn
       assert {:ok, %Blob{uri: ^asset_id}} = Blob.get_by(uri: asset_id)
@@ -37,7 +52,7 @@ defmodule TimesinkWeb.MuxControllerTest do
           }
         }
 
-        resp_conn = post(conn, ~p"/api/webhooks/mux.com", params)
+        resp_conn = post(conn, ~p"/api/webhooks/mux.com/#{@webhook_key}", params)
 
         assert %Plug.Conn{status: 200} = resp_conn
         assert {:ok, %{status: ^status}} = MuxUpload.get_by(mux_id: up.mux_id)

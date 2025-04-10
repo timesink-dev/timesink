@@ -15,9 +15,20 @@ defmodule TimesinkWeb.MuxController do
   def webhook(conn, params) do
     Logger.debug("Mux webhook received", service: :mux, params: params)
 
-    handle_webhook(params)
+    webhook_key =
+      Application.get_env(:timesink, Timesink.Storage.Mux)
+      |> Keyword.get(:webhook_key)
 
-    conn |> resp(200, "OK")
+    case params["webhook_key"] do
+      ^webhook_key ->
+        handle_webhook(params)
+
+        conn |> resp(200, "OK")
+
+      _ ->
+        Logger.info("Invalid Mux webhook key", service: :mux, params: params)
+        conn |> resp(403, "Forbidden")
+    end
   end
 
   @doc """
@@ -41,7 +52,7 @@ defmodule TimesinkWeb.MuxController do
       with {:ok, blob} <- Blob.create(new_blob_params),
            {:ok, mux_upload} <- MuxUpload.get_by(mux_id: asset["id"]),
            {:ok, _} <- MuxUpload.delete(mux_upload) do
-        Logger.log("Blob created from Mux webhook",
+        Logger.info("Blob created from Mux webhook",
           service: :mux,
           params: params,
           blob_id: blob.id,
