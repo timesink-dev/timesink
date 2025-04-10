@@ -22,7 +22,6 @@ defmodule TimesinkWeb.MuxController do
     case params["webhook_key"] do
       ^webhook_key ->
         handle_webhook(params)
-
         conn |> resp(200, "OK")
 
       _ ->
