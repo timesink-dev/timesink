@@ -11,14 +11,30 @@ defmodule TimesinkWeb.WaitlistFormComponent do
 
   def render(assigns) do
     ~H"""
-    <div>
-      <div class="py-2.5 text-center">
+    <div class="min-h-screen bg-backroom-black flex flex-col items-center justify-center px-4 pt-16 pb-24 space-y-6">
+      <!-- Card Container -->
+      <div class="w-full max-w-2xl rounded-2xl bg-backroom-black bg-opacity-70 border border-dark-theater-medium p-10">
+        
+    <!-- Logo / Tagline -->
+        <div class="text-center mb-8">
+          <a href={~p"/"}>
+            <h1 class="text-4xl font-brand text-white tracking-tight leading-none">
+              TimeSink <br /> Presents
+            </h1>
+          </a>
+          <p class="text-sm text-mystery-white mt-2 max-w-lg mx-auto">
+            We sift through the noise. You get the signal. <br />
+            Access opens in carefully curated waves.
+          </p>
+        </div>
+        
+    <!-- Waitlist Form -->
         <.simple_form
           as="applicant"
           for={@form}
           phx-submit="save"
           phx-target={@myself}
-          class="mt-8 mb-8 w-full md:flex md:justify-center gap-x-4 h-full md:items-end"
+          class="mt-8 mb-4 w-full md:flex md:justify-center gap-x-4 h-full md:items-end"
         >
           <div class="w-full flex flex-col gap-y-2">
             <div class="flex gap-x-2">
@@ -26,13 +42,13 @@ defmodule TimesinkWeb.WaitlistFormComponent do
                 field={@form[:first_name]}
                 placeholder="First name"
                 class="w-full"
-                input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+                input_class="w-full p-4 outline-width-0 rounded-lg text-mystery-white border-none focus:outline-none outline-none"
               />
               <.input
                 field={@form[:last_name]}
                 placeholder="Last name"
                 class="w-full"
-                input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+                input_class="w-full p-4 outline-width-0 rounded-lg text-mystery-white border-none focus:outline-none outline-none"
               />
             </div>
             <.input
@@ -41,7 +57,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
               placeholder="Enter your email"
               class="md:relative"
               error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
-              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
+              input_class="w-full p-4 outline-width-0 rounded-lg text-mystery-white border-none focus:outline-none outline-none"
             />
           </div>
           <:actions>
@@ -58,29 +74,35 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             </.button>
           </:actions>
         </.simple_form>
+
+        <%!-- <div class="pt-4 text-center text-xs text-dark-theater-lightest">
+          <p>
+            Questions? <a href="mailto:support@timesinkpresents.com" class="text-brand hover:underline">Contact us</a>
+          </p>
+        </div> --%>
+      </div>
+      
+    <!-- Status Block Outside Card -->
+      <div class="text-center text-mystery-white text-sm space-y-1 max-w-lg px-4">
         <%= if @spots_remaining > 0 do %>
-          <span>
-            <p>Access is released in limited drops.</p>
-            <p>Join now to become part of the next drop in the ticket queue!</p>
-          </span>
+          <p>
+            🎟️
+            <strong class="text-mystery-white">
+              {@spots_remaining} spot{if @spots_remaining > 1, do: "s"}
+            </strong>
+            remaining in this drop.
+          </p>
+          <p>
+            Join now to secure your place in this next wave of invites.
+          </p>
         <% else %>
-          <span>
-            <p>
-              Missed this round? No worries!
-            </p>
-            <p>
-              Secure your spot on the waitlist now to be first in line when the next batch opens!
-            </p>
-          </span>
+          <p>
+            The curtain just closed on this drop.
+          </p>
+          <p>
+            You’re joining the queue for the next invite wave.
+          </p>
         <% end %>
-        <p class="mt-2.5 text-lg">
-          <strong>{if @spots_remaining == 0, do: "No", else: @spots_remaining}</strong> {if @spots_remaining ==
-                                                                                              1,
-                                                                                            do:
-                                                                                              "spot",
-                                                                                            else:
-                                                                                              "spots"} remaining
-        </p>
       </div>
     </div>
     """

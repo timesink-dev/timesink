@@ -37,22 +37,6 @@ defmodule TimesinkWeb.WaitlistLive do
           </.button>
         </div>
       <% else %>
-        <a class="flex flex-col -space-y-2.5 font-brand items-center" href={~p"/"}>
-          <p class="text-[3rem] leading-10 tracking-tighter">
-            TimeSink
-          </p>
-          <p class="pl-4 text-[2.6rem]">
-            Presents
-          </p>
-        </a>
-        <h2 class="uppercase text-[2rem] mt-12 mb-2 tracking-tighter items-center">
-          Welcome to the show.
-        </h2>
-        <div class="flex flex-col gap-y-2">
-          <p>
-            <b>While the world outside buzzes with the chaos of endless content</b>, we sift through it all to bring you a collection of hand-picked cinematic gems made by the filmmakers of today.
-          </p>
-        </div>
         <.live_component
           module={WaitlistFormComponent}
           id="waitlist_form"

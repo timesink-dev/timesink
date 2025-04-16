@@ -2,19 +2,11 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
   use TimesinkWeb, :live_component
   alias Timesink.Accounts.User
 
-  def update(assigns) do
-    data = %{
-      "first_name" => assigns[:data]["first_name"] || "",
-      "last_name" => assigns[:data]["last_name"] || ""
-    }
+  def update(assigns, socket) do
+    data = assigns[:data] || %{}
+    changeset = User.name_changeset(%User{}, data)
 
-    first_name = Map.get(data, "first_name", "")
-    last_name = Map.get(data, "last_name", "")
-
-    changeset =
-      User.name_changeset(%User{}, %{"first_name" => first_name, "last_name" => last_name})
-
-    {:ok, assign(assigns, data: data, form: to_form(changeset))}
+    {:ok, assign(socket, form: to_form(changeset), data: data)}
   end
 
   def render(assigns) do
@@ -24,34 +16,38 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
         <p class="text-gray-400 text-center mt-2">
           Let’s get started with your full name. This will help personalize your experience and let everyone know who you are.
         </p>
+
         <.simple_form
           class="mt-6 space-y-4 w-full"
           phx-submit="save_name"
+          phx-change="validate"
           phx-target={@myself}
-          for={@data}
-          as="data"
+          for={@form}
         >
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-300">First name</label>
               <.input
                 type="text"
-                name="first_name"
+                field={@form[:first_name]}
                 required
-                value={@data["first_name"]}
-                input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
+                input_class="w-full p-3 rounded text-mystery-white border-none"
+                error_class="mt-2 text-sm text-neon-red-light"
                 placeholder="Enter your first name"
+                phx-debounce="500"
               />
             </div>
+
             <div>
               <label class="block text-sm font-medium text-gray-300">Last name</label>
               <.input
                 type="text"
-                name="last_name"
+                field={@form[:last_name]}
                 required
-                value={@data["last_name"]}
-                input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
+                input_class="w-full p-3 rounded text-mystery-white border-none"
+                error_class="mt-2 text-sm text-neon-red-light"
                 placeholder="Enter your last name"
+                phx-debounce="500"
               />
             </div>
           </div>
@@ -67,10 +63,26 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
     """
   end
 
-  def handle_event("save_name", name_params, socket) do
-    send(self(), {:update_user_data, to_form(name_params)})
-    send(self(), {:go_to_step, :next})
-    {:noreply, socket}
+  def handle_event("validate", %{"user" => name_params}, socket) do
+    changeset =
+      %User{}
+      |> User.name_changeset(name_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, form: to_form(changeset))}
+  end
+
+  def handle_event("save_name", %{"user" => name_params}, socket) do
+    changeset = User.name_changeset(%User{}, name_params)
+
+    if changeset.valid? do
+      send(self(), {:update_user_data, %{params: name_params}})
+      IO.inspect("gogo to next ")
+      send(self(), {:go_to_step, :next})
+      {:noreply, socket}
+    else
+      {:noreply, assign(socket, form: to_form(changeset))}
+    end
   end
 
   def handle_event("go_back", _unsigned_params, socket) do
