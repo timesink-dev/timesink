@@ -124,9 +124,14 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
         send(self(), {:go_to_step, :next})
         {:noreply, socket}
       else
+        error_message =
+          changeset
+          |> Ecto.Changeset.traverse_errors(&translate_error/1)
+          |> Enum.map(fn {_field, messages} -> "#{Enum.join(messages, ", ")}" end)
+
         {:noreply,
          socket
-         |> assign(:error, "Hmm… that doesn't look like a real birthday.")
+         |> assign(:error, Enum.join(error_message, ", "))
          |> assign(:birth_month, mm)
          |> assign(:birth_day, dd)
          |> assign(:birth_year, yyyy)}
