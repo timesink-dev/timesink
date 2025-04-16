@@ -95,8 +95,7 @@ defmodule Timesink.Accounts.User do
       message: "First name contains invalid characters, i.e. @, #, $, %, etc. are not allowed."
     )
     |> validate_format(:last_name, ~r/^[\p{L}\p{M}' -]+$/u,
-      message:
-        "Last name contains invalid characters. Characters like @, #, $, %, etc. are not allowed."
+      message: "Last name contains invalid characters. i.e. @, #, $, %, etc. are not allowed."
     )
   end
 

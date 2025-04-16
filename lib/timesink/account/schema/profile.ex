@@ -63,14 +63,25 @@ defmodule Timesink.Accounts.Profile do
     validate_change(changeset, :birthdate, fn :birthdate, date ->
       cond do
         Date.compare(date, Date.utc_today()) == :gt ->
-          [birthdate: "You can’t be born in the future — unless you're in a sci-fi film."]
+          [birthdate: "You can’t be born in the future McFly!"]
 
-        date.year < 1900 ->
+        too_old_to_believe?(date) ->
           [birthdate: "That seems a bit early. We’re flattered, though."]
+
+        too_young?(date) ->
+          [birthdate: "Sorry! You'll have to wait a few years to be able to join the platform."]
 
         true ->
           []
       end
     end)
+  end
+
+  defp too_young?(date) do
+    Date.diff(Date.utc_today(), date) < 16 * 365
+  end
+
+  defp too_old_to_believe?(date) do
+    Date.diff(Date.utc_today(), date) > 110 * 365
   end
 end

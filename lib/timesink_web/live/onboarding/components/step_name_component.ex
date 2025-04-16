@@ -2,7 +2,6 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
   use TimesinkWeb, :live_component
   alias Timesink.Accounts.User
   import Ecto.Changeset
-  import Phoenix.HTML.Form
 
   def update(assigns, socket) do
     data = assigns[:data] || %{}
