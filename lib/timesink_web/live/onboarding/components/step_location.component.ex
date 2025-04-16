@@ -78,10 +78,10 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
           </:actions>
         </.simple_form>
 
-        <.button color="none" class="mt-6 p-0" phx-click="go_back" phx-target={@myself}>
+      </div>
+        <.button color="none" class="mt-6 p-0 text-center" phx-click="go_back" phx-target={@myself}>
           ← Back
         </.button>
-      </div>
     </div>
     """
   end

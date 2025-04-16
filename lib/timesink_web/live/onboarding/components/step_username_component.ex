@@ -68,16 +68,16 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
           <:actions>
             <div class="mt-6">
               <.button color="secondary" class="w-full py-2 text-lg">
-                Take me in! <.icon name="hero-arrow-right" class="ml-1 h-6 w-6" />
+                Take me in ! →
               </.button>
             </div>
           </:actions>
         </.simple_form>
+      </div>
 
-        <.button color="none" class="mt-6 p-0" phx-click="go_back" phx-target={@myself}>
+        <.button color="none" class="mt-6 p-0 text-center" phx-click="go_back" phx-target={@myself}>
           ← Back
         </.button>
-      </div>
     </div>
     """
   end

@@ -88,11 +88,10 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
             <.button color="secondary" class="w-full py-3 text-lg">Continue</.button>
           </:actions>
         </.simple_form>
-
-        <.button color="none" class="mt-6 p-0" phx-click="go_back" phx-target={@myself}>
+      </div>
+        <.button color="none" class="mt-6 p-0 text-center" phx-click="go_back" phx-target={@myself}>
           ← Back
         </.button>
-      </div>
     </div>
     """
   end

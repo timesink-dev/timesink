@@ -15,7 +15,7 @@ defmodule TimesinkWeb.OnboardingLive do
     StepUsernameComponent
   }
 
-  @step_order [:email, :verify_email, :name, :birthdate, :location, :username]
+  @step_order [:username]
   @steps %{
     email: StepEmailComponent,
     verify_email: StepVerifyEmailComponent,
