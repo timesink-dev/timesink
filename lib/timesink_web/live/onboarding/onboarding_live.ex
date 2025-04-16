@@ -112,7 +112,7 @@ defmodule TimesinkWeb.OnboardingLive do
          to: ~p"/auth/complete_onboarding?token=#{token}"
        )}
     else
-      {:error, changeset} ->
+      {:error, _changeset} ->
         {:noreply, socket |> put_flash(:error, "Something went wrong. Please try again.")}
     end
   end
