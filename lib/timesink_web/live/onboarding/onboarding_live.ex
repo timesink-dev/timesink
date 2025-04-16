@@ -36,8 +36,6 @@ defmodule TimesinkWeb.OnboardingLive do
       |> assign(:steps, @steps)
       |> assign(:step, hd(@step_order))
 
-    IO.inspect(socket.assigns.user_data, label: "❌ User Data")
-
     {:ok, socket, layout: {TimesinkWeb.Layouts, :empty}}
   end
 
@@ -94,7 +92,6 @@ defmodule TimesinkWeb.OnboardingLive do
   end
 
   def handle_info({:update_user_data, %{params: params}}, socket) do
-    IO.inspect(params, label: "❌ User Data Update")
     socket = assign(socket, user_data: Map.merge(socket.assigns.user_data, params))
 
     {:noreply, socket}
@@ -116,8 +113,6 @@ defmodule TimesinkWeb.OnboardingLive do
        )}
     else
       {:error, changeset} ->
-        IO.inspect(changeset.errors, label: "❌ User Creation Error")
-
         {:noreply, socket |> put_flash(:error, "Something went wrong. Please try again.")}
     end
   end

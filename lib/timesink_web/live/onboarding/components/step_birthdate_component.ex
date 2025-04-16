@@ -2,7 +2,6 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
   use TimesinkWeb, :live_component
 
   alias Timesink.Accounts.Profile
-  import Ecto.Changeset
 
   def update(assigns, socket) do
     birthdate = get_in(assigns.data, ["profile", "birthdate"])

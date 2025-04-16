@@ -91,6 +91,13 @@ defmodule Timesink.Accounts.User do
     |> validate_required([:first_name, :last_name])
     |> validate_length(:first_name, min: 1)
     |> validate_length(:last_name, min: 1)
+    |> validate_format(:first_name, ~r/^[\p{L}\p{M}' -]+$/u,
+      message: "First name contains invalid characters, i.e. @, #, $, %, etc. are not allowed."
+    )
+    |> validate_format(:last_name, ~r/^[\p{L}\p{M}' -]+$/u,
+      message:
+        "Last name contains invalid characters. Characters like @, #, $, %, etc. are not allowed."
+    )
   end
 
   def username_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do

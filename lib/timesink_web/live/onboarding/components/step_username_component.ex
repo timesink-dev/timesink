@@ -87,8 +87,6 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
       socket.assigns.data
       |> Map.merge(username_params)
 
-    # make user_create_params into atom keys
-
     user_create_changeset = User.username_changeset(%User{}, user_create_params)
 
     if user_create_changeset.valid? do
