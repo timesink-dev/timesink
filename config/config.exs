@@ -82,12 +82,10 @@ config :timesink, Oban,
     {Oban.Plugins.Reindexer, schedule: "@weekly"},
     {Oban.Plugins.Cron,
      crontab: [
-       {"@daily", Timesink.Workers.Waitlist.ScheduleInviteJob},
-       {"@weekly", Timesink.Workers.Waitlist.CleanExpiredInvitesJob}
+       {"@daily", Timesink.Workers.Waitlist.ScheduleInviteJob}
 
        # Runs every 1 minute for dev env
        #  {"*/1 * * * *", Timesink.Workers.Waitlist.ScheduleInviteJob}
-       #  {"*/1 * * * *", Timesink.Workers.Waitlist.CleanExpiredInvitesJob}
      ]}
   ],
   queues: [mailer: 10, waitlist: 10]

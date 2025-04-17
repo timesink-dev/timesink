@@ -76,21 +76,57 @@ defmodule Timesink.Waitlist do
   end
 
   @doc """
-  Creates a new applicant and adds them to the waitlist.
+  Adds a new applicant to the waitlist, or reactivates an existing applicant
+  whose invite token has expired.
+
+  If an applicant with the same email already exists and has a status of
+  `:pending` or `:invited`, and their associated invite token is expired, the
+  token is removed and the applicant is reactivated by resetting their status
+  to `:pending`.
+
+  In all cases, a confirmation email is sent to the applicant.
 
   ## Examples
 
-      iex> join(%{"first_name" => "Jose", "last_name" => "Val Del Omar", "email" => "valdelomar@gmail.com"})
-      {:ok, %Timesink.Waitlist.Applicant{…}}
-  """
-  @spec join(params :: map()) ::
-          {:ok, Applicant.t()} | {:error, Ecto.Changeset.t()}
+      iex> join(%{
+      ...>   "first_name" => "Jose",
+      ...>   "last_name" => "Val Del Omar",
+      ...>   "email" => "valdelomar@gmail.com"
+      ...> })
+      {:ok, %Timesink.Waitlist.Applicant{}}
 
+      iex> join(%{"email" => "someone@already-on.com"})
+      {:error, :already_registered_or_active}
+  """
+  @spec join(map()) ::
+          {:ok, Applicant.t()} | {:error, Ecto.Changeset.t() | :already_registered_or_active}
   def join(params) do
-    with {:ok, applicant} <-
-           Applicant.create(params) do
+    email = Map.get(params, "email")
+
+    with existing when not is_nil(existing) <- Repo.get_by(Applicant, email: email),
+         true <- existing.status in [:pending, :invited],
+         {:ok, token} <- Timesink.Token.get_by(waitlist_id: existing.id),
+         true <- Timesink.Token.is_expired?(token),
+         {:ok, _} <- Repo.delete(token),
+         changeset <- Applicant.changeset(existing, Map.merge(params, %{"status" => :pending})),
+         {:ok, applicant} <- Repo.update(changeset) do
       Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
       {:ok, applicant}
+    else
+      nil ->
+        # No existing applicant → create new
+        with changeset <- Applicant.changeset(%Applicant{}, params),
+             {:ok, applicant} <- Repo.insert(changeset) do
+          Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
+          {:ok, applicant}
+        end
+
+      false ->
+        # Status not eligible for upsert
+        {:error, :already_registered_or_active}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
