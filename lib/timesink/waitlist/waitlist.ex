@@ -100,7 +100,7 @@ defmodule Timesink.Waitlist do
     |> Repo.update()
   end
 
-  def get_applicant_by_token(token) do
+  def get_applicant_by_invite_token(token) do
     query =
       from a in Applicant,
         where: a.id == ^token.waitlist_id,
