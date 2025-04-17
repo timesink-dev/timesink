@@ -87,7 +87,7 @@ config :timesink, Oban,
 
        # Runs every 1 minute for dev env
        #  {"*/1 * * * *", Timesink.Workers.Waitlist.ScheduleInviteJob},
-       #  {"*/1 * * * *", Timesink.Workers.CleanExpiredWaitlistInvites}
+       #  {"*/1 * * * *", Timesink.Workers.Waitlist.CleanExpiredInvitesJob}
      ]}
   ],
   queues: [mailer: 10, waitlist: 10]
