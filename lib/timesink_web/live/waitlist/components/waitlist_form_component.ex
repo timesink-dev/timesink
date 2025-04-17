@@ -14,7 +14,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
     <div class="min-h-screen bg-backroom-black flex flex-col items-center justify-center px-4 pt-16 pb-24 space-y-6">
       <!-- Card Container -->
       <div class="w-full max-w-2xl rounded-2xl bg-backroom-black bg-opacity-70 border border-dark-theater-medium p-10">
-
+        
     <!-- Logo / Tagline -->
         <div class="text-center mb-8">
           <a href={~p"/"}>
@@ -27,7 +27,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             Access opens in carefully curated waves.
           </p>
         </div>
-
+        
     <!-- Waitlist Form -->
         <.simple_form
           as="applicant"
@@ -81,7 +81,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
           </p>
         </div> --%>
       </div>
-
+      
     <!-- Status Block Outside Card -->
       <div class="text-center text-mystery-white text-sm space-y-1 max-w-lg px-4">
         <%= if @spots_remaining > 0 do %>
