@@ -5,6 +5,7 @@ defmodule TimesinkWeb.OnboardingLive do
   alias Timesink.Token
   alias Timesink.Auth, as: CoreAuth
   alias TimesinkWeb.Components.Stepper
+  alias Timesink.Waitlist
 
   alias TimesinkWeb.Onboarding.{
     StepEmailComponent,
@@ -27,12 +28,14 @@ defmodule TimesinkWeb.OnboardingLive do
 
   def mount(_params, session, socket) do
     invite_token = session["invite_token"]
+    applicant = session["applicant"]
 
     socket =
       socket
       |> assign_new(:user_data, fn -> initial_user_data() end)
       |> assign_new(:verified_email, fn -> false end)
       |> assign(:invite_token, invite_token)
+      |> assign(:applicant, applicant)
       |> assign(:steps, @steps)
       |> assign(:step, hd(@step_order))
 
@@ -104,7 +107,8 @@ defmodule TimesinkWeb.OnboardingLive do
 
   def handle_info({:complete_onboarding, %{params: user_create_params}}, socket) do
     with {:ok, user} <- Accounts.create_user(user_create_params),
-         {:ok, _token} <- Token.invalidate_token(socket.assigns.invite_token) do
+         {:ok, _token} <- Token.invalidate_token(socket.assigns.invite_token),
+         {:ok, _} <- Waitlist.set_status(socket.assigns.applicant, "completed") do
       token = CoreAuth.generate_token(user)
 
       {:noreply,

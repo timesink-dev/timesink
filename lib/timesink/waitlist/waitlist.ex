@@ -99,4 +99,18 @@ defmodule Timesink.Waitlist do
     |> Applicant.changeset(%{status: status})
     |> Repo.update()
   end
+
+  def get_applicant_by_token(token) do
+    query =
+      from a in Applicant,
+        where: a.id == ^token.waitlist_id,
+        select: a
+
+    with applicant when not is_nil(applicant) <- Repo.one(query) do
+      {:ok, applicant}
+    else
+      nil ->
+        {:error, :not_found}
+    end
+  end
 end

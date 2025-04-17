@@ -82,13 +82,16 @@ config :timesink, Oban,
     {Oban.Plugins.Reindexer, schedule: "@weekly"},
     {Oban.Plugins.Cron,
      crontab: [
-       {"@daily", Timesink.Workers.ProcessWaitlist}
+       #  {"@daily", Timesink.Workers.ProcessWaitlist},
+       #  {"@daily", Timesink.Workers.CleanExpiredWaitlistInvites}
 
        # Runs every 1 minute for dev env
        #  {"*/1 * * * *", Timesink.Workers.ProcessWaitlist}
+       # Runs every 1 minute for dev env
+       {"*/1 * * * *", Timesink.Workers.CleanExpiredWaitlistInvites}
      ]}
   ],
-  queues: [mailer: 10, waitlist_invites: 10, waitlist_processing: 10]
+  queues: [mailer: 10, waitlist_invites: 10, waitlist_processing: 10, waitlist_cleanup: 10]
 
 config :timesink, :finch, Timesink.Finch
 
