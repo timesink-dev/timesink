@@ -108,7 +108,7 @@ defmodule TimesinkWeb.OnboardingLive do
   def handle_info({:complete_onboarding, %{params: user_create_params}}, socket) do
     with {:ok, user} <- Accounts.create_user(user_create_params),
          {:ok, _token} <- Token.invalidate_token(socket.assigns.invite_token),
-         {:ok, _} <- Waitlist.set_status(socket.assigns.applicant, "completed") do
+         {:ok, _} <- Waitlist.set_status(socket.assigns.applicant, :completed) do
       token = CoreAuth.generate_token(user)
 
       {:noreply,
