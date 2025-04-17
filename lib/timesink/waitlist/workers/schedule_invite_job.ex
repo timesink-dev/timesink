@@ -1,5 +1,5 @@
-defmodule Timesink.Workers.ProcessWaitlist do
-  use Oban.Worker, queue: :waitlist_processing, max_attempts: 3
+defmodule Timesink.Workers.Waitlist.ScheduleInviteJob do
+  use Oban.Worker, queue: :waitlist, max_attempts: 3
 
   import Ecto.Query
   alias Timesink.Repo
