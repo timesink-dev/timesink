@@ -56,7 +56,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
               type="email"
               placeholder="Enter your email"
               class="md:relative"
-              error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
+              error_class="md:absolute md:-bottom-12 md:left-0 md:items-center md:gap-1"
               input_class="w-full p-4 outline-width-0 rounded-lg text-mystery-white border-none focus:outline-none outline-none"
             />
           </div>
@@ -90,17 +90,14 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             <strong class="text-mystery-white">
               {@spots_remaining} spot{if @spots_remaining > 1, do: "s"}
             </strong>
-            remaining in this drop.
+            remaining in this cohort
           </p>
           <p>
             Join now to secure your place in this next wave of invites.
           </p>
         <% else %>
           <p>
-            The curtain just closed on this drop.
-          </p>
-          <p>
-            You’re joining the queue for the next invite wave.
+            You’re joining the queue for the next cohort of invites.
           </p>
         <% end %>
       </div>
@@ -127,14 +124,17 @@ defmodule TimesinkWeb.WaitlistFormComponent do
         error_message =
           changeset
           |> Ecto.Changeset.traverse_errors(&translate_error/1)
-          |> Map.get(:email, [])
-          |> Enum.at(0, "An error occurred. Please try again.")
+          |> Map.get(:email)
+          |> Enum.at(0, "There was an error. Please try again.")
 
         socket =
           socket
           |> assign(:email, applicant_params["email"])
-          |> assign(:form, to_form(changeset))
-          |> put_flash!(:error, error_message)
+          |> assign(:form, to_form(%{changeset | action: :insert}))
+          |> put_flash!(
+            :error,
+            error_message
+          )
 
         {:noreply, socket}
     end

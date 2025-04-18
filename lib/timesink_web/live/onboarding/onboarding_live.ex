@@ -28,7 +28,7 @@ defmodule TimesinkWeb.OnboardingLive do
 
   def mount(_params, session, socket) do
     invite_token = session["invite_token"]
-    applicant = session["applicant"]
+    applicant = session["applicant"] || nil
 
     socket =
       socket
@@ -108,7 +108,7 @@ defmodule TimesinkWeb.OnboardingLive do
   def handle_info({:complete_onboarding, %{params: user_create_params}}, socket) do
     with {:ok, user} <- Accounts.create_user(user_create_params),
          {:ok, _token} <- Token.invalidate_token(socket.assigns.invite_token),
-         {:ok, _} <- Waitlist.set_status(socket.assigns.applicant, :completed) do
+         _maybe_updated <- maybe_mark_applicant_completed(socket.assigns.applicant) do
       token = CoreAuth.generate_token(user)
 
       {:noreply,
@@ -117,8 +117,14 @@ defmodule TimesinkWeb.OnboardingLive do
        )}
     else
       {:error, _changeset} ->
-        {:noreply, socket |> put_flash(:error, "Something went wrong. Please try again.")}
+        {:noreply, put_flash(socket, :error, "Something went wrong. Please try again.")}
     end
+  end
+
+  defp maybe_mark_applicant_completed(nil), do: :ok
+
+  defp maybe_mark_applicant_completed(applicant) do
+    Waitlist.set_status(applicant, :completed)
   end
 
   defp determine_step(current_step, :next, verified_email) do

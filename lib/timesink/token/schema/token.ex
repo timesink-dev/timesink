@@ -6,6 +6,21 @@ defmodule Timesink.Token do
   alias Timesink.Accounts.User
   alias Timesink.Waitlist.Applicant
 
+  @type t :: %__MODULE__{
+          id: Ecto.UUID.t(),
+          kind: kind(),
+          secret: String.t(),
+          status: status(),
+          expires_at: DateTime.t(),
+          email: String.t() | nil,
+          user_id: Ecto.UUID.t() | nil,
+          waitlist_id: Ecto.UUID.t() | nil,
+          user: User.t() | Ecto.Association.NotLoaded.t() | nil,
+          waitlist: Applicant.t() | Ecto.Association.NotLoaded.t() | nil,
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
+
   @type kind :: :invite | :email_verification | :password_reset
   @kind [:invite, :email_verification, :password_reset]
   def kind, do: @kind
@@ -18,19 +33,6 @@ defmodule Timesink.Token do
   * :invalid – The token has already been used or was explicitly invalidated (e.g., a new token was issued, making the old one obsolete).
   """
   def status, do: @status
-
-  @type token :: %{
-          __struct__: __MODULE__,
-          kind: kind(),
-          secret: String.t(),
-          status: status(),
-          expires_at: DateTime.t(),
-          user_id: Ecto.UUID.t(),
-          user: User.t(),
-          waitlist_id: Ecto.UUID.t(),
-          waitlist: Applicant.t(),
-          email: String.t()
-        }
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -52,7 +54,7 @@ defmodule Timesink.Token do
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset(token :: token(), params :: %{optional(atom()) => term()}) ::
+  @spec changeset(token :: Timesink.Token.t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
