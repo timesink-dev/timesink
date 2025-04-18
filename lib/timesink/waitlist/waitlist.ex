@@ -98,35 +98,69 @@ defmodule Timesink.Waitlist do
       iex> join(%{"email" => "someone@already-on.com"})
       {:error, :already_registered_or_active}
   """
-  @spec join(map()) ::
-          {:ok, Applicant.t()} | {:error, Ecto.Changeset.t() | :already_registered_or_active}
+  @spec join(map()) :: {:ok, Applicant.t()} | {:error, Ecto.Changeset.t()}
   def join(params) do
     email = Map.get(params, "email")
+    first_name = Map.get(params, "first_name")
+    last_name = Map.get(params, "last_name")
 
-    with existing when not is_nil(existing) <- Repo.get_by(Applicant, email: email),
-         true <- existing.status in [:pending, :invited],
-         {:ok, token} <- Timesink.Token.get_by(waitlist_id: existing.id),
-         true <- Timesink.Token.is_expired?(token),
-         {:ok, _} <- Repo.delete(token),
-         changeset <- Applicant.changeset(existing, Map.merge(params, %{"status" => :pending})),
-         {:ok, applicant} <- Repo.update(changeset) do
-      Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
-      {:ok, applicant}
+    with {:ok, existing} <- Applicant.get_by(email: email) do
+      status = existing.status
+
+      cond do
+        status == :pending ->
+          changeset =
+            Applicant.changeset(existing, params)
+            |> Ecto.Changeset.add_error(:email, "This email is already on the waitlist.")
+
+          {:error, changeset}
+
+        status == :invited ->
+          with {:ok, token} <- Timesink.Token.get_by(waitlist_id: existing.id) do
+            if Timesink.Token.is_expired?(token) do
+              {:ok, _token} = Timesink.Token.delete(token)
+
+              with {:ok, applicant} <-
+                     Applicant.update(existing, %{
+                       status: :pending,
+                       first_name: first_name,
+                       last_name: last_name
+                     }) do
+                Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
+                {:ok, applicant}
+              else
+                {:error, _} ->
+                  changeset =
+                    Applicant.changeset(existing, params)
+                    |> Ecto.Changeset.add_error(:email, "This email has an active invite.")
+
+                  {:error, changeset}
+              end
+            else
+              {:error, :not_found}
+            end
+          else
+            _ ->
+              {:error, :not_found}
+          end
+
+        status == :completed ->
+          # Some other status like :completed
+          changeset =
+            Applicant.changeset(existing, params)
+            |> Ecto.Changeset.add_error(:email, "This email has already joined.")
+
+          {:error, changeset}
+      end
     else
-      nil ->
-        # No existing applicant → create new
-        with changeset <- Applicant.changeset(%Applicant{}, params),
-             {:ok, applicant} <- Repo.insert(changeset) do
+      _ ->
+        with {:ok, applicant} <- Applicant.create(params) do
           Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
           {:ok, applicant}
+        else
+          {:error, changeset} ->
+            {:error, changeset}
         end
-
-      false ->
-        # Status not eligible for upsert
-        {:error, :already_registered_or_active}
-
-      {:error, reason} ->
-        {:error, reason}
     end
   end
 

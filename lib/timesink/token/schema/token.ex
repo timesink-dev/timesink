@@ -70,6 +70,7 @@ defmodule Timesink.Token do
   end
 
   def is_expired?(token) do
+    IO.inspect(token, label: "is expired")
     token.expires_at && DateTime.compare(token.expires_at, DateTime.utc_now()) == :lt
   end
 
