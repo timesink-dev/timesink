@@ -77,7 +77,6 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
 
     if changeset.valid? do
       send(self(), {:update_user_data, %{params: name_params}})
-      IO.inspect("gogo to next ")
       send(self(), {:go_to_step, :next})
       {:noreply, socket}
     else

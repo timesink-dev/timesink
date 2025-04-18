@@ -76,15 +76,15 @@ defmodule Timesink.Waitlist do
   end
 
   @doc """
-  Adds a new applicant to the waitlist, or reactivates an existing applicant
-  whose invite token has expired.
+  Adds a new applicant to the waitlist, or reactivates an existing one if eligible.
 
-  If an applicant with the same email already exists and has a status of
-  `:pending` or `:invited`, and their associated invite token is expired, the
-  token is removed and the applicant is reactivated by resetting their status
-  to `:pending`.
+  This function handles the following cases:
 
-  In all cases, a confirmation email is sent to the applicant.
+    * **New applicant** – Creates a new waitlist record and sends a confirmation email.
+    * **Existing applicant with `:pending` status** – Returns an error on the `:email` field indicating the applicant is already on the waitlist.
+    * **Existing applicant with `:invited` status and an expired token** – Deletes the expired invite token, reactivates the applicant by setting their status back to `:pending`, updates their name fields if needed, and sends a new confirmation email.
+    * **Existing applicant with `:invited` status and a valid token** – Returns an error on the `:email` field indicating the applicant has an active invite.
+    * **Existing applicant with `:completed` status** – Returns an error on the `:email` field indicating the applicant has already joined.
 
   ## Examples
 
@@ -95,8 +95,11 @@ defmodule Timesink.Waitlist do
       ...> })
       {:ok, %Timesink.Waitlist.Applicant{}}
 
-      iex> join(%{"email" => "someone@already-on.com"})
-      {:error, :already_registered_or_active}
+      iex> join(%{"email" => "already@waiting.com"})
+      {:error, #Ecto.Changeset<action: nil, errors: [email: {"This email is already on the waitlist.", []}]>}
+
+      iex> join(%{"email" => "already@joined.com"})
+      {:error, #Ecto.Changeset<action: nil, errors: [email: {"This email has already joined.", []}]>}
   """
   @spec join(map()) :: {:ok, Applicant.t()} | {:error, Ecto.Changeset.t()}
   def join(params) do
@@ -145,7 +148,6 @@ defmodule Timesink.Waitlist do
           end
 
         status == :completed ->
-          # Some other status like :completed
           changeset =
             Applicant.changeset(existing, params)
             |> Ecto.Changeset.add_error(:email, "This email has already joined.")
@@ -165,22 +167,21 @@ defmodule Timesink.Waitlist do
   end
 
   def set_status(applicant, status) do
-    applicant
-    |> Applicant.changeset(%{status: status})
-    |> Repo.update()
+    Applicant.update(applicant, %{status: status})
   end
 
-  def get_applicant_by_invite_token(token) do
-    query =
-      from a in Applicant,
-        where: a.id == ^token.waitlist_id,
-        select: a
+  @spec get_applicant_by_invite_token(Timesink.Token.t()) ::
+          {:ok, Timesink.Waitlist.Applicant.t()} | {:not_applicant, :not_found}
+  def get_applicant_by_invite_token(%Timesink.Token{waitlist_id: nil}),
+    do: {:not_applicant, :not_found}
 
-    with applicant when not is_nil(applicant) <- Repo.one(query) do
+  @spec get_applicant_by_invite_token(Timesink.Token.t()) ::
+          {:ok, Timesink.Waitlist.Applicant.t()} | {:not_applicant, :not_found}
+  def get_applicant_by_invite_token(%Timesink.Token{waitlist_id: id} = _token) do
+    with {:ok, applicant} <- Applicant.get_by(%{id: id}) do
       {:ok, applicant}
     else
-      nil ->
-        {:error, :not_found}
+      {:error, :not_found} -> {:not_applicant, :not_found}
     end
   end
 end
