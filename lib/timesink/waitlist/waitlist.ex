@@ -129,15 +129,15 @@ defmodule Timesink.Waitlist do
                 Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
                 {:ok, applicant}
               else
-                {:error, _} ->
-                  changeset =
-                    Applicant.changeset(existing, params)
-                    |> Ecto.Changeset.add_error(:email, "This email has an active invite.")
-
+                {:error, changeset} ->
                   {:error, changeset}
               end
             else
-              {:error, :not_found}
+              changeset =
+                Applicant.changeset(existing, params)
+                |> Ecto.Changeset.add_error(:email, "This email has an active invite.")
+
+              {:error, changeset}
             end
           else
             _ ->
