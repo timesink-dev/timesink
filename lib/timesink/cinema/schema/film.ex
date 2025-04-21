@@ -36,6 +36,18 @@ defmodule Timesink.Cinema.Film do
     field :format, Ecto.Enum, values: @formats
     field :synopsis, :string
 
+    has_one :video, {"film_attachment", Timesink.Storage.Attachment},
+      foreign_key: :assoc_id,
+      where: [name: "video"]
+
+    has_one :poster, {"film_attachment", Timesink.Storage.Attachment},
+      foreign_key: :assoc_id,
+      where: [name: "poster"]
+
+    has_one :trailer, {"film_attachment", Timesink.Storage.Attachment},
+      foreign_key: :assoc_id,
+      where: [name: "trailer"]
+
     many_to_many :genres, Timesink.Cinema.Genre, join_through: "film_genre"
 
     has_many :directors, Timesink.Cinema.FilmCreative, where: [role: :director]
@@ -54,5 +66,17 @@ defmodule Timesink.Cinema.Film do
     |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
     |> validate_required([:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
     |> validate_length(:title, min: 1)
+  end
+
+  def attach_poster(%{__struct__: __MODULE__} = film, upload) do
+    Timesink.Storage.create_attachment(film, :poster, upload)
+  end
+
+  def attach_video(%{__struct__: __MODULE__} = film, upload) do
+    Timesink.Storage.create_attachment(film, :video, upload)
+  end
+
+  def attach_trailer(%{__struct__: __MODULE__} = film, upload) do
+    Timesink.Storage.create_attachment(film, :trailer, upload)
   end
 end

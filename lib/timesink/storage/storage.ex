@@ -52,48 +52,38 @@ defmodule Timesink.Storage do
 
   ## Examples
 
-      iex> Storage.create_attachment(%Plug.Upload{...}, %{target_schema: :profile, target_id, profile.id, name: "picture"}, user_id: user.id)
+      iex> Storage.create_attachment(%Plug.Upload{...}, %{assoc_id: profile.id, name: "avatar", table: "profile_attachment"})
       {:ok, %Storage.Attachment{...}}
 
-      iex> Storage.create_attachment(%Blob{...}, %{target_schema: :profile, target_id, profile.id, name: "picture"}, user_id: user.id)
+      iex> Storage.create_attachment(%Blob{...}, %{assoc_id: profile.id, name: "avatar", table: "profile_attachment"})
       {:ok, %Storage.Attachment{...}}
   """
   @spec create_attachment(
-          upload_or_blob :: Plug.Upload.t() | Blob.t(),
-          params :: %{
-            :target_schema => String.t(),
-            :target_id => Ecto.UUID.t(),
-            :name => String.t(),
-            optional(:metadata) => map()
-          },
-          opts :: Keyword.t()
-        ) ::
-          {:ok, Attachment.t()} | {:error, Ecto.Changeset.t() | term()}
-  def create_attachment(upload_or_blob, params, opts \\ [])
-
-  def create_attachment(
-        %Plug.Upload{} = upload,
-        %{target_schema: _, target_id: _, name: _} = params,
-        opts
-      ) do
+          Ecto.Schema.t(),
+          atom(),
+          Plug.Upload.t() | Blob.t(),
+          keyword()
+        ) :: {:ok, Attachment.t()} | {:error, Ecto.Changeset.t() | term()}
+  def create_attachment(struct, assoc_name, %Plug.Upload{} = upload, opts) do
     Repo.transaction(fn ->
       with {:ok, %Blob{} = blob} <- create_blob(upload, opts),
-           {:ok, %Attachment{} = att} <- create_attachment(blob, params, opts) do
+           {:ok, %Attachment{} = att} <- create_attachment(struct, assoc_name, blob, opts) do
         att
       else
         error ->
-          error = if not match?({:error, _}, error), do: error, else: error |> elem(1)
+          error = if not match?({:error, _}, error), do: error, else: elem(error, 1)
           Repo.rollback(error)
       end
     end)
   end
 
-  def create_attachment(
-        %Blob{} = blob,
-        %{target_schema: _, target_id: _, name: _} = params,
-        _opts
-      ) do
-    params |> Map.put(:blob_id, blob.id) |> Attachment.create()
+  def create_attachment(struct, assoc_name, %Blob{} = blob, opts) do
+    metadata = Keyword.get(opts, :metadata, %{})
+    name = Keyword.get(opts, :name, Atom.to_string(assoc_name))
+
+    struct
+    |> Ecto.build_assoc(assoc_name, %{blob_id: blob.id, name: name, metadata: metadata})
+    |> Repo.insert()
   end
 
   @spec config() :: config

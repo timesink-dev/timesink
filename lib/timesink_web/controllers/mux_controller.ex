@@ -19,6 +19,8 @@ defmodule TimesinkWeb.MuxController do
       Application.get_env(:timesink, Timesink.Storage.Mux)
       |> Keyword.get(:webhook_key)
 
+    IO.inspect(webhook_key, label: "webhook_key")
+
     case params["webhook_key"] do
       ^webhook_key ->
         handle_webhook(params)
