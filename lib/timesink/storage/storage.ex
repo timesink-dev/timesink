@@ -48,22 +48,54 @@ defmodule Timesink.Storage do
   end
 
   @doc """
-  Create a new attachment from a Blob or a Plug.Upload.
+  Creates a new attachment for a given schema record and association.
+
+  This function supports either a `%Plug.Upload{}` (which will create a new blob)
+  or a pre-existing `%Blob{}`.
+
+  The associated schema must declare a `has_one` or `has_many` relationship
+  with a properly scoped `where: [name: ...]` clause in order to work with `build_assoc/3`.
 
   ## Examples
 
-      iex> Storage.create_attachment(%Plug.Upload{...}, %{assoc_id: profile.id, name: "avatar", table: "profile_attachment"})
-      {:ok, %Storage.Attachment{...}}
+  Attach an avatar upload to a profile:
 
-      iex> Storage.create_attachment(%Blob{...}, %{assoc_id: profile.id, name: "avatar", table: "profile_attachment"})
-      {:ok, %Storage.Attachment{...}}
+      iex> Storage.create_attachment(profile, :avatar, %Plug.Upload{...})
+      {:ok, %Storage.Attachment{}}
+
+  Attach a trailer upload to a film, with metadata:
+
+      iex> Storage.create_attachment(film, :trailer, %Plug.Upload{...}, metadata: %{duration: "2m34s"})
+      {:ok, %Storage.Attachment{}}
+
+  Attach an existing blob as a poster:
+
+      iex> Storage.create_attachment(film, :poster, %Blob{id: "..."})
+      {:ok, %Storage.Attachment{}}
+
+  You can optionally override the attachment `name` (defaults to the association name):
+
+      iex> Storage.create_attachment(profile, :documents, upload, name: "insurance_card")
   """
+  @spec create_attachment(
+          Ecto.Schema.t(),
+          atom(),
+          Plug.Upload.t() | Blob.t()
+        ) ::
+          {:ok, Attachment.t()} | {:error, Ecto.Changeset.t() | term()}
+
   @spec create_attachment(
           Ecto.Schema.t(),
           atom(),
           Plug.Upload.t() | Blob.t(),
           keyword()
-        ) :: {:ok, Attachment.t()} | {:error, Ecto.Changeset.t() | term()}
+        ) ::
+          {:ok, Attachment.t()} | {:error, Ecto.Changeset.t() | term()}
+
+  def create_attachment(struct, assoc_name, upload_or_blob) do
+    create_attachment(struct, assoc_name, upload_or_blob, [])
+  end
+
   def create_attachment(struct, assoc_name, %Plug.Upload{} = upload, opts) do
     Repo.transaction(fn ->
       with {:ok, %Blob{} = blob} <- create_blob(upload, opts),
