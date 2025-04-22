@@ -41,52 +41,37 @@ defmodule TimesinkWeb.MuxController do
   different types of events and act accordingly.
   """
   @spec handle_webhook(params :: map()) :: term()
-  def handle_webhook(%{"type" => "video.asset.created"} = params) do
-    asset = params["data"]
+  def handle_webhook(%{"type" => "video.asset.created", "data" => asset} = params) do
+    IO.puts("🎬 Mux asset.created webhook received")
+
+    title = asset["meta"]["title"] || "Untitled"
+    year = Date.utc_today().year
 
     film_params = %{
-      title: "Bob",
-      year: 2025,
+      title: title,
+      year: year,
+      # or extract from Mux metadata later
       duration: 25,
       color: :color,
-      aspect_ratio: asset["aspect_ratio"] || "16:9",
       format: :digital,
+      aspect_ratio: asset["aspect_ratio"] || "16:9",
       synopsis: "Uploaded via Mux"
     }
 
-    {:ok, film} = Film.create(film_params)
+    with {:ok, film} <- maybe_create_film(film_params),
+         {:ok, blob} <- create_mux_blob(asset),
+         {:ok, _attachment} <- Storage.create_attachment(film, :video, blob) do
+      IO.puts("🎞️ Attachment created and linked to film")
+      :ok
+    else
+      {:error, %Ecto.Changeset{} = changeset} ->
+        IO.inspect(changeset.errors, label: "❌ Film creation failed with validation errors")
+        {:error, :invalid_film}
 
-    Repo.transaction(fn ->
-      new_blob_params = %{
-        type: :mux,
-        uri: asset["id"],
-        metadata: %{"asset" => asset}
-      }
-
-      upload_id = asset["upload_id"] || asset["id"]
-
-      with {:ok, blob} <- Blob.create(new_blob_params),
-           {:ok, _attachment} <- Film.attach_video(film, blob) do
-        Logger.info("🎞️ Attachment created and linked to film",
-          film_id: film.id,
-          blob_id: blob.id,
-          mux_asset_id: asset["id"]
-        )
-
-        case MuxUpload.get_by(mux_id: upload_id) do
-          {:ok, mux_upload} ->
-            {:ok, _} = MuxUpload.delete(mux_upload)
-            Logger.debug("Deleted MuxUpload entry #{mux_upload.id}")
-
-          {:error, :not_found} ->
-            Logger.debug("No MuxUpload found for mux_id=#{upload_id}, skipping delete")
-        end
-      else
-        error ->
-          Logger.error("Failed to handle video.asset.created: #{inspect(error)}")
-          Repo.rollback(error)
-      end
-    end)
+      {:error, reason} ->
+        IO.inspect(reason, label: "❌ Error in attachment pipeline")
+        {:error, reason}
+    end
   end
 
   def handle_webhook(%{"type" => type} = params)
@@ -121,4 +106,31 @@ defmodule TimesinkWeb.MuxController do
   end
 
   def handle_webhook(_params), do: :ok
+
+  defp maybe_create_film(%{title: title, year: year} = params) do
+    case Repo.get_by(Film, title: title, year: year) do
+      nil ->
+        %Film{}
+        |> Film.changeset(params)
+        |> Repo.insert()
+
+      film ->
+        {:ok, film}
+    end
+  end
+
+  defp create_mux_blob(asset) do
+    uri = asset["id"]
+    metadata = %{"asset" => asset}
+
+    blob_params = %{
+      service: :s3,
+      uri: uri,
+      metadata: metadata
+    }
+
+    %Storage.Blob{}
+    |> Storage.Blob.changeset(blob_params)
+    |> Repo.insert()
+  end
 end
