@@ -7,6 +7,7 @@ defmodule TimesinkWeb.MuxController do
   alias Timesink.Storage.Blob
   alias Timesink.Cinema.Film
   alias Timesink.Storage.MuxUpload
+  alias Timesink.Storage
 
   def it_works(conn, _params) do
     conn
@@ -41,7 +42,7 @@ defmodule TimesinkWeb.MuxController do
   different types of events and act accordingly.
   """
   @spec handle_webhook(params :: map()) :: term()
-  def handle_webhook(%{"type" => "video.asset.created", "data" => asset} = params) do
+  def handle_webhook(%{"type" => "video.asset.created", "data" => asset} = _params) do
     IO.puts("🎬 Mux asset.created webhook received")
 
     title = asset["meta"]["title"] || "Untitled"
@@ -129,8 +130,8 @@ defmodule TimesinkWeb.MuxController do
       metadata: metadata
     }
 
-    %Storage.Blob{}
-    |> Storage.Blob.changeset(blob_params)
+    %Blob{}
+    |> Blob.changeset(blob_params)
     |> Repo.insert()
   end
 end
