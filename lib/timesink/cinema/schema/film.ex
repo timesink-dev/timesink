@@ -73,6 +73,7 @@ defmodule Timesink.Cinema.Film do
   end
 
   def attach_video(%{__struct__: __MODULE__} = film, upload) do
+    IO.inspect(upload, label: "attach_video")
     Timesink.Storage.create_attachment(film, :video, upload)
   end
 

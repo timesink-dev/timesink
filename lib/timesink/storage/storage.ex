@@ -112,6 +112,7 @@ defmodule Timesink.Storage do
   def create_attachment(struct, assoc_name, %Blob{} = blob, opts) do
     metadata = Keyword.get(opts, :metadata, %{})
     name = Keyword.get(opts, :name, Atom.to_string(assoc_name))
+    IO.inspect(name, label: "Attachment name")
 
     struct
     |> Ecto.build_assoc(assoc_name, %{blob_id: blob.id, name: name, metadata: metadata})
