@@ -5,6 +5,7 @@ defmodule TimesinkWeb.MuxController do
   alias Timesink.Storage.MuxUpload
   alias Timesink.Storage.Blob
   alias Timesink.Cinema.Film
+  import Ecto.Query
 
   def it_works(conn, _params) do
     conn
@@ -38,34 +39,12 @@ defmodule TimesinkWeb.MuxController do
   """
   @spec handle_webhook(params :: map()) :: term()
   def handle_webhook(%{"type" => "video.asset.ready", "data" => asset} = params) do
-    title = asset["meta"]["title"] || "Untitled"
-    # temporary solution (film will already have been instantiaed via backpex admin panel)
-    year = Date.utc_today().year
-
-    _film_params = %{
-      title: title,
-      year: year,
-      # or extract from Mux metadata later
-      duration: 25,
-      color: :color,
-      format: :digital,
-      aspect_ratio: asset["aspect_ratio"] || "16:9",
-      synopsis: "Uploaded via Mux"
-    }
-
-    metadata = %{
-      "mux_asset" => %{
-        "playback_id" => asset["playback_ids"],
-        "asset_id" => asset["id"],
-        "upload_id" => asset["upload_id"],
-        "uploaded_at" => params["created_at"]
-      }
-    }
-
-    blob_params = %{
-      service: :mux,
-      uri: asset["id"],
-      metadata: metadata
+    mux_metadata = %{
+      "playback_id" => asset["playback_ids"],
+      "asset_id" => asset["id"],
+      "upload_id" => asset["upload_id"],
+      "uploaded_at" => params["created_at"],
+      "upload_title" => asset["meta"]["title"]
     }
 
     # for testing purposes
@@ -79,13 +58,8 @@ defmodule TimesinkWeb.MuxController do
                uri: mux_upload.url,
                service: :mux,
                metadata: %{
-                 "mux_asset" => %{
-                   "playback_id" => asset["playback_ids"],
-                   "asset_id" => asset["id"],
-                   "upload_id" => asset["upload_id"],
-                   "uploaded_at" => params["created_at"],
-                   "title" => film.title
-                 }
+                 "mux_asset" => mux_metadata,
+                 "film_title" => film.title
                }
              }),
            {:ok, _attachment} <- Film.attach_video(film, blob),
@@ -100,7 +74,24 @@ defmodule TimesinkWeb.MuxController do
   end
 
   def handle_webhook(%{"type" => "video.upload.created", "data" => asset} = params) do
-    IO.inspect(params, label: "Video Upload Created")
+    # temp solution - this film_id will be dynamically passed into these initial uploaad params to create a MuxUpload when uploading has started
+    # so this webhook handling won't be needed once the client upload logic is setup
+
+    mux_upload_params = %{
+      upload_id: asset["id"],
+      url: asset["url"],
+      status: :asset_created,
+      meta: %{
+        "film_id" => "b65127c8-59bc-4f02-bc43-6e9eaf44dda8",
+        "response" => asset
+      }
+    }
+
+    with {:ok, _mux_upload} <- MuxUpload.create(mux_upload_params) do
+      :ok
+    else
+      error -> Logger.error(error |> inspect(), service: :mux, params: params)
+    end
 
     MuxUpload.create(%{
       upload_id: asset["id"],
@@ -138,12 +129,25 @@ defmodule TimesinkWeb.MuxController do
 
   def handle_webhook(%{"type" => "video.asset.deleted", "data" => asset} = params) do
     Repo.transaction(fn ->
-      with {:ok, blob} <- Blob.get_by(uri: asset["id"]),
-           {:ok, _} <- Blob.delete(blob) do
-      else
-        error ->
-          Logger.error(error |> inspect(), service: :mux, params: params)
-          Repo.rollback(error)
+      query =
+        from(b in Blob,
+          where: fragment("?->'mux_asset'->>'asset_id'", b.metadata) == ^asset["id"]
+        )
+
+      case Repo.one(query) do
+        %Blob{} = blob ->
+          case Blob.delete(blob) do
+            {:ok, _} ->
+              :ok
+
+            {:error, reason} ->
+              Logger.error(inspect(reason), service: :mux, params: params)
+              Repo.rollback(reason)
+          end
+
+        nil ->
+          Logger.error("No blob found for asset_id #{asset["id"]}", service: :mux, params: params)
+          Repo.rollback(:not_found)
       end
     end)
   end
