@@ -2,6 +2,7 @@ defmodule TimesinkWeb.MuxController do
   use TimesinkWeb, :controller
   require Logger
   alias Timesink.Repo
+  alias Timesink.Storage.MuxUpload
   alias Timesink.Storage.Blob
   alias Timesink.Cinema.Film
 
@@ -41,7 +42,7 @@ defmodule TimesinkWeb.MuxController do
     # temporary solution (film will already have been instantiaed via backpex admin panel)
     year = Date.utc_today().year
 
-    film_params = %{
+    _film_params = %{
       title: title,
       year: year,
       # or extract from Mux metadata later
@@ -57,8 +58,7 @@ defmodule TimesinkWeb.MuxController do
         "playback_id" => asset["playback_ids"],
         "asset_id" => asset["id"],
         "upload_id" => asset["upload_id"],
-        "uploaded_at" => params["created_at"],
-        "title" => asset["meta"]["title"]
+        "uploaded_at" => params["created_at"]
       }
     }
 
@@ -68,10 +68,28 @@ defmodule TimesinkWeb.MuxController do
       metadata: metadata
     }
 
+    # for testing purposes
+
     Repo.transaction(fn ->
-      with {:ok, film} <- maybe_create_film(film_params),
-           {:ok, blob} <- Blob.create(blob_params),
-           {:ok, _attachment} <- Film.attach_video(film, blob) do
+      with {:ok, mux_upload} <- MuxUpload.get_by(upload_id: asset["upload_id"]),
+           film_id when not is_nil(film_id) <- get_in(mux_upload.meta, ["film_id"]),
+           {:ok, film} <- Film.get(film_id),
+           {:ok, blob} <-
+             Blob.create(%{
+               uri: mux_upload.url,
+               service: :mux,
+               metadata: %{
+                 "mux_asset" => %{
+                   "playback_id" => asset["playback_ids"],
+                   "asset_id" => asset["id"],
+                   "upload_id" => asset["upload_id"],
+                   "uploaded_at" => params["created_at"],
+                   "title" => film.title
+                 }
+               }
+             }),
+           {:ok, _attachment} <- Film.attach_video(film, blob),
+           {:ok, _} <- MuxUpload.delete(mux_upload) do
         :ok
       else
         error ->
@@ -79,6 +97,20 @@ defmodule TimesinkWeb.MuxController do
           Repo.rollback(error)
       end
     end)
+  end
+
+  def handle_webhook(%{"type" => "video.upload.created", "data" => asset} = params) do
+    IO.inspect(params, label: "Video Upload Created")
+
+    MuxUpload.create(%{
+      upload_id: asset["id"],
+      url: asset["url"],
+      status: :asset_created,
+      meta: %{
+        "film_id" => "b65127c8-59bc-4f02-bc43-6e9eaf44dda8",
+        "response" => asset
+      }
+    })
   end
 
   def handle_webhook(%{"type" => type} = params)
@@ -91,12 +123,17 @@ defmodule TimesinkWeb.MuxController do
         "video.upload.cancelled" -> :cancelled
       end
 
-    Logger.info("Mux video upload status updated",
-      service: :mux,
-      params: params,
-      mux_upload_id: asset["id"],
-      mux_upload_status: new_status
-    )
+    with {:ok, mux_upload} <- MuxUpload.get_by(upload_id: asset["id"]),
+         {:ok, _} <- MuxUpload.update(mux_upload, %{status: new_status}) do
+      Logger.info("MuxUpload status updated",
+        service: :mux,
+        params: params,
+        mux_upload_id: mux_upload.id,
+        mux_upload_status: new_status
+      )
+    else
+      error -> Logger.error(error |> inspect(), service: :mux, params: params)
+    end
   end
 
   def handle_webhook(%{"type" => "video.asset.deleted", "data" => asset} = params) do
@@ -120,16 +157,4 @@ defmodule TimesinkWeb.MuxController do
   end
 
   def handle_webhook(_params), do: :ok
-
-  defp maybe_create_film(%{title: title, year: year} = params) do
-    case Repo.get_by(Film, title: title, year: year) do
-      nil ->
-        %Film{}
-        |> Film.changeset(params)
-        |> Repo.insert()
-
-      film ->
-        {:ok, film}
-    end
-  end
 end

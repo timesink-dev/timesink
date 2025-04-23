@@ -185,4 +185,13 @@ defmodule Timesink.Factory do
       theater: theater
     }
   end
+
+  # Timesink.Mux
+
+  def mux_upload_factory do
+    %Timesink.Storage.MuxUpload{
+      upload_id: Ecto.UUID.generate(),
+      url: Faker.Internet.url()
+    }
+  end
 end

@@ -6,7 +6,7 @@ defmodule Timesink.Waitlist.InviteScheduler do
   @delay_range 24..72
 
   # 1 hour in seconds
-  @delay_seconds 3600
+  @delay_seconds 1
 
   def schedule_invite(applicant_id) do
     delay_seconds = Enum.random(@delay_range) * @delay_seconds

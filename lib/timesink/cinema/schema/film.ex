@@ -65,7 +65,7 @@ defmodule Timesink.Cinema.Film do
   def changeset(film, params, _metadata \\ []) do
     film
     |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
-    |> validate_required([:title, :year, :duration, :color, :format])
+    |> validate_required([:title, :year, :duration, :color, :format, :aspect_ratio])
     |> validate_length(:title, min: 1)
   end
 

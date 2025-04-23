@@ -29,7 +29,6 @@ defmodule Timesink.Storage.Blob do
     field :mime, :string
     field :checksum, :string
     field :metadata, :map
-    field :mux_playback_id, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -45,6 +44,7 @@ defmodule Timesink.Storage.Blob do
     end)
     |> foreign_key_constraint(:user_id)
     |> unique_constraint(:uri)
+    |> unique_constraint(:checksum)
   end
 
   @doc """

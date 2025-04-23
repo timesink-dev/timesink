@@ -19,7 +19,6 @@ defmodule Timesink.Storage.Attachment do
   schema "abstract table: attachment" do
     field :assoc_id, :binary_id
     field :name, :string
-    field :metadata, :map, default: %{}
     belongs_to :blob, Timesink.Storage.Blob
 
     timestamps(type: :utc_datetime)
@@ -29,7 +28,7 @@ defmodule Timesink.Storage.Attachment do
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = att, %{} = params) do
     att
-    |> cast(params, [:blob_id, :assoc_id, :name, :metadata])
+    |> cast(params, [:blob_id, :assoc_id, :name])
     |> validate_required([:blob_id, :assoc_id, :name])
     |> foreign_key_constraint(:blob_id)
     |> unique_constraint([:assoc_id, :name])
