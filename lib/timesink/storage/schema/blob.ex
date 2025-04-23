@@ -11,7 +11,6 @@ defmodule Timesink.Storage.Blob do
           __struct__: __MODULE__,
           service: service(),
           uri: :string,
-          url: :string,
           size: :integer,
           mime: :string,
           checksum: :string,
