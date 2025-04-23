@@ -37,13 +37,11 @@ defmodule Timesink.Factory do
   def attachment_factory do
     blob = insert(:blob)
 
-    target_schema = Ecto.Enum.values(Storage.Attachment, :target_schema) |> Enum.random()
-    target_id = Ecto.UUID.generate()
+    assoc_id = Ecto.UUID.generate()
 
     %Timesink.Storage.Attachment{
       blob_id: blob.id,
-      target_schema: target_schema,
-      target_id: target_id,
+      assoc_id: assoc_id,
       name: "test_attachment"
     }
   end
@@ -85,7 +83,6 @@ defmodule Timesink.Factory do
   def profile_factory do
     %Timesink.Accounts.Profile{
       bio: Faker.Lorem.sentence(),
-      avatar_url: Faker.Internet.url(),
       location: build(:location),
       birthdate: Faker.Date.date_of_birth(),
       org_name: Faker.Company.name(),
@@ -186,16 +183,6 @@ defmodule Timesink.Factory do
       film: film,
       showcase: showcase,
       theater: theater
-    }
-  end
-
-  # Timesink.Mux
-
-  def mux_upload_factory do
-    %Timesink.Storage.MuxUpload{
-      mux_id: Ecto.UUID.generate(),
-      asset_id: Ecto.UUID.generate(),
-      playback_id: Ecto.UUID.generate()
     }
   end
 end

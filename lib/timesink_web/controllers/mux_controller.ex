@@ -1,13 +1,9 @@
 defmodule TimesinkWeb.MuxController do
-  alias Ecto.UUID
-  alias Timesink.Storage.MuxUpload
   use TimesinkWeb, :controller
   require Logger
   alias Timesink.Repo
   alias Timesink.Storage.Blob
   alias Timesink.Cinema.Film
-  alias Timesink.Storage.MuxUpload
-  alias Timesink.Storage
 
   def it_works(conn, _params) do
     conn
@@ -21,8 +17,6 @@ defmodule TimesinkWeb.MuxController do
     webhook_key =
       Application.get_env(:timesink, Timesink.Storage.Mux)
       |> Keyword.get(:webhook_key)
-
-    IO.inspect(webhook_key, label: "webhook_key")
 
     case params["webhook_key"] do
       ^webhook_key ->
@@ -42,10 +36,9 @@ defmodule TimesinkWeb.MuxController do
   different types of events and act accordingly.
   """
   @spec handle_webhook(params :: map()) :: term()
-  def handle_webhook(%{"type" => "video.asset.created", "data" => asset} = _params) do
-    IO.puts("🎬 Mux asset.created webhook received")
-
+  def handle_webhook(%{"type" => "video.asset.ready", "data" => asset} = params) do
     title = asset["meta"]["title"] || "Untitled"
+    # temporary solution (film will already have been instantiaed via backpex admin panel)
     year = Date.utc_today().year
 
     film_params = %{
@@ -59,20 +52,33 @@ defmodule TimesinkWeb.MuxController do
       synopsis: "Uploaded via Mux"
     }
 
-    with {:ok, film} <- maybe_create_film(film_params),
-         {:ok, blob} <- create_mux_blob(asset),
-         {:ok, _attachment} <- Storage.create_attachment(film, :video, blob) do
-      IO.puts("🎞️ Attachment created and linked to film")
-      :ok
-    else
-      {:error, %Ecto.Changeset{} = changeset} ->
-        IO.inspect(changeset.errors, label: "❌ Film creation failed with validation errors")
-        {:error, :invalid_film}
+    metadata = %{
+      "mux_asset" => %{
+        "playback_id" => asset["playback_ids"],
+        "asset_id" => asset["id"],
+        "upload_id" => asset["upload_id"],
+        "uploaded_at" => params["created_at"],
+        "title" => asset["meta"]["title"]
+      }
+    }
 
-      {:error, reason} ->
-        IO.inspect(reason, label: "❌ Error in attachment pipeline")
-        {:error, reason}
-    end
+    blob_params = %{
+      service: :mux,
+      uri: asset["id"],
+      metadata: metadata
+    }
+
+    Repo.transaction(fn ->
+      with {:ok, film} <- maybe_create_film(film_params),
+           {:ok, blob} <- Blob.create(blob_params),
+           {:ok, _attachment} <- Film.attach_video(film, blob) do
+        :ok
+      else
+        error ->
+          Logger.error(error |> inspect(), service: :mux, params: params)
+          Repo.rollback(error)
+      end
+    end)
   end
 
   def handle_webhook(%{"type" => type} = params)
@@ -85,17 +91,24 @@ defmodule TimesinkWeb.MuxController do
         "video.upload.cancelled" -> :cancelled
       end
 
-    with {:ok, mux_up} <- MuxUpload.get_by(mux_id: asset["id"]),
-         {:ok, _} <- MuxUpload.update(mux_up, %{status: new_status}) do
-      Logger.info("MuxUpload status updated",
-        service: :mux,
-        params: params,
-        mux_upload_id: mux_up.id,
-        mux_upload_status: new_status
-      )
-    else
-      error -> Logger.error(error |> inspect(), service: :mux, params: params)
-    end
+    Logger.info("Mux video upload status updated",
+      service: :mux,
+      params: params,
+      mux_upload_id: asset["id"],
+      mux_upload_status: new_status
+    )
+  end
+
+  def handle_webhook(%{"type" => "video.asset.deleted", "data" => asset} = params) do
+    Repo.transaction(fn ->
+      with {:ok, blob} <- Blob.get_by(uri: asset["id"]),
+           {:ok, _} <- Blob.delete(blob) do
+      else
+        error ->
+          Logger.error(error |> inspect(), service: :mux, params: params)
+          Repo.rollback(error)
+      end
+    end)
   end
 
   def handle_webhook(%{"type" => "video.asset.errored"} = params) do
@@ -118,20 +131,5 @@ defmodule TimesinkWeb.MuxController do
       film ->
         {:ok, film}
     end
-  end
-
-  defp create_mux_blob(asset) do
-    uri = asset["id"]
-    metadata = %{"asset" => asset}
-
-    blob_params = %{
-      service: :s3,
-      uri: uri,
-      metadata: metadata
-    }
-
-    %Blob{}
-    |> Blob.changeset(blob_params)
-    |> Repo.insert()
   end
 end

@@ -23,14 +23,13 @@ defmodule Timesink.Storage.Blob do
 
   schema "blob" do
     has_one :attachment, {"blob_attachment", Storage.Attachment}, foreign_key: :assoc_id
-
     field :service, Ecto.Enum, values: [:s3, :mux], default: :s3
     field :uri, :string
-    field :url, :string
     field :size, :integer
     field :mime, :string
     field :checksum, :string
     field :metadata, :map
+    field :mux_playback_id, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -39,7 +38,7 @@ defmodule Timesink.Storage.Blob do
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = blob, %{} = params) do
     blob
-    |> cast(params, [:id, :uri, :url, :size, :mime, :checksum, :metadata])
+    |> cast(params, [:id, :uri, :size, :mime, :checksum, :metadata, :service])
     |> validate_required([:uri])
     |> validate_change(:metadata, fn _, value ->
       if is_map(value), do: [], else: [metadata: "must be a map"]

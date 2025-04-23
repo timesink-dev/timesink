@@ -3,9 +3,10 @@ defmodule Timesink.Cinema.Film do
   use SwissSchema, repo: Timesink.Repo
   use Timesink.Schema
   import Ecto.Changeset
+  alias Timesink.Storage
 
   @type color ::
-          :color | :black_and_white | :sepia | :monochrome | :partially_colorized | :techinicolor
+          :color | :black_and_white | :sepia | :monochrome | :partially_colorized | :technicolor
   @colors [:color, :black_and_white, :sepia, :monochrome, :partially_colorized, :technicolor]
   def colors, do: @colors
 
@@ -69,15 +70,14 @@ defmodule Timesink.Cinema.Film do
   end
 
   def attach_poster(%{__struct__: __MODULE__} = film, upload) do
-    Timesink.Storage.create_attachment(film, :poster, upload)
+    Storage.create_attachment(film, :poster, upload)
   end
 
-  def attach_video(%{__struct__: __MODULE__} = film, upload) do
-    IO.inspect(upload, label: "attach_video")
-    Timesink.Storage.create_attachment(film, :video, upload)
+  def attach_video(%{__struct__: __MODULE__} = film, blob) do
+    Storage.create_attachment(film, :video, blob)
   end
 
   def attach_trailer(%{__struct__: __MODULE__} = film, upload) do
-    Timesink.Storage.create_attachment(film, :trailer, upload)
+    Storage.create_attachment(film, :trailer, upload)
   end
 end

@@ -4,6 +4,7 @@ defmodule Timesink.Accounts.Profile do
   use Timesink.Schema
   import Ecto.Changeset
   alias Timesink.Accounts
+  alias Timesink.Storage
 
   @type t :: %{
           __struct__: __MODULE__,
@@ -55,6 +56,6 @@ defmodule Timesink.Accounts.Profile do
   end
 
   def attach_avatar(%{__struct__: __MODULE__} = profile, %Plug.Upload{} = upload) do
-    Timesink.Storage.create_attachment(profile, :avatar, upload)
+    Storage.create_attachment(profile, :avatar, upload)
   end
 end

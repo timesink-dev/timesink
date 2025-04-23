@@ -20,11 +20,11 @@ defmodule TimesinkWeb.MuxControllerTest do
       assert %Plug.Conn{status: 403} = conn
     end
 
-    test "creates a new Blob on 'video.asset.created'", %{conn: conn} do
+    test "creates a new Blob on 'video.asset.ready'", %{conn: conn} do
       asset_id = Ecto.UUID.generate()
 
       params = %{
-        "type" => "video.asset.created",
+        "type" => "video.asset.ready",
         "data" => %{
           "id" => asset_id
         }

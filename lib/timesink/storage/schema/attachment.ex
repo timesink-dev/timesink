@@ -25,12 +25,6 @@ defmodule Timesink.Storage.Attachment do
     timestamps(type: :utc_datetime)
   end
 
-  # i.e. "user.attachment(%{name: "avatar"), film.attachment(%{name: "playable"}), etc.
-  # creates tables "user_attachment", "film_attachment", "showcase_attachment"
-  # -> blod_id, recprd_id
-
-  # Repo.insert!(build_assoc(profile, :avatar))
-
   @spec changeset(att :: t(), params :: %{optional(atom()) => term()}) ::
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = att, %{} = params) do

@@ -6,7 +6,7 @@ defmodule Timesink.Repo.Migrations.CreateConcreteAttachmentTables do
       create table(:"#{table}_attachment", primary_key: false) do
         add :id, :uuid, primary_key: true
         add :assoc_id, references(:"#{table}", type: :uuid, on_delete: :delete_all), null: false
-        add :blob_id, references(:blob, type: :uuid), null: false
+        add :blob_id, references(:blob, type: :uuid, on_delete: :delete_all), null: false
         add :name, :string, null: false
         add :metadata, :map
         timestamps(type: :utc_datetime)
