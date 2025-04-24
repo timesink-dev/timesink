@@ -47,10 +47,6 @@ defmodule TimesinkWeb.MuxController do
       "upload_title" => asset["meta"]["title"] || "Untitled"
     }
 
-    # for testing purposes
-
-    IO.inspect(mux_metadata, label: "Mux Metadata")
-
     Repo.transaction(fn ->
       with {:ok, mux_upload} <- MuxUpload.get_by(upload_id: asset["upload_id"]),
            film_id when not is_nil(film_id) <- get_in(mux_upload.meta, ["film_id"]),
@@ -75,36 +71,36 @@ defmodule TimesinkWeb.MuxController do
     end)
   end
 
-  def handle_webhook(%{"type" => "video.upload.created", "data" => asset} = params) do
-    # temp solution - this film_id will be dynamically passed into these initial uploaad params to create a MuxUpload when uploading has started
-    # so this webhook handling won't be needed once the client upload logic is setup
+  # def handle_webhook(%{"type" => "video.upload.created", "data" => asset} = params) do
+  #   # temp solution - this film_id will be dynamically passed into these initial uploaad params to create a MuxUpload when uploading has started
+  #   # so this webhook handling won't be needed once the client upload logic is setup
 
-    mux_upload_params = %{
-      upload_id: asset["id"],
-      url: asset["url"],
-      status: :asset_created,
-      meta: %{
-        "film_id" => "b65127c8-59bc-4f02-bc43-6e9eaf44dda8",
-        "response" => asset
-      }
-    }
+  #   mux_upload_params = %{
+  #     upload_id: asset["id"],
+  #     url: asset["url"],
+  #     status: :asset_created,
+  #     meta: %{
+  #       "film_id" => "b65127c8-59bc-4f02-bc43-6e9eaf44dda8",
+  #       "response" => asset
+  #     }
+  #   }
 
-    with {:ok, _mux_upload} <- MuxUpload.create(mux_upload_params) do
-      :ok
-    else
-      error -> Logger.error(error |> inspect(), service: :mux, params: params)
-    end
+  #   with {:ok, _mux_upload} <- MuxUpload.create(mux_upload_params) do
+  #     :ok
+  #   else
+  #     error -> Logger.error(error |> inspect(), service: :mux, params: params)
+  #   end
 
-    MuxUpload.create(%{
-      upload_id: asset["id"],
-      url: asset["url"],
-      status: :asset_created,
-      meta: %{
-        "film_id" => "b65127c8-59bc-4f02-bc43-6e9eaf44dda8",
-        "response" => asset
-      }
-    })
-  end
+  #   MuxUpload.create(%{
+  #     upload_id: asset["id"],
+  #     url: asset["url"],
+  #     status: :asset_created,
+  #     meta: %{
+  #       "film_id" => "b65127c8-59bc-4f02-bc43-6e9eaf44dda8",
+  #       "response" => asset
+  #     }
+  #   })
+  # end
 
   def handle_webhook(%{"type" => type} = params)
       when type in ["video.upload.errored", "video.upload.cancelled"] do

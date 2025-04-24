@@ -8,6 +8,7 @@ defmodule Timesink.Waitlist.InviteScheduler do
   # 1 hour in seconds
   @delay_seconds 3600
 
+  @spec schedule_invite(any()) :: {:error, <<_::200>>} | {:ok, pos_integer()}
   def schedule_invite(applicant_id) do
     delay_seconds = Enum.random(@delay_range) * @delay_seconds
     scheduled_at = DateTime.add(DateTime.utc_now(), delay_seconds, :second)

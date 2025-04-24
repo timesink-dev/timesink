@@ -72,6 +72,7 @@ defmodule Timesink.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.6"},
       {:timex, "~> 3.7"},
+      {:tesla, "~> 1.11"},
       {:mox, "~> 1.0", only: :test}
     ]
   end
