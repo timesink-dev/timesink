@@ -7,38 +7,69 @@ defmodule Timesink.Storage.Mux do
   alias Timesink.Repo
   alias Timesink.Storage.MuxUpload
 
-  @spec create_upload_url(
-          params :: %{
-            optional(:cors_origin) => String.t(),
-            optional(:timeout) => integer(),
-            optional(:test) => boolean(),
-            optional(:new_asset_settings) => map(),
-            optional(:film_id) => Ecto.UUID.t() | String.t()
-          },
-          opts :: Keyword.t()
-        ) ::
-          {:ok, MuxUpload.t()} | {:error, term()}
-  def create_upload_url(upload_params, opts \\ []) do
+  # @spec generate_upload_url(
+  #         params :: %{
+  #           optional(:cors_origin) => String.t(),
+  #           optional(:timeout) => integer(),
+  #           optional(:test) => boolean(),
+  #           optional(:new_asset_settings) => map()
+  #         },
+  #         opts :: Keyword.t()
+  #       ) ::
+  #         {:ok, map()} | {:error, term()}
+  def generate_upload_url(upload_params, opts \\ []) do
     config = config()
     key_id = Keyword.get(opts, :access_key_id, config.access_key_id)
     key_secret = Keyword.get(opts, :access_key_secret, config.access_key_secret)
 
-    # Extract and remove `film_id` from the upload_params, so it doesn't go to Mux
-    {film_id, upload_params} = Map.pop(upload_params, :film_id)
+    mux_client = Mux.client(key_id, key_secret)
+    IO.inspect(key_id, label: "Mux key_id")
+    IO.inspect(key_secret, label: "Mux key_secret")
+    IO.inspect(upload_params, label: "Mux upload params")
+
+    params = %{
+      "new_asset_settings" => %{"playback_policy" => ["public"], "video_quality" => "basic"},
+      "cors_origin" => "http://127.0.0.1:4040 "
+    }
+
+    # case Mux.Video.Uploads.create(mux_client, params) do
+    #   _ ->
+    #     Logger.debug("Mux upload error")
+
+    #   {:ok, data, _client} ->
+    #     Logger.debug("Mux Upload Response: #{inspect(data)}")
+    #     {:ok, data}
+
+    #   {:error, reason, _client} ->
+    #     Logger.error("Mux upload error: #{inspect(reason)}")
+    #     {:error, reason}
+    # end
+
+    case Mux.Video.Uploads.create(mux_client, params) do
+      {:ok, data, _client} ->
+        IO.inspect(data, label: "Mux Upload Response")
+        Logger.debug("Mux upload successful")
+        {:ok, data}
+
+      {:error, reason, _client} ->
+        Logger.error("Mux upload error: #{inspect(reason)}")
+        {:error, reason}
+    end
+  end
+
+  def create_mux_upload(upload_params) do
+    mux_upload_params = %{
+      upload_id: upload_params["upload_id"],
+      url: upload_params["url"],
+      meta: %{
+        "film_id" => upload_params["film_id"]
+        # "response" => upload_params
+      }
+    }
 
     Repo.transaction(fn ->
-      mux_client = Mux.client(key_id, key_secret)
-
-      with {:ok, resp, _} <- Mux.Video.Uploads.create(mux_client, upload_params),
-           blob_params <- %{
-             mux_id: resp["id"],
-             meta: %{
-               "film_id" => film_id,
-               "response" => resp
-             }
-           },
-           {:ok, mux_upload} <- MuxUpload.create(blob_params) do
-        mux_upload
+      with {:ok, mux_upload} <- MuxUpload.create(mux_upload_params) do
+        {:ok, mux_upload}
       else
         error ->
           error = if not match?({:error, _}, error), do: error, else: elem(error, 1)

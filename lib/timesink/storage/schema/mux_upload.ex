@@ -15,6 +15,7 @@ defmodule Timesink.Storage.MuxUpload do
   @type t :: %{
           __struct__: __MODULE__,
           status: status(),
+          url: string,
           upload_id: :string
         }
 

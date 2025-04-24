@@ -90,6 +90,7 @@ defmodule TimesinkWeb.Router do
     get "/", RedirectController, :redirect_to_showcases
 
     live_session :admin, on_mount: Backpex.InitAssigns do
+      live "/film-uploads", Admin.FilmUploadLive
       live_resources "/showcases", Admin.ShowcaseLive
       live_resources "/waitlist", Admin.WaitlistLive
       live_resources "/films", Admin.FilmLive

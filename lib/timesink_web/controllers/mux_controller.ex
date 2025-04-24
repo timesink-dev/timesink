@@ -44,10 +44,12 @@ defmodule TimesinkWeb.MuxController do
       "asset_id" => asset["id"],
       "upload_id" => asset["upload_id"],
       "uploaded_at" => params["created_at"],
-      "upload_title" => asset["meta"]["title"]
+      "upload_title" => asset["meta"]["title"] || "Untitled"
     }
 
     # for testing purposes
+
+    IO.inspect(mux_metadata, label: "Mux Metadata")
 
     Repo.transaction(fn ->
       with {:ok, mux_upload} <- MuxUpload.get_by(upload_id: asset["upload_id"]),
