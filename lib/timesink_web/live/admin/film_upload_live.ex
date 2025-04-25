@@ -52,6 +52,14 @@ defmodule TimesinkWeb.Admin.FilmUploadLive do
         >
         </mux-uploader>
       <% end %>
+      <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player" defer>
+      </script>
+      <mux-player
+        playback-id="bTcwavprQFjFfmipCRQd8iNZxdwtyLK6o8y76gJqQSQ"
+        metadata-video-title="Test VOD"
+        stream-type="ll-live"
+      >
+      </mux-player>
     </div>
     """
   end
@@ -75,7 +83,7 @@ defmodule TimesinkWeb.Admin.FilmUploadLive do
 
     Logger.debug("Generating Mux upload URL with params: #{inspect(params)}")
 
-    with {:ok, %{"id" => upload_id, "url" => url} = upload} <- Mux.generate_upload_url(params),
+    with {:ok, %{"id" => upload_id, "url" => url} = _upload} <- Mux.generate_upload_url(params),
          {:ok, _mux_upload} <-
            Mux.create_mux_upload(%{
              "upload_id" => upload_id,
