@@ -91,6 +91,8 @@ defmodule TimesinkWeb.Router do
 
     live_session :admin, on_mount: Backpex.InitAssigns do
       live "/film-uploads", Admin.FilmUploadLive
+      live "/film-media", Admin.FilmMediaLive
+      live "/film-media/:id", Admin.FilmMediaShowLive, :show
       live_resources "/showcases", Admin.ShowcaseLive
       live_resources "/waitlist", Admin.WaitlistLive
       live_resources "/films", Admin.FilmLive

@@ -51,6 +51,22 @@ defmodule Timesink.Storage.Mux do
     end)
   end
 
+  def delete_asset(asset_id, opts \\ []) do
+    config = config()
+    key_id = Keyword.get(opts, :access_key_id, config.access_key_id)
+    key_secret = Keyword.get(opts, :access_key_secret, config.access_key_secret)
+
+    mux_client = Mux.client(key_id, key_secret)
+
+    with {:ok, "", _client} <- Mux.Video.Assets.delete(mux_client, asset_id) do
+      {:ok, ""}
+    else
+      {:error, reason, _client} ->
+        Logger.error("Error deleting Mux asset: #{inspect(reason)}")
+        {:error, reason}
+    end
+  end
+
   @type config :: %{
           access_key_id: String.t(),
           access_key_secret: String.t()

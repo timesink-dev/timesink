@@ -15,51 +15,80 @@ defmodule TimesinkWeb.Admin.FilmUploadLive do
      ), layout: {TimesinkWeb.Layouts, :film_upload}}
   end
 
-  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
-    <div>
-      <h2>Select a Film</h2>
-      <ul>
+    <div class="p-8 space-y-8">
+      <h2 class="text-2xl font-bold">Manage Films</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <%= for film <- @films do %>
-          <li>
-            <strong>{film.title}</strong>
-            <button
-              type="button"
-              phx-click="select_film"
-              phx-value-id={film.id}
-              class={if @selected_film_id == film.id, do: "selected", else: ""}
-            >
-              Select
-            </button>
-          </li>
+          <div
+            phx-click="select_film"
+            phx-value-id={film.id}
+            class={[
+              "border rounded-lg overflow-hidden shadow hover:shadow-lg cursor-pointer transition",
+              @selected_film_id == film.id && "ring-2 ring-indigo-500"
+            ]}
+          >
+            <div class="aspect-w-16 aspect-h-9 bg-gray-100">
+              <%!-- <%= if film.poster_url do %>
+                <img src={film.poster_url} alt={film.title} class="object-cover w-full h-full" />
+              <% else %> --%>
+              <div class="flex items-center justify-center h-full text-gray-400">No Poster</div>
+              <%!-- <% end %> --%>
+            </div>
+            <div class="p-4 space-y-2">
+              <h3 class="text-lg font-semibold">{film.title} ({film.year})</h3>
+              <p class="text-sm text-gray-500">Duration: {film.duration} min</p>
+              <p class="text-sm text-gray-700 line-clamp-2">{film.synopsis}</p>
+            </div>
+          </div>
         <% end %>
-      </ul>
+      </div>
 
-      <%= if @selected_film_id && is_nil(@upload_url) do %>
-        <button phx-click="generate_upload_url" class="generate-btn">
-          Generate Upload URL
-        </button>
-      <% end %>
+      <%= if @selected_film_id do %>
+        <div class="mt-8 space-y-4">
+          <h3 class="text-xl font-semibold">Selected Film Actions</h3>
 
-      <%= if  @upload_url do %>
-        <script src="https://cdn.jsdelivr.net/npm/@mux/mux-uploader">
-        </script>
-        <mux-uploader
-          pausable
-          endpoint={@upload_url}
-          style="margin-top: 20px; border: 1px solid #ccc; padding: 20px; display: block;"
-        >
-        </mux-uploader>
+          <%= if @selected_film && @selected_film.video_attachment_url do %>
+            <div class="border p-4 rounded-lg bg-gray-50">
+              <h4 class="mb-2 font-medium">Video Preview</h4>
+              <mux-player
+                playback-id={@selected_film.video_playback_id}
+                metadata-video-title={@selected_film.title}
+                stream-type="on-demand"
+                class="w-full aspect-w-16 aspect-h-9"
+              >
+              </mux-player>
+            </div>
+          <% else %>
+            <div class="border p-4 rounded-lg bg-yellow-50 text-yellow-700">
+              No video uploaded yet.
+            </div>
+
+            <%= if is_nil(@upload_url) do %>
+              <button
+                phx-click="generate_upload_url"
+                class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+              >
+                Upload Video
+              </button>
+            <% else %>
+              <div class="border mt-4 p-4 rounded-lg bg-white shadow">
+                <h4 class="font-medium mb-2">Upload your video</h4>
+                <script src="https://cdn.jsdelivr.net/npm/@mux/mux-uploader">
+                </script>
+                <mux-uploader
+                  pausable
+                  endpoint={@upload_url}
+                  style="margin-top: 10px; border: 1px solid #ccc; padding: 20px; display: block;"
+                >
+                </mux-uploader>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
       <% end %>
-      <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player" defer>
-      </script>
-      <mux-player
-        playback-id="bTcwavprQFjFfmipCRQd8iNZxdwtyLK6o8y76gJqQSQ"
-        metadata-video-title="Test VOD"
-        stream-type="ll-live"
-      >
-      </mux-player>
     </div>
     """
   end
