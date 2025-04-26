@@ -12,45 +12,46 @@ defmodule TimesinkWeb.Admin.FilmMediaLive do
      ), layout: {TimesinkWeb.Layouts, :film_upload}}
   end
 
-  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
-    <div class="p-8">
-      <h1 class="text-2xl font-bold mb-6 text-logo">Film Media Management</h1>
+    <div class="p-8 min-h-screen space-y-10">
+      <h1 class="text-4xl font-bold text-center mb-12">Film Catalogue Media Management</h1>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
         <%= for film <- @films do %>
-          <div class="border rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
+          <div
+            phx-click="manage_film"
+            phx-value-id={film.id}
+            class="cursor-pointer bg-obsidian bg-opacity-60 border border-dark-theater-medium hover:border-neon-blue-lightest hover:shadow-lg hover:scale-[1.02] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden shadow-md group h-[28rem]"
+          >
             <div class="relative">
               <%= if film.poster do %>
-                <img src={poster_url(film.poster)} alt={film.title} class="w-full h-48 object-cover" />
+                <img
+                  src={poster_url(film.poster)}
+                  alt={film.title}
+                  class="w-full h-64 object-cover group-hover:opacity-90 transition"
+                />
               <% else %>
-                <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+                <div class="w-full h-64 bg-obsidian flex items-center justify-center text-dark-theater-light text-lg">
                   No Poster Available
                 </div>
               <% end %>
             </div>
 
-            <div class="p-4">
-              <h2 class="text-lg font-semibold">{film.title} ({film.year})</h2>
-              <p class="text-sm text-gray-500 mb-2">{film.duration} min</p>
-              <p class="text-sm text-gray-700 truncate">{film.synopsis}</p>
+            <div class="px-6 pt-6 space-y-2 bg-backroom-black">
+              <h2 class="text-2xl font-semibold text-mystery-white">{film.title}</h2>
+              <p class="text-mystery-white text-sm">{film.year} • {film.duration} min</p>
+              <p class="text-sm text-mystery-white truncate">{film.synopsis}</p>
 
-              <div class="flex items-center justify-between mt-4">
+              <div class="mt-4">
                 <span class={
-                  "text-xs font-semibold rounded px-2 py-1 " <>
-                  if film.video, do: "bg-green-100 text-green-800", else: "bg-yellow-100 text-yellow-800"
-                }>
+              "inline-block text-xs font-semibold rounded-full px-3 py-1 " <>
+              if film.video,
+                do: "bg-green-600 text-green-100",
+                else: "bg-yellow-500 text-yellow-100"
+            }>
                   {if film.video, do: "Video Uploaded", else: "No Video"}
                 </span>
-
-                <button
-                  phx-click="manage_film"
-                  phx-value-id={film.id}
-                  class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded"
-                >
-                  Manage
-                </button>
               </div>
             </div>
           </div>
