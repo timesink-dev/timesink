@@ -48,6 +48,7 @@ defmodule TimesinkWeb.MuxController do
            {:ok, blob} <-
              Blob.create(%{
                uri: mux_upload.url,
+               checksum: Blob.checksum(mux_upload.url),
                service: :mux,
                metadata: %{
                  "mux_asset" => mux_metadata,

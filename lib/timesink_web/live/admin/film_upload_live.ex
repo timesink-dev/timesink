@@ -2,7 +2,6 @@ defmodule TimesinkWeb.Admin.FilmUploadLive do
   use TimesinkWeb, :live_view
   alias Timesink.Cinema.Film
   alias Timesink.Storage.Mux
-  alias Timesink.Storage.MuxUpload
   require Logger
 
   def mount(_params, _session, socket) do
@@ -76,8 +75,6 @@ defmodule TimesinkWeb.Admin.FilmUploadLive do
             <% else %>
               <div class="border mt-4 p-4 rounded-lg bg-white shadow">
                 <h4 class="font-medium mb-2">Upload your video</h4>
-                <script src="https://cdn.jsdelivr.net/npm/@mux/mux-uploader">
-                </script>
                 <mux-uploader
                   pausable
                   endpoint={@upload_url}

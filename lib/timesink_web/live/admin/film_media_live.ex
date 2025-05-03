@@ -15,6 +15,9 @@ defmodule TimesinkWeb.Admin.FilmMediaLive do
   def render(assigns) do
     ~H"""
     <div class="p-8 min-h-screen space-y-10">
+      <.button color="none" class="mt-6 p-0 text-center" phx-click="go_back">
+        ← Back to Admin console
+      </.button>
       <h1 class="text-4xl font-bold text-center mb-12">Film Catalogue Media Management</h1>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
@@ -38,7 +41,7 @@ defmodule TimesinkWeb.Admin.FilmMediaLive do
               <% end %>
             </div>
 
-            <div class="px-6 pt-6 space-y-2 bg-backroom-black">
+            <div class="px-6 pt-6 space-y-2 bg-backroom-black h-full">
               <h2 class="text-2xl font-semibold text-mystery-white">{film.title}</h2>
               <p class="text-mystery-white text-sm">{film.year} • {film.duration} min</p>
               <p class="text-sm text-mystery-white truncate">{film.synopsis}</p>
@@ -63,7 +66,11 @@ defmodule TimesinkWeb.Admin.FilmMediaLive do
 
   defp poster_url(poster) do
     # Depending how you store paths...
-    Routes.static_path(TimesinkWeb.Endpoint, poster.path)
+    Phoenix.VerifiedRoutes.static_path(TimesinkWeb.Endpoint, poster.path)
+  end
+
+  def handle_event("go_back", _params, socket) do
+    {:noreply, push_navigate(socket, to: "/admin")}
   end
 
   def handle_event("manage_film", %{"id" => id}, socket) do

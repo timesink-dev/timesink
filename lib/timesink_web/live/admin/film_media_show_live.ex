@@ -64,7 +64,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
             stream-type="on-demand"
           />
           <button
-            class="mt-6 bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-3 rounded-lg transition"
+            class="mt-6 bg-red-600 hover:bg-red-700 text-backroom-black font-bold px-6 py-3 rounded-lg transition"
             phx-click="remove_video"
           >
             Remove Video
