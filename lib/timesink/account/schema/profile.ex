@@ -62,7 +62,7 @@ defmodule Timesink.Accounts.Profile do
     |> validate_date()
   end
 
-    def attach_avatar(%{__struct__: __MODULE__} = profile, %Plug.Upload{} = upload) do
+  def attach_avatar(%{__struct__: __MODULE__} = profile, %Plug.Upload{} = upload) do
     Storage.create_attachment(profile, :avatar, upload)
   end
 
@@ -90,5 +90,5 @@ defmodule Timesink.Accounts.Profile do
 
   defp too_old_to_believe?(date) do
     Date.diff(Date.utc_today(), date) > 110 * 365
-end
+  end
 end

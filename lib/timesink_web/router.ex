@@ -38,7 +38,7 @@ defmodule TimesinkWeb.Router do
   scope "/", TimesinkWeb do
     pipe_through [:browser, :require_invite_token]
     live "/onboarding", OnboardingLive
-end
+  end
 
   scope "/api", TimesinkWeb do
     pipe_through :api
