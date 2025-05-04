@@ -3,13 +3,12 @@ defmodule Timesink.Storage.Blob do
   use SwissSchema, repo: Timesink.Repo
   use Timesink.Schema
   import Ecto.Changeset
+  alias Timesink.Storage
 
   @type service :: :s3 | :mux
 
   @type t :: %{
           __struct__: __MODULE__,
-          user_id: :integer,
-          user: Timesink.Accounts.User.t(),
           service: service(),
           uri: :string,
           size: :integer,
@@ -22,8 +21,7 @@ defmodule Timesink.Storage.Blob do
   @foreign_key_type :binary_id
 
   schema "blob" do
-    belongs_to :user, Timesink.Accounts.User
-
+    has_one :attachment, {"blob_attachment", Storage.Attachment}, foreign_key: :assoc_id
     field :service, Ecto.Enum, values: [:s3, :mux], default: :s3
     field :uri, :string
     field :size, :integer
@@ -38,13 +36,14 @@ defmodule Timesink.Storage.Blob do
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = blob, %{} = params) do
     blob
-    |> cast(params, [:id, :user_id, :uri, :size, :mime, :checksum, :metadata])
+    |> cast(params, [:id, :uri, :size, :mime, :checksum, :metadata, :service])
     |> validate_required([:uri])
     |> validate_change(:metadata, fn _, value ->
       if is_map(value), do: [], else: [metadata: "must be a map"]
     end)
     |> foreign_key_constraint(:user_id)
     |> unique_constraint(:uri)
+    |> unique_constraint(:checksum)
   end
 
   @doc """

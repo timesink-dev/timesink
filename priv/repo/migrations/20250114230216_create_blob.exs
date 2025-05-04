@@ -8,7 +8,7 @@ defmodule Timesink.Repo.Migrations.CreateBlob do
       timestamps type: :utc_datetime
 
       add :user_id, references(:user, type: :uuid, on_delete: :delete_all)
-      add :path, :string, null: false
+      add :path, :text, null: false
       add :size, :integer
       add :mime, :string
       add :checksum, :string

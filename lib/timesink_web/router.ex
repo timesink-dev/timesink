@@ -44,7 +44,6 @@ end
     pipe_through :api
 
     # Mux webhooks
-    get "/webhooks/mux.com", MuxController, :it_works
     post "/webhooks/mux.com/:webhook_key", MuxController, :webhook
   end
 
