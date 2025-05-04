@@ -3,9 +3,10 @@ defmodule Timesink.Cinema.Film do
   use SwissSchema, repo: Timesink.Repo
   use Timesink.Schema
   import Ecto.Changeset
+  alias Timesink.Storage
 
   @type color ::
-          :color | :black_and_white | :sepia | :monochrome | :partially_colorized | :techinicolor
+          :color | :black_and_white | :sepia | :monochrome | :partially_colorized | :technicolor
   @colors [:color, :black_and_white, :sepia, :monochrome, :partially_colorized, :technicolor]
   def colors, do: @colors
 
@@ -36,6 +37,18 @@ defmodule Timesink.Cinema.Film do
     field :format, Ecto.Enum, values: @formats
     field :synopsis, :string
 
+    has_one :video, {"film_attachment", Timesink.Storage.Attachment},
+      foreign_key: :assoc_id,
+      where: [name: "video"]
+
+    has_one :poster, {"film_attachment", Timesink.Storage.Attachment},
+      foreign_key: :assoc_id,
+      where: [name: "poster"]
+
+    has_one :trailer, {"film_attachment", Timesink.Storage.Attachment},
+      foreign_key: :assoc_id,
+      where: [name: "trailer"]
+
     many_to_many :genres, Timesink.Cinema.Genre, join_through: "film_genre"
 
     has_many :directors, Timesink.Cinema.FilmCreative, where: [role: :director]
@@ -52,7 +65,19 @@ defmodule Timesink.Cinema.Film do
   def changeset(film, params, _metadata \\ []) do
     film
     |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
-    |> validate_required([:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
+    |> validate_required([:title, :year, :duration, :color, :format, :aspect_ratio])
     |> validate_length(:title, min: 1)
+  end
+
+  def attach_poster(%{__struct__: __MODULE__} = film, upload) do
+    Storage.create_attachment(film, :poster, upload)
+  end
+
+  def attach_video(%{__struct__: __MODULE__} = film, blob) do
+    Storage.create_attachment(film, :video, blob)
+  end
+
+  def attach_trailer(%{__struct__: __MODULE__} = film, upload) do
+    Storage.create_attachment(film, :trailer, upload)
   end
 end

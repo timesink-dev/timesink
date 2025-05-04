@@ -4,12 +4,13 @@ defmodule Timesink.Accounts.Profile do
   use Timesink.Schema
   import Ecto.Changeset
   alias Timesink.Accounts
+  alias Timesink.Storage
 
   @type t :: %{
           __struct__: __MODULE__,
           user_id: Ecto.UUID.t(),
           user: Accounts.User.t(),
-          avatar_url: String.t(),
+          avatar: Timesink.Storage.Attachment.t(),
           birthdate: Date.t(),
           location: Accounts.Location.t(),
           org_name: String.t(),
@@ -23,7 +24,10 @@ defmodule Timesink.Accounts.Profile do
   schema "profile" do
     belongs_to :user, Accounts.User
 
-    field :avatar_url, :string
+    has_one :avatar, {"profile_attachment", Storage.Attachment},
+      foreign_key: :assoc_id,
+      where: [name: "avatar"]
+
     field :birthdate, :date
     field :org_name, :string
     field :org_position, :string
@@ -42,7 +46,6 @@ defmodule Timesink.Accounts.Profile do
     struct
     |> cast(params, [
       :user_id,
-      :avatar_url,
       :birthdate,
       :org_name,
       :org_position,
@@ -57,6 +60,10 @@ defmodule Timesink.Accounts.Profile do
     |> cast(params, [:birthdate])
     |> validate_required([:birthdate])
     |> validate_date()
+  end
+
+  def attach_avatar(%{__struct__: __MODULE__} = profile, %Plug.Upload{} = upload) do
+    Storage.create_attachment(profile, :avatar, upload)
   end
 
   defp validate_date(changeset) do

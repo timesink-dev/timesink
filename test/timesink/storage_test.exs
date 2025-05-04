@@ -23,7 +23,7 @@ defmodule Timesink.StorageTest do
       assert blob.size == upload_stat.size
 
       assert {:ok, %{status_code: 200, headers: headers}} =
-               S3.head_object(config.bucket, blob.path) |> ExAws.request()
+               S3.head_object(config.bucket, blob.uri) |> ExAws.request()
 
       obj_content_length =
         headers
@@ -31,10 +31,6 @@ defmodule Timesink.StorageTest do
         |> elem(1)
 
       assert "#{upload_stat.size}" == "#{obj_content_length}"
-    end
-
-    test "accept an opt `user_id`", %{user: %{id: uid}, upload: upload} do
-      assert {:ok, %{user_id: ^uid}} = Storage.create_blob(upload, user_id: uid)
     end
   end
 
@@ -47,9 +43,12 @@ defmodule Timesink.StorageTest do
     end
 
     test "creates an attachment out of a %Plug.Upload{}", %{upload: upload} do
-      params = params_for(:attachment) |> Map.take([:target_schema, :target_id, :name])
+      film = insert(:film)
 
-      assert {:ok, %Attachment{}} = Storage.create_attachment(upload, params)
+      assert {:ok, %Attachment{} = att} = Storage.create_attachment(film, :poster, upload)
+      assert att.name == "poster"
+      assert att.blob_id != nil
+      assert att.assoc_id == film.id
     end
   end
 end
