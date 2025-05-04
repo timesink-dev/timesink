@@ -7,12 +7,6 @@ defmodule TimesinkWeb.MuxController do
   alias Timesink.Cinema.Film
   import Ecto.Query
 
-  def it_works(conn, _params) do
-    conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(200, "It works!")
-  end
-
   def webhook(conn, params) do
     Logger.debug("Mux webhook received", service: :mux, params: params)
 
@@ -46,8 +40,6 @@ defmodule TimesinkWeb.MuxController do
       "uploaded_at" => params["created_at"],
       "upload_title" => asset["meta"]["title"]
     }
-
-    # for testing purposes
 
     Repo.transaction(fn ->
       with {:ok, mux_upload} <- MuxUpload.get_by(upload_id: asset["upload_id"]),

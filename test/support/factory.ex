@@ -191,7 +191,8 @@ defmodule Timesink.Factory do
   def mux_upload_factory do
     %Timesink.Storage.MuxUpload{
       upload_id: Ecto.UUID.generate(),
-      url: Faker.Internet.url()
+      url: Faker.Internet.url(),
+      status: :waiting
     }
   end
 end
