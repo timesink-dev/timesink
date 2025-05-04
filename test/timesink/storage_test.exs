@@ -32,10 +32,6 @@ defmodule Timesink.StorageTest do
 
       assert "#{upload_stat.size}" == "#{obj_content_length}"
     end
-
-    test "accept an opt `user_id`", %{user: %{id: uid}, upload: upload} do
-      assert {:ok, %{user_id: ^uid}} = Storage.create_blob(upload, user_id: uid)
-    end
   end
 
   describe "create_attachment/3" do
@@ -47,9 +43,12 @@ defmodule Timesink.StorageTest do
     end
 
     test "creates an attachment out of a %Plug.Upload{}", %{upload: upload} do
-      params = params_for(:attachment) |> Map.take([:target_schema, :target_id, :name])
+      film = insert(:film)
 
-      assert {:ok, %Attachment{}} = Storage.create_attachment(upload, params)
+      assert {:ok, %Attachment{} = att} = Storage.create_attachment(film, :poster, upload)
+      assert att.name == "poster"
+      assert att.blob_id != nil
+      assert att.assoc_id == film.id
     end
   end
 end
