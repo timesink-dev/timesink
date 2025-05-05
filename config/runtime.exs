@@ -152,6 +152,12 @@ if config_env() in [:test] do
     access_key_secret: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_SECRET", "minioadmin"),
     bucket: System.get_env("TIMESINK_TEST_S3_BUCKET", "timesink-dev"),
     prefix: System.get_env("TIMESINK_TEST_S3_PREFIX", "blobs")
+
+  config :timesink, Timesink.Storage.Mux,
+    webhook_key: System.get_env("TIMESINK_TEST_MUX_WEBHOOK_KEY", "MUX_WEBHOOK_KEY_TEST"),
+    access_key_id: System.get_env("TIMESINK_TEST_MUX_ACCESS_KEY_ID", "MUX_ACCESS_KEY_ID_TEST"),
+    access_key_secret:
+      System.get_env("TIMESINK_TEST_MUX_ACCESS_KEY_SECRET", "MUX_ACCESS_KEY_SECRET")
 end
 
 if config_env() in [:prod] do

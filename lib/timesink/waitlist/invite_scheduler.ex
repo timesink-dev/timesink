@@ -1,5 +1,5 @@
 defmodule Timesink.Waitlist.InviteScheduler do
-  alias Timesink.Workers.SendInvite
+  alias Timesink.Workers.Waitlist.SendInviteJob
   alias Oban
 
   # a random delay between 24 and 72 hours
@@ -13,7 +13,7 @@ defmodule Timesink.Waitlist.InviteScheduler do
     delay_seconds = Enum.random(@delay_range) * @delay_seconds
     scheduled_at = DateTime.add(DateTime.utc_now(), delay_seconds, :second)
 
-    job = SendInvite.new(%{"applicant_id" => applicant_id}, scheduled_at: scheduled_at)
+    job = SendInviteJob.new(%{"applicant_id" => applicant_id}, scheduled_at: scheduled_at)
 
     case Oban.insert(job) do
       {:ok, job} -> {:ok, job.id}

@@ -38,8 +38,6 @@ defmodule TimesinkWeb.Router do
   scope "/api", TimesinkWeb do
     pipe_through :api
 
-    # Mux webhooks
-    get "/webhooks/mux.com", MuxController, :it_works
     post "/webhooks/mux.com/:webhook_key", MuxController, :webhook
   end
 
@@ -77,11 +75,6 @@ defmodule TimesinkWeb.Router do
     end
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", TimesinkWeb do
-  #   pipe_through :api
-  # end
-
   scope "/admin", TimesinkWeb do
     pipe_through [:browser, :require_admin]
 
@@ -90,7 +83,6 @@ defmodule TimesinkWeb.Router do
     get "/", RedirectController, :redirect_to_showcases
 
     live_session :admin, on_mount: Backpex.InitAssigns do
-      live "/film-uploads", Admin.FilmUploadLive
       live "/film-media", Admin.FilmMediaLive
       live "/film-media/:id", Admin.FilmMediaShowLive, :show
       live_resources "/showcases", Admin.ShowcaseLive

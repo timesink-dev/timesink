@@ -82,13 +82,13 @@ config :timesink, Oban,
     {Oban.Plugins.Reindexer, schedule: "@weekly"},
     {Oban.Plugins.Cron,
      crontab: [
-       {"@daily", Timesink.Workers.ProcessWaitlist}
+       {"@daily", Timesink.Workers.Waitlist.ScheduleInviteJob}
 
        # Runs every 1 minute for dev env
-       #  {"*/1 * * * *", Timesink.Workers.ProcessWaitlist}
+       #  {"*/1 * * * *", Timesink.Workers.Waitlist.ScheduleInviteJob}
      ]}
   ],
-  queues: [mailer: 10, waitlist_invites: 10, waitlist_processing: 10]
+  queues: [mailer: 10, waitlist: 10]
 
 config :timesink, :finch, Timesink.Finch
 
@@ -97,3 +97,5 @@ config :timesink, :http_client, Timesink.HTTP.FinchClient
 config :timesink, :here_maps_api_key, System.get_env("HERE_MAPS_API_KEY")
 
 config :tesla, adapter: {Tesla.Adapter.Finch, name: Timesink.Finch}
+
+config :timesink, Timesink.Storage.Mux, webhook_key: "mux-test"

@@ -27,19 +27,20 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
           for={@form}
           as="data"
         >
-          <div>
-            <label class="block text-sm font-medium text-gray-300">Email</label>
-            <.input
-              type="email"
-              name="email"
-              phx-debounce="700"
-              phx-change="validate_email"
-              required
-              field={@form[:email]}
-              input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
-              placeholder="Enter your email"
-            />
-          </div>
+          <.input
+            type="email"
+            name="email"
+            phx-debounce="700"
+            phx-change="validate_email"
+            required
+            field={@form[:email]}
+            input_class="w-full p-3 rounded text-mystery-white border-none"
+            placeholder="Enter your email"
+          >
+            <:addon_icon_right :if={email_valid?(@form, @error)}>
+              <.icon name="hero-check-circle-mini" class="h-5 w-5 text-green-500" />
+            </:addon_icon_right>
+          </.input>
 
           <div>
             <label class="block text-sm font-medium text-gray-300">Password</label>
@@ -48,7 +49,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
               name="password"
               field={@form[:password]}
               required
-              input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
+              input_class="w-full p-3 rounded text-mystery-white border-none"
               placeholder="Create a password"
             />
           </div>
@@ -60,14 +61,10 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
               name="password_confirmation"
               value=""
               required
-              input_class="w-full p-3 rounded text-mystery-white border-none bg-dark-theater-primary"
+              input_class="w-full p-3 rounded text-mystery-white border-none"
               placeholder="Confirm your password"
             />
           </div>
-
-          <%= if input_value(@form, :email) != "" && @error == nil do %>
-            <.icon name="hero-check-circle-mini" class="h-6 w-6 text-green-500" />
-          <% end %>
 
           <%= if input_value(@form, :email) !== "" && @error do %>
             <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light">
@@ -109,13 +106,17 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
       })
 
     with {:ok, _validated_data} <- apply_action(changeset, :validate),
-         {:ok, :matched} <-
-           Accounts.verify_password_conformity(password, password_confirmation),
+         {:ok, :available} <- Accounts.is_email_available?(email),
+         {:ok, :matched} <- Accounts.verify_password_conformity(password, password_confirmation),
          {:ok, :sent} <- Accounts.send_email_verification(email) do
       send(self(), {:update_user_data, to_form(changeset)})
       send(self(), {:go_to_step, :next})
       {:noreply, assign(socket, form: to_form(changeset), error: nil)}
     else
+      {:error, :email_taken} ->
+        {:noreply,
+         assign(socket, form: to_form(changeset), error: "This email is already being used.")}
+
       {:error, %Ecto.Changeset{} = changeset} ->
         error_message =
           changeset
@@ -126,7 +127,11 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
         {:noreply, assign(socket, form: to_form(changeset)) |> put_flash(:error, error_message)}
 
       {:error, :password_mismatch} ->
-        {:noreply, put_flash(socket, :error, "Passwords do not match.")}
+        {:noreply,
+         assign(socket,
+           form: to_form(changeset),
+           error: "Passwords do not match."
+         )}
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, to_string(reason))}
@@ -149,14 +154,20 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
     end
   end
 
-  def handle_event("validate_password_strength", _unsigned_params, _socket) do
-    # Passwords should conform to the following rules
-    # - At least 8 characters
-    # - At least 1 uppercase letter
-    # - At least 1 lowercase letter
-    # - At least 1 special character
-
-    # The following regex pattern enforces the above rules
-    # ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$
+  defp email_valid?(form, error) do
+    input_value(form, :email) != "" and
+      error == nil and
+      !Keyword.has_key?(form.source.errors, :email)
   end
+
+  # def handle_event("validate_password_strength", _unsigned_params, _socket) do
+  # Passwords should conform to the following rules
+  # - At least 8 characters
+  # - At least 1 uppercase letter
+  # - At least 1 lowercase letter
+  # - At least 1 special character
+
+  # The following regex pattern enforces the above rules
+  # ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$
+  # end
 end

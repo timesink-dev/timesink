@@ -47,7 +47,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
               required
               phx-debounce="300"
               placeholder="Start typing your city (e.g., Los Angeles)"
-              class="w-full p-3 rounded text-white border-none bg-dark-theater-primary"
+              class="w-full p-3 rounded text-white border-none"
               autocomplete="off"
             />
           </div>
@@ -77,11 +77,10 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
             </.button>
           </:actions>
         </.simple_form>
-
-        <.button color="none" class="mt-6 p-0" phx-click="go_back" phx-target={@myself}>
-          <.icon name="hero-arrow-left-circle" class="h-6 w-6" />
-        </.button>
       </div>
+      <.button color="none" class="mt-6 p-0 text-center" phx-click="go_back" phx-target={@myself}>
+        ← Back
+      </.button>
     </div>
     """
   end
