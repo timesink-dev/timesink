@@ -68,7 +68,7 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
         %{"film_id" => film_id, "showcase_id" => showcase_id, "theater_id" => theater_id},
         socket
       ) do
-    case Cinema.create_exhibition(%{
+    case Timesink.Cinema.create_exhibition(%{
            film_id: film_id,
            showcase_id: showcase_id,
            theater_id: theater_id

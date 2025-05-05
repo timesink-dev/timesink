@@ -243,5 +243,31 @@ Hooks.CodeInputs =  {
   }
 };
 
+Hooks.Draggable = {
+  mounted() {
+    this.el.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("film_id", this.el.dataset.filmId)
+    })
+  }
+}
+
+Hooks.DropZone = {
+  mounted() {
+    this.el.addEventListener("dragover", (e) => e.preventDefault())
+    this.el.addEventListener("drop", (e) => {
+      e.preventDefault()
+      const filmId = e.dataTransfer.getData("film_id")
+      const showcaseId = this.el.dataset.showcaseId
+      const theaterId = this.el.dataset.theaterId
+      this.pushEvent("create_exhibition", {
+        film_id: filmId,
+        showcase_id: showcaseId,
+        theater_id: theaterId
+      })
+    })
+  }
+}
+
+
 
 export default Hooks;
