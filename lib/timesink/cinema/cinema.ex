@@ -7,6 +7,7 @@ defmodule Timesink.Cinema do
   alias Timesink.Cinema.Showcase
   alias Timesink.Cinema.Theater
   alias Timesink.Cinema.Exhibition
+  import Ecto.Query
 
   @doc """
   Create a film.
@@ -87,5 +88,12 @@ defmodule Timesink.Cinema do
            Exhibition.create(params) do
       {:ok, exhibition}
     end
+  end
+
+  def list_showcases_with_theaters do
+    Timesink.Repo.all(
+      from s in Showcase,
+        preload: [exhibitions: [:theater]]
+    )
   end
 end
