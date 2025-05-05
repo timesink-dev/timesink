@@ -35,16 +35,15 @@ defmodule TimesinkWeb.Router do
     plug TimesinkWeb.Plugs.RequireInviteToken
   end
 
-  scope "/", TimesinkWeb do
-    pipe_through [:browser, :require_invite_token]
-    live "/onboarding", OnboardingLive
-  end
-
   scope "/api", TimesinkWeb do
     pipe_through :api
 
-    # Mux webhooks
     post "/webhooks/mux.com/:webhook_key", MuxController, :webhook
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :require_invite_token]
+    live "/onboarding", OnboardingLive
   end
 
   scope "/", TimesinkWeb do
@@ -76,11 +75,6 @@ defmodule TimesinkWeb.Router do
     end
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", TimesinkWeb do
-  #   pipe_through :api
-  # end
-
   scope "/admin", TimesinkWeb do
     pipe_through [:browser, :require_admin]
 
@@ -89,6 +83,8 @@ defmodule TimesinkWeb.Router do
     get "/", RedirectController, :redirect_to_showcases
 
     live_session :admin, on_mount: Backpex.InitAssigns do
+      live "/film-media", Admin.FilmMediaLive
+      live "/film-media/:id", Admin.FilmMediaShowLive, :show
       live_resources "/showcases", Admin.ShowcaseLive
       live_resources "/waitlist", Admin.WaitlistLive
       live_resources "/films", Admin.FilmLive

@@ -117,7 +117,7 @@ defmodule TimesinkWeb.CoreComponents do
       role="alert"
       class={
         [
-          "fixed bottom-4 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 transform transition-transform duration-300 ease-in-out",
+          "fixed bottom-4 right-4 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 transform transition-transform duration-300 ease-in-out",
           # Initial state for slide-in animation
           "translate-y-full opacity-0",
           # Animation class for slide-in effect

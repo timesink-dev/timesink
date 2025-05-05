@@ -96,4 +96,6 @@ config :timesink, :http_client, Timesink.HTTP.FinchClient
 
 config :timesink, :here_maps_api_key, System.get_env("HERE_MAPS_API_KEY")
 
+config :tesla, adapter: {Tesla.Adapter.Finch, name: Timesink.Finch}
+
 config :timesink, Timesink.Storage.Mux, webhook_key: "mux-test"

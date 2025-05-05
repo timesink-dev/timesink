@@ -32,7 +32,7 @@ defmodule Timesink.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:mux, "~> 3.2"},
+      {:mux, "~> 3.2.1"},
       {:ex_aws, "~> 2.5"},
       {:ex_aws_s3, "~> 2.5"},
       {:hackney, "~> 1.23"},
@@ -72,6 +72,7 @@ defmodule Timesink.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.6"},
       {:timex, "~> 3.7"},
+      {:tesla, "~> 1.11"},
       {:mox, "~> 1.0", only: :test}
     ]
   end

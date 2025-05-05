@@ -38,7 +38,7 @@ defmodule TimesinkWeb.MuxController do
       "asset_id" => asset["id"],
       "upload_id" => asset["upload_id"],
       "uploaded_at" => params["created_at"],
-      "upload_title" => asset["meta"]["title"]
+      "upload_title" => asset["meta"]["title"] || "Untitled"
     }
 
     Repo.transaction(fn ->
@@ -48,6 +48,7 @@ defmodule TimesinkWeb.MuxController do
            {:ok, blob} <-
              Blob.create(%{
                uri: mux_upload.url,
+               checksum: Blob.checksum(mux_upload.url),
                service: :mux,
                metadata: %{
                  "mux_asset" => mux_metadata,
@@ -56,6 +57,7 @@ defmodule TimesinkWeb.MuxController do
              }),
            {:ok, _attachment} <- Film.attach_video(film, blob),
            {:ok, _} <- MuxUpload.delete(mux_upload) do
+        TimesinkWeb.Endpoint.broadcast!("film_media:#{film.id}", "video_ready", %{})
         :ok
       else
         error ->
@@ -63,37 +65,6 @@ defmodule TimesinkWeb.MuxController do
           Repo.rollback(error)
       end
     end)
-  end
-
-  def handle_webhook(%{"type" => "video.upload.created", "data" => asset} = params) do
-    # temp solution - this film_id will be dynamically passed into these initial uploaad params to create a MuxUpload when uploading has started
-    # so this webhook handling won't be needed once the client upload logic is setup
-
-    mux_upload_params = %{
-      upload_id: asset["id"],
-      url: asset["url"],
-      status: :asset_created,
-      meta: %{
-        "film_id" => "b65127c8-59bc-4f02-bc43-6e9eaf44dda8",
-        "response" => asset
-      }
-    }
-
-    with {:ok, _mux_upload} <- MuxUpload.create(mux_upload_params) do
-      :ok
-    else
-      error -> Logger.error(error |> inspect(), service: :mux, params: params)
-    end
-
-    MuxUpload.create(%{
-      upload_id: asset["id"],
-      url: asset["url"],
-      status: :asset_created,
-      meta: %{
-        "film_id" => "b65127c8-59bc-4f02-bc43-6e9eaf44dda8",
-        "response" => asset
-      }
-    })
   end
 
   def handle_webhook(%{"type" => type} = params)
@@ -120,16 +91,26 @@ defmodule TimesinkWeb.MuxController do
   end
 
   def handle_webhook(%{"type" => "video.asset.deleted", "data" => asset} = params) do
+    asset_id = asset["id"]
+
     Repo.transaction(fn ->
       query =
-        from(b in Blob,
-          where: fragment("?->'mux_asset'->>'asset_id'", b.metadata) == ^asset["id"]
+        from(
+          from b in Timesink.Storage.Blob,
+            join: a in "film_attachment",
+            on: a.blob_id == b.id,
+            where: fragment("?->'mux_asset'->>'asset_id'", b.metadata) == ^asset_id,
+            select: {b, a.assoc_id}
         )
 
       case Repo.one(query) do
-        %Blob{} = blob ->
+        {blob, film_id} when not is_nil(film_id) ->
+          {:ok, film_id_str} = Ecto.UUID.load(film_id)
+
           case Blob.delete(blob) do
             {:ok, _} ->
+              TimesinkWeb.Endpoint.broadcast!("film_media:#{film_id_str}", "video_deleted", %{})
+              IO.inspect(film_id_str, label: "FILM ID")
               :ok
 
             {:error, reason} ->
