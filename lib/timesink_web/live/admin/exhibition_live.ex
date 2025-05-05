@@ -2,11 +2,14 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
   use TimesinkWeb, :live_view
 
   alias Timesink.Cinema.Film
+  import Ecto.Query
 
   def mount(_params, _session, socket) do
     showcases =
-      Timesink.Cinema.Showcase
-      |> Timesink.Repo.all()
+      Timesink.Repo.all(
+        from s in Timesink.Cinema.Showcase,
+          preload: [exhibitions: [:film, :theater]]
+      )
 
     theaters =
       Timesink.Cinema.Theater
@@ -45,14 +48,24 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
             <div class="grid grid-cols-3 gap-4">
               <%= for theater <- @theaters do %>
                 <div
-                  id={"theater-#{theater.id}"}
+                  id={"theater-#{theater.id}-showcase-#{showcase.id}"}
                   class="border border-dashed rounded p-4 min-h-[100px]"
                   phx-hook="DropZone"
                   data-showcase-id={showcase.id}
                   data-theater-id={theater.id}
                 >
                   <p class="text-sm font-semibold mb-1">{theater.name}</p>
-                  <p class="text-gray-500">Drop films here</p>
+
+                  <%= for exhibition <- showcase.exhibitions,
+              exhibition.theater_id == theater.id do %>
+                    <div class="bg-blue-100 rounded px-2 py-1 text-sm mt-1 text-black">
+                      🎬 {exhibition.film.title}
+                    </div>
+                  <% end %>
+
+                  <%= if Enum.empty?(Enum.filter(showcase.exhibitions, &(&1.theater_id == theater.id))) do %>
+                    <p class="text-gray-500">Drop films here</p>
+                  <% end %>
                 </div>
               <% end %>
             </div>
@@ -74,7 +87,16 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
            theater_id: theater_id
          }) do
       {:ok, _exhibition} ->
-        {:noreply, put_flash(socket, :info, "Exhibition added.")}
+        showcases =
+          Timesink.Repo.all(
+            from s in Timesink.Cinema.Showcase,
+              preload: [exhibitions: [:film, :theater]]
+          )
+
+        {:noreply,
+         socket
+         |> assign(:showcases, showcases)
+         |> put_flash(:info, "Exhibition added.")}
 
       {:error, _changeset} ->
         {:noreply, put_flash(socket, :error, "Failed to add exhibition.")}
