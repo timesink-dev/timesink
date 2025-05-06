@@ -96,14 +96,4 @@ defmodule Timesink.Cinema do
         preload: [exhibitions: [:theater]]
     )
   end
-
-  def list_ordered_showcases do
-    from s in Timesink.Cinema.Showcase,
-      preload: [exhibitions: [:film, :theater]],
-      order_by: [
-        desc: fragment("CASE WHEN ? = 'active' THEN 1 ELSE 0 END", s.status),
-        asc_nulls_last: s.start_at,
-        asc: s.inserted_at
-      ]
-  end
 end
