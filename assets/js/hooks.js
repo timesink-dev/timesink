@@ -243,7 +243,7 @@ Hooks.CodeInputs =  {
   }
 };
 
-Hooks.Draggable = {
+Hooks.ExhibitionDraggable = {
   mounted() {
     this.el.addEventListener("dragstart", (e) => {
       e.dataTransfer.setData("film_id", this.el.dataset.filmId)
@@ -251,11 +251,20 @@ Hooks.Draggable = {
   }
 }
 
-Hooks.DropZone = {
+Hooks.ExhibitionDropZone = {
   mounted() {
-    this.el.addEventListener("dragover", (e) => e.preventDefault())
+    this.el.addEventListener("dragleave", () => {
+      this.el.classList.remove("ring", "ring-neon-blue-lightest");
+    });
+    this.el.addEventListener("dragover", (e) => { e.preventDefault()
+
+            this.el.classList.add("ring", "ring-neon-blue-lightest");}
+);
+    
     this.el.addEventListener("drop", (e) => {
       e.preventDefault()
+            this.el.classList.remove("ring", "ring-neon-blue-lightest");
+
       const filmId = e.dataTransfer.getData("film_id")
       const showcaseId = this.el.dataset.showcaseId
       const theaterId = this.el.dataset.theaterId
@@ -266,6 +275,7 @@ Hooks.DropZone = {
       })
     })
   }
+  
 }
 
 

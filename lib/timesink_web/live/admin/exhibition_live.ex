@@ -16,18 +16,18 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
 
   def render(assigns) do
     ~H"""
-    <div class="min-h-screen bg-backroom-black text-white px-24 md:px-12 lg:px-2 py-10 max-w-screen-2xl mx-auto">
+    <div class="min-h-screen bg-backroom-black text-mystery-white px-24 md:px-12 lg:px-2 py-10 max-w-screen-2xl mx-auto">
       <div class="flex flex-col md:flex-row gap-8">
         <!-- Sidebar with Films -->
-        <div class="md:w-1/4">
-          <h2 class="text-xl font-bold mb-4 text-neon-blue">🎬 Films</h2>
+        <div class="md:w-1/10">
+          <h2 class="text-xl font-bold mb-4">🎥 Films</h2>
           <div class="space-y-2">
             <%= for film <- @films do %>
               <div
                 id={"film-#{film.id}"}
-                class="bg-dark-theater-medium hover:bg-dark-theater-lightest transition rounded-lg px-3 py-2 cursor-move text-mystery-white text-sm"
+                class="bg-dark-theater-primary hover:bg-dark-theater-lightest transition rounded-lg px-3 py-2 cursor-move text-mystery-white text-sm"
                 draggable="true"
-                phx-hook="Draggable"
+                phx-hook="ExhibitionDraggable"
                 data-film-id={film.id}
               >
                 {film.title}
@@ -49,9 +49,9 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
                 "bg-obsidian/70 border border-dark-theater-light hover:border-neon-blue-lightest hover:shadow-md hover:scale-[1.01]"
             ]}>
               <div class="p-8 md:p-10">
-                <div class="flex items-center justify-between mb-2 flex-wrap gap-x-2">
+                <div class="flex flex-col items-start justify-between mb-2 flex-wrap gap-x-2">
                   <div class="flex flex-wrap items-center justify-between">
-                    <div cla<div class="mb-4">
+                    <div>
                       <h3 class={[
                         "text-xl font-semibold flex items-center gap-2 mb-2.5",
                         showcase.status == :active && "text-green-300"
@@ -62,22 +62,27 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
                         {showcase.title}
                       </h3>
 
-                      <div class="text-xs text-gray-400 flex flex-start gap-x-4">
-                        <p class="text-xs text-gray-400">
+                      <div class="text-xs text-gray-400 flex justify-start gap-x-4 w-full">
+                        <p>
                           🕒 <strong>Showtime:</strong>
-                          {(showcase.start_at &&
-                              Calendar.strftime(showcase.start_at, "%m/%d/%Y %I:%M %p")) ||
-                            "Not set"}
+                          <%= if showcase.start_at do %>
+                            {Calendar.strftime(showcase.start_at, "%B %-d, %Y: %I:%M%p")} (UTC)
+                          <% else %>
+                            Not set
+                          <% end %>
                         </p>
-                        <p class="text-xs text-gray-400">
+                        <p>
                           <strong>Ends:</strong>
-                          {(showcase.end_at && Calendar.strftime(showcase.end_at, "%m/%d/%Y %I:%M %p")) ||
-                            "Not set"}
+                          <%= if showcase.end_at do %>
+                            {Calendar.strftime(showcase.end_at, "%B %-d, %Y: %I:%M%p")} (UTC)
+                          <% else %>
+                            Not set
+                          <% end %>
                         </p>
                       </div>
                     </div>
                   </div>
-                  <p class="text-sm text-gray-400 mb-4">
+                  <p class="text-sm text-gray-400 mb-4 mt-2.5">
                     <%= if showcase.description && String.trim(showcase.description) != "" do %>
                       {showcase.description}
                     <% else %>
@@ -86,19 +91,19 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
                   </p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
                   <%= for theater <- @theaters do %>
                     <div
                       id={"theater-#{theater.id}-showcase-#{showcase.id}"}
-                      class="bg-backroom-black/60 border border-dark-theater-medium rounded-xl p-4 min-h-[100px] transition duration-300 ease-in-out hover:border-neon-blue hover:shadow-md"
-                      phx-hook="DropZone"
+                      class="bg-backroom-black/60 border border-dark-theater-medium rounded-xl p-4 min-h-[100px] transition duration-300 ease-in-out hover:border-neon-blue-lightest hover:shadow-md"
+                      phx-hook="ExhibitionDropZone"
                       data-showcase-id={showcase.id}
                       data-theater-id={theater.id}
                     >
                       <p class="text-sm font-medium text-white mb-2">{theater.name}</p>
                       <%= for exhibition <- showcase.exhibitions,
       exhibition.theater_id == theater.id do %>
-                        <div class="relative group bg-dark-theater-medium bg-opacity-60 text-white text-sm px-3 py-2 rounded-lg mt-2 shadow-sm max-w-full break-words overflow-visible">
+                        <div class="relative group bg-dark-theater-medium bg-opacity-60 text-white text-sm px-3 py-2 rounded-lg mt-2 shadow-sm w-full">
                           <!-- Hover-only "X" button in top-right, half-outside -->
                           <button
                             type="button"
@@ -114,15 +119,15 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
                           </button>
                           
     <!-- Exhibition content -->
-                          <div class="flex items-center gap-2 pr-6">
-                            <span class="text-red-500 text-xs">🔴</span>
-                            <span class="whitespace-normal break-words">{exhibition.film.title}</span>
+                          <div class="flex justify-between items-center gap-2 pr-6">
+                            <span>🔴</span>
+                            <span class="text-sm">{exhibition.film.title}</span>
                           </div>
                         </div>
                       <% end %>
 
                       <%= if Enum.empty?(Enum.filter(showcase.exhibitions, &(&1.theater_id == theater.id))) do %>
-                        <p class="text-gray-500 italic text-xs">Drop films here</p>
+                        <p class="text-gray-500 italic text-xs">Drop film here...</p>
                       <% end %>
                     </div>
                   <% end %>
@@ -150,10 +155,10 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
       {:noreply,
        socket
        |> assign(:showcases, refresh_showcases())
-       |> put_flash(:info, "Exhibition placed.")}
+       |> put_flash(:info, "Exhibition scheduled.")}
     else
       {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to place exhibition.")}
+        {:noreply, put_flash(socket, :error, "Failed to schedule exhibiton.")}
     end
   end
 
