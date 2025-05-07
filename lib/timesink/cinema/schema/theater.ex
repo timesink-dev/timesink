@@ -3,10 +3,13 @@ defmodule Timesink.Cinema.Theater do
   use SwissSchema, repo: Timesink.Repo
   use Timesink.Schema
   import Ecto.Changeset
+  alias Timesink.Utils
 
   @type t :: %{
           __struct__: __MODULE__,
-          name: :string
+          name: :string,
+          slug: :string,
+          description: :string
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -14,7 +17,8 @@ defmodule Timesink.Cinema.Theater do
   schema "theater" do
     field :name, :string
     field :description, :string
-    has_one :exhibition, TimeSink.Cinema.Exhibition
+    field :slug, :string
+    has_one :exhibition, Timesink.Cinema.Exhibition
 
     timestamps(type: :utc_datetime)
   end
@@ -23,8 +27,19 @@ defmodule Timesink.Cinema.Theater do
           Ecto.Changeset.t()
   def changeset(theater, params, _metadata \\ []) do
     theater
-    |> cast(params, [:name, :description])
-    |> validate_required([:name])
+    |> cast(params, [:name, :description, :slug])
+    |> validate_required([:name, :slug])
     |> validate_length(:name, min: 1)
+    |> put_slug()
+  end
+
+  defp put_slug(changeset) do
+    if name = get_change(changeset, :name) do
+      slug = Utils.slugify(name)
+      IO.inspect(slug, label: "Generated slug")
+      put_change(changeset, :slug, slug)
+    else
+      changeset
+    end
   end
 end
