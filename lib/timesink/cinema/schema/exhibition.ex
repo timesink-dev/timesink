@@ -35,7 +35,7 @@ defmodule Timesink.Cinema.Exhibition do
 
   def upsert(%{"showcase_id" => showcase_id, "theater_id" => theater_id, "film_id" => film_id}) do
     with nil <-
-           Timesink.Repo.get_by(Timesink.Cinema.Exhibition,
+           Timesink.Repo.get_by(Exhibition,
              showcase_id: showcase_id,
              theater_id: theater_id
            ) do
@@ -45,10 +45,11 @@ defmodule Timesink.Cinema.Exhibition do
         film_id: film_id
       })
     else
-      %Timesink.Cinema.Exhibition{} = existing ->
+      %Exhibition{} = existing ->
         existing
-        |> Ecto.Changeset.change(film_id: film_id)
-        |> Timesink.Repo.update()
+        |> Exhibition.update(%{
+          film_id: film_id
+        })
     end
   end
 end
