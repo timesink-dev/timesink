@@ -96,4 +96,35 @@ defmodule Timesink.Cinema do
         preload: [exhibitions: [:theater]]
     )
   end
+
+  def get_theater_by_slug(slug) do
+    case Timesink.Repo.get_by(Theater, slug: slug) do
+      nil -> {:error, :not_found}
+      theater -> {:ok, theater}
+    end
+  end
+
+  def get_active_showcase() do
+    Timesink.Repo.get_by(Showcase, status: :active)
+    |> case do
+      nil -> {:error, :no_active_showcase}
+      s -> {:ok, s}
+    end
+  end
+
+  def get_exhibition_for_theater_and_showcase(theater_id, showcase_id) do
+    Timesink.Repo.get_by(Exhibition, theater_id: theater_id, showcase_id: showcase_id)
+    |> case do
+      nil -> {:error, :no_exhibition}
+      e -> {:ok, e}
+    end
+  end
+
+  def get_film_by_id(id) do
+    Timesink.Repo.get(Film, id)
+    |> case do
+      nil -> {:error, :not_found}
+      f -> {:ok, f}
+    end
+  end
 end
