@@ -16,23 +16,29 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
 
   def render(assigns) do
     ~H"""
-    <div class="min-h-screen bg-backroom-black text-mystery-white px-24 md:px-12 lg:px-2 py-10 max-w-screen-2xl mx-auto">
+    <div class="min-h-screen bg-backroom-black text-mystery-white px-6 py-10 max-w-screen-2xl mx-auto">
       <div class="flex flex-col md:flex-row gap-8">
-        <!-- Sidebar with Films -->
-        <div class="md:w-1/10">
-          <h2 class="text-xl font-bold mb-4">🎥 Films</h2>
-          <div class="space-y-2">
-            <%= for film <- @films do %>
-              <div
-                id={"film-#{film.id}"}
-                class="bg-dark-theater-primary hover:bg-dark-theater-lightest transition rounded-lg px-3 py-2 cursor-move text-mystery-white text-sm"
-                draggable="true"
-                phx-hook="ExhibitionDraggable"
-                data-film-id={film.id}
-              >
-                {film.title}
-              </div>
-            <% end %>
+        <!-- Left Sidebar -->
+        <div class="md:w-1/4 space-y-6">
+          <.button color="none" class="p-0 text-left" phx-click="go_back">
+            ← Admin console
+          </.button>
+
+          <div>
+            <h2 class="text-xl font-bold mb-4">🎥 Films</h2>
+            <div class="space-y-2">
+              <%= for film <- @films do %>
+                <div
+                  id={"film-#{film.id}"}
+                  class="bg-dark-theater-primary hover:bg-dark-theater-lightest transition rounded-lg px-3 py-2 cursor-move text-mystery-white text-sm"
+                  draggable="true"
+                  phx-hook="ExhibitionDraggable"
+                  data-film-id={film.id}
+                >
+                  {film.title}
+                </div>
+              <% end %>
+            </div>
           </div>
         </div>
         
@@ -177,6 +183,10 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
       {:error, _changeset} ->
         {:noreply, put_flash(socket, :error, "Failed to remove exhibition.")}
     end
+  end
+
+  def handle_event("go_back", _params, socket) do
+    {:noreply, push_navigate(socket, to: "/admin")}
   end
 
   defp refresh_showcases() do
