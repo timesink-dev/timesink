@@ -278,6 +278,12 @@ Hooks.ExhibitionDropZone = {
         theater_id: theaterId
       })
     })
+  },
+
+  destroyed() {
+    this.el.removeEventListener("dragleave", this.handleDragLeave);
+    this.el.removeEventListener("dragover", this.handleDragOver);
+    this.el.removeEventListener("drop", this.handleDrop);
   }
   
 }
