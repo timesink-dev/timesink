@@ -3,6 +3,7 @@ defmodule Timesink.Cinema.Exhibition do
   use SwissSchema, repo: Timesink.Repo
   use Timesink.Schema
   import Ecto.Changeset
+  alias Timesink.Cinema.Exhibition
 
   @type t :: %{
           __struct__: __MODULE__,
@@ -30,5 +31,25 @@ defmodule Timesink.Cinema.Exhibition do
     |> assoc_constraint(:film)
     |> assoc_constraint(:showcase)
     |> assoc_constraint(:theater)
+  end
+
+  def upsert(%{"showcase_id" => showcase_id, "theater_id" => theater_id, "film_id" => film_id}) do
+    with nil <-
+           Timesink.Repo.get_by(Exhibition,
+             showcase_id: showcase_id,
+             theater_id: theater_id
+           ) do
+      create(%{
+        showcase_id: showcase_id,
+        theater_id: theater_id,
+        film_id: film_id
+      })
+    else
+      %Exhibition{} = existing ->
+        existing
+        |> Exhibition.update(%{
+          film_id: film_id
+        })
+    end
   end
 end

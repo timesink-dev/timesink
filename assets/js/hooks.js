@@ -243,5 +243,51 @@ Hooks.CodeInputs =  {
   }
 };
 
+Hooks.ExhibitionDraggable = {
+  mounted() {
+    this.handleDragStart = (e) => {
+      e.dataTransfer.setData("film_id", this.el.dataset.filmId);
+    };
+    this.el.addEventListener("dragstart", this.handleDragStart);
+  },
+  destroyed() {
+    this.el.removeEventListener("dragstart", this.handleDragStart);
+  }
+}
+
+Hooks.ExhibitionDropZone = {
+  mounted() {
+    this.el.addEventListener("dragleave", () => {
+      this.el.classList.remove("ring", "ring-neon-blue-lightest");
+    });
+    this.el.addEventListener("dragover", (e) => { e.preventDefault()
+
+            this.el.classList.add("ring", "ring-neon-blue-lightest");}
+);
+    
+    this.el.addEventListener("drop", (e) => {
+      e.preventDefault()
+            this.el.classList.remove("ring", "ring-neon-blue-lightest");
+
+      const filmId = e.dataTransfer.getData("film_id")
+      const showcaseId = this.el.dataset.showcaseId
+      const theaterId = this.el.dataset.theaterId
+      this.pushEvent("create_exhibition", {
+        film_id: filmId,
+        showcase_id: showcaseId,
+        theater_id: theaterId
+      })
+    })
+  },
+
+  destroyed() {
+    this.el.removeEventListener("dragleave", this.handleDragLeave);
+    this.el.removeEventListener("dragover", this.handleDragOver);
+    this.el.removeEventListener("drop", this.handleDrop);
+  }
+  
+}
+
+
 
 export default Hooks;
