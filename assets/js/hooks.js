@@ -245,9 +245,13 @@ Hooks.CodeInputs =  {
 
 Hooks.ExhibitionDraggable = {
   mounted() {
-    this.el.addEventListener("dragstart", (e) => {
-      e.dataTransfer.setData("film_id", this.el.dataset.filmId)
-    })
+    this.handleDragStart = (e) => {
+      e.dataTransfer.setData("film_id", this.el.dataset.filmId);
+    };
+    this.el.addEventListener("dragstart", this.handleDragStart);
+  },
+  destroyed() {
+    this.el.removeEventListener("dragstart", this.handleDragStart);
   }
 }
 
