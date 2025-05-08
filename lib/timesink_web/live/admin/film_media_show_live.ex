@@ -9,7 +9,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
     if connected?(socket), do: Phoenix.PubSub.subscribe(Timesink.PubSub, "film_media:#{film_id}")
 
     film =
-      Repo.get!(Film, film_id)
+      Film.get!(film_id)
       |> Repo.preload(video: [:blob], poster: [:blob])
 
     {:ok, assign(socket, film: film, upload_url: nil, upload_id: nil, notification: nil),
@@ -56,7 +56,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
       <section class="bg-dark-room-theater-light rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <h2 class="text-2xl font-semibold mb-6">Video</h2>
 
-        <%= if playback_id = get_mux_playback_id(@film.video) do %>
+        <%= if playback_id = Film.get_mux_playback_id(@film.video) do %>
           <mux-player
             playback-id={playback_id}
             metadata-video-title={@film.title}
@@ -185,22 +185,6 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
   defp poster_url(poster) do
     Phoenix.VerifiedRoutes.static_path(TimesinkWeb.Endpoint, poster.path)
   end
-
-  defp get_mux_playback_id(nil), do: nil
-
-  defp get_mux_playback_id(%Timesink.Storage.Attachment{blob: %{metadata: metadata}}) do
-    metadata
-    |> Map.get("mux_asset", %{})
-    |> Map.get("playback_id", [])
-    |> List.first()
-    |> case do
-      nil -> nil
-      %{"id" => id} -> id
-      _ -> nil
-    end
-  end
-
-  defp get_mux_playback_id(_), do: nil
 
   defp load_film(film_id) do
     Film

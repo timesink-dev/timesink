@@ -80,4 +80,20 @@ defmodule Timesink.Cinema.Film do
   def attach_trailer(%{__struct__: __MODULE__} = film, upload) do
     Storage.create_attachment(film, :trailer, upload)
   end
+
+  def get_mux_playback_id(nil), do: nil
+
+  def get_mux_playback_id(%Timesink.Storage.Attachment{blob: %{metadata: metadata}}) do
+    metadata
+    |> Map.get("mux_asset", %{})
+    |> Map.get("playback_id", [])
+    |> List.first()
+    |> case do
+      nil -> nil
+      %{"id" => id} -> id
+      _ -> nil
+    end
+  end
+
+  def get_mux_playback_id(_), do: nil
 end
