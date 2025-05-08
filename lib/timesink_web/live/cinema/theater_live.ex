@@ -15,7 +15,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       {:ok,
        socket
        |> assign(:theater, theater)
-       |> assign(:film, film |> Repo.preload(video: [:blob]))
+       |> assign(:film, film |> Repo.preload(video: [:blob], poster: [:blob]))
        |> assign(:exhibition, exhibition)
        |> assign(:user, socket.assigns.current_user)}
     else
@@ -46,6 +46,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               metadata-video-title={@film.title}
               metadata-video-id={@film.id}
               metadata-viewer_user_id={@user.id}
+              poster={Film.poster_url(@film.poster)}
               style="width: 100%; max-width: 800px; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden;"
               stream-type="live"
               autoplay

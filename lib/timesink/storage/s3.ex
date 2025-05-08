@@ -108,4 +108,10 @@ defmodule Timesink.Storage.S3 do
     configs
     |> Enum.reduce(%{}, fn item, acc -> Enum.into(item, acc) end)
   end
+
+  @spec public_url(String.t()) :: String.t()
+  def public_url(path) do
+    config = Storage.config()
+    "#{config.host}/#{config.bucket}/#{path}"
+  end
 end

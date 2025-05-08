@@ -73,6 +73,10 @@ defmodule Timesink.Cinema.Film do
     Storage.create_attachment(film, :poster, upload)
   end
 
+  def poster_url(%Timesink.Storage.Attachment{blob: %{uri: path}}) do
+    Timesink.Storage.S3.public_url(path)
+  end
+
   def attach_video(%{__struct__: __MODULE__} = film, blob) do
     Storage.create_attachment(film, :video, blob)
   end

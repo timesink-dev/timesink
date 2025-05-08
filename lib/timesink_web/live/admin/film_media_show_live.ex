@@ -12,8 +12,19 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
       Film.get!(film_id)
       |> Repo.preload(video: [:blob], poster: [:blob])
 
-    {:ok, assign(socket, film: film, upload_url: nil, upload_id: nil, notification: nil),
-     layout: {TimesinkWeb.Layouts, :film_upload}}
+    {:ok,
+     assign(socket,
+       film: film,
+       upload_url: nil,
+       upload_id: nil,
+       notification: nil,
+       uploading_poster: false
+     )
+     |> allow_upload(:poster,
+       accept: ~w(.jpg .jpeg .png),
+       max_entries: 1,
+       max_file_size: 5_000_000
+     ), layout: {TimesinkWeb.Layouts, :film_upload}}
   end
 
   def render(assigns) do
@@ -25,7 +36,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
       <!-- Film Header -->
       <div class="space-y-3 text-center max-w-3xl mx-auto">
         <h1 class="text-4xl font-bold">{@film.title}</h1>
-        <p class="text-lg text-dark-room-theater-light">{@film.year}</p>
+        <p class="text-lg text-dark-room-ter-light">{@film.year}</p>
 
         <%= if @film.synopsis do %>
           <p class="mt-2 text-base text-dark-room-theater-light/80 leading-relaxed">
@@ -38,16 +49,33 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
       <section class="bg-dark-room-theater-light rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <h2 class="text-2xl font-semibold mb-6">Poster</h2>
 
+        <%= if @uploading_poster do %>
+          <div class="w-full h-80 flex items-center justify-center">
+            <.icon name="hero-refresh" class="animate-spin h-8 w-8 text-dark-room-theater-light" />
+          </div>
+        <% end %>
+
         <%= if @film.poster do %>
           <img
-            src={poster_url(@film.poster)}
+            src={Film.poster_url(@film.poster)}
             alt="Poster"
             class="rounded-lg w-full max-w-md object-cover shadow-md"
           />
+          <button
+            phx-click="remove_poster"
+            class="mt-4 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded"
+          >
+            Remove Poster
+          </button>
         <% else %>
           <div class="flex flex-col items-center justify-center w-full h-80 bg-dark-room-theater-lightest rounded-lg border-2 border-dashed border-dark-room-theater-light text-dark-room-theater-primary/70">
             <.icon name="hero-document" class="h-16 w-16" />
             <p class="mt-4 text-lg">No poster uploaded yet</p>
+
+            <form phx-submit="upload_poster" phx-change="validate_poster" class="mt-4">
+              <.live_file_input upload={@uploads.poster} />
+              <.button class="mt-2" type="submit">Upload Poster</.button>
+            </form>
           </div>
         <% end %>
       </section>
@@ -158,6 +186,53 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
     end
   end
 
+  def handle_event("upload_poster", _params, socket) do
+    %{film: film, uploads: %{poster: _upload}} = socket.assigns
+
+    socket = assign(socket, uploading_poster: true)
+
+    consume_uploaded_entries(socket, :poster, fn %{path: path}, entry ->
+      upload = %Plug.Upload{
+        filename: Path.basename(path),
+        content_type: entry.client_type || MIME.from_path(entry.client_name),
+        path: path
+      }
+
+      Storage.create_attachment(film, :poster, upload)
+    end)
+
+    {:noreply,
+     socket
+     |> assign(
+       film: load_film(film.id),
+       uploading_poster: false
+     )
+     |> put_flash(:info, "Poster uploaded successfully.")}
+  end
+
+  def handle_event("remove_poster", _params, socket) do
+    film = socket.assigns.film
+
+    with %Timesink.Storage.Attachment{} = poster <- film.poster,
+         {:ok, :deleted} <- Timesink.Storage.delete_attachment(poster) do
+      {:noreply,
+       socket
+       |> assign(film: load_film(film.id))
+       |> put_flash(:info, "Poster removed successfully.")}
+    else
+      nil ->
+        {:noreply, put_flash(socket, :error, "No poster found to remove.")}
+
+      {:error, reason} ->
+        Logger.error("Failed to delete poster: #{inspect(reason)}")
+        {:noreply, put_flash(socket, :error, "Failed to remove poster.")}
+    end
+  end
+
+  def handle_event("validate_poster", _params, socket) do
+    {:noreply, socket}
+  end
+
   def handle_event("go_back", _params, socket) do
     {:noreply, push_navigate(socket, to: "/admin/film-media")}
   end
@@ -180,10 +255,6 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
     {:noreply,
      socket
      |> assign(film: film, notification: {:info, "Video deleted successfully!"})}
-  end
-
-  defp poster_url(poster) do
-    Phoenix.VerifiedRoutes.static_path(TimesinkWeb.Endpoint, poster.path)
   end
 
   defp load_film(film_id) do
