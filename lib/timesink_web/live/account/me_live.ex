@@ -1,8 +1,15 @@
 defmodule TimesinkWeb.Accounts.MeLive do
   use TimesinkWeb, :live_view
   alias TimesinkWeb.Utils
+  alias Timesink.Accounts.Profile
 
   import TimesinkWeb.Accounts.MePageItem
+
+  def mount(_params, _session, socket) do
+    user = Timesink.Repo.preload(socket.assigns.current_user, profile: [avatar: [:blob]])
+
+    {:ok, assign(socket, current_user: user)}
+  end
 
   def render(assigns) do
     ~H"""
@@ -10,7 +17,7 @@ defmodule TimesinkWeb.Accounts.MeLive do
       <div class="ml-6 mt-8 text-md text-dark-theater-lightest flex flex-col justify-center items-center w-full">
         <span class="mb-2">
           <img
-            src={@current_user.profile.avatar_url}
+            src={Profile.avatar_url(@current_user.profile.avatar)}
             alt="Profile picture"
             class="rounded-full w-16 h-16"
           />
@@ -66,10 +73,5 @@ defmodule TimesinkWeb.Accounts.MeLive do
       </div>
     </section>
     """
-  end
-
-  def mount(_params, _session, socket) do
-    user = Timesink.Repo.preload(socket.assigns.current_user, [:profile])
-    {:ok, assign(socket, current_user: user)}
   end
 end
