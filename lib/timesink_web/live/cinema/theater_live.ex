@@ -35,8 +35,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
       <div>
         <h2 class="text-2xl font-semibold text-gray-200 mb-2">Now Playing:</h2>
-        <div class="bg-dark-theater-primary rounded-lg p-4 shadow-md border border-gray-700">
-          <h3 class="text-xl font-bold text-white">
+        <div class="bg-dark-theater-primary rounded-lg py-6 px-4 shadow-md border border-gray-700">
+          <h3 class="text-xl font-bold text-white my-4">
             {@film.title}
             <span class="text-gray-400">({@film.year})</span>
           </h3>

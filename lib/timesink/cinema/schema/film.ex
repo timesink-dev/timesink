@@ -77,6 +77,23 @@ defmodule Timesink.Cinema.Film do
     Timesink.Storage.S3.public_url(path)
   end
 
+  @spec attach_video(Timesink.Cinema.Film.t(), %{
+          :__struct__ => Plug.Upload | Timesink.Storage.Blob,
+          optional(:checksum) => :string,
+          optional(:content_type) => nil | binary(),
+          optional(:filename) => binary(),
+          optional(:metadata) => :map,
+          optional(:mime) => :string,
+          optional(:path) =>
+            binary()
+            | maybe_improper_list(
+                binary() | maybe_improper_list(any(), binary() | []) | char(),
+                binary() | []
+              ),
+          optional(:service) => :mux | :s3,
+          optional(:size) => :integer,
+          optional(:uri) => :string
+        }) :: {:error, any()} | {:ok, Timesink.Storage.Attachment.t()}
   def attach_video(%{__struct__: __MODULE__} = film, blob) do
     Storage.create_attachment(film, :video, blob)
   end
