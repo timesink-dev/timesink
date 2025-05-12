@@ -18,7 +18,8 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
        upload_url: nil,
        upload_id: nil,
        notification: nil,
-       uploading_poster: false
+       uploading_poster: false,
+       poster_upload_progress: nil
      )
      |> allow_upload(:poster,
        accept: ~w(.jpg .jpeg .png),
@@ -52,31 +53,74 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
         <%= if @uploading_poster do %>
           <div class="w-full h-80 flex items-center justify-center">
             <.icon name="hero-refresh" class="animate-spin h-8 w-8 text-dark-room-theater-light" />
+            <%= if @poster_upload_progress do %>
+              <p class="ml-2 text-sm text-mystery-white">
+                Uploading... {@poster_upload_progress}%
+              </p>
+            <% end %>
           </div>
-        <% end %>
-
-        <%= if @film.poster do %>
-          <img
-            src={Film.poster_url(@film.poster)}
-            alt="Poster"
-            class="rounded-lg w-full max-w-md object-cover shadow-md"
-          />
-          <button
-            phx-click="remove_poster"
-            class="mt-4 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded"
-          >
-            Remove Poster
-          </button>
         <% else %>
-          <div class="flex flex-col items-center justify-center w-full h-80 bg-dark-room-theater-lightest rounded-lg border-2 border-dashed border-dark-room-theater-light text-dark-room-theater-primary/70">
-            <.icon name="hero-document" class="h-16 w-16" />
-            <p class="mt-4 text-lg">No poster uploaded yet</p>
+          <%= if @film.poster do %>
+            <img
+              src={Film.poster_url(@film.poster)}
+              alt="Poster"
+              class="rounded-lg w-full max-w-md object-cover shadow-md"
+            />
+            <button
+              phx-click="remove_poster"
+              class="mt-4 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded"
+            >
+              Remove Poster
+            </button>
+          <% else %>
+            <div class="flex flex-col items-center justify-center w-full h-auto min-h-80 bg-dark-room-theater-lightest rounded-lg border-2 border-dashed border-dark-room-theater-light text-dark-room-theater-primary/70 px-4 py-6">
+              <.icon name="hero-document" class="h-16 w-16" />
+              <p class="mt-4 text-lg">No poster uploaded yet</p>
 
-            <form phx-submit="upload_poster" phx-change="validate_poster" class="mt-4">
-              <.live_file_input upload={@uploads.poster} />
-              <.button class="mt-2" type="submit">Upload Poster</.button>
-            </form>
-          </div>
+              <form
+                phx-submit="upload_poster"
+                phx-change="validate_poster"
+                phx-drop-target={@uploads.poster.ref}
+                class="mt-4 flex flex-col items-center w-full"
+              >
+                <.live_file_input upload={@uploads.poster} class="mb-4 mx-auto" />
+
+                <div
+                  :for={entry <- @uploads.poster.entries}
+                  class="flex flex-col items-center w-full max-w-xs"
+                >
+                  <div class="w-full aspect-square overflow-hidden rounded shadow-md mb-2 bg-gray-800">
+                    <.live_img_preview entry={entry} class="w-full h-full object-cover" />
+                  </div>
+
+                  <figcaption class="text-sm text-center mb-2">{entry.client_name}</figcaption>
+
+                  <div class="w-full">
+                    <progress value={entry.progress} max="100" class="w-full h-2 rounded bg-gray-700">
+                      {entry.progress}%
+                    </progress>
+                    <p class="text-xs text-center mt-1 text-dark-room-theater-light">
+                      {entry.progress}%
+                    </p>
+                  </div>
+
+                  <p
+                    :for={err <- upload_errors(@uploads.poster, entry)}
+                    class="text-red-500 text-sm mt-1"
+                  >
+                    {error_to_string(err)}
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  class="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded"
+                >
+                  Upload Poster
+                </button>
+              </form>
+            </div>
+          <% end %>
         <% end %>
       </section>
       
@@ -189,11 +233,9 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
   def handle_event("upload_poster", _params, socket) do
     %{film: film, uploads: %{poster: _upload}} = socket.assigns
 
-    socket = assign(socket, uploading_poster: true)
-
     consume_uploaded_entries(socket, :poster, fn %{path: path}, entry ->
       upload = %Plug.Upload{
-        filename: Path.basename(path),
+        filename: entry.client_name,
         content_type: entry.client_type || MIME.from_path(entry.client_name),
         path: path
       }
@@ -203,11 +245,12 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
 
     {:noreply,
      socket
-     |> assign(
-       film: load_film(film.id),
-       uploading_poster: false
-     )
+     |> assign(film: load_film(film.id))
      |> put_flash(:info, "Poster uploaded successfully.")}
+  end
+
+  def handle_event("validate_poster", _params, socket) do
+    {:noreply, socket}
   end
 
   def handle_event("remove_poster", _params, socket) do
@@ -227,10 +270,6 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
         Logger.error("Failed to delete poster: #{inspect(reason)}")
         {:noreply, put_flash(socket, :error, "Failed to remove poster.")}
     end
-  end
-
-  def handle_event("validate_poster", _params, socket) do
-    {:noreply, socket}
   end
 
   def handle_event("go_back", _params, socket) do
@@ -262,4 +301,8 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
     |> Repo.get!(film_id)
     |> Repo.preload(video: [:blob], poster: [:blob])
   end
+
+  defp error_to_string(:too_large), do: "File too large"
+  defp error_to_string(:not_accepted), do: "File type not allowed"
+  defp error_to_string(err), do: "Upload error: #{inspect(err)}"
 end

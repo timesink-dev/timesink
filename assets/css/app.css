@@ -18,3 +18,30 @@
 .animate-slide-in {
   animation: slide-in 0.3s ease-in-out forwards; /* Duration and easing */
 }
+
+
+.wrapper {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.marquee {
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  animation: marquee 15s linear infinite; /* Adjust duration here */
+}
+
+.marquee p {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}

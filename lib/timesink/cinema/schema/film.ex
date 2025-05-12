@@ -77,6 +77,8 @@ defmodule Timesink.Cinema.Film do
     Timesink.Storage.S3.public_url(path)
   end
 
+  def poster_url(nil), do: nil
+
   @spec attach_video(Timesink.Cinema.Film.t(), %{
           :__struct__ => Plug.Upload | Timesink.Storage.Blob,
           optional(:checksum) => :string,

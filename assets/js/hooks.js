@@ -289,5 +289,23 @@ Hooks.ExhibitionDropZone = {
 }
 
 
+// Hooks.FilmTickerScroll = {
+//   mounted() {
+//     const el = this.el
+//     const text = el.innerText
+//     const span = el
+
+//     // Clone text for seamless looping
+//     const repeatText = text + " " + text + " " + text + " " + text
+//     el.innerText = repeatText
+
+//     // Animate using CSS
+//     el.style.display = "inline-block"
+//     el.style.paddingLeft = "100%"
+//     el.style.animation = "marquee 5s linear infinite"
+//   }
+// }
+
+
 
 export default Hooks;
