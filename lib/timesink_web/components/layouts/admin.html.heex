@@ -18,10 +18,11 @@
         </label>
       </:label>
       <li>
-        <.link navigate={~p"/"} class="flex justify-between text-red-600 hover:bg-gray-100">
-          <p>Logout</p>
-          <.icon name="hero-arrow-right-on-rectangle" class="h-5 w-5" />
-        </.link>
+        <.form method="post" action="/sign_out" for={}>
+          <.button type="submit" color="tertiary" class="text-mystery-white">
+            Sign Out <.icon name="hero-arrow-right-on-rectangle" class="h-5 w-5" />
+          </.button>
+        </.form>
       </li>
     </Backpex.HTML.Layout.topbar_dropdown>
   </:topbar>

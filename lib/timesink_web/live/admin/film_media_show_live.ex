@@ -10,16 +10,14 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
 
     film =
       Film.get!(film_id)
-      |> Repo.preload(video: [:blob], poster: [:blob])
+      |> Repo.preload(video: [:blob], poster: [:blob], trailer: [:blob])
 
     {:ok,
      assign(socket,
        film: film,
        upload_url: nil,
        upload_id: nil,
-       notification: nil,
-       uploading_poster: false,
-       poster_upload_progress: nil
+       notification: nil
      )
      |> allow_upload(:poster,
        accept: ~w(.jpg .jpeg .png),
@@ -50,77 +48,66 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
       <section class="bg-dark-room-theater-light rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <h2 class="text-2xl font-semibold mb-6">Poster</h2>
 
-        <%= if @uploading_poster do %>
-          <div class="w-full h-80 flex items-center justify-center">
-            <.icon name="hero-refresh" class="animate-spin h-8 w-8 text-dark-room-theater-light" />
-            <%= if @poster_upload_progress do %>
-              <p class="ml-2 text-sm text-mystery-white">
-                Uploading... {@poster_upload_progress}%
-              </p>
-            <% end %>
-          </div>
+        <%= if @film.poster do %>
+          <img
+            src={Film.poster_url(@film.poster)}
+            alt="Poster"
+            class="rounded-lg w-full max-w-md object-cover shadow-md"
+          />
+          <button
+            phx-click="remove_poster"
+            class="mt-4 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded"
+          >
+            Remove Poster
+          </button>
         <% else %>
-          <%= if @film.poster do %>
-            <img
-              src={Film.poster_url(@film.poster)}
-              alt="Poster"
-              class="rounded-lg w-full max-w-md object-cover shadow-md"
-            />
-            <button
-              phx-click="remove_poster"
-              class="mt-4 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded"
+          <div class="flex flex-col items-center justify-center w-full h-auto min-h-80 bg-dark-room-theater-lightest rounded-lg border-2 border-dashed border-dark-room-theater-light text-dark-room-theater-primary/70 px-4 py-6">
+            <.icon name="hero-document" class="h-16 w-16" />
+            <p class="mt-4 text-lg">No poster uploaded yet</p>
+
+            <form
+              phx-submit="upload_poster"
+              phx-change="validate_poster"
+              phx-drop-target={@uploads.poster.ref}
+              class="mt-4 flex flex-col items-center w-full"
             >
-              Remove Poster
-            </button>
-          <% else %>
-            <div class="flex flex-col items-center justify-center w-full h-auto min-h-80 bg-dark-room-theater-lightest rounded-lg border-2 border-dashed border-dark-room-theater-light text-dark-room-theater-primary/70 px-4 py-6">
-              <.icon name="hero-document" class="h-16 w-16" />
-              <p class="mt-4 text-lg">No poster uploaded yet</p>
+              <.live_file_input upload={@uploads.poster} class="mb-4 mx-auto" />
 
-              <form
-                phx-submit="upload_poster"
-                phx-change="validate_poster"
-                phx-drop-target={@uploads.poster.ref}
-                class="mt-4 flex flex-col items-center w-full"
+              <div
+                :for={entry <- @uploads.poster.entries}
+                class="flex flex-col items-center w-full max-w-xs"
               >
-                <.live_file_input upload={@uploads.poster} class="mb-4 mx-auto" />
+                <div class="w-full aspect-square overflow-hidden rounded shadow-md mb-2 bg-gray-800">
+                  <.live_img_preview entry={entry} class="w-full h-full object-cover" />
+                </div>
 
-                <div
-                  :for={entry <- @uploads.poster.entries}
-                  class="flex flex-col items-center w-full max-w-xs"
-                >
-                  <div class="w-full aspect-square overflow-hidden rounded shadow-md mb-2 bg-gray-800">
-                    <.live_img_preview entry={entry} class="w-full h-full object-cover" />
-                  </div>
+                <figcaption class="text-sm text-center mb-2">{entry.client_name}</figcaption>
 
-                  <figcaption class="text-sm text-center mb-2">{entry.client_name}</figcaption>
-
-                  <div class="w-full">
-                    <progress value={entry.progress} max="100" class="w-full h-2 rounded bg-gray-700">
-                      {entry.progress}%
-                    </progress>
-                    <p class="text-xs text-center mt-1 text-dark-room-theater-light">
-                      {entry.progress}%
-                    </p>
-                  </div>
-
-                  <p
-                    :for={err <- upload_errors(@uploads.poster, entry)}
-                    class="text-red-500 text-sm mt-1"
-                  >
-                    {error_to_string(err)}
+                <div class="w-full">
+                  <progress value={entry.progress} max="100" class="w-full h-2 rounded bg-gray-700">
+                    {entry.progress}%
+                  </progress>
+                  <p class="text-xs text-center mt-1 text-dark-room-theater-light">
+                    {entry.progress}%
                   </p>
                 </div>
 
-                <button
-                  type="submit"
-                  class="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded"
+                <p
+                  :for={err <- upload_errors(@uploads.poster, entry)}
+                  class="text-red-500 text-sm mt-1"
                 >
-                  Upload Poster
-                </button>
-              </form>
-            </div>
-          <% end %>
+                  {error_to_string(err)}
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                class="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded"
+              >
+                Upload Poster
+              </button>
+            </form>
+          </div>
         <% end %>
       </section>
       
@@ -137,7 +124,8 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
           />
           <button
             class="mt-6 bg-red-600 hover:bg-red-700 text-backroom-black font-bold px-6 py-3 rounded-lg transition"
-            phx-click="remove_video"
+            phx-click="remove_film_media"
+            phx-value-type="video"
           >
             Remove Video
           </button>
@@ -155,6 +143,48 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
             <% else %>
               <button
                 phx-click="generate_upload_url"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition"
+              >
+                Generate Upload Link
+              </button>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+      
+    <!-- Trailer Section -->
+      <section class="bg-dark-room-theater-light rounded-2xl shadow-lg p-8 flex flex-col items-center">
+        <h2 class="text-2xl font-semibold mb-6">Trailer</h2>
+
+        <%= if playback_id = Film.get_mux_playback_id(@film.trailer) do %>
+          <mux-player
+            playback-id={playback_id}
+            metadata-video-title={@film.title}
+            style="width: 100%; max-width: 800px; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden;"
+            stream-type="on-demand"
+          />
+          <button
+            class="mt-6 bg-red-600 hover:bg-red-700 text-backroom-black font-bold px-6 py-3 rounded-lg transition"
+            phx-click="remove_film_media"
+            phx-value-type="trailer"
+          >
+            Remove Trailer
+          </button>
+        <% else %>
+          <div class="flex flex-col items-center w-full">
+            <%= if @upload_url do %>
+              <div class="text-green-400 mb-4 font-medium text-center">
+                Upload URL ready. Drag or drop your video below!
+              </div>
+              <mux-uploader
+                pausable
+                endpoint={@upload_url}
+                style="display: block; width: 100%; border: 2px dashed #999; padding: 30px; border-radius: 12px; background-color: rgba(255,255,255,0.05);"
+              />
+            <% else %>
+              <button
+                phx-click="generate_upload_url"
+                phx-value-is_trailer="true"
                 class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition"
               >
                 Generate Upload Link
@@ -183,7 +213,45 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
     """
   end
 
+  def handle_event(
+        "generate_upload_url",
+        %{"is_trailer" => "true"},
+        %{assigns: %{film: film}} = socket
+      ) do
+    create_mux_upload(socket, film, true)
+  end
+
   def handle_event("generate_upload_url", _params, %{assigns: %{film: film}} = socket) do
+    create_mux_upload(socket, film, false)
+  end
+
+  def handle_event("remove_film_media", %{"type" => type}, socket) do
+    film = socket.assigns.film
+
+    asset =
+      case type do
+        "trailer" -> film.trailer
+        _ -> film.video
+      end
+
+    with %Timesink.Storage.Blob{} = blob <- asset.blob,
+         %{"asset_id" => asset_id} <- blob.metadata["mux_asset"],
+         {:ok, _} <- Timesink.Storage.Mux.delete_asset(asset_id) do
+      {:noreply,
+       socket
+       |> assign(film: load_film(film.id))
+       |> assign(notification: {:info, "#{String.capitalize(type)} removed successfully!"})}
+    else
+      nil ->
+        {:noreply, assign(socket, notification: {:error, "No #{type} asset to remove."})}
+
+      {:error, reason} ->
+        Logger.error("Error removing #{type}: #{inspect(reason)}")
+        {:noreply, assign(socket, notification: {:error, "Failed to remove #{type}."})}
+    end
+  end
+
+  defp create_mux_upload(socket, film, is_trailer) do
     params = %{
       "cors_origin" => "*",
       "new_asset_settings" => %{
@@ -192,41 +260,19 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
       }
     }
 
-    with {:ok, %{"id" => upload_id, "url" => url} = _upload} <-
-           Storage.Mux.generate_upload_url(params),
+    with {:ok, %{"id" => upload_id, "url" => url}} <- Storage.Mux.generate_upload_url(params),
          {:ok, _mux_upload} <-
            Storage.Mux.create_mux_upload(%{
              "upload_id" => upload_id,
              "url" => url,
-             "film_id" => film.id
+             "film_id" => film.id,
+             "is_trailer" => is_trailer
            }) do
-      {:noreply,
-       socket
-       |> assign(
-         upload_url: url,
-         upload_id: upload_id
-       )}
+      {:noreply, assign(socket, upload_url: url, upload_id: upload_id)}
     else
       {:error, reason} ->
         Logger.error("Error generating upload URL: #{inspect(reason)}")
         {:noreply, assign(socket, notification: {:error, "Failed to generate upload URL."})}
-    end
-  end
-
-  def handle_event("remove_video", _params, socket) do
-    film = socket.assigns.film
-
-    with {:ok, _} <-
-           Timesink.Storage.Mux.delete_asset(film.video.blob.metadata["mux_asset"]["asset_id"]) do
-      socket
-      |> assign(film: load_film(film.id))
-      |> assign(notification: {:info, "Video removed successfully!"})
-
-      {:noreply, socket}
-    else
-      {:error, reason} ->
-        Logger.error("Error removing video: #{inspect(reason)}")
-        {:noreply, assign(socket, notification: {:error, "Failed to remove video."})}
     end
   end
 
@@ -299,7 +345,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
   defp load_film(film_id) do
     Film
     |> Repo.get!(film_id)
-    |> Repo.preload(video: [:blob], poster: [:blob])
+    |> Repo.preload(video: [:blob], poster: [:blob], trailer: [:blob])
   end
 
   defp error_to_string(:too_large), do: "File too large"

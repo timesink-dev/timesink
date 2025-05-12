@@ -25,8 +25,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
   def render(assigns) do
     ~H"""
-    <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player" defer>
-    </script>
     <div id="theater" class="max-w-4xl mx-auto p-6 space-y-8 text-gray-100 mt-16">
       <%!-- <div class="border-b border-gray-700 pb-4">
         <h1 class="text-3xl font-bold text-white">{@theater.name}</h1>
