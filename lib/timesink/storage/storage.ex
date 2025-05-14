@@ -41,7 +41,14 @@ defmodule Timesink.Storage do
          stream <- S3.Upload.stream_file(upload.path),
          op <- S3.upload(stream, config.bucket, obj_path, meta: obj_meta),
          {:ok, %{status_code: 200, body: %{key: path}}} <- ExAws.request(op),
-         blob_params <- %{id: blob_id, user_id: uid, uri: path, size: stats.size},
+         blob_params <- %{
+           id: blob_id,
+           user_id: uid,
+           uri: path,
+           size: stats.size,
+           mime: upload.content_type,
+           checksum: Blob.checksum(upload.path)
+         },
          {:ok, blob} <- Blob.create(blob_params) do
       {:ok, blob}
     end
@@ -116,6 +123,28 @@ defmodule Timesink.Storage do
     struct
     |> Ecto.build_assoc(assoc_name, %{blob_id: blob.id, name: name, metadata: metadata})
     |> Repo.insert()
+  end
+
+  @doc """
+  Deletes an attachment and its associated blob from S3 and the database.
+  """
+  @spec delete_attachment(Attachment.t()) ::
+          {:ok, :deleted} | {:error, term()}
+  def delete_attachment(%Attachment{} = attachment) do
+    Repo.transaction(fn ->
+      # Load associated blob
+      blob = Repo.preload(attachment, :blob).blob
+
+      # Delete file from S3
+      with {:ok, _} <- Timesink.Storage.S3.delete(blob.uri),
+           {:ok, _} <- Attachment.delete(attachment),
+           {:ok, _} <- Blob.delete(blob) do
+        :deleted
+      else
+        {:error, reason} ->
+          Repo.rollback(reason)
+      end
+    end)
   end
 
   @spec config() :: config

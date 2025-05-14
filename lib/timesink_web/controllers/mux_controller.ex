@@ -55,13 +55,13 @@ defmodule TimesinkWeb.MuxController do
                  "film_title" => film.title
                }
              }),
-           {:ok, _attachment} <- Film.attach_video(film, blob),
+           {:ok, _attachment} <- attach_mux_asset(film, blob, mux_upload.meta),
            {:ok, _} <- MuxUpload.delete(mux_upload) do
         TimesinkWeb.Endpoint.broadcast!("film_media:#{film.id}", "video_ready", %{})
         :ok
       else
         error ->
-          Logger.error(error |> inspect(), service: :mux, params: params)
+          Logger.error(inspect(error), service: :mux, params: params)
           Repo.rollback(error)
       end
     end)
@@ -110,7 +110,6 @@ defmodule TimesinkWeb.MuxController do
           case Blob.delete(blob) do
             {:ok, _} ->
               TimesinkWeb.Endpoint.broadcast!("film_media:#{film_id_str}", "video_deleted", %{})
-              IO.inspect(film_id_str, label: "FILM ID")
               :ok
 
             {:error, reason} ->
@@ -134,4 +133,7 @@ defmodule TimesinkWeb.MuxController do
   end
 
   def handle_webhook(_params), do: :ok
+
+  defp attach_mux_asset(film, blob, %{"is_trailer" => true}), do: Film.attach_trailer(film, blob)
+  defp attach_mux_asset(film, blob, _), do: Film.attach_video(film, blob)
 end

@@ -136,7 +136,7 @@ config :timesink, Timesink.Storage.S3,
   host: System.get_env("TIMESINK_S3_HOST", "http://localhost:9000"),
   access_key_id: System.get_env("TIMESINK_S3_ACCESS_KEY_ID", "minioadmin"),
   access_key_secret: System.get_env("TIMESINK_S3_ACCESS_KEY_SECRET", "minioadmin"),
-  bucket: System.get_env("TIMESINK_S3_BUCKET", "timesink"),
+  bucket: System.get_env("TIMESINK_S3_BUCKET", "timesink-dev"),
   prefix: System.get_env("TIMESINK_S3_PREFIX", "blobs")
 
 if config_env() in [:test] do
@@ -150,7 +150,7 @@ if config_env() in [:test] do
     host: System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000"),
     access_key_id: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_ID", "minioadmin"),
     access_key_secret: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_SECRET", "minioadmin"),
-    bucket: System.get_env("TIMESINK_TEST_S3_BUCKET", "timesink-dev"),
+    bucket: System.get_env("TIMESINK_TEST_S3_BUCKET", "timesink-test"),
     prefix: System.get_env("TIMESINK_TEST_S3_PREFIX", "blobs")
 
   config :timesink, Timesink.Storage.Mux,

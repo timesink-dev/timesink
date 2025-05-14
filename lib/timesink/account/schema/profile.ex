@@ -91,4 +91,10 @@ defmodule Timesink.Accounts.Profile do
   defp too_old_to_believe?(date) do
     Date.diff(Date.utc_today(), date) > 110 * 365
   end
+
+  def avatar_url(%Timesink.Storage.Attachment{blob: %{uri: path}}) do
+    Timesink.Storage.S3.public_url(path)
+  end
+
+  def avatar_url(nil), do: "/images/default-avatar.png"
 end

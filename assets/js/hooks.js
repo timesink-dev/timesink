@@ -288,6 +288,4 @@ Hooks.ExhibitionDropZone = {
   
 }
 
-
-
 export default Hooks;

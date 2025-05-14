@@ -73,6 +73,12 @@ defmodule Timesink.Cinema.Film do
     Storage.create_attachment(film, :poster, upload)
   end
 
+  def poster_url(%Timesink.Storage.Attachment{blob: %{uri: path}}) do
+    Timesink.Storage.S3.public_url(path)
+  end
+
+  def poster_url(nil), do: nil
+
   def attach_video(%{__struct__: __MODULE__} = film, blob) do
     Storage.create_attachment(film, :video, blob)
   end
@@ -80,4 +86,18 @@ defmodule Timesink.Cinema.Film do
   def attach_trailer(%{__struct__: __MODULE__} = film, upload) do
     Storage.create_attachment(film, :trailer, upload)
   end
+
+  def get_mux_playback_id(%Timesink.Storage.Attachment{blob: %{metadata: metadata}}) do
+    metadata
+    |> Map.get("mux_asset", %{})
+    |> Map.get("playback_id", [])
+    |> List.first()
+    |> case do
+      nil -> nil
+      %{"id" => id} -> id
+      _ -> nil
+    end
+  end
+
+  def get_mux_playback_id(nil), do: nil
 end

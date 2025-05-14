@@ -7,11 +7,21 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
   def mount(_params, _session, socket) do
     showcases = refresh_showcases()
 
-    theaters = Timesink.Repo.all(Timesink.Cinema.Theater)
+    theaters =
+      Timesink.Repo.all(
+        from t in Timesink.Cinema.Theater,
+          order_by: [asc: t.name]
+      )
+
     films = Timesink.Cinema.Film.all()
 
-    {:ok, assign(socket, showcases: showcases, films: films, theaters: theaters),
-     layout: {TimesinkWeb.Layouts, :film_upload}}
+    {:ok,
+     assign(socket,
+       showcases_active_and_upcoming: Enum.reject(showcases, &(&1.status == :archived)),
+       showcases_archived: Enum.filter(showcases, &(&1.status == :archived)),
+       films: films,
+       theaters: theaters
+     ), layout: {TimesinkWeb.Layouts, :film_upload}}
   end
 
   def render(assigns) do
@@ -46,7 +56,7 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
         <div class="flex-1 space-y-10">
           <h2 class="text-2xl font-bold text-white mb-6">📅 Showcases</h2>
 
-          <%= for showcase <- @showcases do %>
+          <%= for showcase <- @showcases_active_and_upcoming do %>
             <div class={[
               "rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 ease-in-out w-full",
               showcase.status == :active &&
@@ -141,6 +151,74 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
               </div>
             </div>
           <% end %>
+          <%= if @showcases_archived != [] do %>
+            <div class="border-t border-gray-600 mt-16 pt-10">
+              <h2 class="text-xl font-bold text-gray-400 mb-6">📦 Archived Showcases</h2>
+
+              <div class="space-y-10">
+                <%= for showcase <- @showcases_archived do %>
+                  <div class="bg-obsidian/60 border border-gray-700 rounded-2xl overflow-hidden shadow-md w-full">
+                    <div class="p-8 md:p-10">
+                      <h3 class="text-xl font-semibold text-white flex items-center gap-2 mb-2.5">
+                        🗃️ {showcase.title}
+                      </h3>
+
+                      <div class="text-xs text-gray-400 flex justify-start gap-x-4 w-full mb-3">
+                        <p>
+                          🕒 <strong>Showtime:</strong>
+                          <%= if showcase.start_at do %>
+                            {Calendar.strftime(showcase.start_at, "%B %-d, %Y: %I:%M%p")} (UTC)
+                          <% else %>
+                            Not set
+                          <% end %>
+                        </p>
+                        <p>
+                          <strong>Ends:</strong>
+                          <%= if showcase.end_at do %>
+                            {Calendar.strftime(showcase.end_at, "%B %-d, %Y: %I:%M%p")} (UTC)
+                          <% else %>
+                            Not set
+                          <% end %>
+                        </p>
+                      </div>
+
+                      <p class="text-sm text-gray-400 mb-6">
+                        <%= if showcase.description && String.trim(showcase.description) != "" do %>
+                          {showcase.description}
+                        <% else %>
+                          <em>No description yet...</em>
+                        <% end %>
+                      </p>
+
+                      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
+                        <%= for theater <- @theaters do %>
+                          <div class="bg-backroom-black/50 border border-dark-theater-medium rounded-xl p-4 min-h-[80px]">
+                            <p class="text-sm font-medium text-white mb-2">{theater.name}</p>
+
+                            <%= for exhibition <- showcase.exhibitions,
+                    exhibition.theater_id == theater.id do %>
+                              <div class="bg-dark-theater-medium/70 text-white text-sm px-3 py-2 rounded-lg mt-2 shadow-sm w-full">
+                                <div class="flex justify-between items-center gap-2">
+                                  <span>🎞️</span>
+                                  <span class="text-sm">{exhibition.film.title}</span>
+                                </div>
+                              </div>
+                            <% end %>
+
+                            <%= if Enum.empty?(Enum.filter(showcase.exhibitions, &(&1.theater_id == theater.id))) do %>
+                              <p class="text-gray-500 italic text-xs">
+                                No film scheduled in this theater
+                              </p>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>
@@ -192,14 +270,18 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
   defp refresh_showcases() do
     Timesink.Repo.all(
       from s in Timesink.Cinema.Showcase,
-        order_by:
-          fragment(
-            "CASE WHEN ? = 'active' THEN 0 ELSE 1 END, COALESCE(?, ?)",
-            s.status,
-            s.start_at,
-            s.inserted_at
-          ),
         preload: [exhibitions: [:film, :theater]]
     )
+    |> Enum.sort_by(fn s ->
+      {
+        showcase_rank(s.status),
+        s.start_at || s.inserted_at
+      }
+    end)
   end
+
+  defp showcase_rank(:active), do: 0
+  defp showcase_rank(:upcoming), do: 1
+  defp showcase_rank(:archived), do: 2
+  defp showcase_rank(_), do: 3
 end

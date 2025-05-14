@@ -3,7 +3,7 @@ defmodule TimesinkWeb.Admin.FilmMediaLive do
   alias Timesink.Cinema.Film
 
   def mount(_params, _session, socket) do
-    films = Film |> Timesink.Repo.all() |> Timesink.Repo.preload([:poster, :video])
+    films = Film |> Timesink.Repo.all() |> Timesink.Repo.preload(video: [:blob], poster: [:blob])
 
     {:ok,
      assign(socket,
@@ -30,7 +30,7 @@ defmodule TimesinkWeb.Admin.FilmMediaLive do
             <div class="relative">
               <%= if film.poster do %>
                 <img
-                  src={poster_url(film.poster)}
+                  src={Film.poster_url(film.poster)}
                   alt={film.title}
                   class="w-full h-64 object-cover group-hover:opacity-90 transition"
                 />
@@ -62,11 +62,6 @@ defmodule TimesinkWeb.Admin.FilmMediaLive do
       </div>
     </div>
     """
-  end
-
-  defp poster_url(poster) do
-    # Depending how you store paths...
-    Phoenix.VerifiedRoutes.static_path(TimesinkWeb.Endpoint, poster.path)
   end
 
   def handle_event("go_back", _params, socket) do

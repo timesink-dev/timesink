@@ -35,7 +35,8 @@ defmodule Timesink.Storage.Mux do
       upload_id: upload_params["upload_id"],
       url: upload_params["url"],
       meta: %{
-        "film_id" => upload_params["film_id"]
+        "film_id" => upload_params["film_id"],
+        "is_trailer" => upload_params["is_trailer"]
       }
     }
 

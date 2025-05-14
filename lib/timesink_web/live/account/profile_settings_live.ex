@@ -1,6 +1,20 @@
 defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
   alias Timesink.Accounts.User
+  alias Timesink.Accounts.Profile
   use TimesinkWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    user = Timesink.Repo.preload(socket.assigns.current_user, profile: [avatar: [:blob]])
+
+    changeset =
+      User.changeset(user)
+
+    socket =
+      socket
+      |> assign(user: user, account_form: to_form(changeset))
+
+    {:ok, socket}
+  end
 
   def render(assigns) do
     ~H"""
@@ -18,7 +32,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
               <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
               <label class="mb-2">Profile image</label>
               <img
-                src={@user.profile.avatar_url}
+                src={Profile.avatar_url(@user.profile.avatar)}
                 alt="Profile picture"
                 class="rounded-full w-24 h-24"
               />
@@ -97,19 +111,6 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
       </div>
     </section>
     """
-  end
-
-  def mount(_params, _session, socket) do
-    user = socket.assigns.current_user |> Timesink.Repo.preload(:profile)
-
-    changeset =
-      User.changeset(user)
-
-    socket =
-      socket
-      |> assign(user: user, account_form: to_form(changeset))
-
-    {:ok, socket}
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
