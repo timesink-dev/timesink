@@ -191,7 +191,6 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
         <% end %>
       </section>
 
-    <!-- Flash Messages -->
       <%= if @notification do %>
         <div class="space-y-4 mt-8">
           <%= case @notification do %>

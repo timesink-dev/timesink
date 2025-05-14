@@ -84,7 +84,7 @@ jobs:
       - run: asdf plugin add mc
       - run: asdf install mc
       - run: sleep 5; mc --debug --insecure config host add minio http://localhost:9000 minioadmin minioadmin
-      - run: sleep 1; mc --debug --insecure mb -p minio/timesink-dev
+      - run: sleep 1; mc --debug --insecure mb -p minio/timesink-test
 
       - run: mix deps.get
       - run: mix compile
