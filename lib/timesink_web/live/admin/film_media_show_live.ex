@@ -43,7 +43,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
           </p>
         <% end %>
       </div>
-      
+
     <!-- Poster Section -->
       <section class="bg-dark-room-theater-light rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <h2 class="text-2xl font-semibold mb-6">Poster</h2>
@@ -110,7 +110,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
           </div>
         <% end %>
       </section>
-      
+
     <!-- Video Section -->
       <section class="bg-dark-room-theater-light rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <h2 class="text-2xl font-semibold mb-6">Video</h2>
@@ -151,7 +151,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
           </div>
         <% end %>
       </section>
-      
+
     <!-- Trailer Section -->
       <section class="bg-dark-room-theater-light rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <h2 class="text-2xl font-semibold mb-6">Trailer</h2>
@@ -193,7 +193,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
           </div>
         <% end %>
       </section>
-      
+
     <!-- Flash Messages -->
       <%= if @notification do %>
         <div class="space-y-4 mt-8">
@@ -248,31 +248,6 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
       {:error, reason} ->
         Logger.error("Error removing #{type}: #{inspect(reason)}")
         {:noreply, assign(socket, notification: {:error, "Failed to remove #{type}."})}
-    end
-  end
-
-  defp create_mux_upload(socket, film, is_trailer) do
-    params = %{
-      "cors_origin" => "*",
-      "new_asset_settings" => %{
-        "playback_policies" => ["public"],
-        "video_quality" => "basic"
-      }
-    }
-
-    with {:ok, %{"id" => upload_id, "url" => url}} <- Storage.Mux.generate_upload_url(params),
-         {:ok, _mux_upload} <-
-           Storage.Mux.create_mux_upload(%{
-             "upload_id" => upload_id,
-             "url" => url,
-             "film_id" => film.id,
-             "is_trailer" => is_trailer
-           }) do
-      {:noreply, assign(socket, upload_url: url, upload_id: upload_id)}
-    else
-      {:error, reason} ->
-        Logger.error("Error generating upload URL: #{inspect(reason)}")
-        {:noreply, assign(socket, notification: {:error, "Failed to generate upload URL."})}
     end
   end
 
@@ -340,6 +315,31 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
     {:noreply,
      socket
      |> assign(film: film, notification: {:info, "Video deleted successfully!"})}
+  end
+
+  defp create_mux_upload(socket, film, is_trailer) do
+    params = %{
+      "cors_origin" => "*",
+      "new_asset_settings" => %{
+        "playback_policies" => ["public"],
+        "video_quality" => "basic"
+      }
+    }
+
+    with {:ok, %{"id" => upload_id, "url" => url}} <- Storage.Mux.generate_upload_url(params),
+         {:ok, _mux_upload} <-
+           Storage.Mux.create_mux_upload(%{
+             "upload_id" => upload_id,
+             "url" => url,
+             "film_id" => film.id,
+             "is_trailer" => is_trailer
+           }) do
+      {:noreply, assign(socket, upload_url: url, upload_id: upload_id)}
+    else
+      {:error, reason} ->
+        Logger.error("Error generating upload URL: #{inspect(reason)}")
+        {:noreply, assign(socket, notification: {:error, "Failed to generate upload URL."})}
+    end
   end
 
   defp load_film(film_id) do

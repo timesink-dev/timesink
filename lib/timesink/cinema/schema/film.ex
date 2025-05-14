@@ -79,23 +79,6 @@ defmodule Timesink.Cinema.Film do
 
   def poster_url(nil), do: nil
 
-  @spec attach_video(Timesink.Cinema.Film.t(), %{
-          :__struct__ => Plug.Upload | Timesink.Storage.Blob,
-          optional(:checksum) => :string,
-          optional(:content_type) => nil | binary(),
-          optional(:filename) => binary(),
-          optional(:metadata) => :map,
-          optional(:mime) => :string,
-          optional(:path) =>
-            binary()
-            | maybe_improper_list(
-                binary() | maybe_improper_list(any(), binary() | []) | char(),
-                binary() | []
-              ),
-          optional(:service) => :mux | :s3,
-          optional(:size) => :integer,
-          optional(:uri) => :string
-        }) :: {:error, any()} | {:ok, Timesink.Storage.Attachment.t()}
   def attach_video(%{__struct__: __MODULE__} = film, blob) do
     Storage.create_attachment(film, :video, blob)
   end
@@ -103,8 +86,6 @@ defmodule Timesink.Cinema.Film do
   def attach_trailer(%{__struct__: __MODULE__} = film, upload) do
     Storage.create_attachment(film, :trailer, upload)
   end
-
-  def get_mux_playback_id(nil), do: nil
 
   def get_mux_playback_id(%Timesink.Storage.Attachment{blob: %{metadata: metadata}}) do
     metadata
@@ -118,5 +99,5 @@ defmodule Timesink.Cinema.Film do
     end
   end
 
-  def get_mux_playback_id(_), do: nil
+  def get_mux_playback_id(nil), do: nil
 end
