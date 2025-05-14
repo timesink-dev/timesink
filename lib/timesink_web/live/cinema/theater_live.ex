@@ -26,16 +26,15 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   def render(assigns) do
     ~H"""
     <div id="theater" class="max-w-4xl mx-auto p-6 space-y-8 text-gray-100 mt-16">
-      <%!-- <div class="border-b border-gray-700 pb-4">
-        <h1 class="text-3xl font-bold text-white">{@theater.name}</h1>
+      <div class="border-b border-gray-700 pb-4">
+        <h1 class="text-xl font-bold">{@theater.name}</h1>
         <p class="text-gray-400 mt-2">{@theater.description}</p>
-      </div> --%>
+      </div>
 
       <div>
-        <h1>{@theater.name}</h1>
-        <div class="my-2 text-neon-blue-lightest text-xs mb-4">
-          Now playing • {@film.title}
-        </div>
+        <%!-- <div class="my-2 text-neon-blue-lightest text-xs mb-4">
+          {@film.title}
+        </div> --%>
         <div class="wrapper w-64 px-2 py-1 mb-6 overflow-hidden">
           <div class="marquee text-neon-red-light text-xs">
             <%= for part <- repeated_film_title_parts(@film.title) do %>
@@ -44,11 +43,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             <% end %>
           </div>
         </div>
-        <%!-- <div class="bg-dark-theater-primary rounded-lg py-6 px-4"> --%>
-        <%!-- <h3 class="text-xl font-bold text-white my-4">
-            {@film.title}
-            <span class="text-gray-400">({@film.year})</span>
-          </h3> --%>
         <%= if playback_id = Film.get_mux_playback_id(@film.video) do %>
           <mux-player
             playback-id={playback_id}
@@ -63,11 +57,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           />
         <% end %>
 
-        <%!-- <p class="text-gray-300 mt-1">by <%= @film.author %></p> --%>
-        <%!-- <%= if @film.poster_url do %>
-            <img src={@film.poster_url} alt="Film Poster" class="mt-4 rounded-lg w-64 shadow-lg" />
-          <% end %> --%>
-        <%!-- </div> --%>
       </div>
 
       <div class="text-sm text-gray-500 italic">
