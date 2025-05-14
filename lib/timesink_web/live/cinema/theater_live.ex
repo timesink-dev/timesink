@@ -4,6 +4,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   alias Timesink.Cinema.Exhibition
   alias Timesink.Cinema.Showcase
   alias Timesink.Cinema.Film
+  alias Timesink.Cinema.Creative
   alias Timesink.Repo
 
   def mount(%{"theater_slug" => theater_slug}, _session, socket) do
@@ -15,7 +16,20 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       {:ok,
        socket
        |> assign(:theater, theater)
-       |> assign(:film, film |> Repo.preload(video: [:blob], poster: [:blob]))
+       |> assign(
+         :film,
+         film
+         |> Repo.preload([
+           {:video, [:blob]},
+           {:poster, [:blob]},
+           :genres,
+           directors: [:creative],
+           cast: [:creative],
+           writers: [:creative],
+           producers: [:creative],
+           crew: [:creative]
+         ])
+       )
        |> assign(:exhibition, exhibition)
        |> assign(:user, socket.assigns.current_user)}
     else
@@ -28,15 +42,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <div id="theater" class="max-w-4xl mx-auto p-6 space-y-8 text-gray-100 mt-16">
       <div class="border-b border-gray-700 pb-4">
         <h1 class="text-xl font-bold">{@theater.name}</h1>
-        <p class="text-gray-400 mt-2">{@theater.description}</p>
+        <p class="text-gray-400 mt-2 text-sm">{@theater.description}</p>
       </div>
 
       <div>
-        <%!-- <div class="my-2 text-neon-blue-lightest text-xs mb-4">
-          {@film.title}
-        </div> --%>
         <div class="wrapper w-64 px-2 py-1 mb-6 overflow-hidden">
-          <div class="marquee text-neon-red-light text-xs">
+          <div class="marquee text-neon-red-light text-sm">
             <%= for part <- repeated_film_title_parts(@film.title) do %>
               <p>Now playing</p>
               <p>{part}</p>
@@ -56,41 +67,91 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             loop
           />
         <% end %>
-
       </div>
 
-      <div class="text-sm text-gray-500 italic">
+      <div id="film-info" class="w-full max-w-3xl mt-10 mx-4 border-t border-gray-700 pt-6 space-y-4">
+        <!-- Title + Year + Duration -->
+        <div class="text-2xl font-semibold tracking-wide text-mystery-white">
+          {@film.title}
+          <span class="text-gray-400 text-base ml-2">({@film.year})</span>
+        </div>
+
+        <div class="text-sm text-mystery-white uppercase tracking-wider flex flex-wrap gap-x-4 gap-y-2">
+          <%= for genre <- @film.genres do %>
+            <span>{genre.name}</span>
+          <% end %>
+          <span>•</span>
+          <span>{@film.duration} min</span>
+          <span>•</span>
+          <span>{String.upcase(to_string(@film.format))}</span>
+          <span>•</span>
+          <span>{@film.aspect_ratio} aspect</span>
+          <%= if @film.color do %>
+            <span>•</span>
+            <span class="capitalize">{String.replace(to_string(@film.color), "_", " ")}</span>
+          <% end %>
+        </div>
+
+        <div class="text-base text-gray-300 leading-relaxed font-light max-w-prose">
+          {@film.synopsis}
+        </div>
+
+        <div class="text-sm text-gray-400 font-light space-y-2 pt-4 border-t border-gray-800 mt-6">
+          <%= if Enum.any?(@film.directors) do %>
+            <div>
+              <span class="text-gray-500 uppercase tracking-wider">Director:</span>
+              <span class="text-gray-300">
+                {join_names(@film.directors)}
+              </span>
+            </div>
+          <% end %>
+
+          <%= if Enum.any?(@film.writers) do %>
+            <div>
+              <span class="text-gray-500 uppercase tracking-wider">Writer:</span>
+              <span class="text-gray-300">
+                {join_names(@film.producers)}
+              </span>
+            </div>
+          <% end %>
+
+          <%= if Enum.any?(@film.producers) do %>
+            <div>
+              <span class="text-gray-500 uppercase tracking-wider">Producer:</span>
+              <span class="text-gray-300">
+                {join_names(@film.producers)}
+              </span>
+            </div>
+          <% end %>
+
+          <%= if Enum.any?(@film.cast) do %>
+            <div>
+              <span class="text-gray-500 uppercase tracking-wider">Cast:</span>
+              <ul class="text-gray-300 list-disc list-inside">
+                {join_names_with_roles(@film.cast)}
+              </ul>
+            </div>
+          <% end %>
+
+          <%= if Enum.any?(@film.crew) do %>
+            <div>
+              <span class="text-gray-500 uppercase tracking-wider">Crew:</span>
+              <ul class="text-gray-300 list-disc list-inside">
+                {join_names_with_roles(@film.crew)}
+              </ul>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="pt-6">
+          <.button color="tertiary" class="hover:cursor-not-allowed" disabled>
+            Tip the Filmmaker
+          </.button>
+        </div>
+      </div>
+      <div class="text-sm text-gray-500 italic mt-32">
         More interactive features (chat, playback, etc.) coming soon.
       </div>
-      <%!-- <div id="film-info" class="flex justify-between w-full">
-        <div class="flex flex-col gap-y-4 text-gray-400">
-          {@film.title}
-          <div>
-            <span>
-              {@film.year}
-            </span>
-            <span class="mx-2">•</span>
-            <span>
-              {@film.duration} min
-            </span>
-          </div>
-          <div class="text-gray-400">{@film.synopsis}</div>
-        </div>
-        <%!-- <div>
-          <span class="text-gray-400">Format:</span>
-          <span class="text-gray-300">
-            {@film.format}
-          </span>
-          <span class="mx-2">•</span>
-          <span class="text-gray-400">Aspect Ratio:</span>
-          <span class="text-gray-300">
-            {@film.aspect_ratio}
-          </span>
-        </div> --%>
-      <%!-- <div>
-          <.button color="tertiary">Tip the project</.button>
-        </div>
-      </div> --%>
     </div>
     """
   end
@@ -98,5 +159,27 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   defp repeated_film_title_parts(title, repeat_count \\ 4) do
     1..repeat_count
     |> Enum.map(fn _ -> title end)
+  end
+
+  defp join_names([]), do: ""
+
+  defp join_names(creatives) do
+    creatives
+    |> Enum.map(fn %{creative: c} -> Creative.full_name(c) end)
+    |> Enum.join(", ")
+  end
+
+  defp join_names_with_roles([]), do: ""
+
+  defp join_names_with_roles(creatives) do
+    creatives
+    |> Enum.map(fn %{creative: c, subrole: r} ->
+      case r do
+        nil -> Creative.full_name(c)
+        "" -> Creative.full_name(c)
+        _ -> "#{Creative.full_name(c)} (#{r})"
+      end
+    end)
+    |> Enum.join(", ")
   end
 end

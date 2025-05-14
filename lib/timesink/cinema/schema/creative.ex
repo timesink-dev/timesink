@@ -8,7 +8,7 @@ defmodule Timesink.Cinema.Creative do
           __struct__: __MODULE__,
           first_name: :string,
           last_name: :string,
-          user: Timesink.Accounts.User.t()
+          profile: Timesink.Accounts.Profile.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -32,4 +32,6 @@ defmodule Timesink.Cinema.Creative do
     |> validate_length(:first_name, min: 2)
     |> validate_length(:last_name, min: 2)
   end
+
+  def full_name(%{first_name: f, last_name: l}), do: "#{f} #{l}"
 end
