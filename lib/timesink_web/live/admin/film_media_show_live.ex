@@ -32,7 +32,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
       <.button color="none" class="mt-6 p-0 text-center" phx-click="go_back">
         ← Back
       </.button>
-      <!-- Film Header -->
+
       <div class="space-y-3 text-center max-w-3xl mx-auto">
         <h1 class="text-4xl font-bold">{@film.title}</h1>
         <p class="text-lg text-dark-room-ter-light">{@film.year}</p>
@@ -44,7 +44,6 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
         <% end %>
       </div>
 
-    <!-- Poster Section -->
       <section class="bg-dark-room-theater-light rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <h2 class="text-2xl font-semibold mb-6">Poster</h2>
 
@@ -111,7 +110,6 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
         <% end %>
       </section>
 
-    <!-- Video Section -->
       <section class="bg-dark-room-theater-light rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <h2 class="text-2xl font-semibold mb-6">Video</h2>
 
@@ -152,7 +150,6 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
         <% end %>
       </section>
 
-    <!-- Trailer Section -->
       <section class="bg-dark-room-theater-light rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <h2 class="text-2xl font-semibold mb-6">Trailer</h2>
 
