@@ -28,7 +28,6 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
     ~H"""
     <div class="min-h-screen bg-backroom-black text-mystery-white px-6 py-10 max-w-screen-2xl mx-auto">
       <div class="flex flex-col md:flex-row gap-8">
-        <!-- Left Sidebar -->
         <div class="md:w-1/4 space-y-6">
           <.button color="none" class="p-0 text-left" phx-click="go_back">
             ← Admin console
@@ -52,7 +51,6 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
           </div>
         </div>
 
-    <!-- Showcase Cards -->
         <div class="flex-1 space-y-10">
           <h2 class="text-2xl font-bold text-white mb-6">📅 Showcases</h2>
 
@@ -120,7 +118,6 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
                       <%= for exhibition <- showcase.exhibitions,
       exhibition.theater_id == theater.id do %>
                         <div class="relative group bg-dark-theater-medium bg-opacity-60 text-white text-sm px-3 py-2 rounded-lg mt-2 shadow-sm w-full">
-                          <!-- Hover-only "X" button in top-right, half-outside -->
                           <button
                             type="button"
                             phx-click="remove_exhibition"
@@ -134,7 +131,6 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
                             />
                           </button>
 
-    <!-- Exhibition content -->
                           <div class="flex justify-between items-center gap-2 pr-6">
                             <span>🔴</span>
                             <span class="text-sm">{exhibition.film.title}</span>
