@@ -51,7 +51,7 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
             </div>
           </div>
         </div>
-        
+
     <!-- Showcase Cards -->
         <div class="flex-1 space-y-10">
           <h2 class="text-2xl font-bold text-white mb-6">📅 Showcases</h2>
@@ -133,7 +133,7 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
                               class="h-5 w-5 opacity-100 group-hover:opacity-70"
                             />
                           </button>
-                          
+
     <!-- Exhibition content -->
                           <div class="flex justify-between items-center gap-2 pr-6">
                             <span>🔴</span>
@@ -238,7 +238,7 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
            }) do
       {:noreply,
        socket
-       |> assign(:showcases, refresh_showcases())
+       |> assign(:showcases_active_and_upcoming, refresh_showcases())
        |> put_flash(:info, "Exhibition scheduled.")}
     else
       {:error, _changeset} ->
@@ -252,7 +252,7 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
          {:ok, _exhibition} <- Timesink.Repo.delete(exhibition) do
       {:noreply,
        socket
-       |> assign(:showcases, refresh_showcases())
+       |> assign(:showcases_active_and_upcoming, refresh_showcases())
        |> put_flash(:info, "Exhibition removed.")}
     else
       nil ->
