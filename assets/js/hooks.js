@@ -285,7 +285,28 @@ Hooks.ExhibitionDropZone = {
     this.el.removeEventListener("dragover", this.handleDragOver);
     this.el.removeEventListener("drop", this.handleDrop);
   }
-  
 }
+
+
+Hooks.HoverPlay = {
+  mounted() {
+    const player = this.el;
+
+    // Prevent it from autoplaying on mount
+    player.pause();
+
+    const container = player.closest(".group");
+    if (container) {
+      container.addEventListener("mouseenter", () => {
+        player.play().catch(() => {});
+      });
+      container.addEventListener("mouseleave", () => {
+        player.pause();
+        player.currentTime = 0;
+      });
+    }
+  }
+}
+
 
 export default Hooks;

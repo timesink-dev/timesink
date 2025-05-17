@@ -12,6 +12,8 @@ defmodule Timesink.Application do
       Timesink.Repo,
       {DNSCluster, query: Application.get_env(:timesink, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Timesink.PubSub},
+      Timesink.Presence,
+
       # Start the Finch HTTP client for sending emails
       {Finch, name: Timesink.Finch},
       # Start a worker by calling: Timesink.Worker.start_link(arg)

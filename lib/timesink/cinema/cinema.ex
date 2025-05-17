@@ -96,4 +96,12 @@ defmodule Timesink.Cinema do
         preload: [exhibitions: [:theater]]
     )
   end
+
+  def list_active_showcase_theaters do
+    Timesink.Repo.all(
+      from s in Showcase,
+        where: s.status == :active,
+        preload: [exhibitions: [:theater]]
+    )
+  end
 end

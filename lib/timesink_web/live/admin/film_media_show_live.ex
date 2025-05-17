@@ -6,7 +6,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
   require Logger
 
   def mount(%{"id" => film_id}, _session, socket) do
-    if connected?(socket), do: Phoenix.PubSub.subscribe(Timesink.PubSub, "film_media:#{film_id}")
+    if connected?(socket), do: Phoenix.PubSub.subscribe(Timesink.PubSub, "film_media")
 
     film =
       Film.get!(film_id)
@@ -293,20 +293,16 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
     {:noreply, push_navigate(socket, to: "/admin/film-media")}
   end
 
-  def handle_info(%{event: "video_ready"}, socket) do
+  def handle_info(%Phoenix.Socket.Broadcast{event: "video_ready", payload: film}, socket) do
     Logger.info("Received video_ready PubSub event, reloading film...")
-
-    film = load_film(socket.assigns.film.id)
 
     {:noreply,
      socket
      |> assign(film: film, notification: {:info, "Video uploaded and ready to view! 🎬"})}
   end
 
-  def handle_info(%{event: "video_deleted"}, socket) do
+  def handle_info(%Phoenix.Socket.Broadcast{event: "video_deleted", payload: film}, socket) do
     Logger.info("Received video_deleted PubSub event, reloading film...")
-
-    film = load_film(socket.assigns.film.id)
 
     {:noreply,
      socket
