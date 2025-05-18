@@ -305,6 +305,13 @@ Hooks.HoverPlay = {
         player.currentTime = 0;
       });
     }
+  },
+  destroyed() {
+    const container = this.el.closest(".group");
+    if (container) {
+      container.removeEventListener("mouseenter", this.handleMouseEnter);
+      container.removeEventListener("mouseleave", this.handleMouseLeave);
+    }
   }
 }
 
