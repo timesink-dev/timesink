@@ -82,13 +82,13 @@ defmodule TimesinkWeb.HomepageLive do
             </div>
           <% end %>
         </div>
-        
+
     <!-- Main Theater Viewer Section -->
         <div class="flex-1">
           <%= for exhibition <- @exhibitions,
               exhibition.theater.id == @selected_theater_id do %>
             <% film = exhibition.film %>
-            
+
     <!-- Title and Description -->
             <div class="mb-6">
               <h3 class="text-3xl font-bold mb-1 text-left text-white drop-shadow-md">
@@ -106,7 +106,7 @@ defmodule TimesinkWeb.HomepageLive do
                 </div>
               </div>
             </div>
-            
+
     <!-- Video -->
                <!-- Card container -->
             <div class="max-w-4xl mx-auto">
@@ -123,7 +123,7 @@ defmodule TimesinkWeb.HomepageLive do
                   class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-90 group-hover:scale-105"
                   phx-hook="HoverPlay"
                 />
-                
+
     <!-- Overlay -->
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 space-y-2 z-10">
                   <h3 class="text-2xl font-bold">{film.title}</h3>
@@ -166,7 +166,7 @@ defmodule TimesinkWeb.HomepageLive do
                 </div>
               </div>
             </div>
-            
+
     <!-- Film Info -->
 
           <% end %>
