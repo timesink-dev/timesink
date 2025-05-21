@@ -323,12 +323,6 @@ Hooks.EmblaMain = {
     this.embla = EmblaCarousel(this.el, { loop: true })
     window.__emblaMain__ = this.embla // Make globally available for thumbs
 
-    this.handleSelect = () => {
-      const index = this.embla.selectedScrollSnap()
-      this.pushEvent("embla_main_changed", { index })
-    }
-
-    this.embla.on("select", this.handleSelect)
   },
 
   updated() {

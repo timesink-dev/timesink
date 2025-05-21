@@ -189,7 +189,7 @@ defmodule TimesinkWeb.HomepageLive do
           <div id="embla-main" phx-hook="EmblaMain" class="overflow-hidden">
             <div class="flex gap-4 px-4">
               <%= for exhibition <- @exhibitions do %>
-                <div class="shrink-0 w-[85%]">
+                <div class="shrink-0 w-full">
                   <.theater_card exhibition={exhibition} />
                 </div>
               <% end %>
@@ -220,18 +220,6 @@ defmodule TimesinkWeb.HomepageLive do
 
   def handle_event("select_theater", %{"id" => id}, socket) do
     {:noreply, assign(socket, selected_theater_id: id)}
-  end
-
-  def handle_event("embla_main_changed", %{"index" => index}, socket) do
-    exhibitions = socket.assigns.exhibitions
-    selected_index = (is_binary(index) && String.to_integer(index)) || index
-    selected = Enum.at(exhibitions, selected_index)
-
-    {:noreply,
-     assign(socket,
-       selected_index: selected_index,
-       selected_theater_id: selected.theater.id
-     )}
   end
 
   def handle_event("select_thumbnail", %{"index" => index}, socket) do
