@@ -1,3 +1,6 @@
+import EmblaCarousel from 'embla-carousel'
+
+
 const Hooks = {};
 
 Hooks.HideFlash = {
@@ -314,6 +317,83 @@ Hooks.HoverPlay = {
     }
   }
 }
+
+Hooks.EmblaMain = {
+  mounted() {
+    this.embla = EmblaCarousel(this.el, { loop: true })
+    window.__emblaMain__ = this.embla // Make globally available for thumbs
+
+    this.handleSelect = () => {
+      const index = this.embla.selectedScrollSnap()
+      this.pushEvent("embla_main_changed", { index })
+    }
+
+    this.embla.on("select", this.handleSelect)
+  },
+
+  updated() {
+    if (this.embla) this.embla.reInit()
+  },
+
+  destroyed() {
+    this.embla?.destroy()
+  }
+}
+
+  Hooks.EmblaThumbs = {
+  mounted() {
+    this.selectedIndex = 0
+
+    // Grab reference to the main embla instance (set globally by EmblaMain)
+    this.emblaMain = window.__emblaMain__
+    this.emblaThumbs = EmblaCarousel(this.el, {
+      containScroll: 'keepSnaps',
+      dragFree: true,
+    })
+
+    // Set up event handlers
+    this.setupThumbClicks()
+    this.highlightSelected()
+
+    this.emblaMain.on('select', this.highlightSelected.bind(this))
+  },
+
+  setupThumbClicks() {
+    const thumbs = this.el.querySelectorAll('[data-thumb-index]')
+    thumbs.forEach((thumb, index) => {
+      thumb.addEventListener('click', () => {
+        if (!this.emblaMain) return
+        this.emblaMain.scrollTo(index)
+      })
+    })
+  },
+
+  highlightSelected() {
+    if (!this.emblaMain || !this.emblaThumbs) return
+
+    const selectedIndex = this.emblaMain.selectedScrollSnap()
+    const thumbs = this.el.querySelectorAll('[data-thumb-index]')
+
+    thumbs.forEach((thumb, index) => {
+      if (index === selectedIndex) {
+        thumb.classList.add('ring-2', 'ring-neon-blue-lightest')
+        // Optionally scroll thumbnail into view
+        thumb.scrollIntoView({ behavior: 'instant', inline: 'center', block: 'nearest' })
+      } else {
+        thumb.classList.remove('ring-2', 'ring-neon-blue-lightest')
+      }
+    })
+  },
+
+  updated() {
+    if (this.emblaThumbs) this.emblaThumbs.reInit()
+  },
+
+  destroyed() {
+    if (this.emblaThumbs) this.emblaThumbs.destroy()
+  }
+}
+
 
 
 export default Hooks;

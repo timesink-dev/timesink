@@ -45,3 +45,8 @@
     transform: translate3d(-50%, 0, 0);
   }
 }
+
+
+.ring-neon-blue-lightest {
+  --tw-ring-color: #aef855; /* customize to match your brand */
+}
