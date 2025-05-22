@@ -46,7 +46,6 @@ defmodule TimesinkWeb.HomepageLive do
       |> assign(:exhibitions, exhibitions)
       |> assign(:selected_theater_id, default_exhibition.theater.id)
       |> assign(:selected_index, default_index)
-      |> assign(:selected_theater_id, default_exhibition.theater.id)
       |> assign(:presence, %{})
 
     if connected?(socket), do: send(self(), :connected)
@@ -111,7 +110,7 @@ defmodule TimesinkWeb.HomepageLive do
                     {exhibition.theater.name}
                   </h3>
                   <p class="text-sm text-white/60 text-left">
-                    {exhibition.theater.description || "No description available."}
+                    {exhibition.theater.description}
                   </p>
                   <div class="wrapper w-64 px-2 py-1 mb-6 overflow-hidden">
                     <div class="marquee text-neon-red-light text-sm">
@@ -190,7 +189,23 @@ defmodule TimesinkWeb.HomepageLive do
             <div class="flex gap-4 px-4">
               <%= for exhibition <- @exhibitions do %>
                 <div class="shrink-0 w-full">
-                  <.theater_card exhibition={exhibition} />
+                  <div class="mb-6">
+                    <h3 class="text-3xl font-bold mb-1 text-left text-white drop-shadow-md">
+                      {exhibition.theater.name}
+                    </h3>
+                    <p class="text-sm text-white/60 text-left">
+                      {exhibition.theater.description}
+                    </p>
+                  </div>
+                  <.theater_card
+                    exhibition={exhibition}
+                    live_viewer_count={
+                      live_viewer_count(
+                        "theater:#{exhibition.theater_id}",
+                        @presence
+                      )
+                    }
+                  />
                 </div>
               <% end %>
             </div>

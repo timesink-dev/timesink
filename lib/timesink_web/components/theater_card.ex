@@ -2,16 +2,16 @@ defmodule TimesinkWeb.TheaterCard do
   use Phoenix.Component
 
   alias Timesink.Cinema.{Film, Exhibition}
-  # if you want to reuse .button, .icon, etc.
   import TimesinkWeb.CoreComponents
 
   attr :exhibition, :map, required: true
+  attr :live_viewer_count, :integer, required: false
 
   def theater_card(assigns) do
     ~H"""
     <% film = @exhibition.film %>
 
-    <div class="rounded-xl overflow-hidden shadow-xl bg-black text-white w-full">
+    <div class="rounded-md overflow-hidden shadow-xl bg-black text-white w-full">
       <div class="relative aspect-video">
         <img
           src={Film.poster_url(film.poster)}
@@ -40,10 +40,22 @@ defmodule TimesinkWeb.TheaterCard do
               <p><span class="font-semibold">Cast:</span> {join_names(film.cast)}</p>
             <% end %>
           </div>
+
+          <div class="mt-2 flex items-center justify-between">
+            <p class="text-white/40 text-md">
+              <.icon name="hero-user-group" class="h-6 w-6" /> {@live_viewer_count}
+            </p>
+            <.link navigate={"/now-playing/#{@exhibition.theater.slug}"}>
+              <.button>
+                Enter Theater →
+              </.button>
+            </.link>
+          </div>
         </div>
       </div>
-      <div class="text-center text-sm mt-4 text-gray-400 italic">
-        Now playing {film.title}
+      <div class="text-center text-md mt-4 text-mystery-white">
+        <span class="text-gray-400">Now playing</span>
+        <span class="italic">{film.title}</span>
       </div>
     </div>
     """
