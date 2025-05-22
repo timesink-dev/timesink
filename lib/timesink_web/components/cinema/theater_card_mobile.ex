@@ -1,13 +1,13 @@
-defmodule TimesinkWeb.TheaterCard do
+defmodule TimesinkWeb.Components.TheaterCardMobile do
   use Phoenix.Component
 
-  alias Timesink.Cinema.{Film, Exhibition}
+  alias Timesink.Cinema.Film
   import TimesinkWeb.CoreComponents
 
   attr :exhibition, :map, required: true
   attr :live_viewer_count, :integer, required: false
 
-  def theater_card(assigns) do
+  def theater_card_mobile(assigns) do
     ~H"""
     <% film = @exhibition.film %>
 
