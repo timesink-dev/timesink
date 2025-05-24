@@ -5,21 +5,21 @@ defmodule TimesinkWeb.HomepageLive do
   import Ecto.Query
   import TimesinkWeb.Components.{TheaterCard, TheaterCardMobile}
 
-  alias Timesink.Cinema
+  alias Timesink.Cinema.Showcase
   alias TimesinkWeb.Presence
-  alias Timesink.Cinema.Film
-  alias Timesink.Cinema.Creative
 
   def mount(_params, _session, socket) do
     showcase =
-      Cinema.Showcase
+      Showcase
       |> where([s], s.status == :active)
       |> preload([:exhibitions])
       |> Repo.one()
 
     exhibitions =
-      (showcase.exhibitions || [])
-      |> Repo.preload([
+      (showcase && showcase.exhibitions) || []
+
+    exhibitions =
+      Repo.preload(exhibitions, [
         :theater,
         film: [
           :genres,
@@ -35,16 +35,17 @@ defmodule TimesinkWeb.HomepageLive do
       ])
       |> Enum.sort_by(& &1.theater.name, :asc)
 
-    # default_exhibition = List.first(exhibitions)
-
     default_index = 0
     default_exhibition = Enum.at(exhibitions, default_index)
+
+    selected_theater_id =
+      default_exhibition && default_exhibition.theater && default_exhibition.theater.id
 
     socket =
       socket
       |> assign(:showcase, showcase)
       |> assign(:exhibitions, exhibitions)
-      |> assign(:selected_theater_id, default_exhibition.theater.id)
+      |> assign(:selected_theater_id, selected_theater_id)
       |> assign(:selected_index, default_index)
       |> assign(:presence, %{})
 
@@ -56,7 +57,6 @@ defmodule TimesinkWeb.HomepageLive do
   def render(assigns) do
     ~H"""
     <div id="homepage">
-      <!-- Hero -->
       <div
         id="hero"
         class="h-screen w-full bg-backroom-black text-white flex items-center justify-center"

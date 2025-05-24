@@ -1,11 +1,11 @@
 defmodule TimesinkWeb.Components.TheaterCardMobile do
   use Phoenix.Component
 
-  alias Timesink.Cinema.Film
+  alias Timesink.Cinema.{Exhibition, Film}
   import TimesinkWeb.CoreComponents
 
-  attr :exhibition, :map, required: true
-  attr :live_viewer_count, :integer, required: false
+  attr :exhibition, Exhibition, required: true
+  attr :live_viewer_count, :integer, required: true
 
   def theater_card_mobile(assigns) do
     ~H"""
@@ -13,12 +13,21 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
 
     <div class="rounded-md overflow-hidden shadow-xl bg-black text-white w-full">
       <div class="relative aspect-video">
-        <img
-          src={Film.poster_url(film.poster)}
-          alt={"Poster of #{film.title}"}
-          class="w-full h-full object-cover"
+        <mux-player
+          id={Ecto.UUID.generate()}
+          playback-id={Film.get_mux_playback_id(film.trailer)}
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          style="--controls: none;"
+          class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-90 group-hover:scale-105"
+          phx-hook="HoverPlay"
         />
         <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent p-4 space-y-2">
+          <div class="absolute top-2 right-2 rounded-full p-1 bg-dark-theater-primary text-mystery-white">
+            <.icon name="hero-play" class="h-6 w-6 text-white" />
+          </div>
           <h3 class="text-lg font-bold tracking-wide text-white">
             {film.title}
           </h3>
