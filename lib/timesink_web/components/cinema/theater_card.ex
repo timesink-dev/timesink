@@ -6,14 +6,13 @@ defmodule TimesinkWeb.Components.TheaterCard do
   alias Timesink.Cinema.{Exhibition, Film, Creative}
 
   attr :exhibition, Exhibition, required: true
-  attr :selected_theater_id, :string, required: true
   attr :live_viewer_count, :integer, required: true
 
   def theater_card(assigns) do
     ~H"""
-    <% film = @exhibition.film %>
-    <div class={if @exhibition.theater.id == @selected_theater_id, do: "block", else: "hidden"}>
-      <div class="mb-6">
+    <div>
+      <% film = @exhibition.film %>
+      <div class="mb-6 h-20">
         <h3 class="text-3xl font-bold mb-1 text-left text-white drop-shadow-md">
           {@exhibition.theater.name}
         </h3>
@@ -21,7 +20,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
           {@exhibition.theater.description}
         </p>
         <div class="wrapper w-64 px-2 py-1 mb-6 overflow-hidden">
-          <div class="marquee text-neon-red-light text-sm">
+          <div class="marquee text-neon-red-lightest text-sm uppercase">
             <%= for part <- repeated_film_title_parts(film.title) do %>
               <p>Now playing</p>
               <p>{part}</p>
@@ -31,26 +30,18 @@ defmodule TimesinkWeb.Components.TheaterCard do
       </div>
 
       <div class="max-w-4xl">
-        <div class="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl group transition-transform duration-300 hover:scale-[1.02] cursor-pointer">
-          <%= if @selected_theater_id == @exhibition.theater.id do %>
-            <mux-player
-              id={"mux-player-#{film.id}"}
-              playback-id={Film.get_mux_playback_id(film.trailer)}
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              style="--controls: none;"
-              class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-90 group-hover:scale-105"
-              phx-hook="HoverPlay"
-            />
-          <% else %>
-            <img
-              src={Timesink.Cinema.Film.poster_url(film.poster)}
-              alt={film.title}
-              class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-500 group-hover:brightness-90 group-hover:scale-105"
-            />
-          <% end %>
+        <div class="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl group transition-transform duration-300 hover:scale-[1.02]">
+          <mux-player
+            id={"mux-player-#{film.id}"}
+            playback-id={Film.get_mux_playback_id(film.trailer)}
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            style="--controls: none;"
+            class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-90 group-hover:scale-105"
+            phx-hook="HoverPlay"
+          />
 
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 space-y-2 z-10">
             <h3 class="text-2xl font-bold">{film.title}</h3>
@@ -82,7 +73,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
                 <.icon name="hero-user-group" class="h-6 w-6" /> {@live_viewer_count}
               </p>
               <.link navigate={"/now-playing/#{@exhibition.theater.slug}"}>
-                <.button>
+                <.button class="cursor-pointer">
                   Enter Theater →
                 </.button>
               </.link>

@@ -372,7 +372,8 @@ Hooks.EmblaMain = {
       if (index === selectedIndex) {
         thumb.classList.add('ring-2', 'ring-neon-blue-lightest')
         // Optionally scroll thumbnail into view
-        thumb.scrollIntoView({ behavior: 'instant', inline: 'center', block: 'nearest' })
+        thumb.scrollTo()
+        this.emblaThumbs.scrollTo(this.emblaMain.selectedScrollSnap())
       } else {
         thumb.classList.remove('ring-2', 'ring-neon-blue-lightest')
       }
@@ -387,7 +388,6 @@ Hooks.EmblaMain = {
     if (this.emblaThumbs) this.emblaThumbs.destroy()
   }
 }
-
 
 
 export default Hooks;

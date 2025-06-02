@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.HomepageLive do
+defmodule TimesinkWeb.Cinema.NowPlayingLive do
   use TimesinkWeb, :live_view
   alias Timesink.Repo
 
@@ -56,14 +56,7 @@ defmodule TimesinkWeb.HomepageLive do
 
   def render(assigns) do
     ~H"""
-    <div id="homepage">
-      <div
-        id="hero"
-        class="h-screen w-full bg-backroom-black text-white flex items-center justify-center"
-      >
-        <h1 class="text-5xl font-bold text-center">Welcome to TimeSink</h1>
-      </div>
-
+    <div id="now-playing">
       <div class="bg-backroom-black py-16 px-6 max-w-7xl mx-auto">
         <div class="hidden lg:flex flex-row gap-24">
           <div class="flex flex-col space-y-12 w-1/5">
@@ -78,7 +71,7 @@ defmodule TimesinkWeb.HomepageLive do
                 ]}
               >
                 <div class="flex justify-between items-start mb-2">
-                  <h3 class="text-white text-sm font-medium">
+                  <h3 class="text-white font-semibold text-lg">
                     {exhibition.theater.name}
                   </h3>
                   <div class="text-xs text-white/60">
@@ -86,7 +79,7 @@ defmodule TimesinkWeb.HomepageLive do
                     {live_viewer_count("theater:#{exhibition.theater_id}", @presence)}
                   </div>
                 </div>
-                <div class="mt-6 text-mystery-white font-semibold text-lg">
+                <div class="mt-6 text-neon-blue-lightest text-sm font-medium">
                   {exhibition.film.title}
                 </div>
               </div>
@@ -134,7 +127,7 @@ defmodule TimesinkWeb.HomepageLive do
             </h2>
           </div>
           <div id="embla-thumbs" phx-hook="EmblaThumbs" class="overflow-hidden w-full p-2">
-            <div class="flex gap-4">
+            <div class="flex gap-2">
               <%= for {exhibition, index} <- Enum.with_index(@exhibitions) do %>
                 <img
                   src={Timesink.Cinema.Film.poster_url(exhibition.film.poster)}
@@ -180,7 +173,7 @@ defmodule TimesinkWeb.HomepageLive do
 
   defp live_viewer_count(theater_id, presence) do
     # determine the joining (before it was "theater:#{theater_id}"), but that was producing
-    # a duplicate "theater:theater:#{theater_id}" topic
+    # a dpulicate "theater:theater:#{theater_id}" topic
     topic = "#{theater_id}"
     Map.get(presence, topic, %{}) |> map_size()
   end

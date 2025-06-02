@@ -178,16 +178,18 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           More interactive features (chat, playback, etc.) coming soon.
         </div>
       </div>
-      <div class="text-sm text-gray-400 pt-6 w-1/8">
-        <h4 class="text-xs text-center tracking-wider mb-2 bg-[#AEF855] text-backroom-black p-1 rounded">
-          Live Audience
-        </h4>
-        <ul class="list-disc list-inside text-gray-300">
-          <%= for {_id, %{metas: metas}} <- @presence do %>
-            <%= for meta <- metas, username = meta[:username], not is_nil(username) do %>
-              <li>{meta.username}</li>
-            <% end %>
-          <% end %>
+      <div class="text-sm text-backroom-black pt-6">
+        <div class="flex justify-between items-center">
+          <h4 class="text-xs text-center tracking-wider mb-2 bg-[#AEF855] text-backroom-black py-1 px-2 rounded">
+            Live audience <span>({live_viewer_count(@theater.id, @presence)})</span>
+          </h4>
+        </div>
+        <ul class="list-none text-mystery-white space-y-1">
+          <%= @presence
+    |> Enum.map(fn {_id, %{metas: metas}} -> List.first(metas)end)
+    |> Enum.map(fn meta -> %>
+            <li>{meta.username}</li>
+          <% end) %>
         </ul>
       </div>
     </div>
@@ -225,4 +227,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     end)
     |> Enum.join(", ")
   end
+
+  defp live_viewer_count(_theater_id, presence), do: map_size(presence)
 end
