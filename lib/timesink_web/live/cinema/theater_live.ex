@@ -68,14 +68,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         </div>
 
         <div>
-          <div class="wrapper w-64 px-2 py-1 mb-6 overflow-hidden">
-            <div class="marquee text-neon-red-light text-sm">
-              <%= for part <- repeated_film_title_parts(@film.title) do %>
-                <p>Now playing</p>
-                <p>{part}</p>
-              <% end %>
-            </div>
-          </div>
           <%= if playback_id = Film.get_mux_playback_id(@film.video) do %>
             <mux-player
               playback-id={playback_id}
