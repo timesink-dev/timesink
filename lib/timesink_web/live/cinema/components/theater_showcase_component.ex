@@ -55,7 +55,6 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
             </div>
           <% end %>
         </div>
-
         <div class="flex-1">
           <%= for exhibition <- @exhibitions do %>
             <%= if @selected_theater_id == exhibition.theater.id do %>

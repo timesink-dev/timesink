@@ -387,5 +387,43 @@ Hooks.EmblaMain = {
   }
 }
 
+Hooks.ScrollObserver = {
+  mounted() {
+    const threshold = 800; // px
+
+    const indicator = document.getElementById("scroll-indicator");
+    const theaterSection = document.getElementById("cinema-barrier");
+
+    if (!indicator || !theaterSection) return;
+
+    const updateVisibility = () => {
+      const theaterTop = theaterSection.getBoundingClientRect().bottom;
+
+      if (theaterTop <= threshold) {
+        // Theater has entered viewport — hide the indicator
+                indicator.classList.remove("opacity-80", "pointer-events-none");
+
+        indicator.classList.add("opacity-0", "pointer-events-none");
+      } else {
+        // Theater is below viewport — show the indicator
+        indicator.classList.remove("opacity-0", "pointer-events-none");
+                indicator.classList.add("opacity-80", "pointer-events-none");
+
+      }
+    };
+
+    window.addEventListener("scroll", updateVisibility);
+    window.addEventListener("resize", updateVisibility);
+    updateVisibility(); // Initial check
+
+    this.cleanup = () => {
+      window.removeEventListener("scroll", updateVisibility);
+      window.removeEventListener("resize", updateVisibility);
+    };
+  },
+  destroyed() {
+    this.cleanup && this.cleanup();
+  }
+};
 
 export default Hooks;

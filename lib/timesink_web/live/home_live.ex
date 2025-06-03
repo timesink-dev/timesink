@@ -26,6 +26,7 @@ defmodule TimesinkWeb.HomepageLive do
       >
         <.hero />
       </div>
+      <div id="cinema-barrier" class="h-16" phx-hook="ScrollObserver" />
       <.live_component
         id="theater-showcase"
         module={TheaterShowcaseComponent}
