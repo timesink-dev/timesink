@@ -6,7 +6,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
   require Logger
 
   def mount(%{"id" => film_id}, _session, socket) do
-    if connected?(socket), do: Phoenix.PubSub.subscribe(Timesink.PubSub, "film_media:#{film_id}")
+    if connected?(socket), do: Phoenix.PubSub.subscribe(Timesink.PubSub, "film_media")
 
     film =
       Film.get!(film_id)
@@ -15,8 +15,9 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
     {:ok,
      assign(socket,
        film: film,
-       upload_url: nil,
+       video_upload_url: nil,
        upload_id: nil,
+       trailer_upload_url: nil,
        notification: nil
      )
      |> allow_upload(:poster,
@@ -129,18 +130,18 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
           </button>
         <% else %>
           <div class="flex flex-col items-center w-full">
-            <%= if @upload_url do %>
+            <%= if @video_upload_url do %>
               <div class="text-green-400 mb-4 font-medium text-center">
                 Upload URL ready. Drag or drop your video below!
               </div>
               <mux-uploader
                 pausable
-                endpoint={@upload_url}
+                endpoint={@video_upload_url}
                 style="display: block; width: 100%; border: 2px dashed #999; padding: 30px; border-radius: 12px; background-color: rgba(255,255,255,0.05);"
               />
             <% else %>
               <button
-                phx-click="generate_upload_url"
+                phx-click="generate_video_upload_url"
                 class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition"
               >
                 Generate Upload Link
@@ -169,18 +170,18 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
           </button>
         <% else %>
           <div class="flex flex-col items-center w-full">
-            <%= if @upload_url do %>
+            <%= if @trailer_upload_url do %>
               <div class="text-green-400 mb-4 font-medium text-center">
                 Upload URL ready. Drag or drop your video below!
               </div>
               <mux-uploader
                 pausable
-                endpoint={@upload_url}
+                endpoint={@trailer_upload_url}
                 style="display: block; width: 100%; border: 2px dashed #999; padding: 30px; border-radius: 12px; background-color: rgba(255,255,255,0.05);"
               />
             <% else %>
               <button
-                phx-click="generate_upload_url"
+                phx-click="generate_trailer_upload_url"
                 phx-value-is_trailer="true"
                 class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition"
               >
@@ -210,14 +211,14 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
   end
 
   def handle_event(
-        "generate_upload_url",
+        "generate_trailer_upload_url",
         %{"is_trailer" => "true"},
         %{assigns: %{film: film}} = socket
       ) do
     create_mux_upload(socket, film, true)
   end
 
-  def handle_event("generate_upload_url", _params, %{assigns: %{film: film}} = socket) do
+  def handle_event("generate_video_upload_url", _params, %{assigns: %{film: film}} = socket) do
     create_mux_upload(socket, film, false)
   end
 
@@ -293,20 +294,16 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
     {:noreply, push_navigate(socket, to: "/admin/film-media")}
   end
 
-  def handle_info(%{event: "video_ready"}, socket) do
+  def handle_info(%Phoenix.Socket.Broadcast{event: "video_ready", payload: film}, socket) do
     Logger.info("Received video_ready PubSub event, reloading film...")
-
-    film = load_film(socket.assigns.film.id)
 
     {:noreply,
      socket
      |> assign(film: film, notification: {:info, "Video uploaded and ready to view! 🎬"})}
   end
 
-  def handle_info(%{event: "video_deleted"}, socket) do
+  def handle_info(%Phoenix.Socket.Broadcast{event: "video_deleted", payload: film}, socket) do
     Logger.info("Received video_deleted PubSub event, reloading film...")
-
-    film = load_film(socket.assigns.film.id)
 
     {:noreply,
      socket
@@ -330,7 +327,12 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
              "film_id" => film.id,
              "is_trailer" => is_trailer
            }) do
-      {:noreply, assign(socket, upload_url: url, upload_id: upload_id)}
+      with true <- is_trailer do
+        {:noreply, assign(socket, trailer_upload_url: url, upload_id: upload_id)}
+      else
+        false ->
+          {:noreply, assign(socket, video_upload_url: url, upload_id: upload_id)}
+      end
     else
       {:error, reason} ->
         Logger.error("Error generating upload URL: #{inspect(reason)}")

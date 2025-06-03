@@ -110,10 +110,10 @@ defmodule TimesinkWeb.Router do
     live_session :default, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
       live "/", HomepageLive
       live "/submit", FilmSubmissionLive
-      live "/archives", ArchiveLive
+      live "/archives", Cinema.ArchivesLive
       live "/blog", BlogLive
       live "/upcoming", UpcomingLive
-      live "/now-playing", Cinema.ShowcaseLive
+      live "/now-playing", Cinema.NowPlayingLive
       live "/:profile_username", Accounts.ProfileLive
     end
   end

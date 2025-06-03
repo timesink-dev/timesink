@@ -7,6 +7,7 @@ defmodule Timesink.Cinema do
   alias Timesink.Cinema.Showcase
   alias Timesink.Cinema.Theater
   alias Timesink.Cinema.Exhibition
+  alias Timesink.Repo
   import Ecto.Query
 
   @doc """
@@ -95,5 +96,37 @@ defmodule Timesink.Cinema do
       from s in Showcase,
         preload: [exhibitions: [:theater]]
     )
+  end
+
+  def list_active_showcase_theaters do
+    Timesink.Repo.all(
+      from s in Showcase,
+        where: s.status == :active,
+        preload: [exhibitions: [:theater]]
+    )
+  end
+
+  def get_active_showcase_with_exhibitions do
+    Showcase |> where([s], s.status == :active) |> preload([:exhibitions]) |> Timesink.Repo.one()
+  end
+
+  @doc """
+  Preloads all relevant associations for a list of exhibitions.
+  """
+  def preload_exhibitions(exhibitions) do
+    Repo.preload(exhibitions, [
+      :theater,
+      film: [
+        :genres,
+        :writers,
+        :producers,
+        :crew,
+        video: [:blob],
+        poster: [:blob],
+        trailer: [:blob],
+        directors: [:creative],
+        cast: [:creative]
+      ]
+    ])
   end
 end

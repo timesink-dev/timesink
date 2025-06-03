@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.HomepageLive do
+defmodule TimesinkWeb.Cinema.NowPlayingLive do
   use TimesinkWeb, :live_view
 
   alias TimesinkWeb.Presence
@@ -18,13 +18,7 @@ defmodule TimesinkWeb.HomepageLive do
 
   def render(assigns) do
     ~H"""
-    <div id="homepage">
-      <div
-        id="hero"
-        class="h-screen w-full bg-backroom-black text-white flex items-center justify-center"
-      >
-        <h1 class="text-5xl font-bold text-center">Welcome to TimeSink</h1>
-      </div>
+    <div id="now-playing">
       <.live_component
         id="theater-showcase"
         module={TheaterShowcaseComponent}

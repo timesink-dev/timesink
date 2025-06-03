@@ -57,7 +57,9 @@ defmodule TimesinkWeb.MuxController do
              }),
            {:ok, _attachment} <- attach_mux_asset(film, blob, mux_upload.meta),
            {:ok, _} <- MuxUpload.delete(mux_upload) do
-        TimesinkWeb.Endpoint.broadcast!("film_media:#{film.id}", "video_ready", %{})
+        film = film |> Repo.preload(video: [:blob], poster: [:blob], trailer: [:blob])
+
+        TimesinkWeb.Endpoint.broadcast!("film_media", "video_ready", film)
         :ok
       else
         error ->
@@ -109,12 +111,16 @@ defmodule TimesinkWeb.MuxController do
 
           case Blob.delete(blob) do
             {:ok, _} ->
-              TimesinkWeb.Endpoint.broadcast!("film_media:#{film_id_str}", "video_deleted", %{})
-              :ok
+              with {:ok, film} <- Film.get(film_id_str) do
+                film = film |> Repo.preload(video: [:blob], poster: [:blob], trailer: [:blob])
 
-            {:error, reason} ->
-              Logger.error(inspect(reason), service: :mux, params: params)
-              Repo.rollback(reason)
+                TimesinkWeb.Endpoint.broadcast!("film_media", "video_deleted", film)
+                :ok
+              else
+                _ ->
+                  Logger.error("Failed to load film #{film_id_str} for broadcast")
+                  Repo.rollback(:film_not_found)
+              end
           end
 
         nil ->

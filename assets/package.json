@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "daisyui": "^4.12.14"
+    "@mux/mux-player": "^3.4.0",
+    "@mux/mux-uploader": "^1.2.0",
+    "daisyui": "^4.12.14",
+    "embla-carousel": "^8.6.0"
   }
 }

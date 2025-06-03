@@ -12,9 +12,11 @@ defmodule TimesinkWeb.TopNav do
     ~H"""
     <header class={["z-40 sticky bg-backgroom-black", @class]}>
       <div class="md:hidden flex items-center justify-between border-gray-200 mt-2 text-sm z-40">
-        <p class="md:hidden bg-backroom-black font-brand rounded-xl px-2 font-medium leading-6">
-          TimeSink Presents
-        </p>
+        <div class="md:hidden bg-backroom-black font-brand rounded-xl px-2 font-medium leading-6">
+          <a id="nav-logo" href="/" class="font-brand">
+            TimeSink Presents
+          </a>
+        </div>
         <.hamburger_button />
       </div>
       <.open_hamburger current_user={@current_user} />
@@ -29,7 +31,28 @@ defmodule TimesinkWeb.TopNav do
       <div id="nav-container" class="hidden md:flex justify-between items-center">
         <!-- Main navigation links -->
         <ul id="nav-links" class="flex justify-between items-center gap-x-8">
-          <li><a href="/now-playing">Now Playing</a></li>
+          <li class="relative hidden md:block">
+            <button
+              type="button"
+              phx-click={JS.toggle(to: "#films-dropdown", display: "block")}
+              class="inline-flex items-center gap-1 text-sm font-medium text-mystery-white hover:underline focus:outline-none"
+            >
+              Cinema <.icon name="hero-chevron-down" class="h-4 w-4 mt-[1px] transition-transform" />
+            </button>
+
+            <ul
+              id="films-dropdown"
+              class="hidden absolute mt-2 w-48 rounded-md bg-dark-theater-primary text-mystery-white shadow-md z-50 overflow-hidden"
+            >
+              <li>
+                <a href="/now-playing" class="block px-4 py-2 hover:bg-zinc-700">Now Playing</a>
+              </li>
+              <li>
+                <a href="/archives" class="block px-4 py-2 hover:bg-zinc-700">Archives</a>
+              </li>
+            </ul>
+          </li>
+
           <li><a href="/blog">Blog</a></li>
           <li><a href="/info">Info</a></li>
         </ul>
@@ -91,6 +114,7 @@ defmodule TimesinkWeb.TopNav do
           </div>
           <ul class="flex flex-col justify-start items-start gap-y-4 pt-2.5">
             <li><a href="/now-playing">Now Playing</a></li>
+            <li><a href="/archives">Archives</a></li>
             <li><a href="/blog">Blog</a></li>
             <li><a href="/info">Info</a></li>
             <hr />
