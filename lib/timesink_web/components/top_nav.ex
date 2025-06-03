@@ -13,7 +13,7 @@ defmodule TimesinkWeb.TopNav do
     <header class={["z-40 sticky bg-backgroom-black", @class]}>
       <div class="md:hidden flex items-center justify-between border-gray-200 mt-2 text-sm z-40">
         <div class="md:hidden bg-backroom-black font-brand rounded-xl px-2 font-medium leading-6">
-          <a id="nav-logo" href="/" class="font-brand">
+          <a id="nav-logo-mobile" href="/" class="font-brand">
             TimeSink Presents
           </a>
         </div>

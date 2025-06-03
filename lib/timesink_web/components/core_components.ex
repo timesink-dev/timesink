@@ -389,7 +389,8 @@ defmodule TimesinkWeb.CoreComponents do
         class={[
           @input_class,
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
+          @errors != [] && "border-rose-400 focus:border-rose-400",
+          "bg-dark-theater-primary"
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
@@ -415,7 +416,7 @@ defmodule TimesinkWeb.CoreComponents do
             @errors == [] && "border-zinc-300 focus:border-zinc-400",
             @errors != [] && "border-rose-400 focus:border-rose-400",
             @addon_icon_right != [] && "pr-10",
-            "rounded-lg"
+            "rounded-lg bg-dark-theater-primary"
           ]}
           {@rest}
         />

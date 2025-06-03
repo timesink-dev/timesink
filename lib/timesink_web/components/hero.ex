@@ -46,7 +46,7 @@ defmodule TimesinkWeb.Components.Hero do
                   where great films meet great Audiences.
                 </h2>
                 <p class="mt-4 text-base md:text-lg text-mystery-white max-w-xl mx-auto">
-                  Join a community of film lovers and creators exploring bold cinema.
+                  Join a community of cinephiles and creators exploring bold cinema.
                   Watch live. Chat in real time. Share what moves you.
                 </p>
                 <a href="/join">
