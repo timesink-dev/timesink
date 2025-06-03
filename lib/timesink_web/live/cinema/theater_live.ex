@@ -62,7 +62,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       class="max-w-4xl mx-auto p-6 space-y-8 text-gray-100 mt-16 flex justify-between gap-x-12"
     >
       <div class="flex-1">
-        <div class="border-b border-gray-700 pb-4">
+        <div class="border-b border-gray-700 pb-4 mb-10">
           <h1 class="text-xl font-bold">{@theater.name}</h1>
           <p class="text-gray-400 mt-2 text-sm">{@theater.description}</p>
         </div>
@@ -109,61 +109,63 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             <% end %>
           </div>
 
-          <div class="text-base text-gray-300 leading-relaxed font-light max-w-prose">
+          <div class="text-base text-gray-300 leading-relaxed font-light max-w-prose pb-2">
             {@film.synopsis}
           </div>
 
-          <div class="text-sm text-gray-400 font-light space-y-2 pt-4 border-t border-gray-800 mt-6">
-            <%= if Enum.any?(@film.directors) do %>
-              <div>
-                <span class="text-gray-500 uppercase tracking-wider">Director:</span>
-                <span class="text-gray-300">
-                  {join_names(@film.directors)}
-                </span>
-              </div>
-            <% end %>
+          <div class="flex justify-between items-start pt-4 border-t border-gray-800">
+            <div class="text-sm text-gray-400 font-light space-y-2">
+              <%= if Enum.any?(@film.directors) do %>
+                <div>
+                  <span class="text-gray-500 uppercase tracking-wider">Director:</span>
+                  <span class="text-gray-300">
+                    {join_names(@film.directors)}
+                  </span>
+                </div>
+              <% end %>
 
-            <%= if Enum.any?(@film.writers) do %>
-              <div>
-                <span class="text-gray-500 uppercase tracking-wider">Writer:</span>
-                <span class="text-gray-300">
-                  {join_names(@film.producers)}
-                </span>
-              </div>
-            <% end %>
+              <%= if Enum.any?(@film.writers) do %>
+                <div>
+                  <span class="text-gray-500 uppercase tracking-wider">Writer:</span>
+                  <span class="text-gray-300">
+                    {join_names(@film.producers)}
+                  </span>
+                </div>
+              <% end %>
 
-            <%= if Enum.any?(@film.producers) do %>
-              <div>
-                <span class="text-gray-500 uppercase tracking-wider">Producer:</span>
-                <span class="text-gray-300">
-                  {join_names(@film.producers)}
-                </span>
-              </div>
-            <% end %>
+              <%= if Enum.any?(@film.producers) do %>
+                <div>
+                  <span class="text-gray-500 uppercase tracking-wider">Producer:</span>
+                  <span class="text-gray-300">
+                    {join_names(@film.producers)}
+                  </span>
+                </div>
+              <% end %>
 
-            <%= if Enum.any?(@film.cast) do %>
-              <div>
-                <span class="text-gray-500 uppercase tracking-wider">Cast:</span>
-                <ul class="text-gray-300 list-disc list-inside">
-                  {join_names_with_roles(@film.cast)}
-                </ul>
-              </div>
-            <% end %>
+              <%= if Enum.any?(@film.cast) do %>
+                <div>
+                  <span class="text-gray-500 uppercase tracking-wider">Cast:</span>
+                  <ul class="text-gray-300 list-disc list-inside">
+                    {join_names_with_roles(@film.cast)}
+                  </ul>
+                </div>
+              <% end %>
 
-            <%= if Enum.any?(@film.crew) do %>
-              <div>
-                <span class="text-gray-500 uppercase tracking-wider">Crew:</span>
-                <ul class="text-gray-300 list-disc list-inside">
-                  {join_names_with_roles(@film.crew)}
-                </ul>
-              </div>
-            <% end %>
-          </div>
+              <%= if Enum.any?(@film.crew) do %>
+                <div>
+                  <span class="text-gray-500 uppercase tracking-wider">Crew:</span>
+                  <ul class="text-gray-300 list-disc list-inside">
+                    {join_names_with_roles(@film.crew)}
+                  </ul>
+                </div>
+              <% end %>
+            </div>
 
-          <div class="pt-6">
-            <.button color="tertiary" class="hover:cursor-not-allowed" disabled>
-              Tip the Filmmaker
-            </.button>
+            <div class="flex justify-end">
+              <.button color="tertiary" class="hover:cursor-not-allowed" disabled>
+                Tip the Filmmaker
+              </.button>
+            </div>
           </div>
         </div>
         <div class="text-sm text-gray-500 italic mt-32">
