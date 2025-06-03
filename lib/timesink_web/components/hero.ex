@@ -39,7 +39,7 @@ defmodule TimesinkWeb.Components.Hero do
           </div>
           
     <!-- Right text -->
-          <div class="w-full md:w-1/3 flex items-center justify-center px-6 text-white text-center md:text-left z-10">
+          <div class="mt-8 lg:mt-0 w-full md:w-1/3 flex items-center justify-center px-6 text-white text-center md:text-left z-10">
             <div class="max-w-md">
               <div class="text-center mb-10">
                 <h2 class="text-4xl md:text-5xl font-brand text-white tracking-tight leading-tight">
