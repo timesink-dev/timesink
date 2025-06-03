@@ -193,11 +193,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     {:noreply, assign(socket, presence: presence)}
   end
 
-  defp repeated_film_title_parts(title, repeat_count \\ 4) do
-    1..repeat_count
-    |> Enum.map(fn _ -> title end)
-  end
-
   defp join_names([]), do: ""
 
   defp join_names(creatives) do

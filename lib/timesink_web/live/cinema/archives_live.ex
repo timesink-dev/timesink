@@ -16,7 +16,7 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
         A curated record of our past screenings, presented by theater and showcase.
       </p>
 
-      <%= for {showcase, idx} <- Enum.with_index(@showcases) do %>
+      <%= for {showcase, _idx} <- Enum.with_index(@showcases) do %>
         <div class="showcase mb-20 pb-10 border-b border-gray-800">
           <div class="mb-6">
             <h2 class="text-xl font-semibold text-gray-200 tracking-tight">{showcase.title}</h2>

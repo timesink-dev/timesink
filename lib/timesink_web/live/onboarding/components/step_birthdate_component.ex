@@ -53,7 +53,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
               placeholder="MM"
               inputmode="numeric"
               value={@birth_month}
-              input_class="w-full p-3 rounded text-center text-mystery-white border-none"
+              input_class="w-full p-3 pl-4 rounded text-left text-mystery-white border-none"
             />
             <.input
               type="text"
@@ -63,7 +63,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
               placeholder="DD"
               inputmode="numeric"
               value={@birth_day}
-              input_class="w-full p-3 rounded text-center text-mystery-white border-none"
+              input_class="w-full p-3 pl-4 rounded text-left text-mystery-white border-none"
             />
             <.input
               type="text"
@@ -73,7 +73,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
               inputmode="numeric"
               phx-hook="DigitsOnlyAutoTab"
               value={@birth_year}
-              input_class="w-full p-3 rounded text-center text-mystery-white border-none"
+              input_class="w-full p-3 pl-4 rounded text-left text-mystery-white border-none"
             />
           </div>
 
