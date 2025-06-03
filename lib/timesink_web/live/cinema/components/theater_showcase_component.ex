@@ -28,7 +28,19 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
   def render(assigns) do
     ~H"""
     <div class="bg-backroom-black py-16 px-6 max-w-7xl mx-auto mt-12">
-      <h2 class="mb-16 uppercase text-3xl">Featured Showcase: {@showcase.title}</h2>
+      <div class="mb-24 max-w-3xl mx-auto text-center px-4">
+        <h2 class="text-4xl md:text-5xl tracking-tight text-white mb-4 uppercase">
+          Featured ShowCase
+        </h2>
+        <div class="h-1 w-20 bg-neon-blue-lightest mx-auto mb-6 animate-pulse rounded-full" />
+        <div class="text-xl md:text-2xl font-semibold text-neon-blue-lightest mb-2">
+          {@showcase.title}
+        </div>
+        <div class="text-mystery-white text-base md:text-lg font-light leading-relaxed max-w-2xl mx-auto">
+          {@showcase.description}
+        </div>
+      </div>
+
       <div class="hidden lg:flex flex-row gap-24">
         <div class="flex flex-col space-y-12 w-1/5">
           <%= for exhibition <- @exhibitions do %>

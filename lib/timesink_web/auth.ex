@@ -198,5 +198,5 @@ defmodule TimesinkWeb.Auth do
     end
   end
 
-  defp signed_in_path(_conn), do: ~p"/"
+  defp signed_in_path(_conn), do: ~p"/now-playing"
 end
