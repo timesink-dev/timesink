@@ -4,6 +4,7 @@ defmodule TimesinkWeb.HomepageLive do
   alias TimesinkWeb.Presence
   alias Timesink.Cinema
   alias TimesinkWeb.{TheaterShowcaseComponent}
+  import TimesinkWeb.Components.Hero
 
   def mount(_params, _session, socket) do
     showcase =
@@ -23,7 +24,7 @@ defmodule TimesinkWeb.HomepageLive do
         id="hero"
         class="h-screen w-full bg-backroom-black text-white flex items-center justify-center"
       >
-        <h1 class="text-5xl font-bold text-center">Welcome to TimeSink</h1>
+        <.hero />
       </div>
       <.live_component
         id="theater-showcase"
