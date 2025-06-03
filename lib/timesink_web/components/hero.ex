@@ -4,9 +4,9 @@ defmodule TimesinkWeb.Components.Hero do
 
   def hero(assigns) do
     ~H"""
-    <section id="hero-section" class="relative bg-[#0C0C0C] overflow-hidden">
+    <section id="hero-section" class="relative overflow-hidden">
       <div class="w-full flex justify-center">
-        <div class="relative flex flex-col md:flex-row w-full max-w-7xl h-[60vh] overflow-hidden">
+        <div class="relative flex flex-col md:flex-row w-full max-w-7xl h-[70vh] overflow-hidden">
           
     <!-- Irregular top blend -->
           <div

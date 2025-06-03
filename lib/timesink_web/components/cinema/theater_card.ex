@@ -39,7 +39,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
             playsinline
             preload="metadata"
             style="--controls: none;"
-            class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-90 group-hover:scale-105"
+            class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-85"
             phx-hook="HoverPlay"
           />
 

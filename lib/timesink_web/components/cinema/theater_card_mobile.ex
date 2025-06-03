@@ -27,7 +27,7 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
           </div>
         </div>
       </div>
-      <div class="relative w-full aspect-video min-h-[240px] overflow-hidden group">
+      <div class="relative rounded-xl w-full aspect-video min-h-[240px] overflow-hidden group">
         <mux-player
           id={"mux-player-#{film.id}-mobile#{Enum.random(?a..?z)}"}
           playback-id={Film.get_mux_playback_id(film.trailer)}
@@ -36,7 +36,7 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
           playsinline
           preload="metadata"
           style="--controls: none;"
-          class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-90 group-hover:scale-105"
+          class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-85"
           phx-hook="HoverPlay"
         />
       </div>
