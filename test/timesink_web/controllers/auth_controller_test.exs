@@ -21,7 +21,7 @@ defmodule TimesinkWeb.AuthControllerTest do
         |> fetch_flash()
         |> post("/sign_in", params)
 
-      assert redirected_to(conn) == "/"
+      assert redirected_to(conn) == "/now-playing"
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Welcome back!"
       token = get_session(conn, "user_token")
       assert is_binary(token)

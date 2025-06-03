@@ -18,6 +18,7 @@ config :timesink, Timesink.Repo,
 config :timesink, TimesinkWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "e9gSkUYsRSUjPc1MQg5VHjnsEN0oIwBBAMXnLFAI/Qr0DHMwXCxhhLkrmeWPr7rT",
+  static_url: [path: "/"],
   server: false
 
 # In test we don't send emails
