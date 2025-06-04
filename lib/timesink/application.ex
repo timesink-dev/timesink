@@ -21,6 +21,7 @@ defmodule Timesink.Application do
       {Oban, Application.fetch_env!(:timesink, Oban)},
       TimesinkWeb.Endpoint,
       {Timesink.Locations.Cache, name: Timesink.Locations.Cache},
+      Timesink.Cinema.TheaterScheduler,
       {Task.Supervisor, name: Timesink.TaskSupervisor}
     ]
 

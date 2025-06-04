@@ -426,4 +426,30 @@ Hooks.ScrollObserver = {
   }
 };
 
+
+Hooks.SimulatedLivePlayback = {
+  mounted() {
+    console.log("SimulatedLivePlayback mounted")
+
+    this.handleEvent("sync_offset", ({ offset }) => {
+      const mux = this.el.querySelector("mux-player")
+      if (!mux) {
+        console.warn("mux-player not found")
+        return
+      }
+
+      const drift = Math.abs(mux.currentTime - offset)
+      console.log(`Current time: ${mux.currentTime}, Offset: ${offset}, Drift: ${drift}`)
+      if (drift > 1.5) {
+        mux.currentTime = offset
+        mux.play().catch(() => {
+          console.warn("Autoplay may be blocked until user interaction")
+        })
+      }
+    })
+  }
+}
+
+
+
 export default Hooks;

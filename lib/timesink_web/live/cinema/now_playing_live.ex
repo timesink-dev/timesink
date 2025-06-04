@@ -44,6 +44,11 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
     {:noreply, assign(socket, :presence, presence)}
   end
 
+  def handle_info(%{event: "tick", offset: offset, interval: interval}, socket) do
+    # This assumes you're tracking a selected theater's offset
+    {:noreply, assign(socket, current_offset: offset, interval: interval)}
+  end
+
   def handle_info(%{event: "presence_diff", topic: topic}, socket) do
     updated = Presence.list(topic)
     {:noreply, update(socket, :presence, &Map.put(&1, topic, updated))}

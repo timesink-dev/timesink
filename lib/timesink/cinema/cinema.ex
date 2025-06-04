@@ -129,4 +129,19 @@ defmodule Timesink.Cinema do
       ]
     ])
   end
+
+  def current_screening_start(%Exhibition{showcase: showcase, theater: theater}) do
+    interval_seconds = theater.playback_interval_minutes * 60
+    now = DateTime.utc_now()
+    seconds_since_anchor = DateTime.diff(now, showcase.start_at)
+    cycles_elapsed = div(seconds_since_anchor, interval_seconds)
+
+    DateTime.add(showcase.start_at, cycles_elapsed * interval_seconds)
+  end
+
+  def playback_offset_seconds(exhibition) do
+    now = DateTime.utc_now()
+    start = current_screening_start(exhibition)
+    DateTime.diff(now, start)
+  end
 end
