@@ -10,7 +10,7 @@ defmodule TimesinkWeb.Components.Hero do
           
     <!-- Irregular top blend -->
           <div
-            class="absolute top-0 left-0 w-full h-16 z-20 pointer-events-none"
+            class="absolute top-0 left-0 w-full h-8 z-20 pointer-events-none"
             style="background: radial-gradient(ellipse at top left, #0C0C0C 40%, transparent 80%),
                     radial-gradient(ellipse at top right, #0C0C0C 40%, transparent 80%)"
           >

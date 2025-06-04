@@ -88,5 +88,6 @@ jobs:
 
       - run: mix deps.get
       - run: mix compile
+      - run: mix assets.deploy
       - run: mix do ecto.create + ecto.migrate + run priv/repo/seeds.exs
       - run: mix test
