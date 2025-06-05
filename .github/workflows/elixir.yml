@@ -88,6 +88,17 @@ jobs:
 
       - run: mix deps.get
       - run: mix compile
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Node.js dependencies
+        run: |
+          cd assets
+          npm ci
+          cd ..
       - run: mix assets.deploy
       - run: mix do ecto.create + ecto.migrate + run priv/repo/seeds.exs
       - run: mix test
