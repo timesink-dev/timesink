@@ -7,10 +7,19 @@ defmodule TimesinkWeb.HomepageLive do
   import TimesinkWeb.Components.Hero
 
   def mount(_params, _session, socket) do
-    showcase =
-      Cinema.get_active_showcase_with_exhibitions()
+    showcase = Cinema.get_active_showcase_with_exhibitions()
 
-    socket = socket |> assign(:showcase, showcase) |> assign(:presence, %{})
+    exhibitions =
+      (showcase.exhibitions || [])
+      |> Cinema.preload_exhibitions()
+      |> Enum.sort_by(& &1.theater.name, :asc)
+
+    socket =
+      socket
+      |> assign(:showcase, showcase)
+      |> assign(:exhibitions, exhibitions)
+      |> assign(:presence, %{})
+      |> assign(:playback_states, %{})
 
     if connected?(socket), do: send(self(), :connected)
 
@@ -30,8 +39,9 @@ defmodule TimesinkWeb.HomepageLive do
       <.live_component
         id="theater-showcase"
         module={TheaterShowcaseComponent}
-        showcase={@showcase}
+        exhibitions={@exhibitions}
         presence={@presence}
+        playback_states={@playback_states || %{}}
       />
     </div>
     """

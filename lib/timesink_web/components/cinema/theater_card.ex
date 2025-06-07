@@ -13,8 +13,6 @@ defmodule TimesinkWeb.Components.TheaterCard do
     ~H"""
     <div>
       <% film = @exhibition.film %>
-      <% phase =
-        get_in(@playback_state || %{}, [:phase]) %>
       <div class="mb-6 h-20">
         <h3 class="text-xl font-bold mb-1 text-left text-white drop-shadow-md">
           {@exhibition.theater.name}
@@ -24,21 +22,24 @@ defmodule TimesinkWeb.Components.TheaterCard do
         </p>
         <div class="wrapper w-64 px-2 py-1 mb-6 overflow-hidden">
           <div class="marquee text-neon-red-lightest text-sm uppercase">
-            <%= for part <- repeated_film_title_parts(film.title) do %>
-              <%= case phase do %>
-                <% :playing -> %>
+            <%= case playback_phase(@playback_state) do %>
+              <% :playing -> %>
+                <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
                   <p>Now Playing</p>
                   <p>{part}</p>
-                <% :intermission -> %>
+                <% end %>
+              <% :intermission -> %>
+                <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
                   <p>Intermission</p>
                   <p>{part}</p>
-                <% :before -> %>
-                  <p>Upcoming</p>
+                <% end %>
+              <% :before -> %>
+                <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
+                  <p>Scheduled</p>
                   <p>{part}</p>
-                <% _ -> %>
-                  <p>Loading...</p>
-                  <p>{part}</p>
-              <% end %>
+                <% end %>
+              <% _ -> %>
+                <p>Loading…</p>
             <% end %>
           </div>
         </div>
@@ -112,4 +113,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
     |> Enum.map(fn %{creative: c} -> Creative.full_name(c) end)
     |> Enum.join(", ")
   end
+
+  defp playback_phase(%{phase: phase}) when not is_nil(phase), do: phase
+  defp playback_phase(_), do: :unknown
 end

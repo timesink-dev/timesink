@@ -202,4 +202,15 @@ defmodule Timesink.Cinema.TheaterScheduler do
         :ok
     end
   end
+
+  def handle_cast(:reload, state) do
+    preload_into_ets()
+    {:noreply, state}
+  end
+
+  @doc """
+  Reload the theater schedule cache. (e.g. when an admin modifies a schedule)
+  This can be called to refresh the ETS table with the latest exhibition data.
+  """
+  def reload, do: GenServer.cast(__MODULE__, :reload)
 end

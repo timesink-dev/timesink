@@ -1,33 +1,21 @@
 defmodule TimesinkWeb.TheaterShowcaseComponent do
   use TimesinkWeb, :live_component
-  alias Timesink.Cinema
 
   import TimesinkWeb.Components.{TheaterCard, TheaterCardMobile}
 
-  def update(%{showcase: showcase, presence: presence} = assigns, socket) do
-    exhibitions =
-      (showcase && showcase.exhibitions) || []
+  def update(assigns, socket) do
+    default_theater_id =
+      assigns.exhibitions
+      |> List.first()
+      |> then(& &1.theater.id)
 
-    exhibitions =
-      exhibitions |> Cinema.preload_exhibitions() |> Enum.sort_by(& &1.theater.name, :asc)
+    selected_theater_id =
+      socket.assigns[:selected_theater_id] || default_theater_id
 
-    playback_states = Cinema.derive_playback_states(exhibitions)
-
-    IO.inspect(playback_states, label: "Playback States")
-
-    default_exhibition = Enum.at(exhibitions, 0)
-    selected_theater_id = default_exhibition && default_exhibition.theater.id
-
-    socket =
-      socket
-      |> assign(assigns)
-      |> assign(:showcase, showcase)
-      |> assign(:exhibitions, exhibitions)
-      |> assign(:selected_theater_id, selected_theater_id)
-      |> assign(:presence, presence || %{})
-      |> assign(:playback_states, playback_states)
-
-    {:ok, socket}
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign(:selected_theater_id, selected_theater_id)}
   end
 
   def render(assigns) do
@@ -86,7 +74,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                   )
                 }
                 playback_state={Map.get(@playback_states, to_string(exhibition.theater_id))}
-              /> />
+              />
             <% else %>
               {nil}
             <% end %>
@@ -136,10 +124,12 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
     {:noreply, assign(socket, selected_theater_id: id)}
   end
 
-  def handle_info(%{event: "tick", playback_state: %{theater_id: id} = state}, socket) do
-    updated_states = Map.put(socket.assigns.playback_states, to_string(id), state)
-    {:noreply, assign(socket, :playback_states, updated_states)}
-  end
+  # def handle_info(%{event: "tick", playback_state: %{theater_id: id} = state}, socket) do
+  #   IO.inspect(state, label: "🎬 Received playback_state")
+
+  #   updated_states = Map.put(socket.assigns.playback_states, to_string(id), state)
+  #   {:noreply, assign(socket, :playback_states, updated_states)}
+  # end
 
   defp live_viewer_count(theater_id, presence) do
     # determine the joining (before it was "theater:#{theater_id}"), but that was producing
