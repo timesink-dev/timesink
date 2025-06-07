@@ -26,7 +26,7 @@ defmodule TimesinkWeb.Components.Hero do
           </div>
           
     <!-- Left image -->
-          <div class="relative w-full md:w-2/3 h-full z-10">
+          <div class="relative w-full md:w-2/3 h-[60vh] z-10">
             <img src="/images/hero.png" alt="TimeSink Marquee" class="w-full h-full object-cover" />
             <div class="absolute inset-0 z-20 pointer-events-none">
               <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0C0C0C] to-transparent">
@@ -47,7 +47,7 @@ defmodule TimesinkWeb.Components.Hero do
                 </h2>
                 <p class="mt-4 text-base md:text-lg text-mystery-white max-w-xl mx-auto">
                   Join a friendly broadcast of cinephiles and visionaries exploring bold cinema.
-                  Watch live. Share what moves you. Connect in real time.
+                  Watch live. Connect in real time. Share what moves you.
                 </p>
                 <a href="/join">
                   <.button class="mt-6 px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition">
