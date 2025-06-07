@@ -17,6 +17,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
     socket =
       socket
       |> assign(assigns)
+      |> assign(:showcase, showcase)
       |> assign(:exhibitions, exhibitions)
       |> assign(:selected_theater_id, selected_theater_id)
       |> assign(:presence, presence || %{})
@@ -26,7 +27,20 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="bg-backroom-black py-16 px-6 max-w-7xl mx-auto">
+    <div class="bg-backroom-black py-16 px-6 max-w-7xl mx-auto mt-12">
+      <div class="mb-32 md:mb-72 max-w-3xl mx-auto text-center px-4">
+        <h2 class="text-4xl md:text-5xl tracking-tight text-white mb-4 uppercase">
+          Featured ShowCase
+        </h2>
+        <div class="h-1 w-20 bg-neon-blue-lightest mx-auto mb-6 animate-pulse rounded-full" />
+        <div class="text-xl md:text-2xl font-semibold text-neon-blue-lightest mb-2">
+          {@showcase.title}
+        </div>
+        <div class="text-mystery-white text-base md:text-lg font-light leading-relaxed max-w-2xl mx-auto">
+          {@showcase.description}
+        </div>
+      </div>
+
       <div class="hidden lg:flex flex-row gap-24">
         <div class="flex flex-col space-y-12 w-1/5">
           <%= for exhibition <- @exhibitions do %>
@@ -55,7 +69,6 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
             </div>
           <% end %>
         </div>
-
         <div class="flex-1">
           <%= for exhibition <- @exhibitions do %>
             <%= if @selected_theater_id == exhibition.theater.id do %>

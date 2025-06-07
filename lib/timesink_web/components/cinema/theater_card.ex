@@ -13,7 +13,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
     <div>
       <% film = @exhibition.film %>
       <div class="mb-6 h-20">
-        <h3 class="text-3xl font-bold mb-1 text-left text-white drop-shadow-md">
+        <h3 class="text-xl font-bold mb-1 text-left text-white drop-shadow-md">
           {@exhibition.theater.name}
         </h3>
         <p class="text-sm text-white/60 text-left">
@@ -39,7 +39,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
             playsinline
             preload="metadata"
             style="--controls: none;"
-            class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-90 group-hover:scale-105"
+            class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-85"
             phx-hook="HoverPlay"
           />
 

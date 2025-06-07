@@ -31,7 +31,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
                 pattern="[0-9]*"
                 data-index={index}
                 name={"digit-#{index}"}
-                class="w-full text-2xl text-center px-1 py-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none"
+                class="w-full text-2xl text-center px-1 py-3 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
                 value={digit}
                 phx-value-index={index}
                 id={"digit-#{index}"}

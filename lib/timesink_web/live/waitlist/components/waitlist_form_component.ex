@@ -93,7 +93,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             remaining in this cohort
           </p>
           <p>
-            Join now to secure your place in this next wave of invites.
+            Join <i>now</i> to secure your ticket!
           </p>
         <% else %>
           <p>
