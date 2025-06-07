@@ -113,7 +113,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   <span>Intermission in progress...</span>
                 </div>
               <% else %>
-                Next screening starts in {@countdown} seconds
+                Next screening starts in {format_seconds(@countdown)} min
               <% end %>
             </div>
           <% end %>
@@ -121,5 +121,13 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       </div>
     </div>
     """
+  end
+
+  defp format_seconds(nil), do: "--:--"
+
+  defp format_seconds(seconds) when is_integer(seconds) do
+    minutes = Integer.to_string(div(seconds, 60))
+    seconds = rem(seconds, 60) |> Integer.to_string() |> String.pad_leading(2, "0")
+    "#{minutes}:#{seconds}"
   end
 end
