@@ -27,7 +27,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       if connected?(socket) do
         topic = "theater:#{theater.id}"
         Phoenix.PubSub.subscribe(Timesink.PubSub, topic)
-        Phoenix.PubSub.subscribe(Timesink.PubSub, topic)
 
         TimesinkWeb.Presence.track(self(), topic, "#{socket.assigns.current_user.id}", %{
           username: socket.assigns.current_user.username,
@@ -44,34 +43,11 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:presence, %{})
        |> assign(:started, false)
        |> assign(:offset, nil)
+       |> assign(:phase, nil)
        |> assign(:countdown, nil)}
     else
       _ -> {:redirect, socket |> put_flash(:error, "Not found") |> redirect(to: "/")}
     end
-  end
-
-  def handle_info(%{event: "tick", offset: offset, interval: interval}, socket) do
-    push_event(socket, "sync_offset", %{offset: offset})
-
-    Logger.debug("Pushing sync_offset event with offset=#{offset}")
-
-    film_duration = 30
-
-    cond do
-      offset < 0 ->
-        {:noreply, assign(socket, started: false, countdown: abs(offset), offset: nil)}
-
-      offset >= 0 and offset < film_duration ->
-        {:noreply, assign(socket, started: true, offset: offset, countdown: nil)}
-
-      offset >= film_duration ->
-        {:noreply, assign(socket, started: false, countdown: interval - offset, offset: nil)}
-    end
-  end
-
-  def handle_info(%{event: "presence_diff", topic: topic}, socket) do
-    presence = TimesinkWeb.Presence.list(topic)
-    {:noreply, assign(socket, presence: presence)}
   end
 
   def render(assigns) do
@@ -88,7 +64,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
         <div>
           <% playback_id = Film.get_mux_playback_id(@film.video) %>
-          <%= if @started and playback_id do %>
+          <%= if @phase == :playing and playback_id do %>
             <div id="simulated-live-player" data-offset={@offset} phx-hook="SimulatedLivePlayback">
               <mux-player
                 id={@film.title}
@@ -107,13 +83,26 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           <% else %>
             <div class="text-center text-gray-400 text-xl py-8">
               <%= if is_nil(@countdown) do %>
-                <div class="flex items-center justify-center gap-2 text-gray-400">
-                  <div class="h-4 w-4 border-2 border-t-transparent border-gray-400 rounded-full animate-spin">
-                  </div>
-                  <span>Intermission in progress...</span>
+                <div class="flex flex-col items-center justify-center gap-2 text-gray-400">
+                  <h3 class="font-semibold">Loading schedule...</h3>
+                  <div class="h-4 w-4 border-2 border-t-transparent border-gray-400 rounded-full animate-spin" />
                 </div>
               <% else %>
-                Next screening starts in {format_seconds(@countdown)} min
+                <div class="flex flex-col justify-center text-center gap-y-2">
+                  <h3 class="text-gray-400">
+                    <%= case @phase do %>
+                      <% :before -> %>
+                        This showcase is scheduled and will begin shortly.
+                      <% :intermission -> %>
+                        Intermission — next screening begins in
+                      <% _ -> %>
+                        Waiting for playback...
+                    <% end %>
+                  </h3>
+                  <h3 class="text-4xl font-brand">
+                    {format_seconds(@countdown)} min
+                  </h3>
+                </div>
               <% end %>
             </div>
           <% end %>
@@ -123,11 +112,43 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     """
   end
 
-  defp format_seconds(nil), do: "--:--"
+  def handle_info(
+        %{
+          event: "tick",
+          playback_state: %{
+            phase: phase,
+            offset: offset,
+            countdown: countdown,
+            theater_id: _theater_id
+          }
+        },
+        socket
+      ) do
+    Logger.debug(
+      "Playback tick: phase=#{inspect(phase)}, offset=#{inspect(offset)}, countdown=#{inspect(countdown)}"
+    )
+
+    if phase == :playing and offset do
+      push_event(socket, "sync_offset", %{offset: offset})
+    end
+
+    {:noreply,
+     socket
+     |> assign(:phase, phase)
+     |> assign(:offset, offset)
+     |> assign(:countdown, countdown)}
+  end
+
+  def handle_info(%{event: "presence_diff", topic: topic}, socket) do
+    presence = TimesinkWeb.Presence.list(topic)
+    {:noreply, assign(socket, presence: presence)}
+  end
 
   defp format_seconds(seconds) when is_integer(seconds) do
     minutes = Integer.to_string(div(seconds, 60))
     seconds = rem(seconds, 60) |> Integer.to_string() |> String.pad_leading(2, "0")
     "#{minutes}:#{seconds}"
   end
+
+  defp format_seconds(nil), do: "--:--"
 end

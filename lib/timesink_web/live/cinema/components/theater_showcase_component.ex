@@ -11,6 +11,10 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
     exhibitions =
       exhibitions |> Cinema.preload_exhibitions() |> Enum.sort_by(& &1.theater.name, :asc)
 
+    playback_states = Cinema.derive_playback_states(exhibitions)
+
+    IO.inspect(playback_states, label: "Playback States")
+
     default_exhibition = Enum.at(exhibitions, 0)
     selected_theater_id = default_exhibition && default_exhibition.theater.id
 
@@ -21,6 +25,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
       |> assign(:exhibitions, exhibitions)
       |> assign(:selected_theater_id, selected_theater_id)
       |> assign(:presence, presence || %{})
+      |> assign(:playback_states, playback_states)
 
     {:ok, socket}
   end
@@ -80,7 +85,8 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                     @presence
                   )
                 }
-              />
+                playback_state={Map.get(@playback_states, to_string(exhibition.theater_id))}
+              /> />
             <% else %>
               {nil}
             <% end %>
@@ -128,6 +134,11 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
 
   def handle_event("select_theater", %{"id" => id}, socket) do
     {:noreply, assign(socket, selected_theater_id: id)}
+  end
+
+  def handle_info(%{event: "tick", playback_state: %{theater_id: id} = state}, socket) do
+    updated_states = Map.put(socket.assigns.playback_states, to_string(id), state)
+    {:noreply, assign(socket, :playback_states, updated_states)}
   end
 
   defp live_viewer_count(theater_id, presence) do

@@ -52,7 +52,8 @@ defmodule TimesinkWeb.MuxController do
                service: :mux,
                metadata: %{
                  "mux_asset" => mux_metadata,
-                 "film_title" => film.title
+                 "film_title" => film.title,
+                 "duration_sec" => asset["duration"]
                }
              }),
            {:ok, _attachment} <- attach_mux_asset(film, blob, mux_upload.meta),

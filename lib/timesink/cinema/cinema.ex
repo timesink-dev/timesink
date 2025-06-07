@@ -7,8 +7,10 @@ defmodule Timesink.Cinema do
   alias Timesink.Cinema.Showcase
   alias Timesink.Cinema.Theater
   alias Timesink.Cinema.Exhibition
+
   alias Timesink.Repo
   import Ecto.Query
+  require Logger
 
   @doc """
   Create a film.
@@ -143,5 +145,39 @@ defmodule Timesink.Cinema do
     now = DateTime.utc_now()
     start = current_screening_start(exhibition)
     DateTime.diff(now, start)
+  end
+
+  def derive_playback_states(exhibitions) do
+    Enum.reduce(exhibitions, %{}, fn exhibition, acc ->
+      theater_id = exhibition.theater_id || exhibition.theater.id
+
+      offset = Timesink.Cinema.TheaterScheduler.current_offset_for(theater_id)
+      duration_secs = get_film_duration_seconds(exhibition.film.video)
+
+      IO.inspect(
+        duration_secs: duration_secs,
+        offset: offset,
+        theater_id: theater_id
+      )
+
+      playing? =
+        is_integer(offset) and offset >= 0 and offset < duration_secs
+
+      Map.put(acc, theater_id, playing?)
+    end)
+  end
+
+  # Correct pattern for a video with blob
+  def get_film_duration_seconds(%{video: %{blob: %{metadata: %{"duration_sec" => secs}}}}) do
+    secs
+  end
+
+  def get_film_duration_seconds(%{duration: minutes}) when is_integer(minutes),
+    do: minutes
+
+  # default fallback
+  def get_film_duration_seconds(_film) do
+    Logger.warning("Film duration not found, returning 0 seconds")
+    0
   end
 end

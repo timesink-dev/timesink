@@ -7,11 +7,14 @@ defmodule TimesinkWeb.Components.TheaterCard do
 
   attr :exhibition, Exhibition, required: true
   attr :live_viewer_count, :integer, required: true
+  attr :playback_state, :map, required: true
 
   def theater_card(assigns) do
     ~H"""
     <div>
       <% film = @exhibition.film %>
+      <% phase =
+        get_in(@playback_state || %{}, [:phase]) %>
       <div class="mb-6 h-20">
         <h3 class="text-xl font-bold mb-1 text-left text-white drop-shadow-md">
           {@exhibition.theater.name}
@@ -22,8 +25,20 @@ defmodule TimesinkWeb.Components.TheaterCard do
         <div class="wrapper w-64 px-2 py-1 mb-6 overflow-hidden">
           <div class="marquee text-neon-red-lightest text-sm uppercase">
             <%= for part <- repeated_film_title_parts(film.title) do %>
-              <p>Now playing</p>
-              <p>{part}</p>
+              <%= case phase do %>
+                <% :playing -> %>
+                  <p>Now Playing</p>
+                  <p>{part}</p>
+                <% :intermission -> %>
+                  <p>Intermission</p>
+                  <p>{part}</p>
+                <% :before -> %>
+                  <p>Upcoming</p>
+                  <p>{part}</p>
+                <% _ -> %>
+                  <p>Loading...</p>
+                  <p>{part}</p>
+              <% end %>
             <% end %>
           </div>
         </div>

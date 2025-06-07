@@ -52,9 +52,25 @@ defmodule TimesinkWeb.HomepageLive do
     {:noreply, assign(socket, :presence, presence)}
   end
 
-  def handle_info(%{event: "tick", offset: offset, interval: interval}, socket) do
-    # This assumes you're tracking a selected theater's offset
-    {:noreply, assign(socket, current_offset: offset, interval: interval)}
+  def handle_info(
+        %{
+          event: "tick",
+          playback_state:
+            %{
+              phase: _phase,
+              offset: _offset,
+              countdown: _countdown,
+              theater_id: theater_id
+            } = playback_state
+        },
+        socket
+      ) do
+    updated_states =
+      Map.update(socket.assigns[:playback_states] || %{}, theater_id, playback_state, fn _ ->
+        playback_state
+      end)
+
+    {:noreply, assign(socket, :playback_states, updated_states)}
   end
 
   def handle_info(%{event: "presence_diff", topic: topic}, socket) do
