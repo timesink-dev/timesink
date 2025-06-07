@@ -180,7 +180,6 @@ defmodule Timesink.Cinema.TheaterScheduler do
           |> Repo.all()
 
         for exhibition <- exhibitions do
-          IO.inspect(exhibition.film, label: "Film for exhibition")
           duration = Timesink.Cinema.get_film_duration_seconds(exhibition.film)
 
           Logger.info(
