@@ -3,11 +3,11 @@ defmodule Timesink.Cinema.PlaybackState do
   Represents the real-time playback state of a theater.
   """
 
-  @type phases :: :before | :playing | :intermission
-  @phases [:before, :playing, :intermission]
+  @type phases :: :upcoming | :playing | :intermission
+  @phases [:upcoming, :playing, :intermission]
 
   defstruct [
-    # :before | :playing | :intermission
+    # :upcominge | :playing | :intermission
     :phase,
     # seconds (integer), offset from phase start
     :offset,
@@ -32,7 +32,7 @@ defmodule Timesink.Cinema.PlaybackState do
       __MODULE__,
       Map.merge(
         %{
-          phase: :before,
+          phase: :upcoming,
           offset: 0,
           countdown: nil,
           theater_id: nil

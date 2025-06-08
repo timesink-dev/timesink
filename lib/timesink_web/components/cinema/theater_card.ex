@@ -33,7 +33,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
                   <p>Intermission</p>
                   <p>{part}</p>
                 <% end %>
-              <% :before -> %>
+              <% :upcoming -> %>
                 <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
                   <p>Upcoming Showcase</p>
                   <p>{part}</p>

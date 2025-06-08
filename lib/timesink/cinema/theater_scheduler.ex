@@ -33,9 +33,9 @@ defmodule Timesink.Cinema.TheaterScheduler do
                                                acc ->
         playback_state =
           case current_offset_for(ex.theater, showcase, duration) do
-            {:before, countdown} ->
+            {:upcoming, countdown} ->
               %PlaybackState{
-                phase: :before,
+                phase: :upcoming,
                 countdown: countdown,
                 offset: nil,
                 theater_id: theater_id
@@ -90,7 +90,7 @@ defmodule Timesink.Cinema.TheaterScheduler do
 
       case DateTime.compare(now, anchor) do
         :lt ->
-          {:before, DateTime.diff(anchor, now)}
+          {:upcoming, DateTime.diff(anchor, now)}
 
         _ ->
           seconds_since_anchor = DateTime.diff(now, anchor)
@@ -113,9 +113,9 @@ defmodule Timesink.Cinema.TheaterScheduler do
 
   def get_playback_state(theater, showcase, duration) do
     case current_offset_for(theater, showcase, duration) do
-      {:before, countdown} ->
+      {:upcoming, countdown} ->
         %PlaybackState{
-          phase: :before,
+          phase: :upcoming,
           countdown: countdown,
           offset: nil,
           theater_id: theater.id

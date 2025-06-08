@@ -98,7 +98,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 <div class="flex flex-col justify-center text-center gap-y-2">
                   <h3 class="text-gray-400">
                     <%= case @phase do %>
-                      <% :before -> %>
+                      <% :upcoming -> %>
                         This showcase is scheduled and will begin shortly.
                       <% :intermission -> %>
                         Intermission — next screening begins in
