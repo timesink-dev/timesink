@@ -36,7 +36,6 @@ defmodule Timesink.Cinema.TheaterScheduler do
             {:before, countdown} ->
               %PlaybackState{
                 phase: :before,
-                started: false,
                 countdown: countdown,
                 offset: nil,
                 theater_id: theater_id
@@ -45,7 +44,6 @@ defmodule Timesink.Cinema.TheaterScheduler do
             {:playing, offset} ->
               %PlaybackState{
                 phase: :playing,
-                started: true,
                 countdown: nil,
                 offset: offset,
                 theater_id: theater_id
@@ -54,7 +52,6 @@ defmodule Timesink.Cinema.TheaterScheduler do
             {:intermission, countdown} ->
               %PlaybackState{
                 phase: :intermission,
-                started: false,
                 countdown: countdown,
                 offset: nil,
                 theater_id: theater_id
@@ -119,7 +116,6 @@ defmodule Timesink.Cinema.TheaterScheduler do
       {:before, countdown} ->
         %PlaybackState{
           phase: :before,
-          started: false,
           countdown: countdown,
           offset: nil,
           theater_id: theater.id
@@ -128,7 +124,6 @@ defmodule Timesink.Cinema.TheaterScheduler do
       {:playing, offset} ->
         %PlaybackState{
           phase: :playing,
-          started: true,
           countdown: nil,
           offset: offset,
           theater_id: theater.id
@@ -137,7 +132,6 @@ defmodule Timesink.Cinema.TheaterScheduler do
       {:intermission, countdown} ->
         %PlaybackState{
           phase: :intermission,
-          started: false,
           countdown: countdown,
           offset: nil,
           theater_id: theater.id

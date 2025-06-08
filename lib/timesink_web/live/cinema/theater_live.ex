@@ -49,7 +49,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:film, film)
        |> assign(:user, socket.assigns.current_user)
        |> assign(:presence, presence)
-       |> assign(:started, false)
        |> assign(:offset, nil)
        |> assign(:phase, nil)
        |> assign(:countdown, nil)}
