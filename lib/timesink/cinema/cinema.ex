@@ -3,10 +3,7 @@ defmodule Timesink.Cinema do
   The Cinema context.
   """
 
-  alias Timesink.Cinema.Film
-  alias Timesink.Cinema.Showcase
-  alias Timesink.Cinema.Theater
-  alias Timesink.Cinema.Exhibition
+  alias Timesink.Cinema.{Film, Showcase, Theater, Exhibition, TheaterScheduler, PlaybackState}
 
   alias Timesink.Repo
   import Ecto.Query
@@ -164,6 +161,24 @@ defmodule Timesink.Cinema do
         is_integer(offset) and offset >= 0 and offset < duration_secs
 
       Map.put(acc, theater_id, playing?)
+    end)
+  end
+
+  def compute_initial_playback_states(exhibitions, showcase) do
+    Enum.reduce(exhibitions, %{}, fn exhibition, acc ->
+      duration = get_film_duration_seconds(exhibition.film)
+
+      case Timesink.Cinema.TheaterScheduler.get_playback_state(
+             exhibition.theater,
+             showcase,
+             duration
+           ) do
+        %PlaybackState{} = state ->
+          Map.put(acc, exhibition.theater_id, state)
+
+        _ ->
+          acc
+      end
     end)
   end
 

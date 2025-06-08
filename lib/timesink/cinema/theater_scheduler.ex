@@ -2,7 +2,7 @@ defmodule Timesink.Cinema.TheaterScheduler do
   use GenServer
   require Logger
 
-  alias Timesink.Cinema.{Theater, Exhibition, Showcase}
+  alias Timesink.Cinema.{Exhibition, Showcase, PlaybackState}
   alias Timesink.Repo
 
   import Ecto.Query
@@ -15,88 +15,76 @@ defmodule Timesink.Cinema.TheaterScheduler do
   end
 
   def init(_) do
-    # Create ETS table if not exists
     :ets.new(@ets_table, [:named_table, :public, :set])
-
     preload_into_ets()
-
     schedule_tick()
-    {:ok, %{}}
+    {:ok, %{previous_states: %{}}}
   end
 
   def handle_info(:tick, state) do
-    :ets.tab2list(@ets_table)
-    |> Enum.each(fn {theater_id, %{exhibition: ex, duration: duration, showcase: showcase}} ->
-      case current_offset_for(ex.theater, showcase, duration) do
-        {:before, countdown} ->
-          Phoenix.PubSub.broadcast(
-            Timesink.PubSub,
-            "theater:#{theater_id}",
-            %{
-              event: "tick",
-              playback_state: %{
+    new_state =
+      :ets.tab2list(@ets_table)
+      |> Enum.reduce(state.previous_states, fn {theater_id,
+                                                %{
+                                                  exhibition: ex,
+                                                  duration: duration,
+                                                  showcase: showcase
+                                                }},
+                                               acc ->
+        playback_state =
+          case current_offset_for(ex.theater, showcase, duration) do
+            {:before, countdown} ->
+              %PlaybackState{
                 phase: :before,
                 started: false,
                 countdown: countdown,
                 offset: nil,
                 theater_id: theater_id
               }
-            }
-          )
 
-        {:playing, offset} ->
-          Phoenix.PubSub.broadcast(
-            Timesink.PubSub,
-            "theater:#{theater_id}",
-            %{
-              event: "tick",
-              playback_state: %{
+            {:playing, offset} ->
+              %PlaybackState{
                 phase: :playing,
                 started: true,
-                offset: offset,
                 countdown: nil,
+                offset: offset,
                 theater_id: theater_id
               }
-            }
-          )
 
-        {:intermission, countdown} ->
-          Phoenix.PubSub.broadcast(
-            Timesink.PubSub,
-            "theater:#{theater_id}",
-            %{
-              event: "tick",
-              playback_state: %{
+            {:intermission, countdown} ->
+              %PlaybackState{
                 phase: :intermission,
                 started: false,
-                offset: nil,
                 countdown: countdown,
+                offset: nil,
                 theater_id: theater_id
               }
-            }
-          )
 
-        nil ->
-          Logger.warning("No valid offset for theater #{theater_id}")
-      end
-    end)
+            nil ->
+              Logger.warning("No valid offset for theater #{theater_id}")
+              nil
+          end
+
+        if playback_state do
+          prev = Map.get(acc, theater_id)
+
+          maybe_broadcast_phase_change(prev, playback_state)
+          broadcast_tick(playback_state)
+
+          Map.put(acc, theater_id, playback_state)
+        else
+          acc
+        end
+      end)
 
     schedule_tick()
-    {:noreply, state}
+    {:noreply, %{state | previous_states: new_state}}
   end
 
   defp schedule_tick do
     Process.send_after(self(), :tick, @tick_interval)
   end
 
-  @doc """
-  Calculate the current playback offset for a theater based on its playback interval and the showcase start time.
-  """
-  @spec current_offset_for(Theater.t(), Showcase.t(), integer()) ::
-          {:before, pos_integer()}
-          | {:playing, non_neg_integer()}
-          | {:intermission, pos_integer()}
-          | nil
   def current_offset_for(theater, showcase, film_duration_secs) do
     with %NaiveDateTime{} = naive <- showcase.start_at do
       interval = theater.playback_interval_minutes * 60
@@ -114,15 +102,9 @@ defmodule Timesink.Cinema.TheaterScheduler do
           offset = DateTime.diff(now, cycle_start)
 
           cond do
-            offset < film_duration_secs ->
-              {:playing, offset}
-
-            offset < interval ->
-              {:intermission, interval - offset}
-
-            true ->
-              # Fallback
-              {:intermission, interval}
+            offset < film_duration_secs -> {:playing, offset}
+            offset < interval -> {:intermission, interval - offset}
+            true -> {:intermission, interval}
           end
       end
     else
@@ -132,43 +114,41 @@ defmodule Timesink.Cinema.TheaterScheduler do
     end
   end
 
-  @doc """
-  Calculate the current playback offset for a theater based on its playback interval and the showcase start time.
-  """
-  @spec current_offset_for(Theater.t(), Showcase.t()) :: integer() | nil
-  def current_offset_for(theater, showcase) do
-    with %NaiveDateTime{} = naive <- showcase.start_at do
-      interval = theater.playback_interval_minutes * 60
-      now = DateTime.utc_now()
-      anchor = DateTime.from_naive!(naive, "Etc/UTC")
+  def get_playback_state(theater, showcase, duration) do
+    case current_offset_for(theater, showcase, duration) do
+      {:before, countdown} ->
+        %PlaybackState{
+          phase: :before,
+          started: false,
+          countdown: countdown,
+          offset: nil,
+          theater_id: theater.id
+        }
 
-      case DateTime.compare(now, anchor) do
-        :lt ->
-          DateTime.diff(now, anchor)
+      {:playing, offset} ->
+        %PlaybackState{
+          phase: :playing,
+          started: true,
+          countdown: nil,
+          offset: offset,
+          theater_id: theater.id
+        }
 
-        _ ->
-          seconds_since_anchor = DateTime.diff(now, anchor)
-          cycles_elapsed = div(seconds_since_anchor, interval)
-          cycle_start = DateTime.add(anchor, cycles_elapsed * interval)
-          DateTime.diff(now, cycle_start)
-      end
-    else
-      _ ->
-        Logger.warning("Missing or invalid showcase.start_at for theater #{theater.id}")
+      {:intermission, countdown} ->
+        %PlaybackState{
+          phase: :intermission,
+          started: false,
+          countdown: countdown,
+          offset: nil,
+          theater_id: theater.id
+        }
+
+      nil ->
         nil
     end
   end
 
-  def current_offset_for(theater_id) do
-    with {:ok, theater} <- Theater.get(theater_id),
-         {:ok, showcase} <- Showcase.get_by(%{status: :active}) do
-      current_offset_for(theater, showcase)
-    else
-      _ -> nil
-    end
-  end
-
-  defp preload_into_ets do
+  def preload_into_ets do
     :ets.delete_all_objects(@ets_table)
 
     case Showcase.get_by(%{status: :active}) do
@@ -188,11 +168,7 @@ defmodule Timesink.Cinema.TheaterScheduler do
 
           :ets.insert(@ets_table, {
             exhibition.theater_id,
-            %{
-              exhibition: exhibition,
-              showcase: showcase,
-              duration: duration
-            }
+            %{exhibition: exhibition, showcase: showcase, duration: duration}
           })
         end
 
@@ -207,9 +183,37 @@ defmodule Timesink.Cinema.TheaterScheduler do
     {:noreply, state}
   end
 
-  @doc """
-  Reload the theater schedule cache. (e.g. when an admin modifies a schedule)
-  This can be called to refresh the ETS table with the latest exhibition data.
-  """
   def reload, do: GenServer.cast(__MODULE__, :reload)
+
+  ## ───── Phase Change Broadcasting ─────
+
+  def maybe_broadcast_phase_change(nil, %PlaybackState{} = current),
+    do: broadcast_phase_change(current)
+
+  def maybe_broadcast_phase_change(
+        %PlaybackState{phase: prev_phase},
+        %PlaybackState{phase: curr_phase} = current
+      )
+      when prev_phase != curr_phase,
+      do: broadcast_phase_change(current)
+
+  def maybe_broadcast_phase_change(_, _), do: :noop
+
+  defp broadcast_phase_change(%PlaybackState{} = state) do
+    Phoenix.PubSub.broadcast(
+      Timesink.PubSub,
+      "theater:#{state.theater_id}",
+      %{event: "phase_change", playback_state: state}
+    )
+  end
+
+  ## ───── Tick Broadcasting ─────
+
+  defp broadcast_tick(%PlaybackState{} = state) do
+    Phoenix.PubSub.broadcast(
+      Timesink.PubSub,
+      "scheduler:#{state.theater_id}",
+      %{event: "tick", playback_state: state}
+    )
+  end
 end

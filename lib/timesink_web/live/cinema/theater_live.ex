@@ -1,6 +1,7 @@
 defmodule TimesinkWeb.Cinema.TheaterLive do
   use TimesinkWeb, :live_view
   alias Timesink.Cinema.{Theater, Exhibition, Showcase, Film}
+  alias TimesinkWeb.PubSubTopics
   alias Timesink.Repo
   require Logger
 
@@ -25,14 +26,21 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         ])
 
       if connected?(socket) do
-        topic = "theater:#{theater.id}"
-        Phoenix.PubSub.subscribe(Timesink.PubSub, topic)
+        Phoenix.PubSub.subscribe(Timesink.PubSub, PubSubTopics.scheduler_topic(theater.id))
 
-        TimesinkWeb.Presence.track(self(), topic, "#{socket.assigns.current_user.id}", %{
-          username: socket.assigns.current_user.username,
-          joined_at: System.system_time(:second)
-        })
+        TimesinkWeb.Presence.track(
+          self(),
+          PubSubTopics.presence_topic(theater.id),
+          "#{socket.assigns.current_user.id}",
+          %{
+            username: socket.assigns.current_user.username,
+            joined_at: System.system_time(:second)
+          }
+        )
       end
+
+      presence_topic = PubSubTopics.presence_topic(theater.id)
+      presence = TimesinkWeb.Presence.list(presence_topic)
 
       {:ok,
        socket
@@ -40,7 +48,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:exhibition, exhibition)
        |> assign(:film, film)
        |> assign(:user, socket.assigns.current_user)
-       |> assign(:presence, %{})
+       |> assign(:presence, presence)
        |> assign(:started, false)
        |> assign(:offset, nil)
        |> assign(:phase, nil)
@@ -139,9 +147,30 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
      |> assign(:countdown, countdown)}
   end
 
-  def handle_info(%{event: "presence_diff", topic: topic}, socket) do
-    presence = TimesinkWeb.Presence.list(topic)
+  def handle_info(%{event: "presence_diff", topic: _}, socket) do
+    presence_topic = PubSubTopics.presence_topic(socket.assigns.theater.id)
+    presence = TimesinkWeb.Presence.list(presence_topic)
     {:noreply, assign(socket, presence: presence)}
+  end
+
+  def handle_info(
+        %{
+          event: "phase_change",
+          playback_state: %{
+            phase: phase,
+            offset: offset,
+            countdown: countdown
+          }
+        },
+        socket
+      ) do
+    Logger.debug("Phase changed to #{inspect(phase)}")
+
+    {:noreply,
+     socket
+     |> assign(:phase, phase)
+     |> assign(:offset, offset)
+     |> assign(:countdown, countdown)}
   end
 
   defp format_seconds(seconds) when is_integer(seconds) do

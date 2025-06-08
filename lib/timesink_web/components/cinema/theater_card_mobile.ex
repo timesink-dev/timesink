@@ -6,6 +6,7 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
 
   attr :exhibition, Exhibition, required: true
   attr :live_viewer_count, :integer, required: true
+  attr :playback_state, :map, required: true
 
   def theater_card_mobile(assigns) do
     ~H"""
@@ -20,9 +21,24 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
         </p>
         <div class="wrapper w-72 px-2 py-2 mb-2 overflow-hidden text-center">
           <div class="marquee text-neon-red-lightest text-sm uppercase">
-            <%= for part <- repeated_film_title_parts(film.title) do %>
-              <p>Now playing</p>
-              <p>{part}</p>
+            <%= case playback_phase(@playback_state) do %>
+              <% :playing -> %>
+                <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
+                  <p>Now Playing</p>
+                  <p>{part}</p>
+                <% end %>
+              <% :intermission -> %>
+                <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
+                  <p>Intermission</p>
+                  <p>{part}</p>
+                <% end %>
+              <% :before -> %>
+                <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
+                  <p>Upcoming Showcase</p>
+                  <p>{part}</p>
+                <% end %>
+              <% _ -> %>
+                <p>Loading…</p>
             <% end %>
           </div>
         </div>
@@ -102,4 +118,7 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
     1..repeat_count
     |> Enum.map(fn _ -> title end)
   end
+
+  defp playback_phase(%{phase: phase}) when not is_nil(phase), do: phase
+  defp playback_phase(_), do: :unknown
 end
