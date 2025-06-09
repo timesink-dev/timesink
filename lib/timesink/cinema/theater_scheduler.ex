@@ -86,16 +86,20 @@ defmodule Timesink.Cinema.TheaterScheduler do
     with %NaiveDateTime{} = naive <- showcase.start_at do
       interval = theater.playback_interval_minutes * 60
       now = DateTime.utc_now()
-      anchor = DateTime.from_naive!(naive, "Etc/UTC")
 
-      case DateTime.compare(now, anchor) do
+      adjusted_anchor =
+        showcase.start_at
+        |> DateTime.from_naive!("Etc/UTC")
+        |> DateTime.add(theater.start_offset_minutes * 60)
+
+      case DateTime.compare(now, adjusted_anchor) do
         :lt ->
-          {:upcoming, DateTime.diff(anchor, now)}
+          {:upcoming, DateTime.diff(adjusted_anchor, now)}
 
         _ ->
-          seconds_since_anchor = DateTime.diff(now, anchor)
+          seconds_since_anchor = DateTime.diff(now, adjusted_anchor)
           cycles_elapsed = div(seconds_since_anchor, interval)
-          cycle_start = DateTime.add(anchor, cycles_elapsed * interval)
+          cycle_start = DateTime.add(adjusted_anchor, cycles_elapsed * interval)
           offset = DateTime.diff(now, cycle_start)
 
           cond do

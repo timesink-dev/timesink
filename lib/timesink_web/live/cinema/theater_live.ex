@@ -27,6 +27,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
       if connected?(socket) do
         Phoenix.PubSub.subscribe(Timesink.PubSub, PubSubTopics.scheduler_topic(theater.id))
+        Phoenix.PubSub.subscribe(Timesink.PubSub, PubSubTopics.presence_topic(theater.id))
 
         TimesinkWeb.Presence.track(
           self(),
@@ -146,9 +147,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
      |> assign(:countdown, countdown)}
   end
 
-  def handle_info(%{event: "presence_diff", topic: _}, socket) do
-    presence_topic = PubSubTopics.presence_topic(socket.assigns.theater.id)
-    presence = TimesinkWeb.Presence.list(presence_topic)
+  def handle_info(%{event: "presence_diff", topic: topic}, socket) do
+    presence = TimesinkWeb.Presence.list(topic)
     {:noreply, assign(socket, presence: presence)}
   end
 

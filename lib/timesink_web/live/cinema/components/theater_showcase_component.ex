@@ -127,13 +127,6 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
     {:noreply, assign(socket, selected_theater_id: id)}
   end
 
-  # def handle_info(%{event: "tick", playback_state: %{theater_id: id} = state}, socket) do
-  #   IO.inspect(state, label: "🎬 Received playback_state")
-
-  #   updated_states = Map.put(socket.assigns.playback_states, to_string(id), state)
-  #   {:noreply, assign(socket, :playback_states, updated_states)}
-  # end
-
   defp live_viewer_count(theater_id, presence) do
     # determine the joining (before it was "theater:#{theater_id}"), but that was producing
     # a duplicate "theater:theater:#{theater_id}" topic

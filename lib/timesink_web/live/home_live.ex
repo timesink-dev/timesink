@@ -52,13 +52,15 @@ defmodule TimesinkWeb.HomepageLive do
   end
 
   def handle_info(:connected, socket) do
-    # Don't subscribe to scheduler topics from homepage (performance)
-    # Only track presence for each theater
     presence =
-      socket.assigns.showcase.exhibitions
+      socket.assigns.exhibitions
       |> Enum.map(fn ex ->
         presence_topic = PubSubTopics.presence_topic(ex.theater_id)
         Phoenix.PubSub.subscribe(Timesink.PubSub, presence_topic)
+
+        # Also subscribe to phase_change messages
+        Phoenix.PubSub.subscribe(Timesink.PubSub, "theater:#{ex.theater_id}")
+
         {presence_topic, Presence.list(presence_topic)}
       end)
       |> Enum.into(%{})
@@ -80,8 +82,6 @@ defmodule TimesinkWeb.HomepageLive do
       Map.update(socket.assigns[:playback_states] || %{}, theater_id, playback_state, fn _ ->
         playback_state
       end)
-
-    IO.inspect(updated_states, label: "Phase change: Updated Playback States")
 
     {:noreply, assign(socket, :playback_states, updated_states)}
   end
