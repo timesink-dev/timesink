@@ -81,6 +81,8 @@ defmodule TimesinkWeb.HomepageLive do
         playback_state
       end)
 
+    IO.inspect(updated_states, label: "Phase change: Updated Playback States")
+
     {:noreply, assign(socket, :playback_states, updated_states)}
   end
 
