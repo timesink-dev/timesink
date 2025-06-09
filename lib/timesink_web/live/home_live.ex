@@ -56,10 +56,10 @@ defmodule TimesinkWeb.HomepageLive do
       socket.assigns.exhibitions
       |> Enum.map(fn ex ->
         presence_topic = PubSubTopics.presence_topic(ex.theater_id)
+        playback_phase_change_topic = PubSubTopics.phase_change_topic(ex.theater_id)
         Phoenix.PubSub.subscribe(Timesink.PubSub, presence_topic)
 
-        # Also subscribe to phase_change messages
-        Phoenix.PubSub.subscribe(Timesink.PubSub, "theater:#{ex.theater_id}")
+        Phoenix.PubSub.subscribe(Timesink.PubSub, playback_phase_change_topic)
 
         {presence_topic, Presence.list(presence_topic)}
       end)

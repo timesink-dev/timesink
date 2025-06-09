@@ -3,6 +3,7 @@ defmodule Timesink.Cinema.TheaterScheduler do
   require Logger
 
   alias Timesink.Cinema.{Exhibition, Showcase, PlaybackState}
+  alias TimesinkWeb.PubSubTopics
   alias Timesink.Repo
 
   import Ecto.Query
@@ -83,7 +84,7 @@ defmodule Timesink.Cinema.TheaterScheduler do
   end
 
   def current_offset_for(theater, showcase, film_duration_secs) do
-    with %NaiveDateTime{} = naive <- showcase.start_at do
+    with %NaiveDateTime{} = _naive <- showcase.start_at do
       interval = theater.playback_interval_minutes * 60
       now = DateTime.utc_now()
 
@@ -200,7 +201,7 @@ defmodule Timesink.Cinema.TheaterScheduler do
   defp broadcast_phase_change(%PlaybackState{} = state) do
     Phoenix.PubSub.broadcast(
       Timesink.PubSub,
-      "theater:#{state.theater_id}",
+      PubSubTopics.phase_change_topic(state.theater_id),
       %{event: "phase_change", playback_state: state}
     )
   end
@@ -210,7 +211,7 @@ defmodule Timesink.Cinema.TheaterScheduler do
   defp broadcast_tick(%PlaybackState{} = state) do
     Phoenix.PubSub.broadcast(
       Timesink.PubSub,
-      "scheduler:#{state.theater_id}",
+      PubSubTopics.scheduler_topic(state.theater_id),
       %{event: "tick", playback_state: state}
     )
   end
