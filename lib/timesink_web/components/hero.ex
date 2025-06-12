@@ -25,14 +25,14 @@ defmodule TimesinkWeb.Components.Hero do
           </div>
            --%>
           <!-- Left image -->
-          <div class="relative w-full md:w-2/3 h-[70vh] z-10">
+          <div class="relative w-full md:w-2/3 h-[80vh] z-10">
             <img src="/images/hero-16.png" alt="TimeSink Marquee" class="w-full h-full object-cover" />
-            <%!-- <div class="absolute inset-0 z-20 pointer-events-none"> --%>
-            <%!-- <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0C0C0C] to-transparent">
+            <div class="absolute inset-0 z-20 pointer-events-none">
+              <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0C0C0C] to-transparent">
               </div>
               <div class="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#0C0C0C] to-transparent">
-              </div> --%>
-            <%!-- </div> --%>
+              </div>
+            </div>
             <%!-- <div class="absolute bottom-0 left-0 w-full h-16 z-20 pointer-events-none bg-gradient-to-t from-[#0C0C0C] via-[#0C0C0C]/70 to-transparent">
             </div> --%>
           </div>
