@@ -26,7 +26,7 @@ defmodule TimesinkWeb.Components.Hero do
            --%>
           <!-- Left image -->
           <div class="relative w-full md:w-2/3 h-[80vh] z-10">
-            <img src="/images/hero-16.png" alt="TimeSink Marquee" class="w-full h-full object-cover" />
+            <img src="/images/hero-17.png" alt="TimeSink Marquee" class="w-full h-full object-cover" />
             <div class="absolute inset-0 z-20 pointer-events-none">
               <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0C0C0C] to-transparent">
               </div>

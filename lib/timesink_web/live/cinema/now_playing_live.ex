@@ -44,8 +44,6 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
   end
 
   def handle_info(:connected, socket) do
-    # Don't subscribe to scheduler topics from homepage (performance)
-    # Only track presence for each theater
     presence =
       socket.assigns.showcase.exhibitions
       |> Enum.map(fn ex ->

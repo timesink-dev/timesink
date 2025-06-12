@@ -22,7 +22,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
         </p>
 
         <form class="w-full" phx-submit="verify_code" phx-target={@myself}>
-          <div class="flex gap-2 my-6" phx-hook="CodeInputs" id="code-entry">
+          <div class="flex gap-2 mt-6" phx-hook="CodeInputs" id="code-entry">
             <%= for {digit, index} <- Enum.with_index(@digits) do %>
               <input
                 type="text"
@@ -39,14 +39,14 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
             <% end %>
           </div>
           <%= if @verification_error do %>
-            <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light">
+            <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light my-2">
               <.icon name="hero-exclamation-circle-mini" class="h-6 w-6" />
               <p class="text-md mt-2">
                 {@verification_error}
               </p>
             </span>
           <% end %>
-          <.button color="secondary" class="w-full py-3 mt-6 text-lg">
+          <.button color="primary" class="w-full py-3 mt-6 text-lg">
             Verify & Continue
           </.button>
         </form>

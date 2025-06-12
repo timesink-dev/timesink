@@ -52,7 +52,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:presence, presence)
        |> assign(:offset, nil)
        |> assign(:phase, nil)
-       |> assign(:countdown, nil)}
+       |> assign(:countdown, nil)
+       |> assign(:pulse_seconds_only?, false)}
     else
       _ -> {:redirect, socket |> put_flash(:error, "Not found") |> redirect(to: "/")}
     end
@@ -107,9 +108,21 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                         Waiting for playback...
                     <% end %>
                   </h3>
-                  <h3 class="text-4xl font-brand">
-                    {format_seconds(@countdown)} min
-                  </h3>
+                  <div class="flex justify-center gap-x-4 mt-2 text-center">
+                    <%= for {label, value} <- breakdown_time(@countdown) do %>
+                      <div class="flex flex-col items-center mx-2">
+                        <span class={
+        "text-3xl font-bold" <>
+          if label == :seconds and @pulse_seconds_only?, do: " pulse-second text-neon-red-lightest", else: ""
+      }>
+                          {String.pad_leading(to_string(value), 2, "0")}
+                        </span>
+                        <span class="text-xs uppercase text-gray-400 tracking-wider">
+                          {Atom.to_string(label)}
+                        </span>
+                      </div>
+                    <% end %>
+                  </div>
                 </div>
               <% end %>
             </div>
@@ -132,19 +145,20 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         },
         socket
       ) do
-    Logger.debug(
-      "Playback tick: phase=#{inspect(phase)}, offset=#{inspect(offset)}, countdown=#{inspect(countdown)}"
-    )
+    # consider in future - to sync more aggresively on playback start time if lagging
+    # if phase == :playing and offset do
+    #   push_event(socket, "sync_offset", %{offset: offset})
+    # end
 
-    if phase == :playing and offset do
-      push_event(socket, "sync_offset", %{offset: offset})
-    end
+    time_parts = breakdown_time(countdown || 0)
+    pulse_seconds_only? = Enum.all?(time_parts, fn {unit, _} -> unit == :seconds end)
 
     {:noreply,
      socket
      |> assign(:phase, phase)
      |> assign(:offset, offset)
-     |> assign(:countdown, countdown)}
+     |> assign(:countdown, countdown)
+     |> assign(:pulse_seconds_only?, pulse_seconds_only?)}
   end
 
   def handle_info(%{event: "presence_diff", topic: topic}, socket) do
@@ -163,8 +177,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         },
         socket
       ) do
-    Logger.debug("Phase changed to #{inspect(phase)}")
-
     {:noreply,
      socket
      |> assign(:phase, phase)
@@ -172,11 +184,25 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
      |> assign(:countdown, countdown)}
   end
 
-  defp format_seconds(seconds) when is_integer(seconds) do
-    minutes = Integer.to_string(div(seconds, 60))
-    seconds = rem(seconds, 60) |> Integer.to_string() |> String.pad_leading(2, "0")
-    "#{minutes}:#{seconds}"
-  end
+  defp breakdown_time(nil), do: []
 
-  defp format_seconds(nil), do: "--:--"
+  defp breakdown_time(seconds) when is_float(seconds),
+    do: breakdown_time(trunc(seconds))
+
+  defp breakdown_time(total) when is_integer(total) do
+    days = div(total, 86_400)
+    hours = rem(total, 86_400) |> div(3_600)
+    minutes = rem(total, 3_600) |> div(60)
+    seconds = rem(total, 60)
+
+    Enum.filter(
+      [
+        {:days, days},
+        {:hours, hours},
+        {:minutes, minutes},
+        {:seconds, seconds}
+      ],
+      fn {_k, v} -> v > 0 end
+    )
+  end
 end
