@@ -336,7 +336,8 @@ Hooks.EmblaMain = {
 
   Hooks.EmblaThumbs = {
   mounted() {
-    this.selectedIndex = 0
+    
+this.selectedIndex = this.emblaMain?.selectedScrollSnap?.() || 0
 
     // Grab reference to the main embla instance (set globally by EmblaMain)
     this.emblaMain = window.__emblaMain__
@@ -368,6 +369,8 @@ Hooks.EmblaMain = {
     const selectedIndex = this.emblaMain.selectedScrollSnap()
     const thumbs = this.el.querySelectorAll('[data-thumb-index]')
 
+    console.log(`Highlighting thumb at index ${selectedIndex}`)
+
     thumbs.forEach((thumb, index) => {
       if (index === selectedIndex) {
         thumb.classList.add('ring-2', 'ring-neon-blue-lightest')
@@ -379,7 +382,11 @@ Hooks.EmblaMain = {
   },
 
   updated() {
-    if (this.emblaThumbs) this.emblaThumbs.reInit()
+    if (!this.emblaThumbs || !this.emblaMain) return
+
+    const index = this.emblaMain.selectedScrollSnap()
+    this.emblaThumbs.reInit()
+    this.emblaThumbs.scrollTo(index)
   },
 
   destroyed() {
@@ -425,5 +432,31 @@ Hooks.ScrollObserver = {
     this.cleanup && this.cleanup();
   }
 };
+
+
+Hooks.SimulatedLivePlayback = {
+  mounted() {
+    console.log("SimulatedLivePlayback mounted")
+
+    this.handleEvent("sync_offset", ({ offset }) => {
+      const mux = this.el.querySelector("mux-player")
+      if (!mux) {
+        console.warn("mux-player not found")
+        return
+      }
+
+      const drift = Math.abs(mux.currentTime - offset)
+      console.log(`Current time: ${mux.currentTime}, Offset: ${offset}, Drift: ${drift}`)
+      if (drift > 1.5) {
+        mux.currentTime = offset
+        mux.play().catch(() => {
+          console.warn("Autoplay may be blocked until user interaction")
+        })
+      }
+    })
+  }
+}
+
+
 
 export default Hooks;

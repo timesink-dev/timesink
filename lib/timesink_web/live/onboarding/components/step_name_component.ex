@@ -54,7 +54,7 @@ defmodule TimesinkWeb.Onboarding.StepNameComponent do
 
           <:actions>
             <div class="mt-6">
-              <.button color="secondary" class="w-full py-2 text-lg">Continue</.button>
+              <.button color="primary" class="w-full py-3 text-lg">Continue</.button>
             </div>
           </:actions>
         </.simple_form>

@@ -9,6 +9,8 @@ defmodule Timesink.Cinema.Theater do
           __struct__: __MODULE__,
           name: :string,
           slug: :string,
+          playback_interval_minutes: :integer,
+          start_offset_minutes: :integer,
           description: :string
         }
 
@@ -18,6 +20,8 @@ defmodule Timesink.Cinema.Theater do
     field :name, :string
     field :description, :string
     field :slug, :string
+    field :playback_interval_minutes, :integer, default: 15
+    field :start_offset_minutes, :integer, default: 0
     has_one :exhibition, Timesink.Cinema.Exhibition
 
     timestamps(type: :utc_datetime)
@@ -27,8 +31,14 @@ defmodule Timesink.Cinema.Theater do
           Ecto.Changeset.t()
   def changeset(theater, params, _metadata \\ []) do
     theater
-    |> cast(params, [:name, :description, :slug])
-    |> validate_required([:name, :slug])
+    |> cast(params, [
+      :name,
+      :description,
+      :slug,
+      :playback_interval_minutes,
+      :start_offset_minutes
+    ])
+    |> validate_required([:name, :slug, :playback_interval_minutes, :start_offset_minutes])
     |> validate_length(:name, min: 1)
     |> put_slug()
   end
@@ -36,7 +46,6 @@ defmodule Timesink.Cinema.Theater do
   defp put_slug(changeset) do
     if name = get_change(changeset, :name) do
       slug = Utils.slugify(name)
-      IO.inspect(slug, label: "Generated slug")
       put_change(changeset, :slug, slug)
     else
       changeset

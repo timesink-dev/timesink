@@ -42,7 +42,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
           as="birthdate"
           phx-target={@myself}
           phx-submit="submit_birthdate"
-          class="mt-6 space-y-4"
+          class="mt-6"
         >
           <div class="flex justify-center gap-x-2">
             <.input
@@ -85,7 +85,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
           <% end %>
 
           <:actions>
-            <.button color="secondary" class="w-full py-3 text-lg">Continue</.button>
+            <.button color="primary" class="w-full py-3 text-lg mt-6">Continue</.button>
           </:actions>
         </.simple_form>
       </div>

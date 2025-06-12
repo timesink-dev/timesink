@@ -36,7 +36,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
               <.input
                 type="text"
                 name="username"
-                phx-debounce="700"
+                phx-debounce="400"
                 required
                 field={@form[:username]}
                 input_class="w-full pl-9 pr-10 py-3 text-mystery-white border-none"
@@ -67,7 +67,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
 
           <:actions>
             <div class="mt-6">
-              <.button color="secondary" class="w-full py-2 text-lg">
+              <.button color="primary" class="w-full py-3 text-lg">
                 Take me in ! →
               </.button>
             </div>

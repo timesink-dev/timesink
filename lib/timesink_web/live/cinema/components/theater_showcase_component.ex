@@ -1,28 +1,23 @@
 defmodule TimesinkWeb.TheaterShowcaseComponent do
   use TimesinkWeb, :live_component
-  alias Timesink.Cinema
 
   import TimesinkWeb.Components.{TheaterCard, TheaterCardMobile}
+  alias TimesinkWeb.PubSubTopics
 
-  def update(%{showcase: showcase, presence: presence} = assigns, socket) do
-    exhibitions =
-      (showcase && showcase.exhibitions) || []
+  def update(assigns, socket) do
+    old_selected_id = socket.assigns[:selected_theater_id]
 
-    exhibitions =
-      exhibitions |> Cinema.preload_exhibitions() |> Enum.sort_by(& &1.theater.name, :asc)
+    default_theater_id =
+      assigns.exhibitions
+      |> List.first()
+      |> then(& &1.theater.id)
 
-    default_exhibition = Enum.at(exhibitions, 0)
-    selected_theater_id = default_exhibition && default_exhibition.theater.id
+    selected_theater_id = old_selected_id || default_theater_id
 
-    socket =
-      socket
-      |> assign(assigns)
-      |> assign(:showcase, showcase)
-      |> assign(:exhibitions, exhibitions)
-      |> assign(:selected_theater_id, selected_theater_id)
-      |> assign(:presence, presence || %{})
-
-    {:ok, socket}
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign(:selected_theater_id, selected_theater_id)}
   end
 
   def render(assigns) do
@@ -60,7 +55,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                 </h3>
                 <div class="text-xs text-white/60">
                   <.icon name="hero-user-group" class="h-5 w-5" />
-                  {live_viewer_count("theater:#{exhibition.theater_id}", @presence)}
+                  {live_viewer_count(exhibition.theater_id, @presence)}
                 </div>
               </div>
               <div class="mt-6 text-mystery-white font-semibold text-lg">
@@ -74,9 +69,10 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
             <%= if @selected_theater_id == exhibition.theater.id do %>
               <.theater_card
                 exhibition={exhibition}
+                playback_state={Map.get(@playback_states, to_string(exhibition.theater_id))}
                 live_viewer_count={
                   live_viewer_count(
-                    "theater:#{exhibition.theater_id}",
+                    exhibition.theater_id,
                     @presence
                   )
                 }
@@ -94,9 +90,10 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
             <%= for {exhibition, _index} <- Enum.with_index(@exhibitions) do %>
               <.theater_card_mobile
                 exhibition={exhibition}
+                playback_state={Map.get(@playback_states, to_string(exhibition.theater_id))}
                 live_viewer_count={
                   live_viewer_count(
-                    "theater:#{exhibition.theater_id}",
+                    exhibition.theater_id,
                     @presence
                   )
                 }
@@ -133,7 +130,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
   defp live_viewer_count(theater_id, presence) do
     # determine the joining (before it was "theater:#{theater_id}"), but that was producing
     # a duplicate "theater:theater:#{theater_id}" topic
-    topic = "#{theater_id}"
+    topic = PubSubTopics.presence_topic(theater_id)
     Map.get(presence, topic, %{}) |> map_size()
   end
 end

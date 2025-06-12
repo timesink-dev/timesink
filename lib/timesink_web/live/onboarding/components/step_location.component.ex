@@ -36,7 +36,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
           phx-change="search"
           phx-submit="save_location"
           phx-target={@myself}
-          class="mt-6 space-y-4"
+          class="mt-6"
         >
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">City</label>
@@ -72,7 +72,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
             </li>
           </ul>
           <:actions>
-            <.button class="mt-6 w-full py-3 text-lg" color="secondary">
+            <.button class="mt-6 w-full py-3 text-lg" color="primary">
               Continue
             </.button>
           </:actions>

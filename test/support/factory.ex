@@ -109,6 +109,7 @@ defmodule Timesink.Factory do
   def theater_factory do
     %Timesink.Cinema.Theater{
       name: Faker.Cat.name(),
+      slug: Faker.Internet.slug(),
       description: Faker.Lorem.sentence()
     }
   end

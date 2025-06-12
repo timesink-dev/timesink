@@ -48,6 +48,9 @@ defmodule TimesinkWeb.TopNav do
                 <a href="/now-playing" class="block px-4 py-2 hover:bg-zinc-700">Now Playing</a>
               </li>
               <li>
+                <a href="/" class="block px-4 py-2 hover:bg-zinc-700">Upcoming</a>
+              </li>
+              <li>
                 <a href="/archives" class="block px-4 py-2 hover:bg-zinc-700">Archives</a>
               </li>
             </ul>

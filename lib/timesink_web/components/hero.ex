@@ -6,17 +6,16 @@ defmodule TimesinkWeb.Components.Hero do
     ~H"""
     <section id="hero-section" class="relative overflow-hidden">
       <div class="w-full flex justify-center">
-        <div class="relative flex flex-col md:flex-row w-full max-w-7xl h-[70vh] overflow-hidden">
-          
-    <!-- Irregular top blend -->
+        <div class="relative flex flex-col md:flex-row w-full max-w-8xl h-[90vh] overflow-hidden">
+          <%!-- <!-- Irregular top blend -->
           <div
             class="absolute top-0 left-0 w-full h-8 z-20 pointer-events-none"
             style="background: radial-gradient(ellipse at top left, #0C0C0C 40%, transparent 80%),
                     radial-gradient(ellipse at top right, #0C0C0C 40%, transparent 80%)"
           >
-          </div>
-          
-    <!-- Irregular bottom blend -->
+          </div> --%>
+
+          <%!-- <!-- Irregular bottom blend -->
           <div
             class="absolute bottom-0 left-0 w-full h-10 z-30 pointer-events-none"
             style="background:
@@ -24,18 +23,18 @@ defmodule TimesinkWeb.Components.Hero do
                   radial-gradient(ellipse 30% 80% at bottom right, #0C0C0C 20%, transparent 60%)"
           >
           </div>
-          
-    <!-- Left image -->
-          <div class="relative w-full md:w-2/3 h-[60vh] z-10">
-            <img src="/images/hero.png" alt="TimeSink Marquee" class="w-full h-full object-cover" />
+           --%>
+          <!-- Left image -->
+          <div class="relative w-full md:w-2/3 h-[80vh] z-10">
+            <img src="/images/hero-17.png" alt="TimeSink Marquee" class="w-full h-full object-cover" />
             <div class="absolute inset-0 z-20 pointer-events-none">
               <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0C0C0C] to-transparent">
               </div>
               <div class="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#0C0C0C] to-transparent">
               </div>
             </div>
-            <div class="absolute bottom-0 left-0 w-full h-16 z-20 pointer-events-none bg-gradient-to-t from-[#0C0C0C] via-[#0C0C0C]/70 to-transparent">
-            </div>
+            <%!-- <div class="absolute bottom-0 left-0 w-full h-16 z-20 pointer-events-none bg-gradient-to-t from-[#0C0C0C] via-[#0C0C0C]/70 to-transparent">
+            </div> --%>
           </div>
           
     <!-- Right text -->
