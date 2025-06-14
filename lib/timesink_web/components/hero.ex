@@ -6,7 +6,7 @@ defmodule TimesinkWeb.Components.Hero do
     ~H"""
     <section id="hero-section" class="relative overflow-hidden">
       <div class="w-full flex justify-center">
-        <div class="relative flex flex-col md:flex-row w-full max-w-8xl h-[90vh] overflow-hidden">
+        <div class="relative flex flex-col md:flex-row w-full max-w-8xl h-[80vh] overflow-hidden">
           <%!-- <!-- Irregular top blend -->
           <div
             class="absolute top-0 left-0 w-full h-8 z-20 pointer-events-none"
@@ -25,7 +25,7 @@ defmodule TimesinkWeb.Components.Hero do
           </div>
            --%>
           <!-- Left image -->
-          <div class="relative w-full md:w-2/3 h-[80vh] z-10">
+          <div class="relative w-full md:w-2/3 h-[70vh] z-10">
             <img src="/images/hero-17.png" alt="TimeSink Marquee" class="w-full h-full object-cover" />
             <div class="absolute inset-0 z-20 pointer-events-none">
               <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0C0C0C] to-transparent">

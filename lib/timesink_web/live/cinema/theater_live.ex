@@ -113,7 +113,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                       <div class="flex flex-col items-center mx-2">
                         <span class={
         "text-3xl font-bold" <>
-          if label == :seconds and @pulse_seconds_only?, do: " pulse-second text-neon-blue-light", else: ""
+          if label == :seconds and @pulse_seconds_only?, do: " pulse-second text-neon-red-lightest", else: ""
       }>
                           {String.pad_leading(to_string(value), 2, "0")}
                         </span>
