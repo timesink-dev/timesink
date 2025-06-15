@@ -133,6 +133,21 @@ defmodule Timesink.Factory do
     }
   end
 
+  def film_submission_factory do
+    %Timesink.Cinema.FilmSubmission{
+      title: Faker.Lorem.sentence(),
+      year: 1900..2024 |> Enum.random(),
+      duration_min: 10..180 |> Enum.random(),
+      synopsis: Faker.Lorem.paragraph(),
+      video_url: Faker.Internet.url(),
+      video_pw: nil,
+      contact_name: Faker.Person.name(),
+      contact_email: Faker.Internet.email(),
+      status_review: Timesink.Cinema.FilmSubmission.statuses_review() |> Enum.random(),
+      submitted_by: build(:user)
+    }
+  end
+
   def film_creative_factory(params) do
     [film, creative] =
       for field <- [:film, :creative] do
