@@ -31,7 +31,7 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
               Every submission gets a human review by our programming team. If it moves us, we’ll move mountains to share it.
             </p>
             <p>
-              So go on. Submit your work. Step into the room. The reel is rolling.
+              So go on. Submit your work. Step into the room. The lights are bright. The reel is rolling. The music is playing. The spotlight is yours.
             </p>
           </div>
 

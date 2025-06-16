@@ -1,21 +1,27 @@
 defmodule TimesinkWeb.FilmSubmissionLive do
   use TimesinkWeb, :live_view
 
-  alias TimesinkWeb.FilmSubmission.{StepIntroComponent, StepFilmDetailsComponent}
+  alias TimesinkWeb.FilmSubmission.{
+    StepIntroComponent,
+    StepFilmDetailsComponent,
+    StepPaymentComponent,
+    StepReviewAndSubmitComponent,
+    StepConfirmationComponent
+  }
+
   alias TimesinkWeb.Components.Stepper
 
   @step_order [
     :intro,
-    :film_details
-    # :payment,
-    # :review_and_submit
+    :film_details,
+    :payment,
+    :confirmation
   ]
   @steps %{
     intro: StepIntroComponent,
-    film_details: StepFilmDetailsComponent
-    # film_details: FilmSubmissionStepFilmDetailsComponent,
-    # payment: FilmSubmissionStepPaymentComponent,
-    # review_and_submit: FilmSubmissionStepReviewAndSubmitComponent
+    film_details: StepFilmDetailsComponent,
+    payment: StepPaymentComponent,
+    confirmation: StepConfirmationComponent
   }
   @initial_form_data %{
     contact_name: "",
@@ -41,22 +47,23 @@ defmodule TimesinkWeb.FilmSubmissionLive do
 
   def render(assigns) do
     ~H"""
-    <div
-      id="film-submission"
-      class="relative min-h-screen px-6 md:px-12 py-16 md:py-24 flex flex-col-reverse md:flex-row items-center gap-6"
-    >
-      <!-- Step Content -->
-      <.live_component
-        module={Stepper}
-        id="film-submission-form"
-        steps={@steps}
-        current_step={@step}
-        data={@data}
-      />
-      
-    <!-- Dot Stepper + Nav -->
-      <div class="absolute bottom-6 left-6 z-50 flex items-center space-x-4">
-        <!-- Dots -->
+    <section id="film-submission" class="relative min-h-screen px-6 md:px-12 py-16 md:py-24">
+      <div class="flex flex-col-reverse md:flex-row items-center gap-6">
+        <!-- Fixed-size Step Content Container -->
+        <div class="w-full">
+          <div class="min-h-[700px] transition-all duration-300">
+            <.live_component
+              module={Stepper}
+              id="film-submission-form"
+              steps={@steps}
+              current_step={@step}
+              data={@data}
+            />
+          </div>
+        </div>
+      </div>
+      <!-- Step Dots -->
+      <div class="mt-24 z-50 flex justify-center items-center space-x-4 cursor-pointer">
         <div class="flex space-x-3">
           <%= for step_key <- @step_order do %>
             <div
@@ -71,28 +78,8 @@ defmodule TimesinkWeb.FilmSubmissionLive do
             </div>
           <% end %>
         </div>
-        
-    <!-- Prev/Next Buttons -->
-        <div class="flex space-x-2 ml-4">
-          <button
-            type="button"
-            phx-click="go_to_step"
-            phx-value-step={determine_step(@step, :back, @step_order)}
-            class="px-4 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700"
-          >
-            Prev
-          </button>
-          <button
-            type="button"
-            phx-click="go_to_step"
-            phx-value-step={determine_step(@step, :next, @step_order)}
-            class="px-4 py-2 text-sm bg-white text-black rounded hover:bg-gray-200"
-          >
-            Next
-          </button>
-        </div>
       </div>
-    </div>
+    </section>
     """
   end
 

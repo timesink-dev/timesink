@@ -26,104 +26,116 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
 
   def render(assigns) do
     ~H"""
-    <section class="w-full px-6 py-16 md:py-24">
-      <div class="max-w-6xl mx-auto bg-backroom-black shadow-xl rounded-2xl p-10 text-white">
-        <h2 class="text-3xl font-brand font-bold mb-6">Film Submission</h2>
+    <section class="w-full px-6 h-1/2">
+      <div class="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-start gap-12 md:gap-24">
+        
+    <!-- Left: Form Content -->
+        <div class="w-full md:w-2/5">
+          <h2 class="text-3xl font-brand font-bold mb-6">Film Submission</h2>
 
-        <.simple_form
-          for={@form}
-          phx-submit="save_intro"
-          phx-change="validate"
-          phx-target={@myself}
-          class="space-y-12"
-        >
-          <!-- Contact Info -->
-          <div>
-            <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Contact Information</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <.input
-                type="text"
-                field={@form[:contact_name]}
-                label="Your name"
-                placeholder="e.g. Alex Rivera"
-                required
-                input_class="w-full p-3 rounded text-mystery-white border-none"
-              />
-              <.input
-                type="email"
-                field={@form[:contact_email]}
-                label="Email address"
-                placeholder="you@example.com"
-                required
-                input_class="w-full p-3 rounded text-mystery-white border-none"
-              />
+          <.simple_form
+            for={@form}
+            phx-submit="save_intro"
+            phx-change="validate"
+            phx-target={@myself}
+            class="space-y-12"
+          >
+            <!-- Contact Info -->
+            <div>
+              <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Contact Information</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <.input
+                  type="text"
+                  field={@form[:contact_name]}
+                  label="Your name"
+                  placeholder="e.g. Alex Rivera"
+                  required
+                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                />
+                <.input
+                  type="email"
+                  field={@form[:contact_email]}
+                  label="Email address"
+                  placeholder="you@example.com"
+                  required
+                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                />
+              </div>
             </div>
-          </div>
-          
+            
     <!-- Film Info -->
-          <div>
-            <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Film Details</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <.input
-                type="text"
-                field={@form[:film_title]}
-                label="Film title"
-                placeholder="Your film’s name"
-                required
-                input_class="w-full p-3 rounded text-mystery-white border-none"
-              />
-              <.input
-                type="number"
-                field={@form[:runtime_minutes]}
-                label="Runtime (minutes)"
-                placeholder="e.g. 14"
-                min="1"
-                required
-                input_class="w-full p-3 rounded text-mystery-white border-none"
-              />
+            <div>
+              <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Film Details</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <.input
+                  type="text"
+                  field={@form[:film_title]}
+                  label="Film title"
+                  placeholder="Your film’s name"
+                  required
+                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                />
+                <.input
+                  type="number"
+                  field={@form[:runtime_minutes]}
+                  label="Runtime (minutes)"
+                  placeholder="e.g. 14"
+                  min="1"
+                  required
+                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                />
+              </div>
+              <div class="mt-6">
+                <.input
+                  type="textarea"
+                  field={@form[:synopsis]}
+                  label="Synopsis"
+                  placeholder="Give us a taste of what it’s about..."
+                  required
+                  rows="5"
+                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                />
+              </div>
+              <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <.input
+                  type="url"
+                  field={@form[:video_url]}
+                  label="Link to your film"
+                  placeholder="e.g. https://vimeo.com/123456"
+                  required
+                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                />
+                <.input
+                  type="text"
+                  field={@form[:video_pw]}
+                  label="Password (if applicable)"
+                  placeholder="Leave empty if public"
+                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                />
+              </div>
             </div>
-            <div class="mt-6">
-              <.input
-                type="textarea"
-                field={@form[:synopsis]}
-                label="Synopsis"
-                placeholder="Give us a taste of what it’s about..."
-                required
-                rows="5"
-                input_class="w-full p-3 rounded text-mystery-white border-none"
-              />
-            </div>
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <.input
-                type="url"
-                field={@form[:video_url]}
-                label="Link to your film"
-                placeholder="e.g. https://vimeo.com/123456"
-                required
-                input_class="w-full p-3 rounded text-mystery-white border-none"
-              />
-              <.input
-                type="text"
-                field={@form[:video_pw]}
-                label="Password (if applicable)"
-                placeholder="Leave empty if public"
-                input_class="w-full p-3 rounded text-mystery-white border-none"
-              />
-            </div>
-          </div>
-          
-    <!-- Optional Extras -->
-          <%!-- Add more sections here if needed, e.g. genre, language, Vimeo link etc. --%>
-          
+            
     <!-- Submit -->
-          <:actions>
-            <div class="pt-6 border-t border-white/10">
-              <.button color="primary" class="w-full md:w-1/3 py-3 text-lg">
-                Continue
-              </.button>
-            </div>
-          </:actions>
-        </.simple_form>
+            <:actions>
+              <div class="pt-6 border-t border-white/10">
+                <.button color="primary" class="w-full md:w-1/2 py-3 text-lg">
+                  Continue
+                </.button>
+              </div>
+            </:actions>
+          </.simple_form>
+        </div>
+        
+    <!-- Right: Shared Image -->
+        <div class="w-full md:w-3/5 self-center">
+          <div class="aspect-[3/2] md:aspect-[16/9] w-full rounded-xl overflow-hidden">
+            <img
+              src="/images/submit-2.png"
+              alt="Film submission visual"
+              class="w-full h-full object-cover"
+            />
+          </div>
+        </div>
       </div>
     </section>
     """
