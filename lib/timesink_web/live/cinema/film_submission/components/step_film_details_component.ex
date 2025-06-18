@@ -4,17 +4,22 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
   alias Timesink.Cinema.FilmSubmission
 
   def update(assigns, socket) do
-    data = assigns[:data] || %{}
+    raw_data = assigns[:data] || %{}
+    data = atomize_keys(raw_data)
+
+    year = parse_int(data[:year])
+    duration_min = parse_int(data[:duration_min])
 
     changeset =
       FilmSubmission.changeset(%FilmSubmission{}, %{
         contact_name: Map.get(data, :contact_name, ""),
         contact_email: Map.get(data, :contact_email, ""),
-        film_title: Map.get(data, :film_title, ""),
-        runtime_minutes: Map.get(data, :runtime_minutes, ""),
+        title: Map.get(data, :title, ""),
+        duration_min: duration_min,
         synopsis: Map.get(data, :synopsis, ""),
         video_url: Map.get(data, :video_url, ""),
-        video_pw: Map.get(data, :video_pw, "")
+        video_pw: Map.get(data, :video_pw, ""),
+        year: year
       })
 
     {:ok,
@@ -35,7 +40,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
 
           <.simple_form
             for={@form}
-            phx-submit="save_intro"
+            phx-submit="save_film_details"
             phx-change="validate"
             phx-target={@myself}
             class="space-y-12"
@@ -66,10 +71,10 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
     <!-- Film Info -->
             <div>
               <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Film Details</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <.input
                   type="text"
-                  field={@form[:film_title]}
+                  field={@form[:title]}
                   label="Film title"
                   placeholder="Your film’s name"
                   required
@@ -77,14 +82,25 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                 />
                 <.input
                   type="number"
-                  field={@form[:runtime_minutes]}
+                  field={@form[:duration_min]}
                   label="Runtime (minutes)"
                   placeholder="e.g. 14"
                   min="1"
                   required
                   input_class="w-full p-3 rounded text-mystery-white border-none"
                 />
+                <.input
+                  type="number"
+                  field={@form[:year]}
+                  label="Year"
+                  placeholder="e.g. 2024"
+                  min="1888"
+                  max={Date.utc_today().year}
+                  required
+                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                />
               </div>
+
               <div class="mt-6">
                 <.input
                   type="textarea"
@@ -150,11 +166,15 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
     {:noreply, assign(socket, form: to_form(changeset))}
   end
 
-  def handle_event("save_intro", %{"film_submission" => params}, socket) do
+  def handle_event("save_film_details", %{"film_submission" => params}, socket) do
     changeset = FilmSubmission.changeset(%FilmSubmission{}, params)
 
+    IO.inspect(params, label: "Film Submission Params")
+
+    IO.inspect(changeset, label: "Film Submission Changeset")
+
     if changeset.valid? do
-      send(self(), {:update_user_data, %{params: params}})
+      send(self(), {:update_film_submission_data, %{params: params}})
       send(self(), {:go_to_step, :next})
       {:noreply, socket}
     else
@@ -166,4 +186,23 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
     send(self(), {:go_to_step, :back})
     {:noreply, socket}
   end
+
+  defp atomize_keys(map) do
+    for {k, v} <- map, into: %{} do
+      key = if is_binary(k), do: String.to_atom(k), else: k
+      {key, v}
+    end
+  end
+
+  defp parse_int(nil), do: nil
+  defp parse_int(""), do: nil
+
+  defp parse_int(val) when is_binary(val) do
+    case Integer.parse(val) do
+      {int, _} -> int
+      :error -> nil
+    end
+  end
+
+  defp parse_int(val), do: val
 end

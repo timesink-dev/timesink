@@ -1,7 +1,21 @@
 defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
   use TimesinkWeb, :live_component
+  alias Timesink.Cinema.FilmSubmission
 
-  @impl true
+  def update(assigns, socket) do
+    data = assigns[:data] || %{}
+
+    data =
+      Map.new(data, fn
+        {k, v} when is_atom(k) -> {Atom.to_string(k), v}
+        {k, v} -> {k, v}
+      end)
+
+    changeset = FilmSubmission.changeset(%FilmSubmission{}, data)
+
+    {:ok, assign(socket, form: to_form(changeset), data: data)}
+  end
+
   def render(assigns) do
     ~H"""
     <section class="w-full px-6">
@@ -82,29 +96,29 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
             <dl class="space-y-4 text-sm text-gray-300">
               <div>
                 <dt class="font-medium text-gray-400">Contact Name</dt>
-                <dd>{"Bob Simmons"}</dd>
+                <dd>{@data["contact_name"] || "—"}</dd>
               </div>
 
               <div>
                 <dt class="font-medium text-gray-400">Contact Email</dt>
-                <dd>{"simmons@gmail.com"}</dd>
+                <dd>{@data["contact_email"] || "—"}</dd>
               </div>
 
               <div>
                 <dt class="font-medium text-gray-400">Film Title</dt>
-                <dd>{"The booker"}</dd>
+                <dd>{@data["title"] || "—"}</dd>
               </div>
 
               <div>
                 <dt class="font-medium text-gray-400">Synopsis</dt>
-                <dd>{@data.synopsis || "No synopsis provided."}</dd>
+                <dd>{@data["synopsis"] || "No synopsis provided."}</dd>
               </div>
 
               <div>
                 <dt class="font-medium text-gray-400">Video URL</dt>
-                <dd>{@data.video_url || "—"}</dd>
-                <%= if @data.video_pw && @data.video_pw != "" do %>
-                  <dd class="text-xs text-gray-500">Password: {@data.video_pw}</dd>
+                <dd>{@data["video_url"] || "—"}</dd>
+                <%= if @data["video_pw"] && @data["video_pw"] != "" do %>
+                  <dd class="text-xs text-gray-500">Password: {@data["video_pw"]}</dd>
                 <% end %>
               </div>
 
@@ -120,7 +134,6 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
     """
   end
 
-  @impl true
   def handle_event("update_form", %{"card_number" => _} = _params, socket) do
     {:noreply, socket}
   end

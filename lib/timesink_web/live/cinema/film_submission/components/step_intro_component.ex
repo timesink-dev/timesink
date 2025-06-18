@@ -1,7 +1,6 @@
 defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
   use TimesinkWeb, :live_component
 
-  @impl true
   def mount(socket) do
     {:ok, socket}
   end
