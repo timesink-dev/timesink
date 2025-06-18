@@ -34,16 +34,21 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
             </p>
           </div>
 
-          <%!-- Optional: current user signed-in notice --%>
-          <%!--
-          <%= if @current_user do %>
+          <.button
+            color="primary"
+            class="w-full md:w-1/2 py-3 text-lg mt-12 mb-4"
+            phx-click={JS.push("go_to_step", value: %{step: "next"})}
+          >
+            Begin film submission
+          </.button>
+
+          <%= if @data.user do %>
             <div class="mt-8">
               <p class="text-sm text-green-300 bg-green-900/30 p-3 rounded border border-green-600">
-                You're signed in as <%= @current_user.email %>. We’ll pre-fill your details.
+                You're signed in as {"@" <> @data.user.username}. We’ll pre-fill your details.
               </p>
             </div>
           <% end %>
-          --%>
         </div>
         
     <!-- Image -->
@@ -59,5 +64,10 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
       </div>
     </section>
     """
+  end
+
+  def handle_event("begin_submission", _params, socket) do
+    send(self(), {:go_to_step, :next})
+    {:noreply, socket}
   end
 end

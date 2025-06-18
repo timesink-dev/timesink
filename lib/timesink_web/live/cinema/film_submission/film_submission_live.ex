@@ -4,9 +4,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
   alias TimesinkWeb.FilmSubmission.{
     StepIntroComponent,
     StepFilmDetailsComponent,
-    StepPaymentComponent,
-    StepReviewAndSubmitComponent,
-    StepConfirmationComponent
+    StepPaymentComponent
   }
 
   alias TimesinkWeb.Components.Stepper
@@ -29,50 +27,54 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     duration_min: nil,
     synopsis: "",
     video_url: "",
-    video_pw: ""
+    video_pw: "",
+    user: nil
   }
 
   def mount(_params, _session, socket) do
+    form_data = Map.put(@initial_form_data, :user, socket.assigns[:current_user])
+
     {:ok,
      assign(socket,
        steps: @steps,
        step: hd(@step_order),
        step_order: @step_order,
-       data: @initial_form_data,
-       current_user: socket.assigns[:current_user]
+       data: form_data
      )}
   end
 
   def render(assigns) do
     ~H"""
-    <section id="film-submission" class="relative min-h-screen px-6 md:px-12 py-16 md:py-24">
+    <section
+      id="film-submission"
+      class="relative h-[100vh] px-6 md:px-12 py-16 md:py-24 flex flex-col justify-between"
+    >
       <div class="flex flex-col-reverse md:flex-row items-center gap-6">
         <div class="w-full">
-          <div class="min-h-[700px] transition-all duration-300">
+          <div class="min-h-[calc(100vh-200px)] max-h-[calc(100vh-200px)] overflow-auto">
             <.live_component
               module={Stepper}
               id="film-submission-form"
               steps={@steps}
               current_step={@step}
               data={@data}
+              current_user={@current_user}
             />
           </div>
         </div>
       </div>
       
     <!-- Step Navigation + Dots -->
-      <div class="mt-24 z-50 flex justify-center items-center w-full max-w-5xl mx-auto px-4">
+      <div class="relative w-full mt-8 md:mt-2 max-w-5xl mx-auto px-4 mb-12 flex justify-center items-center">
         <!-- Prev button -->
         <%= unless @step == hd(@step_order) do %>
           <button
             type="button"
             phx-click={JS.push("go_to_step", value: %{step: "back"})}
-            class="text-md text-white hover:text-gray-300 mr-6"
+            class="absolute left-0 text-md text-white hover:text-gray-300"
           >
             &larr; Prev
           </button>
-        <% else %>
-          <div class="w-[68px] mr-6"></div>
         <% end %>
         
     <!-- Dots -->
@@ -82,7 +84,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
               phx-click="go_to_step"
               phx-value-step={step_key}
               class={[
-                "w-4 h-4 rounded-full transition duration-200",
+                "w-4 h-4 rounded-full transition duration-200 cursor-pointer",
                 step_key == @step && "bg-white",
                 step_key != @step && "bg-gray-600 hover:bg-gray-400"
               ]}
@@ -96,12 +98,10 @@ defmodule TimesinkWeb.FilmSubmissionLive do
           <button
             type="button"
             phx-click={JS.push("go_to_step", value: %{step: "next"})}
-            class="text-md text-white hover:text-gray-300 ml-6"
+            class="absolute right-0 text-md text-white hover:text-gray-300"
           >
             Next &rarr;
           </button>
-        <% else %>
-          <div class="w-[68px] ml-6"></div>
         <% end %>
       </div>
     </section>

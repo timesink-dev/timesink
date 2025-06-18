@@ -7,26 +7,37 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
     raw_data = assigns[:data] || %{}
     data = atomize_keys(raw_data)
 
-    year = parse_int(data[:year])
-    duration_min = parse_int(data[:duration_min])
+    user = Map.get(data, :user)
+    IO.inspect(user, label: "User in Film Details")
+
+    contact_name =
+      case Map.get(data, :contact_name) do
+        nil -> user_full_name(user)
+        "" -> user_full_name(user)
+        name -> name
+      end
+
+    contact_email =
+      case Map.get(data, :contact_email) do
+        nil -> user_email(user)
+        "" -> user_email(user)
+        email -> email
+      end
 
     changeset =
       FilmSubmission.changeset(%FilmSubmission{}, %{
-        contact_name: Map.get(data, :contact_name, ""),
-        contact_email: Map.get(data, :contact_email, ""),
+        contact_name: contact_name || "",
+        contact_email: contact_email || "",
         title: Map.get(data, :title, ""),
-        duration_min: duration_min,
+        duration_min: parse_int(data[:duration_min]),
         synopsis: Map.get(data, :synopsis, ""),
         video_url: Map.get(data, :video_url, ""),
         video_pw: Map.get(data, :video_pw, ""),
-        year: year
+        year: parse_int(data[:year]),
+        user: user
       })
 
-    {:ok,
-     assign(socket,
-       form: to_form(changeset),
-       data: data
-     )}
+    {:ok, assign(socket, form: to_form(changeset), data: data)}
   end
 
   def render(assigns) do
@@ -36,7 +47,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
         
     <!-- Left: Form Content -->
         <div class="w-full md:w-2/5">
-          <h2 class="text-3xl font-brand font-bold mb-6">Film Submission</h2>
+          <h2 class="text-3xl font-brand mb-6">Film Submission Info</h2>
 
           <.simple_form
             for={@form}
@@ -205,4 +216,14 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
   end
 
   defp parse_int(val), do: val
+
+  defp user_full_name(%{first_name: first, last_name: last})
+       when is_binary(first) and is_binary(last) do
+    "#{first} #{last}"
+  end
+
+  defp user_full_name(_), do: ""
+
+  defp user_email(%{email: email}) when is_binary(email), do: email
+  defp user_email(_), do: ""
 end
