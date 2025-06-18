@@ -19,6 +19,13 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     film_details: StepFilmDetailsComponent,
     payment: StepPaymentComponent
   }
+
+  @step_display_names %{
+    intro: "About",
+    film_details: "Film info",
+    payment: "Payment"
+  }
+
   @initial_form_data %{
     contact_name: "",
     contact_email: "",
@@ -35,12 +42,16 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     form_data = Map.put(@initial_form_data, :user, socket.assigns[:current_user])
 
     {:ok,
-     assign(socket,
+     socket
+     |> assign(
        steps: @steps,
        step: hd(@step_order),
        step_order: @step_order,
-       data: form_data
-     )}
+       step_display_names: @step_display_names,
+       data: form_data,
+       complete_film_details: film_details_complete?(form_data)
+     )
+     |> update_navigation_assigns()}
   end
 
   def render(assigns) do
@@ -73,34 +84,45 @@ defmodule TimesinkWeb.FilmSubmissionLive do
             phx-click={JS.push("go_to_step", value: %{step: "back"})}
             class="absolute left-0 text-md text-white hover:text-gray-300"
           >
-            &larr; Prev
+            &larr; Prev ({@step_display_names[@prev_step]})
           </button>
         <% end %>
         
     <!-- Dots -->
         <div class="flex space-x-3">
           <%= for step_key <- @step_order do %>
-            <div
-              phx-click="go_to_step"
-              phx-value-step={step_key}
-              class={[
-                "w-4 h-4 rounded-full transition duration-200 cursor-pointer",
-                step_key == @step && "bg-white",
-                step_key != @step && "bg-gray-600 hover:bg-gray-400"
-              ]}
-            >
-            </div>
+            <% is_clickable = step_key != :payment || @complete_film_details %>
+            <%= if is_clickable do %>
+              <div
+                phx-click="go_to_step"
+                phx-value-step={step_key}
+                class={[
+                  "w-4 h-4 rounded-full transition duration-200 cursor-pointer",
+                  step_key == @step && "bg-white",
+                  step_key != @step && "bg-gray-600 hover:bg-gray-400"
+                ]}
+              />
+            <% else %>
+              <div class="w-4 h-4 rounded-full bg-gray-700 opacity-40" />
+            <% end %>
           <% end %>
         </div>
         
     <!-- Next button -->
         <%= unless @step == List.last(@step_order) do %>
+          <% can_advance = @next_step != :payment || @complete_film_details %>
+
           <button
             type="button"
             phx-click={JS.push("go_to_step", value: %{step: "next"})}
-            class="absolute right-0 text-md text-white hover:text-gray-300"
+            class={[
+              "absolute right-0 text-md",
+              can_advance && "text-white hover:text-gray-300",
+              !can_advance && "text-gray-600 cursor-not-allowed"
+            ]}
+            disabled={!can_advance}
           >
-            Next &rarr;
+            Next ({@step_display_names[@next_step]}) &rarr;
           </button>
         <% end %>
       </div>
@@ -111,10 +133,25 @@ defmodule TimesinkWeb.FilmSubmissionLive do
   def handle_params(%{"step" => step_param}, _url, socket) do
     step_atom = String.to_existing_atom(step_param)
 
-    if step_atom in socket.assigns.step_order do
-      {:noreply, assign(socket, step: step_atom)}
-    else
-      {:noreply, socket}
+    cond do
+      # Invalid step
+      step_atom not in socket.assigns.step_order ->
+        {:noreply, socket}
+
+      # Prevent skipping to payment if film details aren't complete
+      step_atom == :payment and not socket.assigns.complete_film_details ->
+        {:noreply,
+         socket
+         |> assign(step: :film_details)
+         |> update_navigation_assigns()
+         |> push_patch(to: "/submit?step=film_details")}
+
+      # Valid step and allowed
+      true ->
+        {:noreply,
+         socket
+         |> assign(step: step_atom)
+         |> update_navigation_assigns()}
     end
   end
 
@@ -122,6 +159,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     {:noreply, socket}
   end
 
+  @spec handle_event(<<_::80>>, map(), any()) :: {:noreply, any()}
   def handle_event("go_to_step", %{"step" => step}, socket) do
     # Convert string key to atom
     step_atom = String.to_existing_atom(step)
@@ -130,26 +168,65 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     {:noreply, socket}
   end
 
-  def handle_info({:go_to_step, direction}, socket) do
-    new_step = determine_step(socket.assigns.step, direction, socket.assigns.step_order)
-    {:noreply, assign(socket, step: new_step) |> push_patch(to: "/submit?step=#{new_step}")}
-  end
-
   def handle_info({:update_film_submission_data, %{params: params}}, socket) do
     updated = Map.merge(socket.assigns.data, params)
-    {:noreply, assign(socket, data: updated)}
+
+    {:noreply,
+     assign(socket,
+       data: updated,
+       complete_film_details: film_details_complete?(updated)
+     )}
   end
 
   # Step navigation logic
-  defp determine_step(current_step, :next, step_order) do
+  def handle_info({:go_to_step, direction}, socket) do
+    new_step =
+      determine_step(
+        socket.assigns.step,
+        direction,
+        socket.assigns.step_order,
+        socket.assigns.complete_film_details
+      )
+
+    {:noreply,
+     socket
+     |> assign(step: new_step)
+     |> update_navigation_assigns()
+     |> push_patch(to: "/submit?step=#{new_step}")}
+  end
+
+  defp update_navigation_assigns(socket) do
+    index = Enum.find_index(socket.assigns.step_order, &(&1 == socket.assigns.step)) || 0
+    prev_step = Enum.at(socket.assigns.step_order, index - 1)
+    next_step = Enum.at(socket.assigns.step_order, index + 1)
+
+    assign(socket,
+      prev_step: prev_step,
+      next_step: next_step
+    )
+  end
+
+  defp determine_step(:film_details, :next, _step_order, false), do: :film_details
+
+  defp determine_step(current_step, :next, step_order, _complete_film_details) do
     index = Enum.find_index(step_order, &(&1 == current_step)) || 0
     Enum.at(step_order, index + 1) || current_step
   end
 
-  defp determine_step(current_step, :back, step_order) do
-    index = Enum.find_index(step_order, &(&1 == current_step)) || 0
-    Enum.at(step_order, max(index - 1, 0)) || current_step
-  end
+  defp determine_step(current_step, :back, step_order, _),
+    do:
+      Enum.at(step_order, max(Enum.find_index(step_order, &(&1 == current_step)) - 1, 0)) ||
+        current_step
 
-  defp determine_step(_current_step, step, _step_order) when is_atom(step), do: step
+  defp determine_step(_current_step, step, _step_order, _) when is_atom(step), do: step
+
+  defp film_details_complete?(data) do
+    Enum.all?([
+      data["title"] not in [nil, ""],
+      data["year"],
+      data["duration_min"],
+      data["synopsis"] not in [nil, ""],
+      data["video_url"] not in [nil, ""]
+    ])
+  end
 end

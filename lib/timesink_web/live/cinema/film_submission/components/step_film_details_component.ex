@@ -8,7 +8,6 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
     data = atomize_keys(raw_data)
 
     user = Map.get(data, :user)
-    IO.inspect(user, label: "User in Film Details")
 
     contact_name =
       case Map.get(data, :contact_name) do
