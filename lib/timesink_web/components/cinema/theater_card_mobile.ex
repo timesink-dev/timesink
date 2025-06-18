@@ -13,7 +13,7 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
     <div class="shrink-0 w-full">
       <% film = @exhibition.film %>
       <div class="mb-6 h-20">
-        <h3 class="text-xl font-bold mb-1 text-left text-white drop-shadow-md">
+        <h3 class="text-xl font-bold mb-1 text-left text-white drop-shadow-md font-brand">
           {@exhibition.theater.name}
         </h3>
         <p class="text-sm text-white/60 text-left">
@@ -96,8 +96,8 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
             <.icon name="hero-user-group" class="h-5 w-5 inline-block" /> {@live_viewer_count}
           </p>
           <.link navigate={"/now-playing/#{@exhibition.theater.slug}"}>
-            <.button class="cursor-pointer">
-              Enter Theater →
+            <.button class="cursor-pointer font-brand">
+              enter →
             </.button>
           </.link>
         </div>
