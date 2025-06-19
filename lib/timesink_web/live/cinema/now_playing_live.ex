@@ -6,39 +6,99 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
   alias TimesinkWeb.{TheaterShowcaseComponent, PubSubTopics}
 
   def mount(_params, _session, socket) do
-    showcase = Cinema.get_active_showcase_with_exhibitions()
+    with showcase when not is_nil(showcase) <- Cinema.get_active_showcase_with_exhibitions() do
+      exhibitions =
+        (showcase.exhibitions || [])
+        |> Cinema.preload_exhibitions()
+        |> Enum.sort_by(& &1.theater.name, :asc)
 
-    exhibitions =
-      (showcase.exhibitions || [])
-      |> Cinema.preload_exhibitions()
-      |> Enum.sort_by(& &1.theater.name, :asc)
+      playback_states = Timesink.Cinema.compute_initial_playback_states(exhibitions, showcase)
 
-    playback_states = Timesink.Cinema.compute_initial_playback_states(exhibitions, showcase)
+      socket =
+        assign(socket,
+          showcase: showcase,
+          exhibitions: exhibitions,
+          playback_states: playback_states,
+          presence: %{},
+          upcoming_showcase: nil,
+          no_showcase: false
+        )
 
-    socket =
-      assign(socket,
-        showcase: showcase,
-        exhibitions: exhibitions,
-        playback_states: playback_states,
-        presence: %{}
-      )
+      if connected?(socket), do: send(self(), :connected)
+      {:ok, socket}
+    else
+      nil ->
+        case Cinema.get_upcoming_showcase() do
+          %{} = upcoming ->
+            {:ok,
+             assign(socket,
+               showcase: nil,
+               exhibitions: [],
+               playback_states: %{},
+               presence: %{},
+               upcoming_showcase: upcoming,
+               no_showcase: false
+             )}
 
-    if connected?(socket), do: send(self(), :connected)
-
-    {:ok, socket}
+          nil ->
+            {:ok,
+             assign(socket,
+               showcase: nil,
+               exhibitions: [],
+               playback_states: %{},
+               presence: %{},
+               upcoming_showcase: nil,
+               no_showcase: true
+             )}
+        end
+    end
   end
 
   def render(assigns) do
     ~H"""
     <div id="now-playing">
-      <.live_component
-        id="theater-showcase"
-        module={TheaterShowcaseComponent}
-        showcase={@showcase}
-        exhibitions={@exhibitions}
-        presence={@presence}
-        playback_states={@playback_states || %{}}
-      />
+      <%= cond do %>
+        <% @showcase -> %>
+          <.live_component
+            id="theater-showcase"
+            module={TheaterShowcaseComponent}
+            showcase={@showcase}
+            exhibitions={@exhibitions}
+            presence={@presence}
+            playback_states={@playback_states}
+          />
+        <% @upcoming_showcase -> %>
+          <div class="text-center text-white my-32 px-6 max-w-xl mx-auto h-[100vh] flex flex-col items-center justify-center">
+            <.icon name="hero-clock" class="h-16 w-16 mb-6 text-neon-blue-lightest" />
+            <h1 class="text-4xl font-bold mb-4">Upcoming Showcase</h1>
+            <h2 class="text-2xl font-semibold text-neon-blue-lightest mb-2">
+              {@upcoming_showcase.title}
+            </h2>
+            <p class="text-gray-400 mb-4">
+              {@upcoming_showcase.description}
+            </p>
+            <p class="text-gray-500 text-sm">
+              Starts
+              <span class="font-medium">
+                {Calendar.strftime(@upcoming_showcase.start_at, "%A, %B %d at %H:%M")}
+              </span>
+            </p>
+          </div>
+        <% @no_showcase -> %>
+          <div class="text-center text-white my-32 px-6 max-w-xl mx-auto h-[100vh] flex flex-col items-center justify-center">
+            <.icon name="hero-film" class="h-16 w-16 mb-6 text-neon-blue-lightest" />
+            <h1 class="text-4xl font-bold mb-4">No Showcases Available</h1>
+            <p class="text-gray-400 mb-8">
+              It seems like there are no active or upcoming showcases at the moment.
+              Check back later for new screenings!
+            </p>
+            <p class="text-gray-500 text-sm">
+              In the meantime, feel free to explore our
+              <a href="/blog" class="text-neon-blue-lightest hover:underline">blog</a>
+              for insights and updates.
+            </p>
+          </div>
+      <% end %>
     </div>
     """
   end

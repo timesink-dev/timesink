@@ -4,7 +4,95 @@
     <.flash_group flash={@flash} /> {@inner_content}
   </div>
 </main>
-<footer class="flex justify-start items-left flex-col mt-8 py-16 px-8 text-left text-mystery-white font-brand h-[150px]">
-  <p>&copy; {DateTime.utc_now().year} TimeSink Presents</p>
-  <p class="font-gangster font-light">hello@timesinkpresents.com</p>
+<footer class="bg-backroom-black text-mystery-white font-brand py-20 mt-24">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-12">
+      
+<!-- Column 1: Branding and Contact -->
+      <div class="space-y-2.5">
+        <p class="text-xl sm:text-2xl font-semibold">TimeSink Presents</p>
+        <p class="text-sm opacity-70">Independent Cinema, reimagined.</p>
+        <p class="font-gangster font-light text-xs sm:text-sm">hello@timesinkpresents.com</p>
+      </div>
+      
+<!-- Column 2: Navigation Links -->
+      <div class="space-y-2.5 text-sm">
+        <p class="font-semibold text-base mb-2">eXplOre</p>
+        <a href="/now-playing" class="hover:underline hover:text-white transition">Now Playing</a>
+        <br />
+        <a href="/upcoming" class="hover:underline hover:text-white transition">upcoming</a>
+        <br />
+        <a href="/archives" class="hover:underline hover:text-white transition">Archives</a>
+        <br />
+        <a href="/blog" class="hover:underline hover:text-white transition">Blog</a>
+        <br />
+        <a href="/info" class="hover:underline hover:text-white transition">About</a>
+        <br />
+      </div>
+      
+<!-- Column 3: Participate + Social -->
+      <div class="space-y-8 md:space-y-6 text-sm">
+        
+<!-- Participation Section -->
+        <div class="space-y-2">
+          <p class="font-semibold text-base mb-2.5">Make your mark</p>
+          <div class="flex flex-col space-y-4">
+            <a href="/submit" class="hover:underline hover:text-white transition">
+              <.button color="primary">Submit your film</.button>
+            </a>
+            <a href="/join" class="hover:underline hover:text-white transition">
+              <.button color="secondary">Get membership</.button>
+            </a>
+          </div>
+        </div>
+        
+<!-- Connect Section -->
+        <div class="space-y-2">
+          <p class="font-semibold text-base mb-2">Connect</p>
+          <div class="flex space-x-4">
+            <a
+              href="https://instagram.com/timesinkpresents"
+              target="_blank"
+              class="hover:underline hover:text-white transition"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://twitter.com/timesink_"
+              target="_blank"
+              class="hover:underline hover:text-white transition"
+            >
+              Twitter
+            </a>
+          </div>
+        </div>
+        <p class="text-xs opacity-60 mt-12">
+          &copy; {DateTime.utc_now().year} TimeSink Presents. All rights reserved.
+        </p>
+      </div>
+    </div>
+    
+<!-- Newsletter Signup -->
+    <div class="max-w-3xl mx-auto mt-16 border-t border-mystery-white/10 pt-10">
+      <p class="text-lg font-semibold mb-2 text-center">
+        Get screening updates & Cinematic transmissions.
+      </p>
+      <p class="text-sm text-center text-mystery-white/70 mb-6 font-gangster">
+        Be the first to know about upcoming films, special events, and platform news—no noise, just the good stuff.
+      </p>
+      <form
+        phx-submit="subscribe"
+        class="flex flex-col sm:flex-row items-center justify-center gap-4"
+      >
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="Your email"
+          class="font-gangster bg-transparent border border-mystery-white/20 text-sm px-4 py-2 rounded w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+        <.button type="submit" color="primary" class="font-gangster">Subscribe</.button>
+      </form>
+    </div>
+  </div>
 </footer>

@@ -175,4 +175,17 @@ defmodule Timesink.Cinema do
     Logger.warning("Film duration not found, returning 0 seconds")
     0
   end
+
+  @doc """
+  Fetch the upcoming showcase that starts soonest after now.
+  Returns nil if none found.
+  """
+  def get_upcoming_showcase do
+    Showcase
+    |> where([s], s.status == :upcoming)
+    |> where([s], s.start_at > ^DateTime.utc_now())
+    |> order_by([s], asc: s.start_at)
+    |> limit(1)
+    |> Repo.one()
+  end
 end
