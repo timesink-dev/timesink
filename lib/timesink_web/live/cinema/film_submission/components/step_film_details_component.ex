@@ -42,12 +42,15 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
   def render(assigns) do
     ~H"""
     <section class="w-full px-6 h-1/2">
-      <div class="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-start gap-12 md:gap-24">
+      <div class="max-w-4xl mx-auto">
         
     <!-- Left: Form Content -->
-        <div class="w-full md:w-2/5">
-          <h2 class="text-3xl font-brand mb-6">Film Submission Info</h2>
-
+        <div class="w-full md:w-3/5">
+          <h2 class="text-3xl font-brand mb-6">Film Submission</h2>
+          <p class="text-mystery-white/80 mb-6 text-sm">
+            This is where you share the essentials—your film’s name, runtime, synopsis, and how to watch it.
+            We also ask for your contact info so we can reach you if your film is selected.
+          </p>
           <.simple_form
             for={@form}
             phx-submit="save_film_details"
@@ -55,28 +58,6 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
             phx-target={@myself}
             class="space-y-12"
           >
-            <!-- Contact Info -->
-            <div>
-              <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Contact Information</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <.input
-                  type="text"
-                  field={@form[:contact_name]}
-                  label="Your name"
-                  placeholder="e.g. Alex Rivera"
-                  required
-                  input_class="w-full p-3 rounded text-mystery-white border-none"
-                />
-                <.input
-                  type="email"
-                  field={@form[:contact_email]}
-                  label="Email address"
-                  placeholder="you@example.com"
-                  required
-                  input_class="w-full p-3 rounded text-mystery-white border-none"
-                />
-              </div>
-            </div>
             
     <!-- Film Info -->
             <div>
@@ -91,7 +72,8 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                   input_class="w-full p-3 rounded text-mystery-white border-none"
                 />
                 <.input
-                  type="number"
+                  type="text"
+                  inputmode="numeric"
                   field={@form[:duration_min]}
                   label="Runtime (minutes)"
                   placeholder="e.g. 14"
@@ -100,7 +82,8 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                   input_class="w-full p-3 rounded text-mystery-white border-none"
                 />
                 <.input
-                  type="number"
+                  type="text"
+                  inputmode="numeric"
                   field={@form[:year]}
                   label="Year"
                   placeholder="e.g. 2024"
@@ -141,6 +124,29 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
               </div>
             </div>
             
+    <!-- Contact Info -->
+            <div>
+              <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Contact Information</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <.input
+                  type="text"
+                  field={@form[:contact_name]}
+                  label="Your name"
+                  placeholder="e.g. Alex Rivera"
+                  required
+                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                />
+                <.input
+                  type="email"
+                  field={@form[:contact_email]}
+                  label="Email address"
+                  placeholder="you@example.com"
+                  required
+                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                />
+              </div>
+            </div>
+            
     <!-- Submit -->
             <:actions>
               <div class="pt-6 border-t border-white/10">
@@ -150,17 +156,6 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
               </div>
             </:actions>
           </.simple_form>
-        </div>
-        
-    <!-- Right: Shared Image -->
-        <div class="w-full md:w-3/5 self-center">
-          <div class="aspect-[3/2] md:aspect-[16/9] w-full rounded-xl overflow-hidden">
-            <img
-              src="/images/submit-2.png"
-              alt="Film submission visual"
-              class="w-full h-full object-cover"
-            />
-          </div>
         </div>
       </div>
     </section>
@@ -178,10 +173,6 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
 
   def handle_event("save_film_details", %{"film_submission" => params}, socket) do
     changeset = FilmSubmission.changeset(%FilmSubmission{}, params)
-
-    IO.inspect(params, label: "Film Submission Params")
-
-    IO.inspect(changeset, label: "Film Submission Changeset")
 
     if changeset.valid? do
       send(self(), {:update_film_submission_data, %{params: params}})

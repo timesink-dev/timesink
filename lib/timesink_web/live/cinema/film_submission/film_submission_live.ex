@@ -76,55 +76,57 @@ defmodule TimesinkWeb.FilmSubmissionLive do
       </div>
       
     <!-- Step Navigation + Dots -->
-      <div class="relative w-full mt-8 md:mt-2 max-w-5xl mx-auto px-4 mb-12 flex justify-center items-center">
-        <!-- Prev button -->
-        <%= unless @step == hd(@step_order) do %>
-          <button
-            type="button"
-            phx-click={JS.push("go_to_step", value: %{step: "back"})}
-            class="absolute left-0 text-md text-white hover:text-gray-300"
-          >
-            &larr; Prev ({@step_display_names[@prev_step]})
-          </button>
-        <% end %>
-        
+      <div class="w-full mt-12 md:mt-2 max-w-5xl mx-auto px-4 mb-12">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <!-- Prev button -->
+          <%= unless @step == hd(@step_order) do %>
+            <button
+              type="button"
+              phx-click={JS.push("go_to_step", value: %{step: "back"})}
+              class="text-md text-white hover:text-gray-300"
+            >
+              &larr; Prev ({@step_display_names[@prev_step]})
+            </button>
+          <% end %>
+          
     <!-- Dots -->
-        <div class="flex space-x-3">
-          <%= for step_key <- @step_order do %>
-            <% is_clickable = step_key != :payment || @complete_film_details %>
-            <%= if is_clickable do %>
-              <div
-                phx-click="go_to_step"
-                phx-value-step={step_key}
-                class={[
-                  "w-4 h-4 rounded-full transition duration-200 cursor-pointer",
-                  step_key == @step && "bg-white",
-                  step_key != @step && "bg-gray-600 hover:bg-gray-400"
-                ]}
-              />
-            <% else %>
-              <div class="w-4 h-4 rounded-full bg-gray-700 opacity-40" />
+          <div class="flex space-x-3 justify-center">
+            <%= for step_key <- @step_order do %>
+              <% is_clickable = step_key != :payment || @complete_film_details %>
+              <%= if is_clickable do %>
+                <div
+                  phx-click="go_to_step"
+                  phx-value-step={step_key}
+                  class={[
+                    "w-4 h-4 rounded-full transition duration-200 cursor-pointer",
+                    step_key == @step && "bg-white",
+                    step_key != @step && "bg-gray-600 hover:bg-gray-400"
+                  ]}
+                />
+              <% else %>
+                <div class="w-4 h-4 rounded-full bg-gray-700 opacity-40" />
+              <% end %>
             <% end %>
+          </div>
+          
+    <!-- Next button -->
+          <%= unless @step == List.last(@step_order) do %>
+            <% can_advance = @next_step != :payment || @complete_film_details %>
+
+            <button
+              type="button"
+              phx-click={JS.push("go_to_step", value: %{step: "next"})}
+              class={[
+                "text-md",
+                can_advance && "text-white hover:text-gray-300",
+                !can_advance && "text-gray-600 cursor-not-allowed"
+              ]}
+              disabled={!can_advance}
+            >
+              Next ({@step_display_names[@next_step]}) &rarr;
+            </button>
           <% end %>
         </div>
-        
-    <!-- Next button -->
-        <%= unless @step == List.last(@step_order) do %>
-          <% can_advance = @next_step != :payment || @complete_film_details %>
-
-          <button
-            type="button"
-            phx-click={JS.push("go_to_step", value: %{step: "next"})}
-            class={[
-              "absolute right-0 text-md",
-              can_advance && "text-white hover:text-gray-300",
-              !can_advance && "text-gray-600 cursor-not-allowed"
-            ]}
-            disabled={!can_advance}
-          >
-            Next ({@step_display_names[@next_step]}) &rarr;
-          </button>
-        <% end %>
       </div>
     </section>
     """
