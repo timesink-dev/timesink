@@ -49,8 +49,8 @@ defmodule TimesinkWeb.Components.Hero do
                   Watch live. Connect in real time. Share what moves you.
                 </p>
                 <a href="/join">
-                  <.button class="mt-6 px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition font-brand">
-                    join the waitlist
+                  <.button class="mt-6 px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition">
+                    Join the Waitlist
                   </.button>
                 </a>
               </div>
