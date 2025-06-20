@@ -74,9 +74,9 @@ defmodule TimesinkWeb.FilmSubmissionLive do
           </div>
         </div>
       </div>
-      
+
     <!-- Step Navigation + Dots -->
-      <div class="w-full mt-12 md:mt-2 max-w-5xl mx-auto px-4 mb-12">
+      <div class="w-full mt-12 md:mt-2 max-w-5xl mx-auto px-4 mb-12 py-6">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
           <!-- Prev button -->
           <%= unless @step == hd(@step_order) do %>
@@ -88,7 +88,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
               &larr; Prev ({@step_display_names[@prev_step]})
             </button>
           <% end %>
-          
+
     <!-- Dots -->
           <div class="flex space-x-3 justify-center">
             <%= for step_key <- @step_order do %>
@@ -108,7 +108,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
               <% end %>
             <% end %>
           </div>
-          
+
     <!-- Next button -->
           <%= unless @step == List.last(@step_order) do %>
             <% can_advance = @next_step != :payment || @complete_film_details %>

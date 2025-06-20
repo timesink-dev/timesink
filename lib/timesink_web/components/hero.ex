@@ -36,7 +36,7 @@ defmodule TimesinkWeb.Components.Hero do
             <%!-- <div class="absolute bottom-0 left-0 w-full h-16 z-20 pointer-events-none bg-gradient-to-t from-[#0C0C0C] via-[#0C0C0C]/70 to-transparent">
             </div> --%>
           </div>
-          
+
     <!-- Right text -->
           <div class="mt-8 lg:mt-0 w-full md:w-1/3 flex items-center justify-center px-6 text-white text-center md:text-left z-10">
             <div class="max-w-md">
@@ -50,7 +50,7 @@ defmodule TimesinkWeb.Components.Hero do
                 </p>
                 <a href="/join">
                   <.button class="mt-6 px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition font-brand">
-                    Join the waitlist
+                    join the waitlist
                   </.button>
                 </a>
               </div>
@@ -58,7 +58,7 @@ defmodule TimesinkWeb.Components.Hero do
           </div>
         </div>
       </div>
-      
+
     <!-- Scroll indicator -->
       <div
         id="scroll-indicator"

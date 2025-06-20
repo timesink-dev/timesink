@@ -41,13 +41,13 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
 
   def render(assigns) do
     ~H"""
-    <section class="w-full px-6 h-1/2">
+    <section class="w-full px-6">
       <div class="max-w-4xl mx-auto">
-        
+
     <!-- Left: Form Content -->
         <div class="w-full md:w-3/5">
-          <h2 class="text-3xl font-brand mb-6">Film Submission</h2>
-          <p class="text-mystery-white/80 mb-6 text-sm">
+          <h2 class="text-3xl font-brand mb-4">Film Submission</h2>
+          <p class="text-mystery-white/80 mb-4 text-sm">
             This is where you share the essentials—your film’s name, runtime, synopsis, and how to watch it.
             We also ask for your contact info so we can reach you if your film is selected.
           </p>
@@ -56,9 +56,9 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
             phx-submit="save_film_details"
             phx-change="validate"
             phx-target={@myself}
-            class="space-y-12"
+            class="space-y-6"
           >
-            
+
     <!-- Film Info -->
             <div>
               <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Film Details</h3>
@@ -94,18 +94,18 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                 />
               </div>
 
-              <div class="mt-6">
+              <div class="mt-4">
                 <.input
                   type="textarea"
                   field={@form[:synopsis]}
                   label="Synopsis"
                   placeholder="Give us a taste of what it’s about..."
                   required
-                  rows="5"
+                  rows="2"
                   input_class="w-full p-3 rounded text-mystery-white border-none"
                 />
               </div>
-              <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <.input
                   type="url"
                   field={@form[:video_url]}
@@ -123,7 +123,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                 />
               </div>
             </div>
-            
+
     <!-- Contact Info -->
             <div>
               <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Contact Information</h3>
@@ -146,7 +146,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                 />
               </div>
             </div>
-            
+
     <!-- Submit -->
             <:actions>
               <div class="pt-6 border-t border-white/10">
