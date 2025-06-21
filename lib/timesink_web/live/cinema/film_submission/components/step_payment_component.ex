@@ -11,16 +11,6 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
         {k, v} -> {k, v}
       end)
 
-    if connected?(socket) do
-      topic = "payment:film-submission:#{data["contact_email"]}"
-      IO.inspect(topic, label: "Subscribing to payment topic in step payment")
-
-      Phoenix.PubSub.subscribe(
-        Timesink.PubSub,
-        "payment:film-submission:#{data["contact_email"]}"
-      )
-    end
-
     changeset = FilmSubmission.changeset(%FilmSubmission{}, data)
 
     IO.inspect(assigns[:method], label: "StepPaymentComponent method")
@@ -54,7 +44,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
           <% end %>
           <!-- Method toggle -->
           <div class="flex gap-4 mt-4">
-          <button
+            <button
               type="button"
               phx-click="select_method"
               phx-value-method="bitcoin"
