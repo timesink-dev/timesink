@@ -43,7 +43,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
     ~H"""
     <section class="w-full px-6">
       <div class="max-w-4xl mx-auto">
-        
+
     <!-- Left: Form Content -->
         <div class="w-full md:w-3/5">
           <h2 class="text-3xl font-brand mb-4">Film Submission</h2>
@@ -58,16 +58,15 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
             phx-target={@myself}
             class="space-y-6"
           >
-            
+
     <!-- Film Info -->
             <div>
-              <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Film Details</h3>
+              <h3 class="text-xl font-semibold mb-2 text-neon-blue-lightest">Film Details</h3>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <.input
                   type="text"
                   field={@form[:title]}
-                  label="Film title"
-                  placeholder="Your film’s name"
+                  placeholder="Film title"
                   required
                   input_class="w-full p-3 rounded text-mystery-white border-none"
                 />
@@ -75,8 +74,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                   type="text"
                   inputmode="numeric"
                   field={@form[:duration_min]}
-                  label="Runtime (minutes)"
-                  placeholder="e.g. 14"
+                  placeholder="Runtime (minutes)"
                   min="1"
                   required
                   input_class="w-full p-3 rounded text-mystery-white border-none"
@@ -85,8 +83,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                   type="text"
                   inputmode="numeric"
                   field={@form[:year]}
-                  label="Year"
-                  placeholder="e.g. 2024"
+                  placeholder="Year of release"
                   min="1888"
                   max={Date.utc_today().year}
                   required
@@ -123,7 +120,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                 />
               </div>
             </div>
-            
+
     <!-- Contact Info -->
             <div>
               <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Contact Information</h3>
@@ -132,7 +129,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                   type="text"
                   field={@form[:contact_name]}
                   label="Your name"
-                  placeholder="e.g. Alex Rivera"
+                  placeholder="Enter your full name"
                   required
                   input_class="w-full p-3 rounded text-mystery-white border-none"
                 />
@@ -146,7 +143,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                 />
               </div>
             </div>
-            
+
     <!-- Submit -->
             <:actions>
               <div class="pt-6 border-t border-white/10">

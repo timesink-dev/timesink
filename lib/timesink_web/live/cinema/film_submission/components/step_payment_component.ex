@@ -13,16 +13,6 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
 
     changeset = FilmSubmission.changeset(%FilmSubmission{}, data)
 
-    IO.inspect(assigns[:method], label: "StepPaymentComponent method")
-    IO.inspect(assigns[:btcpay_invoice], label: "StepPaymentComponent invoice")
-    IO.inspect(assigns[:id], label: "StepPaymentComponent assigns")
-
-    method =
-      case assigns do
-        %{method: m} when is_binary(m) -> m
-        _ -> "card"
-      end
-
     {:ok,
      socket
      |> assign(method: assigns[:method] || nil)
@@ -53,12 +43,13 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
                 "px-4 py-2 rounded font-semibold border transition flex items-center gap-2",
                 @method == "bitcoin" && "bg-orange-500 text-white border-orange-400 shadow",
                 @method != "bitcoin" &&
-                  "bg-backroom-black  text-orange-300 hover:bg-gray-700 border-orange-300"
+                  "bg-backroom-black  border-orange-400 text-orange-400 hover:text-orange-300 hover:border-orange-300"
               ]}
               disabled={@btcpay_loading}
             >
-              &#8383;
-              Pay with Bitcoin {if @method == "bitcoin", do: raw("✓"), else: ""}
+              &#x20BF;
+              Pay with
+              Bitcoin {if @method == "bitcoin", do: raw("✓"), else: ""}
             </button>
             <button
               type="button"
@@ -226,8 +217,11 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
   end
 
   def handle_event("create_btcpay_invoice", _, socket) do
+    user = socket.assigns.data["user"]
+    user_id = if is_map(user), do: user.id, else: nil
+
     metadata = %{
-      user_id: socket.assigns.data["user"].id,
+      user_id: user_id,
       contact_email: socket.assigns.data["contact_email"]
     }
 
