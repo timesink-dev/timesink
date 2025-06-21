@@ -1,5 +1,6 @@
 defmodule Timesink.Cinema.FilmSubmission do
   use Ecto.Schema
+  use SwissSchema, repo: Timesink.Repo
   import Ecto.Changeset
 
   @type status_review :: :received | :under_review | :accepted | :rejected

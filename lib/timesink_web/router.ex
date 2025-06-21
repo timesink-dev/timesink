@@ -39,6 +39,7 @@ defmodule TimesinkWeb.Router do
     pipe_through :api
 
     post "/webhooks/mux.com/:webhook_key", MuxController, :webhook
+    post "/webhooks/btc-pay.server", BtcPayController, :webhook
   end
 
   scope "/", TimesinkWeb do

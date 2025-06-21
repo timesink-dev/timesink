@@ -8,6 +8,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
   }
 
   alias TimesinkWeb.Components.Stepper
+  alias Timesink.Payment.BtcPay
 
   @step_order [
     :intro,
@@ -74,7 +75,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
           </div>
         </div>
       </div>
-
+      
     <!-- Step Navigation + Dots -->
       <div class="w-full mt-12 md:mt-2 max-w-5xl mx-auto px-4 mb-12 py-6">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -88,7 +89,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
               &larr; Prev ({@step_display_names[@prev_step]})
             </button>
           <% end %>
-
+          
     <!-- Dots -->
           <div class="flex space-x-3 justify-center">
             <%= for step_key <- @step_order do %>
@@ -108,7 +109,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
               <% end %>
             <% end %>
           </div>
-
+          
     <!-- Next button -->
           <%= unless @step == List.last(@step_order) do %>
             <% can_advance = @next_step != :payment || @complete_film_details %>
@@ -195,6 +196,34 @@ defmodule TimesinkWeb.FilmSubmissionLive do
      |> assign(step: new_step)
      |> update_navigation_assigns()
      |> push_patch(to: "/submit?step=#{new_step}")}
+  end
+
+  def handle_info({:create_btcpay_invoice, data}, socket) do
+    case BtcPay.create_invoice(%{
+           amount: 25,
+           currency: "USD",
+           metadata: data
+         }) do
+      {:ok, invoice} ->
+        send_update(
+          TimesinkWeb.FilmSubmission.StepPaymentComponent,
+          id: "payment_step",
+          btcpay_invoice: invoice,
+          btcpay_loading: false,
+          method: "bitcoin"
+        )
+
+        {:noreply, socket}
+
+      {:error, reason} ->
+        send_update(
+          TimesinkWeb.FilmSubmission.StepPaymentComponent,
+          id: "payment_step",
+          btcpay_loading: false
+        )
+
+        {:noreply, socket}
+    end
   end
 
   defp update_navigation_assigns(socket) do
