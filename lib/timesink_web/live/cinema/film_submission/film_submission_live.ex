@@ -37,7 +37,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     video_url: "",
     video_pw: "",
     user: nil,
-    payment_id: nil,
+    payment_id: nil
   }
 
   def mount(_params, _session, socket) do
@@ -73,7 +73,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
             <%= if !@film_submission do %>
               <.live_component
                 module={Stepper}
-                id="film-submission-form"
+                id="film_submission_steps"
                 steps={@steps}
                 current_step={@step}
                 data={@data}
@@ -113,7 +113,9 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                       </div>
                       <div class="flex justify-between items-start gap-4">
                         <span class="font-semibold text-white">Synopsis</span>
-                        <span class="text-right">{@film_submission.synopsis || "No synopsis provided."}</span>
+                        <span class="text-right">
+                          {@film_submission.synopsis || "No synopsis provided."}
+                        </span>
                       </div>
                       <div class="flex justify-between items-center">
                         <span class="font-semibold text-white">Private Video Link</span>
@@ -121,7 +123,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                       </div>
                       <div class="flex justify-between items-center">
                         <span class="font-semibold text-white">Payment Ref</span>
-                        <span>{"Completed"}</span>
+                        <span>{@film_submission.payment_id}</span>
                       </div>
                     </div>
                   </div>
@@ -148,59 +150,59 @@ defmodule TimesinkWeb.FilmSubmissionLive do
       </div>
 
     <!-- Step Navigation + Dots -->
-    <%= if !@film_submission do %>
-      <div class="w-full mt-12 md:mt-2 max-w-5xl mx-auto px-4 mb-12 py-6">
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <!-- Prev button -->
-          <%= unless @step == hd(@step_order) do %>
-            <button
-              type="button"
-              phx-click={JS.push("go_to_step", value: %{step: "back"})}
-              class="text-md text-white hover:text-gray-300"
-            >
-              &larr; Prev ({@step_display_names[@prev_step]})
-            </button>
-          <% end %>
+      <%= if !@film_submission do %>
+        <div class="w-full mt-12 md:mt-2 max-w-5xl mx-auto px-4 mb-12 py-6">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <!-- Prev button -->
+            <%= unless @step == hd(@step_order) do %>
+              <button
+                type="button"
+                phx-click={JS.push("go_to_step", value: %{step: "back"})}
+                class="text-md text-white hover:text-gray-300"
+              >
+                &larr; Prev ({@step_display_names[@prev_step]})
+              </button>
+            <% end %>
 
     <!-- Dots -->
-          <div class="flex space-x-3 justify-center">
-            <%= for step_key <- @step_order do %>
-              <% is_clickable = step_key != :payment || @complete_film_details %>
-              <%= if is_clickable do %>
-                <div
-                  phx-click="go_to_step"
-                  phx-value-step={step_key}
-                  class={[
-                    "w-4 h-4 rounded-full transition duration-200 cursor-pointer",
-                    step_key == @step && "bg-white",
-                    step_key != @step && "bg-gray-600 hover:bg-gray-400"
-                  ]}
-                />
-              <% else %>
-                <div class="w-4 h-4 rounded-full bg-gray-700 opacity-40" />
+            <div class="flex space-x-3 justify-center">
+              <%= for step_key <- @step_order do %>
+                <% is_clickable = step_key != :payment || @complete_film_details %>
+                <%= if is_clickable do %>
+                  <div
+                    phx-click="go_to_step"
+                    phx-value-step={step_key}
+                    class={[
+                      "w-4 h-4 rounded-full transition duration-200 cursor-pointer",
+                      step_key == @step && "bg-white",
+                      step_key != @step && "bg-gray-600 hover:bg-gray-400"
+                    ]}
+                  />
+                <% else %>
+                  <div class="w-4 h-4 rounded-full bg-gray-700 opacity-40" />
+                <% end %>
               <% end %>
-            <% end %>
-          </div>
+            </div>
 
     <!-- Next button -->
-          <%= unless @step == List.last(@step_order) do %>
-            <% can_advance = @next_step != :payment || @complete_film_details %>
+            <%= unless @step == List.last(@step_order) do %>
+              <% can_advance = @next_step != :payment || @complete_film_details %>
 
-            <button
-              type="button"
-              phx-click={JS.push("go_to_step", value: %{step: "next"})}
-              class={[
-                "text-md",
-                can_advance && "text-white hover:text-gray-300",
-                !can_advance && "text-gray-600 cursor-not-allowed"
-              ]}
-              disabled={!can_advance}
-            >
-              Next ({@step_display_names[@next_step]}) &rarr;
-            </button>
-          <% end %>
+              <button
+                type="button"
+                phx-click={JS.push("go_to_step", value: %{step: "next"})}
+                class={[
+                  "text-md",
+                  can_advance && "text-white hover:text-gray-300",
+                  !can_advance && "text-gray-600 cursor-not-allowed"
+                ]}
+                disabled={!can_advance}
+              >
+                Next ({@step_display_names[@next_step]}) &rarr;
+              </button>
+            <% end %>
+          </div>
         </div>
-      </div>
       <% end %>
     </section>
     """
@@ -309,7 +311,10 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     end
   end
 
-  def handle_info(%Phoenix.Socket.Broadcast{event: "film_submission_completed", payload: submission}, socket) do
+  def handle_info(
+        %Phoenix.Socket.Broadcast{event: "film_submission_completed", payload: submission},
+        socket
+      ) do
     {:noreply,
      socket
      |> assign(:film_submission, submission)}

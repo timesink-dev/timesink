@@ -176,6 +176,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
       send(self(), {:go_to_step, :next})
       {:noreply, socket}
     else
+      IO.inspect(changeset, label: "Film Submission Changeset Error")
       {:noreply, assign(socket, form: to_form(changeset))}
     end
   end

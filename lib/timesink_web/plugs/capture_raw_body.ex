@@ -8,7 +8,7 @@ defmodule TimesinkWeb.Plugs.CaptureRawBody do
 
     case read_body(conn) do
       {:ok, body, conn} ->
-      conn |> assign(:raw_body, body)
+        conn |> assign(:raw_body, body)
 
       {:more, _partial_body, conn} ->
         # If the body is too large to read in one go

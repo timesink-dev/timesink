@@ -4,6 +4,8 @@
 
 /* This file is for your main application CSS */
 
+
+
 @keyframes slide-in {
   0% {
     transform: translateX(100%); /* Start from the right of the screen */

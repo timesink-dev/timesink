@@ -64,7 +64,7 @@ defmodule TimesinkWeb.BtcPayController do
       # required
       "status_review" => "received",
       "review_notes" => nil,
-      "stripe_id" => nil,
+      "payment_id" => invoice_id,
       # or a valid UUID if available
       "submitted_by_id" => nil
     }

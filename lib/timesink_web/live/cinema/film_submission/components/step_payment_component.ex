@@ -2,6 +2,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
   use TimesinkWeb, :live_component
   alias Timesink.Cinema.FilmSubmission
 
+
   def update(assigns, socket) do
     data = assigns[:data] || %{}
 
@@ -13,15 +14,13 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
 
     changeset = FilmSubmission.changeset(%FilmSubmission{}, data)
 
-    IO.inspect(assigns[:btcpay_loading], label: "Payment Step is loading invoice")
-    IO.inspect(assigns[:data], label: "BTCPay Invoice Data")
-
     {:ok,
      socket
      |> assign(method: assigns[:method] || nil)
      |> assign(btcpay_invoice: assigns[:btcpay_invoice] || nil)
      |> assign(btcpay_loading: assigns[:btcpay_loading] || false)
-     |> assign(form: to_form(changeset), data: data)}
+     |> assign(form: to_form(changeset), data: data)
+     |> assign(:stripe_public_key, Timesink.Payment.Stripe.config().publishable_key)}
   end
 
   def render(assigns) do
@@ -69,54 +68,23 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
           </div>
 
           <%= if @method == "card" do %>
-            <form phx-change="update_form" phx-target={@myself} class="space-y-6">
-              <!-- Card inputs (same as before) -->
-              <div>
-                <label class="block text-sm font-medium text-gray-200">Card Number</label>
-                <input
-                  name="card_number"
-                  placeholder="4242 4242 4242 4242"
-                  class="w-full mt-1 px-4 py-2 rounded-md bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-indigo-500"
-                />
-              </div>
+            <form
+              id="stripe-payment-form"
+              phx-hook="StripePayment"
+              phx-target={@myself}
+              data-stripe-key={@stripe_public_key}
+            >
+            <div id="card-element" class="p-4 rounded-xl bg-obsidian border border-dark-theater-medium shadow-md"></div>
 
-              <div class="flex gap-4">
-                <div class="flex-1">
-                  <label class="block text-sm font-medium text-gray-200">Exp. Month</label>
-                  <input
-                    name="exp_month"
-                    placeholder="MM"
-                    class="w-full mt-1 px-4 py-2 rounded-md bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-indigo-500"
-                  />
-                </div>
-                <div class="flex-1">
-                  <label class="block text-sm font-medium text-gray-200">Exp. Year</label>
-                  <input
-                    name="exp_year"
-                    placeholder="YY"
-                    class="w-full mt-1 px-4 py-2 rounded-md bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
+              <div id="card-errors" class="text-red-500 text-sm mt-2"></div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-200">CVC</label>
-                <input
-                  name="cvc"
-                  placeholder="CVC"
-                  class="w-full mt-1 px-4 py-2 rounded-md bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-indigo-500"
-                />
-              </div>
-
-              <div class="text-sm text-gray-400">
+              <div class="text-sm text-gray-400 mt-4">
                 Note: This is a placeholder. No actual payment will be processed.
               </div>
 
               <button
-                type="button"
-                phx-click="submit_payment"
-                phx-target={@myself}
-                class="bg-white text-black font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition"
+                type="submit"
+                class="mt-6 bg-white text-black font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition"
               >
                 Pay & Submit
               </button>
@@ -182,7 +150,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
             </div>
           <% end %>
         </div>
-        
+
     <!-- Review Box (unchanged) -->
         <div class="md:w-1/2">
           <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-6 shadow-inner">
@@ -223,6 +191,36 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
     """
   end
 
+  # Card payment selected – create Stripe PaymentIntent
+  def handle_event("select_method", %{"method" => "card"}, socket) do
+    user = socket.assigns.data["user"] || %{}
+    amount = 2500
+
+    case Timesink.Payment.Stripe.create_payment_intent(%{
+           amount: amount,
+           currency: "usd",
+           metadata: %{user_id: user.id || "guest"}
+         }) do
+      {:ok, %Stripe.PaymentIntent{client_secret: secret}} ->
+        socket =
+          socket
+          |> assign(:method, "card")
+          |> push_event("stripe_client_secret", %{client_secret: secret})
+
+        {:noreply, socket}
+
+      {:error, err} ->
+        Logger.error("Stripe error: #{inspect(err)}")
+        {:noreply, assign(socket, :method, "card")}
+    end
+  end
+
+  # Bitcoin selected – create BTCPay invoice
+  def handle_event("select_method", %{"method" => "bitcoin"}, socket) do
+    {:noreply, assign(socket, :method, "bitcoin")}
+  end
+
+  # Default case (future methods, validation, etc.)
   def handle_event("select_method", %{"method" => method}, socket) do
     {:noreply, assign(socket, :method, method)}
   end

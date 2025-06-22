@@ -21,7 +21,7 @@ defmodule Timesink.Cinema.FilmSubmission do
           status_review: status_review(),
           status_review_updated_at: DateTime.t() | nil,
           review_notes: String.t() | nil,
-          stripe_id: String.t() | nil,
+          payment_id: String.t() | nil,
           submitted_by_id: Ecto.UUID.t() | nil
         }
 
@@ -43,7 +43,7 @@ defmodule Timesink.Cinema.FilmSubmission do
     field :status_review_updated_at, :utc_datetime_usec
     field :review_notes, :string
 
-    field :stripe_id, :string
+    field :payment_id, :string
 
     belongs_to :submitted_by, Timesink.Accounts.User
 
@@ -65,7 +65,7 @@ defmodule Timesink.Cinema.FilmSubmission do
       :contact_email,
       :status_review,
       :review_notes,
-      :stripe_id,
+      :payment_id,
       :submitted_by_id
     ])
     |> validate_required([

@@ -187,6 +187,17 @@ if config_env() == :dev do
         "http://localhost:4000/api/btc_pay/webhook"
 end
 
+if config_env() == :dev do
+  config :timesink, :stripe,
+    secret_key: System.get_env("TIMESINK_TEST_STRIPE_SECRET_KEY") || "test-api-key",
+    publishable_key:
+      System.get_env("TIMESINK_TEST_STRIPE_PUBLISHABLE_KEY") || "test-webhook-secret"
+end
+
+if config_env() == :dev do
+  config :stripity_stripe, api_key: System.get_env("TIMESINK_TEST_STRIPE_SECRET_KEY")
+end
+
 config :timesink, base_url: base_url
 
 config :timesink, :here_maps_api_key, System.get_env("TIMESINK_HERE_MAPS_API_KEY")
