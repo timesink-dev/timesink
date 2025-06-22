@@ -2,7 +2,6 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
   use TimesinkWeb, :live_component
   alias Timesink.Cinema.FilmSubmission
 
-
   def update(assigns, socket) do
     data = assigns[:data] || %{}
 
@@ -74,7 +73,11 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
               phx-target={@myself}
               data-stripe-key={@stripe_public_key}
             >
-            <div id="card-element" class="p-4 rounded-xl bg-obsidian border border-dark-theater-medium shadow-md"></div>
+              <div
+                id="card-element"
+                class="p-4 rounded-xl bg-obsidian border border-dark-theater-medium shadow-md"
+              >
+              </div>
 
               <div id="card-errors" class="text-red-500 text-sm mt-2"></div>
 
