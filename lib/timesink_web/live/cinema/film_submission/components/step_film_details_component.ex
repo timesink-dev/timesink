@@ -43,7 +43,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
     ~H"""
     <section class="w-full px-6">
       <div class="max-w-4xl mx-auto">
-
+        
     <!-- Left: Form Content -->
         <div class="w-full md:w-3/5">
           <h2 class="text-3xl font-brand mb-4">Film Submission</h2>
@@ -58,7 +58,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
             phx-target={@myself}
             class="space-y-6"
           >
-
+            
     <!-- Film Info -->
             <div>
               <h3 class="text-xl font-semibold mb-2 text-neon-blue-lightest">Film Details</h3>
@@ -120,7 +120,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                 />
               </div>
             </div>
-
+            
     <!-- Contact Info -->
             <div>
               <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Contact Information</h3>
@@ -143,7 +143,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                 />
               </div>
             </div>
-
+            
     <!-- Submit -->
             <:actions>
               <div class="pt-6 border-t border-white/10">
