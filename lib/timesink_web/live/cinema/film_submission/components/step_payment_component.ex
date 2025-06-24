@@ -2,6 +2,26 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
   use TimesinkWeb, :live_component
   alias Timesink.Cinema.FilmSubmission
 
+  # def mount(_params, _session, socket) do
+  #   user = socket.assigns[:data]["user"] || %{}
+  #   stripe_client_secret = socket.assigns[:data]["stripe_client_secret"] || ""
+
+  #   IO.inspect(stripe_client_secret, label: "INITIAL CLIENT SECRET")
+
+  #   IO.inspect(stripe_client_secret, label: "GET CLINET SECRET")
+
+  #   socket =
+  #     socket
+  #     |> assign(:stripe_client_secret, stripe_client_secret)
+  #     |> assign(:user, user)
+
+  #   # if connected?(socket) do
+  #   #   send(self(), :create_payment_intent)
+  #   # end
+
+  #   {:ok, socket}
+  # end
+
   def update(assigns, socket) do
     data = assigns[:data] || %{}
 
@@ -13,13 +33,24 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
 
     changeset = FilmSubmission.changeset(%FilmSubmission{}, data)
 
-    {:ok,
-     socket
-     |> assign(method: assigns[:method] || nil)
-     |> assign(btcpay_invoice: assigns[:btcpay_invoice] || nil)
-     |> assign(btcpay_loading: assigns[:btcpay_loading] || false)
-     |> assign(form: to_form(changeset), data: data)
-     |> assign(:stripe_public_key, Timesink.Payment.Stripe.config().publishable_key)}
+    stripe_client_secret = data["stripe_client_secret"] || socket.assigns[:stripe_client_secret]
+
+
+
+        IO.inspect(stripe_client_secret, label: "Z STRIPE CLIENT SECRET")
+
+
+    socket =
+      socket
+      |> assign(method: assigns[:method] || nil)
+      |> assign(btcpay_invoice: assigns[:btcpay_invoice] || nil)
+      |> assign(btcpay_loading: assigns[:btcpay_loading] || false)
+      |> assign(form: to_form(changeset), data: data)
+      |> assign(:stripe_public_key, Timesink.Payment.Stripe.config().publishable_key)
+      |> assign(:stripe_secret, Timesink.Payment.Stripe.config().secret_key)
+      |> assign(:stripe_client_secret, stripe_client_secret)
+
+    {:ok, socket}
   end
 
   def render(assigns) do
@@ -67,23 +98,18 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
           </div>
 
           <%= if @method == "card" do %>
-            <form
-              id="stripe-payment-form"
-              phx-hook="StripePayment"
-              phx-target={@myself}
-              data-stripe-key={@stripe_public_key}
-            >
-              <div
-                id="card-element"
-                class="p-4 rounded-xl bg-obsidian border border-dark-theater-medium shadow-md"
-              >
-              </div>
-
-              <div id="card-errors" class="text-red-500 text-sm mt-2"></div>
-
-              <div class="text-sm text-gray-400 mt-4">
-                Note: This is a placeholder. No actual payment will be processed.
-              </div>
+            <div>
+              <%= if @stripe_client_secret do %>
+                <div
+                  id="payment-element"
+                  phx-hook="StripePayment"
+                  data-stripe-secret={@stripe_client_secret}
+                  data-stripe-key={@stripe_public_key}
+                />
+              <% end %>
+              <%!-- <% else %>
+                <p>Loading payment info...</p>
+              <% end %> --%>
 
               <button
                 type="submit"
@@ -91,7 +117,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
               >
                 Pay & Submit
               </button>
-            </form>
+            </div>
           <% end %>
           <%= if @method == "bitcoin" do %>
             <div class="mt-6 bg-gray-900/60 border border-gray-800 rounded-lg p-6 space-y-4">
@@ -194,28 +220,51 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
     """
   end
 
+  # def handle_info(:create_payment_intent, socket) do
+  #   user = socket.assigns.user
+
+  #   case Timesink.Payment.Stripe.create_payment_intent(%{
+  #          amount: 2500,
+  #          currency: "usd",
+  #          metadata: %{user_id: user.id || "guest"}
+  #        }) do
+  #     {:ok, %Stripe.PaymentIntent{client_secret: secret}} ->
+  #       IO.inspect("connected!")
+  #       IO.inspect(secret, label: "theeee client secret")
+
+  #       {:noreply,
+  #        socket
+  #        |> assign(:stripe_client_secret, secret)
+  #        |> push_event("stripe_client_secret", %{client_secret: secret})}
+
+  #     {:error, err} ->
+  #       Logger.error("Stripe intent error: #{inspect(err)}")
+  #       {:noreply, assign(socket, :stripe_client_secret, nil)}
+  #   end
+  # end
+
   # Card payment selected – create Stripe PaymentIntent
   def handle_event("select_method", %{"method" => "card"}, socket) do
-    user = socket.assigns.data["user"] || %{}
-    amount = 2500
+    # user = socket.assigns.data["user"] || %{}
+    # amount = 2500
 
-    case Timesink.Payment.Stripe.create_payment_intent(%{
-           amount: amount,
-           currency: "usd",
-           metadata: %{user_id: user.id || "guest"}
-         }) do
-      {:ok, %Stripe.PaymentIntent{client_secret: secret}} ->
-        socket =
-          socket
-          |> assign(:method, "card")
-          |> push_event("stripe_client_secret", %{client_secret: secret})
+    # case Timesink.Payment.Stripe.create_payment_intent(%{
+    #        amount: amount,
+    #        currency: "usd",
+    #        metadata: %{user_id: user.id |F| "guest"}
+    #      }) do
+    #   {:ok, %Stripe.PaymentIntent{client_secret: secret}} ->
+    socket =
+      socket
+      |> assign(:method, "card")
 
-        {:noreply, socket}
+    # |> push_event("stripe_client_secret", %{client_secret: secret})
 
-      {:error, err} ->
-        Logger.error("Stripe error: #{inspect(err)}")
-        {:noreply, assign(socket, :method, "card")}
-    end
+    {:noreply, socket}
+
+    # {:error, err} ->
+    #   Logger.error("Stripe error: #{inspect(err)}")
+    #   {:noreply, assign(socket, :method, "card")}
   end
 
   # Bitcoin selected – create BTCPay invoice

@@ -4,8 +4,6 @@ defmodule TimesinkWeb.Plugs.CaptureRawBody do
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    IO.inspect(read_body(conn), label: "Raw Body Capture")
-
     case read_body(conn) do
       {:ok, body, conn} ->
         conn |> assign(:raw_body, body)

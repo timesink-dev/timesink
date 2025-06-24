@@ -7,6 +7,8 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     StepPaymentComponent
   }
 
+  require Logger
+
   alias TimesinkWeb.Components.Stepper
   alias Timesink.Payment.BtcPay
 
@@ -37,13 +39,17 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     video_url: "",
     video_pw: "",
     user: nil,
-    payment_id: nil
+    payment_id: nil,
+    stripe_client_secret: nil
   }
 
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      Phoenix.PubSub.subscribe(Timesink.PubSub, "film_submission")
+    socket = assign_new(socket, :stripe_client_secret, fn -> nil end)
+
+    if connected?(socket) && is_nil(socket.assigns.stripe_client_secret) do
+      send(self(), :create_payment_intent)
     end
+
 
     form_data = Map.put(@initial_form_data, :user, socket.assigns[:current_user])
 
@@ -56,6 +62,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
        step_display_names: @step_display_names,
        data: form_data,
        complete_film_details: film_details_complete?(form_data),
+       stripe_client_secret: nil,
        film_submission: nil
      )
      |> update_navigation_assigns()}
@@ -72,12 +79,12 @@ defmodule TimesinkWeb.FilmSubmissionLive do
           <div class="min-h-[calc(100vh-200px)] max-h-[calc(100vh-200px)] overflow-auto">
             <%= if !@film_submission do %>
               <.live_component
+                id="film_submission_stepper"
                 module={Stepper}
-                id="film_submission_steps"
                 steps={@steps}
                 current_step={@step}
                 data={@data}
-                current_user={@current_user}
+                stripe_client_secret={@stripe_client_secret}
               />
             <% else %>
               <div class="w-full px-6">
@@ -96,12 +103,12 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                       <path d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  
-    <!-- Headline -->
+
+                  <!-- Headline -->
                   <div>
                     <h2 class="text-3xl font-brand text-white">Your film has been submitted!</h2>
                     <p class="mt-2 text-gray-300 text-lg">
-                      We’ve received your submission and sent a confirmation email to <span class="text-white font-semibold">{@film_submission.contact_email}</span>.
+                      We’ve received your submission and sent a confirmation email to <span class="text-white font-semibold">{@film_submission.contact_email || ""}</span>.
                     </p>
                   </div>
 
@@ -127,13 +134,13 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                       </div>
                     </div>
                   </div>
-                  
-    <!-- Next Steps -->
+
+                   <!-- Next Steps -->
                   <div class="text-gray-400 text-sm">
                     Our programming team reviews every submission with care. If your work is selected, we’ll reach out with next steps.
                   </div>
-                  
-    <!-- Optional Share or CTA -->
+
+                  <!-- Optional Share or CTA -->
                   <div class="mt-6">
                     <a
                       href="/"
@@ -148,7 +155,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
           </div>
         </div>
       </div>
-      
+
     <!-- Step Navigation + Dots -->
       <%= if !@film_submission do %>
         <div class="w-full mt-12 md:mt-2 max-w-5xl mx-auto px-4 mb-12 py-6">
@@ -163,7 +170,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                 &larr; Prev ({@step_display_names[@prev_step]})
               </button>
             <% end %>
-            
+
     <!-- Dots -->
             <div class="flex space-x-3 justify-center">
               <%= for step_key <- @step_order do %>
@@ -183,7 +190,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                 <% end %>
               <% end %>
             </div>
-            
+
     <!-- Next button -->
             <%= unless @step == List.last(@step_order) do %>
               <% can_advance = @next_step != :payment || @complete_film_details %>
@@ -216,7 +223,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
       step_atom not in socket.assigns.step_order ->
         {:noreply, socket}
 
-      # Prevent skipping to payment if film details aren't complete
+      # # Prevent skipping to payment if film details aren't complete
       step_atom == :payment and not socket.assigns.complete_film_details ->
         {:noreply,
          socket
@@ -272,6 +279,25 @@ defmodule TimesinkWeb.FilmSubmissionLive do
      |> push_patch(to: "/submit?step=#{new_step}")}
   end
 
+  def handle_info(:create_payment_intent, socket) do
+    user = socket.assigns[:current_user]
+
+    case Timesink.Payment.Stripe.create_payment_intent(%{
+           amount: 2500,
+           currency: "usd",
+           metadata: %{user_id: user.id || "guest"}
+         }) do
+      {:ok, %Stripe.PaymentIntent{client_secret: secret}} ->
+        updated_data = Map.put(socket.assigns.data, "stripe_client_secret", secret)
+
+        {:noreply, assign(socket, data: updated_data)}
+
+      {:error, err} ->
+        Logger.error("❌ Stripe error: #{inspect(err)}")
+        {:noreply, socket}
+    end
+  end
+
   def handle_info({:create_btcpay_invoice, data}, socket) do
     send_update(
       TimesinkWeb.FilmSubmission.StepPaymentComponent,
@@ -279,7 +305,8 @@ defmodule TimesinkWeb.FilmSubmissionLive do
       btcpay_loading: true,
       btcpay_invoice: nil,
       method: "bitcoin",
-      data: socket.assigns.data
+      data: socket.assigns.data,
+      stripe_client_secret: socket.assigns.stripe_client_secret
     )
 
     case BtcPay.create_invoice(%{

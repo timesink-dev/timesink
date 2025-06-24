@@ -458,87 +458,23 @@ Hooks.SimulatedLivePlayback = {
 }
 
 
-let stripe = null;
-let elements = null;
 
-Hooks.StripePayment = {
+
+Hooks.StripePayment =  {
   mounted() {
-      this.mountStripe();
+    if (this.el.dataset.mounted) return;
+    this.el.dataset.mounted = "true";
 
-    this.el.addEventListener("submit", (e) => {
-      e.preventDefault();
-      this.submitPayment();
-    });
-  },
-
-  updated() {
-    this.mountStripe();
-  },
-
-  mountStripe() {
-    const stripeKey = this.el.dataset.stripeKey;
-
-    if (!stripeKey) {
-      console.error("Missing stripeKey");
-      return;
+    const appearance = {
+      theme: 'night',
     }
 
-    // Initialize Stripe only once
-    if (!stripe) {
-      stripe = Stripe(stripeKey);
-    }
+    const stripe = Stripe(this.el.dataset.stripeKey);
+    const elements = stripe.elements({ clientSecret: this.el.dataset.stripeSecret, appearance });
 
-    // Create elements instance
-    elements = stripe.elements();
-
-    // Create a card element and mount it
-    const style = {
-      base: {
-        color: "#E0EBFF", // neon-blue-lightest
-        fontFamily: "Ano Regular Wide, sans-serif", // custom font
-        fontSmoothing: "antialiased",
-        fontSize: "16px",
-        backgroundColor: "#0B1215", // obsidian
-        "::placeholder": {
-          color: "#6E6E6E" // dark-theater-lightest
-        },
-        iconColor: "#7AA8FF" // neon-blue-primary
-      },
-      invalid: {
-        color: "#EC2013", // neon-red-primary
-        iconColor: "#EC2013"
-      }
-    };
-    
-
-    const card = elements.create("card", { style });
-    const cardContainer = this.el.querySelector("#card-element");
-
-    if (cardContainer) {
-      card.mount(cardContainer);
-    } else {
-      console.error("Missing #card-element container");
-    }
-  },
-
-  async submitPayment() {
-    if (!this.stripe || !this.card || !this.clientSecret) return;
-
-    const result = await this.stripe.confirmCardPayment(this.clientSecret, {
-      payment_method: {
-        card: this.card,
-      },
-    });
-
-    if (result.error) {
-      document.querySelector("#card-errors").textContent = result.error.message;
-    } else if (result.paymentIntent.status === "succeeded") {
-      // Notify LiveView
-      this.pushEvent("submit_payment", {});
-    }
-  },
-};
-
-
+    const paymentElement = elements.create("payment");
+    paymentElement.mount(this.el);
+  }
+}
 
 export default Hooks;
