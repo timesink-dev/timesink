@@ -35,10 +35,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
 
     stripe_client_secret = data["stripe_client_secret"] || socket.assigns[:stripe_client_secret]
 
-
-
-        IO.inspect(stripe_client_secret, label: "Z STRIPE CLIENT SECRET")
-
+    IO.inspect(stripe_client_secret, label: "Z STRIPE CLIENT SECRET")
 
     socket =
       socket

@@ -59,14 +59,14 @@ defmodule TimesinkWeb.TopNav do
           <li><a href="/blog">Blog</a></li>
           <li><a href="/info">Info</a></li>
         </ul>
-
+        
     <!-- Logo -->
         <div>
           <a id="nav-logo" href="/" class="font-brand">
             TimeSink
           </a>
         </div>
-
+        
     <!-- Actions -->
         <ul id="nav-actions" class="flex justify-between items-center gap-x-8">
           <%= if @current_user do %>

@@ -47,9 +47,9 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     socket = assign_new(socket, :stripe_client_secret, fn -> nil end)
 
     if connected?(socket) && is_nil(socket.assigns.stripe_client_secret) do
+      Phoenix.PubSub.subscribe(Timesink.PubSub, "film_submission")
       send(self(), :create_payment_intent)
     end
-
 
     form_data = Map.put(@initial_form_data, :user, socket.assigns[:current_user])
 
@@ -104,7 +104,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                     </svg>
                   </div>
 
-                  <!-- Headline -->
+    <!-- Headline -->
                   <div>
                     <h2 class="text-3xl font-brand text-white">Your film has been submitted!</h2>
                     <p class="mt-2 text-gray-300 text-lg">
@@ -135,12 +135,12 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                     </div>
                   </div>
 
-                   <!-- Next Steps -->
+    <!-- Next Steps -->
                   <div class="text-gray-400 text-sm">
                     Our programming team reviews every submission with care. If your work is selected, we’ll reach out with next steps.
                   </div>
 
-                  <!-- Optional Share or CTA -->
+    <!-- Optional Share or CTA -->
                   <div class="mt-6">
                     <a
                       href="/"

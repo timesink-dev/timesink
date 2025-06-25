@@ -41,7 +41,7 @@ defmodule TimesinkWeb.Endpoint do
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
-  # plug TimesinkWeb.Plugs.CaptureRawBody
+  plug TimesinkWeb.Plugs.CaptureRawBody
 
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
