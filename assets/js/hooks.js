@@ -503,12 +503,12 @@ Hooks.StripePayment = {
         redirect: "if_required"
       });
 
-      if (error) {
-        console.error("Payment error:", error.message);
-        this.pushEvent("stripe_payment_failed", { error: error.message });
-      } else {
-        this.pushEvent("stripe_payment_succeeded", {});
-      }
+      // if (error) {
+      //   console.error("Payment error:", error.message);
+      //   this.pushEvent("stripe_payment_failed", { error: error.message });
+      // } else {
+      //   this.pushEvent("stripe_payment_succeeded", {});
+      // }
     });
   }
 }
