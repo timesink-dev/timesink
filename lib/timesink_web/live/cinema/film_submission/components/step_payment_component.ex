@@ -75,23 +75,29 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
           <%= if @method == "card" do %>
             <div>
               <%= if @stripe_client_secret do %>
-                <div
-                  id="payment-element"
+                <form
+                  id="stripe-payment-form"
                   phx-hook="StripePayment"
-                  data-stripe-secret={@stripe_client_secret}
                   data-stripe-key={@stripe_public_key}
-                />
+                  data-stripe-secret={@stripe_client_secret}
+                  data-contact-name={@data["contact_name"]}
+                  data-contact-email={@data["contact_email"]}
+                >
+                  <div id="payment-element" />
+                  <button
+                    type="submit"
+                    class="mt-6 bg-white text-black font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition"
+                  >
+                    Pay & Submit
+                  </button>
+                </form>
+              <% else %>
+                <div class="bg-gray-900/60 border border-gray-800 rounded-lg p-6 space-y-4">
+                  <p class="text-sm text-gray-400">
+                    Stripe client secret not available. Please try again later.
+                  </p>
+                </div>
               <% end %>
-              <%!-- <% else %>
-                <p>Loading payment info...</p>
-              <% end %> --%>
-
-              <button
-                type="submit"
-                class="mt-6 bg-white text-black font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition"
-              >
-                Pay & Submit
-              </button>
             </div>
           <% end %>
           <%= if @method == "bitcoin" do %>
@@ -195,45 +201,11 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
     """
   end
 
-  # def handle_info(:create_payment_intent, socket) do
-  #   user = socket.assigns.user
-
-  #   case Timesink.Payment.Stripe.create_payment_intent(%{
-  #          amount: 2500,
-  #          currency: "usd",
-  #          metadata: %{user_id: user.id || "guest"}
-  #        }) do
-  #     {:ok, %Stripe.PaymentIntent{client_secret: secret}} ->
-  #       IO.inspect("connected!")
-  #       IO.inspect(secret, label: "theeee client secret")
-
-  #       {:noreply,
-  #        socket
-  #        |> assign(:stripe_client_secret, secret)
-  #        |> push_event("stripe_client_secret", %{client_secret: secret})}
-
-  #     {:error, err} ->
-  #       Logger.error("Stripe intent error: #{inspect(err)}")
-  #       {:noreply, assign(socket, :stripe_client_secret, nil)}
-  #   end
-  # end
-
   # Card payment selected – create Stripe PaymentIntent
   def handle_event("select_method", %{"method" => "card"}, socket) do
-    # user = socket.assigns.data["user"] || %{}
-    # amount = 2500
-
-    # case Timesink.Payment.Stripe.create_payment_intent(%{
-    #        amount: amount,
-    #        currency: "usd",
-    #        metadata: %{user_id: user.id |F| "guest"}
-    #      }) do
-    #   {:ok, %Stripe.PaymentIntent{client_secret: secret}} ->
     socket =
       socket
       |> assign(:method, "card")
-
-    # |> push_event("stripe_client_secret", %{client_secret: secret})
 
     {:noreply, socket}
 

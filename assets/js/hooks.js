@@ -460,20 +460,56 @@ Hooks.SimulatedLivePlayback = {
 
 
 
-Hooks.StripePayment =  {
+Hooks.StripePayment = {
   mounted() {
     if (this.el.dataset.mounted) return;
     this.el.dataset.mounted = "true";
 
-    const appearance = {
-      theme: 'night',
-    }
-
+    const appearance = { theme: "night" };
     const stripe = Stripe(this.el.dataset.stripeKey);
-    const elements = stripe.elements({ clientSecret: this.el.dataset.stripeSecret, appearance });
+    const elements = stripe.elements({
+      clientSecret: this.el.dataset.stripeSecret,
+      appearance
+    });
 
-    const paymentElement = elements.create("payment");
-    paymentElement.mount(this.el);
+
+    const paymentElement = elements.create("payment", {
+      fields: {
+        billingDetails: {
+          name: "never",
+          email: "never"
+        }
+      }
+    });
+
+    paymentElement.mount("#payment-element");
+
+    this.el.addEventListener("submit", async (e) => {
+      console.log("StripePayment form submit event triggered");
+      e.preventDefault();
+      console.log("StripePayment form submitted");
+
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: window.location.href,
+          payment_method_data: {
+            billing_details: {
+              name: this.el.dataset.contactName,
+              email: this.el.dataset.contactEmail
+            }
+          }
+        },
+        redirect: "if_required"
+      });
+
+      if (error) {
+        console.error("Payment error:", error.message);
+        this.pushEvent("stripe_payment_failed", { error: error.message });
+      } else {
+        this.pushEvent("stripe_payment_succeeded", {});
+      }
+    });
   }
 }
 
