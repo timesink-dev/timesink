@@ -2,26 +2,6 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
   use TimesinkWeb, :live_component
   alias Timesink.Cinema.FilmSubmission
 
-  # def mount(_params, _session, socket) do
-  #   user = socket.assigns[:data]["user"] || %{}
-  #   stripe_client_secret = socket.assigns[:data]["stripe_client_secret"] || ""
-
-  #   IO.inspect(stripe_client_secret, label: "INITIAL CLIENT SECRET")
-
-  #   IO.inspect(stripe_client_secret, label: "GET CLINET SECRET")
-
-  #   socket =
-  #     socket
-  #     |> assign(:stripe_client_secret, stripe_client_secret)
-  #     |> assign(:user, user)
-
-  #   # if connected?(socket) do
-  #   #   send(self(), :create_payment_intent)
-  #   # end
-
-  #   {:ok, socket}
-  # end
-
   def update(assigns, socket) do
     data = assigns[:data] || %{}
 
@@ -34,8 +14,6 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
     changeset = FilmSubmission.changeset(%FilmSubmission{}, data)
 
     stripe_client_secret = data["stripe_client_secret"] || socket.assigns[:stripe_client_secret]
-
-    IO.inspect(stripe_client_secret, label: "Z STRIPE CLIENT SECRET")
 
     socket =
       socket
@@ -176,7 +154,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
             </div>
           <% end %>
         </div>
-
+        
     <!-- Review Box (unchanged) -->
         <div class="md:w-1/2">
           <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-6 shadow-inner">

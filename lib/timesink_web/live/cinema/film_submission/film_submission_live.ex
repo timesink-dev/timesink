@@ -103,7 +103,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                       <path d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-
+                  
     <!-- Headline -->
                   <div>
                     <h2 class="text-3xl font-brand text-white">Your film has been submitted!</h2>
@@ -134,12 +134,12 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                       </div>
                     </div>
                   </div>
-
+                  
     <!-- Next Steps -->
                   <div class="text-gray-400 text-sm">
                     Our programming team reviews every submission with care. If your work is selected, we’ll reach out with next steps.
                   </div>
-
+                  
     <!-- Optional Share or CTA -->
                   <div class="mt-6">
                     <a
@@ -155,7 +155,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
           </div>
         </div>
       </div>
-
+      
     <!-- Step Navigation + Dots -->
       <%= if !@film_submission do %>
         <div class="w-full mt-12 md:mt-2 max-w-5xl mx-auto px-4 mb-12 py-6">
@@ -170,7 +170,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                 &larr; Prev ({@step_display_names[@prev_step]})
               </button>
             <% end %>
-
+            
     <!-- Dots -->
             <div class="flex space-x-3 justify-center">
               <%= for step_key <- @step_order do %>
@@ -190,7 +190,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
                 <% end %>
               <% end %>
             </div>
-
+            
     <!-- Next button -->
             <%= unless @step == List.last(@step_order) do %>
               <% can_advance = @next_step != :payment || @complete_film_details %>
@@ -281,11 +281,12 @@ defmodule TimesinkWeb.FilmSubmissionLive do
 
   def handle_info(:create_payment_intent, socket) do
     user = socket.assigns[:current_user]
+    user_id = (user && user.id) || "guest"
 
     case Timesink.Payment.Stripe.create_payment_intent(%{
            amount: 2500,
            currency: "usd",
-           metadata: %{user_id: user.id || "guest"}
+           metadata: %{user_id: user_id}
          }) do
       {:ok, %Stripe.PaymentIntent{client_secret: secret}} ->
         updated_data = Map.put(socket.assigns.data, "stripe_client_secret", secret)
@@ -325,7 +326,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
 
         {:noreply, socket}
 
-      {:error, reason} ->
+      {:error, _} ->
         send_update(
           TimesinkWeb.FilmSubmission.StepPaymentComponent,
           id: "payment_step",
