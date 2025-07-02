@@ -254,12 +254,17 @@ defmodule TimesinkWeb.FilmSubmissionLive do
 
   def handle_info({:update_film_submission_data, %{params: params}}, socket) do
     updated = Map.merge(socket.assigns.data, params)
+    complete = film_details_complete?(updated)
 
-    {:noreply,
-     assign(socket,
-       data: updated,
-       complete_film_details: film_details_complete?(updated)
-     )}
+    # log assigns data for debugging
+    Logger.debug("Film submission data before update: #{inspect(socket.assigns.data)}")
+
+    Logger.info("Updating film submission data: #{inspect(updated)}")
+
+    # Only try to update if we have a payment intent ID
+    maybe_update_stripe_metadata(updated)
+
+    {:noreply, assign(socket, data: updated, complete_film_details: complete)}
   end
 
   # Step navigation logic
@@ -281,15 +286,20 @@ defmodule TimesinkWeb.FilmSubmissionLive do
 
   def handle_info(:create_payment_intent, socket) do
     user = socket.assigns[:current_user]
-    user_id = (user && user.id) || "guest"
+    user_id = (user && user.id) || nil
+
+    metadata = %{
+      "submitted_by_id" => user_id
+    }
 
     case Timesink.Payment.Stripe.create_payment_intent(%{
            amount: 2500,
            currency: "usd",
-           metadata: %{user_id: user_id}
+           metadata: metadata
          }) do
-      {:ok, %Stripe.PaymentIntent{client_secret: secret}} ->
+      {:ok, %Stripe.PaymentIntent{client_secret: secret, id: id}} ->
         updated_data = Map.put(socket.assigns.data, "stripe_client_secret", secret)
+        updated_data = Map.put(updated_data, "payment_id", id)
 
         {:noreply, assign(socket, data: updated_data)}
 
@@ -382,4 +392,24 @@ defmodule TimesinkWeb.FilmSubmissionLive do
       data["video_url"] not in [nil, ""]
     ])
   end
+
+  defp maybe_update_stripe_metadata(%{"payment_id" => id} = data) when is_binary(id) do
+    metadata = %{
+      "title" => data["title"],
+      "year" => data["year"],
+      "duration_min" => data["duration_min"],
+      "synopsis" => data["synopsis"],
+      "video_url" => data["video_url"],
+      "video_pw" => data["video_pw"],
+      "contact_name" => data["contact_name"],
+      "contact_email" => data["contact_email"]
+    }
+
+    case Stripe.PaymentIntent.update(id, %{metadata: metadata}) do
+      {:ok, _intent} -> :ok
+      {:error, err} -> Logger.error("❌ Stripe update error: #{inspect(err)}")
+    end
+  end
+
+  defp maybe_update_stripe_metadata(_), do: :noop
 end

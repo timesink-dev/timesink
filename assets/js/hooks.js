@@ -465,7 +465,25 @@ Hooks.StripePayment = {
     if (this.el.dataset.mounted) return;
     this.el.dataset.mounted = "true";
 
-    const appearance = { theme: "night" };
+    const appearance = { 
+      theme: "night",
+      labels: "floating",
+      variables: { 
+        colorDanger: "#FF6640", // Neon red light   
+        colorBackground: '#11182799', // Dark background with slight transparency
+        fontFamily: 'Gangster Grotesk, sans-serif',
+        fontSmooth: "always",
+      },
+      rules: {
+        ".Input": {
+          backgroundColor: "#11182799",
+          borderColor: "#1f2937",
+        },
+        ".Input:focus": {
+          borderColor: "#ADC9FF"
+        }
+      }
+    };
     const stripe = Stripe(this.el.dataset.stripeKey);
     const elements = stripe.elements({
       clientSecret: this.el.dataset.stripeSecret,
@@ -485,9 +503,7 @@ Hooks.StripePayment = {
     paymentElement.mount("#payment-element");
 
     this.el.addEventListener("submit", async (e) => {
-      console.log("StripePayment form submit event triggered");
       e.preventDefault();
-      console.log("StripePayment form submitted");
 
       const { error } = await stripe.confirmPayment({
         elements,
@@ -503,12 +519,12 @@ Hooks.StripePayment = {
         redirect: "if_required"
       });
 
-      // if (error) {
-      //   console.error("Payment error:", error.message);
-      //   this.pushEvent("stripe_payment_failed", { error: error.message });
-      // } else {
-      //   this.pushEvent("stripe_payment_succeeded", {});
-      // }
+      const errorEl = document.querySelector("#card-errors");
+
+      if (error) {
+        console.error("Payment error:", error.message);
+        if (errorEl) errorEl.textContent = error.message;
+      }
     });
   }
 }

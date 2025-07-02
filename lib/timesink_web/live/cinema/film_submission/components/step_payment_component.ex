@@ -44,6 +44,19 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
             <button
               type="button"
               phx-click="select_method"
+              phx-value-method="card"
+              phx-target={@myself}
+              class={[
+                "px-4 py-2 rounded font-semibold border transition",
+                @method == "card" && "bg-white text-black border-white shadow",
+                @method != "card" && "bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-700"
+              ]}
+            >
+              Credit / Debit Card {if @method == "card", do: raw("✓"), else: ""}
+            </button>
+            <button
+              type="button"
+              phx-click="select_method"
               phx-value-method="bitcoin"
               phx-target={@myself}
               class={[
@@ -56,19 +69,6 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
               ₿
               Pay with
               Bitcoin {if @method == "bitcoin", do: raw("✓"), else: ""}
-            </button>
-            <button
-              type="button"
-              phx-click="select_method"
-              phx-value-method="card"
-              phx-target={@myself}
-              class={[
-                "px-4 py-2 rounded font-semibold border transition",
-                @method == "card" && "bg-white text-black border-white shadow",
-                @method != "card" && "bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-700"
-              ]}
-            >
-              Credit / Debit Card {if @method == "card", do: raw("✓"), else: ""}
             </button>
           </div>
 
@@ -239,12 +239,22 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
   end
 
   def handle_event("create_btcpay_invoice", _, socket) do
-    user = socket.assigns.data["user"]
-    user_id = if is_map(user), do: user.id, else: nil
+    user = socket.assigns[:current_user]
+    user_id = (user && user.id) || nil
 
     metadata = %{
-      user_id: user_id,
-      contact_email: socket.assigns.data["contact_email"]
+      title: socket.assigns.data["title"],
+      year: socket.assigns.data["year"],
+      duration_min: socket.assigns.data["duration_min"],
+      synopsis: socket.assigns.data["synopsis"],
+      video_url: socket.assigns.data["video_url"],
+      video_pw: socket.assigns.data["video_pw"],
+      contact_name: socket.assigns.data["contact_name"],
+      contact_email: socket.assigns.data["contact_email"],
+      status_review: socket.assigns.data["status_review"],
+      review_notes: socket.assigns.data["review_notes"],
+      payment_id: "mock_#{System.system_time(:millisecond)}",
+      submitted_by_id: user_id
     }
 
     send(self(), {:create_btcpay_invoice, metadata})
