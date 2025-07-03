@@ -39,7 +39,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
       <div class="hidden lg:flex flex-row gap-24">
         <div class="flex flex-col space-y-12 w-1/5">
           <%= for exhibition <- @exhibitions do %>
-            <div
+            <button
               phx-click="select_theater"
               phx-value-id={exhibition.theater.id}
               phx-target={@myself}
@@ -61,7 +61,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
               <div class="mt-6 text-mystery-white font-semibold text-lg">
                 {exhibition.film.title}
               </div>
-            </div>
+            </button>
           <% end %>
         </div>
         <div class="flex-1">
