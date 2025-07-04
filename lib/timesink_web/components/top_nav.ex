@@ -43,6 +43,7 @@ defmodule TimesinkWeb.TopNav do
             <ul
               id="films-dropdown"
               class="hidden absolute mt-2 w-48 rounded-md bg-dark-theater-primary text-mystery-white shadow-md z-50 overflow-hidden"
+              phx-click-away={JS.toggle(display: "hidden")}
             >
               <li>
                 <a href="/now-playing" class="block px-4 py-2 hover:bg-zinc-700">Now Playing</a>

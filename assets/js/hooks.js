@@ -529,4 +529,5 @@ Hooks.StripePayment = {
   }
 }
 
+
 export default Hooks;

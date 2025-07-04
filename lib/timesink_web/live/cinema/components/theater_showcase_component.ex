@@ -44,7 +44,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
               phx-value-id={exhibition.theater.id}
               phx-target={@myself}
               class={[
-                "bg-dark-theater-primary rounded-lg p-4 shadow-md cursor-pointer transition",
+                "bg-dark-theater-primary rounded-lg p-4 shadow-md cursor-pointer transition text-left",
                 "hover:bg-dark-theater-light",
                 @selected_theater_id == exhibition.theater.id && "ring-1 ring-neon-blue-lightest"
               ]}
