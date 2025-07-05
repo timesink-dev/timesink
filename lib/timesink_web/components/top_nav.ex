@@ -35,9 +35,10 @@ defmodule TimesinkWeb.TopNav do
             <button
               type="button"
               phx-click={JS.toggle(to: "#films-dropdown", display: "block")}
-              class="inline-flex items-center gap-1 text-sm font-medium text-mystery-white hover:underline focus:outline-none"
+              class="inline-flex items-end gap-1 text-sm font-medium text-mystery-white hover:underline focus:outline-none"
             >
-              Cinema <.icon name="hero-chevron-down" class="h-4 w-4 mt-[1px] transition-transform" />
+              <span> Cinema </span>
+              <.icon name="hero-chevron-down" class="h-4 w-4 mt-[1px] transition-transform" />
             </button>
 
             <ul
