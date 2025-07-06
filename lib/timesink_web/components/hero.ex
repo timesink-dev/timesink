@@ -42,11 +42,13 @@ defmodule TimesinkWeb.Components.Hero do
             <div class="max-w-md">
               <div class="text-center mb-10">
                 <h2 class="text-4xl font-brand text-white tracking-tight leading-tight">
-                  Not just a cinema. TimeSink.
+                  Fresh Cinema. Real Audiences. No endless scrolls.
                 </h2>
                 <p class="mt-4 text-base md:text-md text-mystery-white max-w-xl mx-auto">
-                  A live platform where bold films meet real-time conversation.
-                  Watch together. Talk it through. Stick around.
+                  We bring filmmakers — of all levels — to the stage.
+                  And we don’t waste your time discovering great art.
+
+                  Real audiences. Real-time reactions. Conversations and feelings that last. No noise, pure signal.
                 </p>
                 <a href="/join">
                   <.button class="mt-6 px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition">
