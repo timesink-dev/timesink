@@ -35,14 +35,16 @@ defmodule TimesinkWeb.TopNav do
             <button
               type="button"
               phx-click={JS.toggle(to: "#films-dropdown", display: "block")}
-              class="inline-flex items-center gap-1 text-sm font-medium text-mystery-white hover:underline focus:outline-none"
+              class="inline-flex items-end gap-1 text-sm font-medium text-mystery-white hover:underline focus:outline-none"
             >
-              Cinema <.icon name="hero-chevron-down" class="h-4 w-4 mt-[1px] transition-transform" />
+              <span> Cinema </span>
+              <.icon name="hero-chevron-down" class="h-4 w-4 mt-[1px] transition-transform" />
             </button>
 
             <ul
               id="films-dropdown"
               class="hidden absolute mt-2 w-48 rounded-md bg-dark-theater-primary text-mystery-white shadow-md z-50 overflow-hidden"
+              phx-click-away={JS.toggle(display: "hidden")}
             >
               <li>
                 <a href="/now-playing" class="block px-4 py-2 hover:bg-zinc-700">Now Playing</a>
@@ -128,9 +130,11 @@ defmodule TimesinkWeb.TopNav do
                     Sign Out
                   </.button>
                 </.form>
-                <.button color="primary" class="w-full md:w-1/2">
-                  Submit film
-                </.button>
+                <a href="/submit">
+                  <.button color="primary" class="w-full md:w-1/2">
+                    Submit film
+                  </.button>
+                </a>
               <% else %>
                 <a href="/sign_in">
                   <.button class="w-full md:w-1/2">

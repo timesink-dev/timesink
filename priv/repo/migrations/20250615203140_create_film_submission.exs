@@ -19,7 +19,7 @@ defmodule Timesink.Repo.Migrations.CreateFilmSubmission do
       add :status_review_updated_at, :utc_datetime_usec
       add :review_notes, :text
 
-      add :stripe_id, :string
+      add :payment_id, :string
 
       add :submitted_by_id, references(:user, type: :uuid, on_delete: :nilify_all), null: true
 

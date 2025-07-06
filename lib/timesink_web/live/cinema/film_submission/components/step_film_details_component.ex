@@ -41,13 +41,13 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
 
   def render(assigns) do
     ~H"""
-    <section class="w-full px-6 h-1/2">
+    <section class="w-full px-6">
       <div class="max-w-4xl mx-auto">
         
     <!-- Left: Form Content -->
         <div class="w-full md:w-3/5">
-          <h2 class="text-3xl font-brand mb-6">Film Submission</h2>
-          <p class="text-mystery-white/80 mb-6 text-sm">
+          <h2 class="text-3xl font-brand mb-4">Film Submission</h2>
+          <p class="text-mystery-white/80 mb-4 text-sm">
             This is where you share the essentials—your film’s name, runtime, synopsis, and how to watch it.
             We also ask for your contact info so we can reach you if your film is selected.
           </p>
@@ -56,18 +56,17 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
             phx-submit="save_film_details"
             phx-change="validate"
             phx-target={@myself}
-            class="space-y-12"
+            class="space-y-6"
           >
             
     <!-- Film Info -->
             <div>
-              <h3 class="text-xl font-semibold mb-4 text-neon-blue-lightest">Film Details</h3>
+              <h3 class="text-xl font-semibold mb-2 text-neon-blue-lightest">Film Details</h3>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <.input
                   type="text"
                   field={@form[:title]}
-                  label="Film title"
-                  placeholder="Your film’s name"
+                  placeholder="Film title"
                   required
                   input_class="w-full p-3 rounded text-mystery-white border-none"
                 />
@@ -75,8 +74,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                   type="text"
                   inputmode="numeric"
                   field={@form[:duration_min]}
-                  label="Runtime (minutes)"
-                  placeholder="e.g. 14"
+                  placeholder="Runtime (minutes)"
                   min="1"
                   required
                   input_class="w-full p-3 rounded text-mystery-white border-none"
@@ -85,8 +83,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                   type="text"
                   inputmode="numeric"
                   field={@form[:year]}
-                  label="Year"
-                  placeholder="e.g. 2024"
+                  placeholder="Year of release"
                   min="1888"
                   max={Date.utc_today().year}
                   required
@@ -94,18 +91,18 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                 />
               </div>
 
-              <div class="mt-6">
+              <div class="mt-4">
                 <.input
                   type="textarea"
                   field={@form[:synopsis]}
                   label="Synopsis"
                   placeholder="Give us a taste of what it’s about..."
                   required
-                  rows="5"
+                  rows="2"
                   input_class="w-full p-3 rounded text-mystery-white border-none"
                 />
               </div>
-              <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <.input
                   type="url"
                   field={@form[:video_url]}
@@ -132,7 +129,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                   type="text"
                   field={@form[:contact_name]}
                   label="Your name"
-                  placeholder="e.g. Alex Rivera"
+                  placeholder="Enter your full name"
                   required
                   input_class="w-full p-3 rounded text-mystery-white border-none"
                 />
@@ -179,6 +176,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
       send(self(), {:go_to_step, :next})
       {:noreply, socket}
     else
+      IO.inspect(changeset, label: "Film Submission Changeset Error")
       {:noreply, assign(socket, form: to_form(changeset))}
     end
   end

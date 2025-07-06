@@ -41,16 +41,18 @@ defmodule TimesinkWeb.Components.Hero do
           <div class="mt-8 lg:mt-0 w-full md:w-1/3 flex items-center justify-center px-6 text-white text-center md:text-left z-10">
             <div class="max-w-md">
               <div class="text-center mb-10">
-                <h2 class="text-4xl md:text-5xl font-brand text-white tracking-tight leading-tight">
-                  where great films meet great Audiences.
+                <h2 class="text-4xl font-brand text-white tracking-tight leading-tight">
+                  Fresh Cinema. Real Audiences. No endless scrolls.
                 </h2>
-                <p class="mt-4 text-base md:text-lg text-mystery-white max-w-xl mx-auto">
-                  Join a friendly broadcast of cinephiles and visionaries exploring bold cinema.
-                  Watch live. Connect in real time. Share what moves you.
+                <p class="mt-4 text-base md:text-md text-mystery-white max-w-xl mx-auto">
+                  We bring filmmakers — of all levels — to the stage.
+                  And we don’t waste your time discovering them.
+
+                  Real audiences. Real-time reactions. Conversations and feelings that last. No noise, pure signal.
                 </p>
                 <a href="/join">
-                  <.button class="mt-6 px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition font-brand">
-                    Join the waitlist
+                  <.button class="mt-6 px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition">
+                    Get started
                   </.button>
                 </a>
               </div>

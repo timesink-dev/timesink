@@ -4,6 +4,8 @@
 
 /* This file is for your main application CSS */
 
+
+
 @keyframes slide-in {
   0% {
     transform: translateX(100%); /* Start from the right of the screen */
@@ -59,4 +61,14 @@
 
 .pulse-second {
   animation: pulse 1s ease-in-out infinite;
+}
+
+
+#hero-section {
+  animation: fadeIn 2s ease;
+  background-attachment: fixed; /* for parallax effect */
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

@@ -28,19 +28,37 @@
 # Mux (https://mux.com)
 # export TIMESINK_MUX_ACCESS_KEY_ID=
 # export TIMESINK_MUX_ACCESS_KEY_SECRET=
+# export TIMESINK_MUX_WEBHOOK_KEY=
 #
 # Mux (test-specific; customize if needed)
 # export TIMESINK_TEST_MUX_ACCESS_KEY_ID=
 # export TIMESINK_TEST_MUX_ACCESS_KEY_SECRET=
+# export TIMESINK_TEST_MUX_WEBHOOK_KEY=
 
 
 # export AUTH_TOKEN_SALT="example_auth_token_salt"
 
 # Location API
-# export HERE_MAPS_API_KEY
+# export TIMESINK_HERE_MAPS_API_KEY
 
+# Payment providers
+
+# Bitcoin
+# export TIMESINK_BTC_PAY_API_URL=
+# export TIMESINK_BTC_PAY_API_KEY=
+# export TIMESINK_BTC_PAY_WEBHOOK_KEY=
+# export TIMESINK_BTC_PAY_STORE_ID=
+# export TIMESINK_TEST_BTC_PAY_API_KEY=
+# export TIMESINK_TEST_BTC_PAY_STORE_ID=
+# export TIMESINK_TEST_BTC_PAY_WEBHOOK_KEY=
+# export TIMESINK_TEST_BTC_PAY_API_URL=
+
+# Stripe
+# export TIMESINK_TEST_STRIPE_PUBLISHABLE_KEY=
+# export TIMESINK_TEST_STRIPE_SECRET_KEY=
+# export TIMESINK_TEST_STRIPE_WEBHOOK_SECRET=
 
 # Base URLs
-# export PROD_URL
-# export DEV_URL
-# export STAGING_URL
+# export TIMESINK_PROD_URL=
+# export TIMESINK_DEV_URL=
+# export TIMESINK_STAGING_URL=

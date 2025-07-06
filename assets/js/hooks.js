@@ -337,7 +337,6 @@ Hooks.EmblaMain = {
   Hooks.EmblaThumbs = {
   mounted() {
     
-this.selectedIndex = this.emblaMain?.selectedScrollSnap?.() || 0
 
     // Grab reference to the main embla instance (set globally by EmblaMain)
     this.emblaMain = window.__emblaMain__
@@ -348,8 +347,7 @@ this.selectedIndex = this.emblaMain?.selectedScrollSnap?.() || 0
 
     // Set up event handlers
     this.setupThumbClicks()
-    this.highlightSelected()
-
+    this.emblaMain.on('init', this.highlightSelected.bind(this))
     this.emblaMain.on('select', this.highlightSelected.bind(this))
   },
 
@@ -368,8 +366,6 @@ this.selectedIndex = this.emblaMain?.selectedScrollSnap?.() || 0
 
     const selectedIndex = this.emblaMain.selectedScrollSnap()
     const thumbs = this.el.querySelectorAll('[data-thumb-index]')
-
-    console.log(`Highlighting thumb at index ${selectedIndex}`)
 
     thumbs.forEach((thumb, index) => {
       if (index === selectedIndex) {
@@ -457,6 +453,77 @@ Hooks.SimulatedLivePlayback = {
   }
 }
 
+
+
+
+Hooks.StripePayment = {
+  mounted() {
+    if (this.el.dataset.mounted) return;
+    this.el.dataset.mounted = "true";
+
+    const appearance = { 
+      theme: "night",
+      labels: "floating",
+      variables: { 
+        colorDanger: "#FF6640", // Neon red light   
+        colorBackground: '#11182799', // Dark background with slight transparency
+        fontFamily: 'Gangster Grotesk, sans-serif',
+        fontSmooth: "always",
+      },
+      rules: {
+        ".Input": {
+          backgroundColor: "#11182799",
+          borderColor: "#1f2937",
+        },
+        ".Input:focus": {
+          borderColor: "#ADC9FF"
+        }
+      }
+    };
+    const stripe = Stripe(this.el.dataset.stripeKey);
+    const elements = stripe.elements({
+      clientSecret: this.el.dataset.stripeSecret,
+      appearance
+    });
+
+
+    const paymentElement = elements.create("payment", {
+      fields: {
+        billingDetails: {
+          name: "never",
+          email: "never"
+        }
+      }
+    });
+
+    paymentElement.mount("#payment-element");
+
+    this.el.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: window.location.href,
+          payment_method_data: {
+            billing_details: {
+              name: this.el.dataset.contactName,
+              email: this.el.dataset.contactEmail
+            }
+          }
+        },
+        redirect: "if_required"
+      });
+
+      const errorEl = document.querySelector("#card-errors");
+
+      if (error) {
+        console.error("Payment error:", error.message);
+        if (errorEl) errorEl.textContent = error.message;
+      }
+    });
+  }
+}
 
 
 export default Hooks;

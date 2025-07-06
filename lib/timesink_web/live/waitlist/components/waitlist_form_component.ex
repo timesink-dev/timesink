@@ -42,13 +42,13 @@ defmodule TimesinkWeb.WaitlistFormComponent do
                 field={@form[:first_name]}
                 placeholder="First name"
                 class="w-full"
-                input_class="w-full p-4 outline-width-0 rounded-lg text-mystery-white border-none focus:outline-none outline-none"
+                input_class="w-full px-3 py-4 outline-width-0 rounded-lg text-mystery-white border-none focus:outline-none outline-none"
               />
               <.input
                 field={@form[:last_name]}
                 placeholder="Last name"
                 class="w-full"
-                input_class="w-full p-4 outline-width-0 rounded-lg text-mystery-white border-none focus:outline-none outline-none"
+                input_class="w-full px-3 py-4 outline-width-0 rounded-lg text-mystery-white border-none focus:outline-none outline-none"
               />
             </div>
             <.input
@@ -57,7 +57,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
               placeholder="Enter your email"
               class="md:relative"
               error_class="md:absolute md:-bottom-12 md:left-0 md:items-center md:gap-1"
-              input_class="w-full p-4 outline-width-0 rounded-lg text-mystery-white border-none focus:outline-none outline-none"
+              input_class="w-full px-3 py-4 outline-width-0 rounded-lg text-mystery-white border-none focus:outline-none outline-none"
             />
           </div>
           <:actions>

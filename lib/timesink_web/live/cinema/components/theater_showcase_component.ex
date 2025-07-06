@@ -39,12 +39,12 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
       <div class="hidden lg:flex flex-row gap-24">
         <div class="flex flex-col space-y-12 w-1/5">
           <%= for exhibition <- @exhibitions do %>
-            <div
+            <button
               phx-click="select_theater"
               phx-value-id={exhibition.theater.id}
               phx-target={@myself}
               class={[
-                "bg-dark-theater-primary rounded-lg p-4 shadow-md cursor-pointer transition",
+                "bg-dark-theater-primary rounded-lg p-4 shadow-md cursor-pointer transition text-left",
                 "hover:bg-dark-theater-light",
                 @selected_theater_id == exhibition.theater.id && "ring-1 ring-neon-blue-lightest"
               ]}
@@ -61,7 +61,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
               <div class="mt-6 text-mystery-white font-semibold text-lg">
                 {exhibition.film.title}
               </div>
-            </div>
+            </button>
           <% end %>
         </div>
         <div class="flex-1">

@@ -96,8 +96,8 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
             <.icon name="hero-user-group" class="h-5 w-5 inline-block" /> {@live_viewer_count}
           </p>
           <.link navigate={"/now-playing/#{@exhibition.theater.slug}"}>
-            <.button class="cursor-pointer font-brand">
-              enter →
+            <.button class="cursor-pointer">
+              Enter theater →
             </.button>
           </.link>
         </div>

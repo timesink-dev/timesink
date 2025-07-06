@@ -158,6 +158,16 @@ if config_env() in [:test] do
     access_key_id: System.get_env("TIMESINK_TEST_MUX_ACCESS_KEY_ID", "MUX_ACCESS_KEY_ID_TEST"),
     access_key_secret:
       System.get_env("TIMESINK_TEST_MUX_ACCESS_KEY_SECRET", "MUX_ACCESS_KEY_SECRET")
+
+  config :timesink, :btc_pay,
+    api_key: System.get_env("TIMESINK_TEST_BTC_PAY_API_KEY") || "test-api-key",
+    url: System.get_env("TIMESINK_TEST_BTC_PAY_API_URL") || "http://localhost:23000",
+    store_id: System.get_env("TIMESINK_TEST_BTC_PAY_STORE_ID") || "test-store-id",
+    webhook_secret:
+      System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_SECRET", "BTC_PAY_WEBHOOK_SECRET_TEST"),
+    webhook_url:
+      System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_URL") ||
+        "http://localhost:4000/api/btc_pay/webhook"
 end
 
 if config_env() in [:prod] do
@@ -171,11 +181,33 @@ end
 
 base_url =
   case config_env() do
-    :dev -> System.get_env("DEV_URL") || "http://localhost:4000"
-    :prod -> System.get_env("PROD_URL") || "https://timesinkpresents.com"
+    :dev -> System.get_env("TIMESINK_DEV_URL") || "http://localhost:4000"
+    :prod -> System.get_env("TIMESINK_PROD_URL") || "https://timesinkpresents.com"
     :test -> "http://localhost:4001"
   end
 
+if config_env() == :dev do
+  config :timesink, :btc_pay,
+    api_key: System.get_env("TIMESINK_TEST_BTC_PAY_API_KEY") || "test-api-key",
+    url: System.get_env("TIMESINK_TEST_BTC_PAY_API_URL") || "http://localhost:23000",
+    store_id: System.get_env("TIMESINK_TEST_BTC_PAY_STORE_ID") || "test-store-id",
+    webhook_secret: System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_SECRET") || "test-secret",
+    webhook_url:
+      System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_URL") ||
+        "http://localhost:4000/api/btc_pay/webhook"
+end
+
+if config_env() == :dev do
+  config :timesink, :stripe,
+    secret_key: System.get_env("TIMESINK_TEST_STRIPE_SECRET_KEY") || "test-api-key",
+    publishable_key:
+      System.get_env("TIMESINK_TEST_STRIPE_PUBLISHABLE_KEY") || "test-webhook-secret"
+end
+
+if config_env() == :dev do
+  config :stripity_stripe, api_key: System.get_env("TIMESINK_TEST_STRIPE_SECRET_KEY")
+end
+
 config :timesink, base_url: base_url
 
-config :timesink, :here_maps_api_key, System.get_env("HERE_MAPS_API_KEY")
+config :timesink, :here_maps_api_key, System.get_env("TIMESINK_HERE_MAPS_API_KEY")
