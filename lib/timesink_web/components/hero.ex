@@ -46,7 +46,7 @@ defmodule TimesinkWeb.Components.Hero do
                 </h2>
                 <p class="mt-4 text-base md:text-md text-mystery-white max-w-xl mx-auto">
                   We bring filmmakers — of all levels — to the stage.
-                  And we don’t waste your time discovering great art.
+                  And we don’t waste your time discovering them.
 
                   Real audiences. Real-time reactions. Conversations and feelings that last. No noise, pure signal.
                 </p>

@@ -337,7 +337,6 @@ Hooks.EmblaMain = {
   Hooks.EmblaThumbs = {
   mounted() {
     
-this.selectedIndex = this.emblaMain?.selectedScrollSnap?.() || 0
 
     // Grab reference to the main embla instance (set globally by EmblaMain)
     this.emblaMain = window.__emblaMain__
@@ -348,8 +347,7 @@ this.selectedIndex = this.emblaMain?.selectedScrollSnap?.() || 0
 
     // Set up event handlers
     this.setupThumbClicks()
-    this.highlightSelected()
-
+    this.emblaMain.on('init', this.highlightSelected.bind(this))
     this.emblaMain.on('select', this.highlightSelected.bind(this))
   },
 
@@ -368,8 +366,6 @@ this.selectedIndex = this.emblaMain?.selectedScrollSnap?.() || 0
 
     const selectedIndex = this.emblaMain.selectedScrollSnap()
     const thumbs = this.el.querySelectorAll('[data-thumb-index]')
-
-    console.log(`Highlighting thumb at index ${selectedIndex}`)
 
     thumbs.forEach((thumb, index) => {
       if (index === selectedIndex) {
