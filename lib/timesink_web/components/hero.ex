@@ -42,7 +42,7 @@ defmodule TimesinkWeb.Components.Hero do
             <div class="max-w-md">
               <div class="text-center mb-10">
                 <h2 class="text-4xl font-brand text-white tracking-tight leading-tight">
-                  Not just cinema. TimeSink.
+                  Not just a cinema. TimeSink.
                 </h2>
                 <p class="mt-4 text-base md:text-md text-mystery-white max-w-xl mx-auto">
                   A live platform where bold films meet real-time conversation.

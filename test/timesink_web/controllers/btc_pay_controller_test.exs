@@ -3,7 +3,10 @@ defmodule TimesinkWeb.BtcPayControllerTest do
   import Timesink.Factory
   alias Timesink.Cinema.FilmSubmission
 
-  @webhook_secret System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_SECRET")
+  @webhook_secret System.get_env(
+                    "TIMESINK_TEST_BTC_PAY_WEBHOOK_SECRET",
+                    "BTC_PAY_WEBHOOK_SECRET_TEST"
+                  )
 
   @valid_sig "validsig123"
 

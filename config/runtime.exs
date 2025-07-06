@@ -163,7 +163,8 @@ if config_env() in [:test] do
     api_key: System.get_env("TIMESINK_TEST_BTC_PAY_API_KEY") || "test-api-key",
     url: System.get_env("TIMESINK_TEST_BTC_PAY_API_URL") || "http://localhost:23000",
     store_id: System.get_env("TIMESINK_TEST_BTC_PAY_STORE_ID") || "test-store-id",
-    webhook_secret: System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_SECRET") || "test-secret",
+    webhook_secret:
+      System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_SECRET", "BTC_PAY_WEBHOOK_SECRET_TEST"),
     webhook_url:
       System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_URL") ||
         "http://localhost:4000/api/btc_pay/webhook"
