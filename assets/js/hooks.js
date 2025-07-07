@@ -348,6 +348,7 @@ Hooks.EmblaMain = {
     // Set up event handlers
     this.setupThumbClicks()
     this.emblaMain.on('init', this.highlightSelected.bind(this))
+    this.emblaMain.on('reInit', this.highlightSelected.bind(this))
     this.emblaMain.on('select', this.highlightSelected.bind(this))
   },
 
