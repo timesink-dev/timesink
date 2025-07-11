@@ -45,10 +45,10 @@ defmodule TimesinkWeb.Components.Hero do
                   Fresh Cinema. Real Audiences. No endless scrolls.
                 </h2>
                 <p class="mt-4 text-base md:text-md text-mystery-white max-w-xl mx-auto">
-                  We bring filmmakers — of all levels — to the stage.
+                  We bring great filmmakers — of all levels — to the stage.
                   And we don’t waste your time discovering them.
 
-                  Real audiences. Real-time reactions. Conversations and feelings that last. No noise, pure signal.
+                  Real audiences. Real-time reactions. Conversations and feels that last. No noise — pure signal.
                 </p>
                 <a href="/join">
                   <.button class="mt-6 px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition">

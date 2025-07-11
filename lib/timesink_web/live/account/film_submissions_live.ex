@@ -29,8 +29,11 @@ defmodule TimesinkWeb.Accounts.FilmSubmissionsLive do
             <thead class="bg-gray-900 border-b border-gray-800">
               <tr>
                 <th class="text-left text-gray-400 text-sm font-semibold px-4 py-3">Title</th>
-                <th class="text-left text-gray-400 text-sm font-semibold px-4 py-3">Status</th>
                 <th class="text-left text-gray-400 text-sm font-semibold px-4 py-3">Submitted</th>
+                <th class="text-left text-gray-400 text-sm font-semibold px-4 py-3">Status</th>
+                <th class="text-left text-gray-400 text-sm font-semibold px-4 py-3">
+                  Last status update
+                </th>
                 <th class="text-left text-gray-400 text-sm font-semibold px-4 py-3">Notes</th>
               </tr>
             </thead>
@@ -40,12 +43,15 @@ defmodule TimesinkWeb.Accounts.FilmSubmissionsLive do
                   <td class="px-4 py-3 text-white font-medium">
                     {s.title || "Untitled Film"}
                   </td>
+                  <td class="px-4 py-3 text-gray-400 text-sm">
+                    {format_datetime(s.inserted_at)}
+                  </td>
                   <td class="px-4 py-3 flex items-center gap-2 text-sm">
                     {status_icon(s.status_review)}
                     <span class="text-gray-300">{human_status(s.status_review)}</span>
                   </td>
                   <td class="px-4 py-3 text-gray-400 text-sm">
-                    {format_datetime(s.inserted_at)}
+                    {format_datetime(s.status_review_updated_at)}
                   </td>
                   <td class="px-4 py-3 text-amber-200 text-sm italic">
                     {s.review_notes || "—"}
