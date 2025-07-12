@@ -101,5 +101,5 @@ config :tesla, adapter: {Tesla.Adapter.Finch, name: Timesink.Finch}
 config :timesink, Timesink.Storage.Mux, webhook_key: "mux-test"
 
 config :timesink, :ghost_content,
-  host: "https://timesink-presents.ghost.io/",
-  api_key: System.get_env("GHOST_API_KEY")
+  host: "https://timesink.ghost.io/",
+  api_key: System.get_env("TIMESINK_GHOST_CONTENT_API_KEY")
