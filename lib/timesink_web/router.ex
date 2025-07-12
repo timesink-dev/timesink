@@ -73,7 +73,7 @@ defmodule TimesinkWeb.Router do
       live "/me", Accounts.MeLive
       live "/me/profile", Accounts.ProfileSettingsLive
       live "/me/security", Accounts.SecuritySettingsLive
-      live "/me/film-submissions", Accounts.FilmSubmissionsLive
+      live "/me/film-submissions", Accounts.PersonalFilmSubmissionsLive
       live "/now-playing/:theater_slug", Cinema.TheaterLive
     end
   end
