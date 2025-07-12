@@ -1,6 +1,8 @@
 defmodule TimesinkWeb.FilmSubmissionLive do
   use TimesinkWeb, :live_view
 
+  alias Timesink.Cinema.Mail
+
   alias TimesinkWeb.FilmSubmission.{
     StepIntroComponent,
     StepFilmDetailsComponent,
@@ -256,11 +258,6 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     updated = Map.merge(socket.assigns.data, params)
     complete = film_details_complete?(updated)
 
-    # log assigns data for debugging
-    Logger.debug("Film submission data before update: #{inspect(socket.assigns.data)}")
-
-    Logger.info("Updating film submission data: #{inspect(updated)}")
-
     # Only try to update if we have a payment intent ID
     maybe_update_stripe_metadata(updated)
 
@@ -353,6 +350,12 @@ defmodule TimesinkWeb.FilmSubmissionLive do
         %Phoenix.Socket.Broadcast{event: "film_submission_completed", payload: submission},
         socket
       ) do
+    Mail.send_film_submission_completion_notification(
+      socket.assigns.applicant.contact_email,
+      socket.assigns.applicant.contact_name,
+      submission
+    )
+
     {:noreply,
      socket
      |> assign(:film_submission, submission)}

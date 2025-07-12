@@ -1,4 +1,6 @@
 defmodule TimesinkWeb.Admin.FilmSubmissionLive do
+  alias Timesink.Cinema.Mail
+
   use Backpex.LiveResource,
     adapter_config: [
       schema: Timesink.Cinema.FilmSubmission,
@@ -71,7 +73,7 @@ defmodule TimesinkWeb.Admin.FilmSubmissionLive do
         label: "Status",
         options: fn _assigns ->
           [
-            {"Pending", :received},
+            {"Received", :received},
             {"Under Review", :under_review},
             {"Accepted", :accepted},
             {"Rejected", :rejected}
@@ -84,4 +86,17 @@ defmodule TimesinkWeb.Admin.FilmSubmissionLive do
       }
     ]
   end
+
+  @impl Backpex.LiveResource
+  def on_item_updated(socket, %Timesink.Cinema.FilmSubmission{} = submission) do
+    maybe_send_film_status_email(submission)
+    {socket, :ok}
+  end
+
+  defp maybe_send_film_status_email(%{status_review: new_status} = submission)
+       when new_status in [:accepted, :rejected, :under_review] do
+    Mail.send_film_status_update(submission, new_status)
+  end
+
+  defp maybe_send_film_status_email(_), do: :noop
 end
