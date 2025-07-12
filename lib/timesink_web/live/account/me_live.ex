@@ -56,7 +56,7 @@ defmodule TimesinkWeb.Accounts.MeLive do
             %{
               title: "Film submissions",
               icon: "hero-film",
-              coming_soon: true
+              link: ~p"/me/film-submissions"
             }
           ]}
         />
