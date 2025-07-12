@@ -47,6 +47,12 @@
       >
         <.icon name="hero-document-check" class="h-5 w-5" /> Media Management
       </Backpex.HTML.Layout.sidebar_item>
+            <Backpex.HTML.Layout.sidebar_item
+        current_url={@current_url}
+        navigate={~p"/admin/film-submissions"}
+      >
+        <.icon name="hero-envelope-open" class="h-5 w-5" /> Film Submissions
+      </Backpex.HTML.Layout.sidebar_item>
       <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate="/admin/genres">
         <Backpex.HTML.CoreComponents.icon name="hero-tag" class="h-5 w-5" /> Genres
       </Backpex.HTML.Layout.sidebar_item>
