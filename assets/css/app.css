@@ -72,3 +72,67 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+
+// For blog posts
+
+.ghost-blog-title {
+  font-size: 3rem;
+  margin: 10px 0;
+  line-height: 1em;
+}
+
+.ghost-blog-content h2 {
+  font-size: 2rem;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.ghost-blog-content p {
+  content: "\a";
+  white-space: preline;
+  margin-bottom: 2em;
+}
+
+.ghost-blog-content img {
+  max-width: 100%;
+  width: 35%;
+  display: block;
+  margin: 0 auto;
+}
+
+.ghost-blog-content figcaption {
+  font-size: 0.8em;
+  color: #718096;
+  margin-top: 0.5em;
+  margin-bottom: 2em;
+  text-align: center;
+}
+
+.ghost-blog-content blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding: 0.5em 1em;
+  margin: 1em 0;
+  font-style: italic;
+  color: #718096;
+}
+
+
+.ghost-blog-content blockquote::before {
+  content: open-quote;
+}
+.ghost-blog-content blockquote::after {
+  content: close-quote;
+}
+
+.ghost-blog-content blockquote {
+  text-indent: -0.45em;
+  font-size: 20px;
+  /* border-left: 2px solid #e2e8f0; */
+}
+@supports (hanging-punctuation: first) {
+  .ghost-blog-content blockquote {
+    text-indent: 0;
+    hanging-punctuation: first;
+  }
+}

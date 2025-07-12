@@ -116,6 +116,7 @@ defmodule TimesinkWeb.Router do
       live "/submit", FilmSubmissionLive
       live "/archives", Cinema.ArchivesLive
       live "/blog", BlogLive
+      live "/blog/:slug", BlogPostLive
       live "/upcoming", UpcomingLive
       live "/now-playing", Cinema.NowPlayingLive
       live "/:profile_username", Accounts.ProfileLive
