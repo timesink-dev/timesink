@@ -34,7 +34,10 @@ defmodule Timesink.Cinema.Mail do
   end
 
   defp format_status(:received), do: "Received 📨"
-  defp format_status(:under_review), do: "Under Review 🔍"
+
+  defp format_status(:under_review),
+    do: "Under Review 🔍 as we are currently watching your submission."
+
   defp format_status(:accepted), do: "Accepted ✅"
   defp format_status(:rejected), do: "Rejected"
 
@@ -47,7 +50,9 @@ defmodule Timesink.Cinema.Mail do
         "Unfortunately, your film submission for <i>#{submission.title}</i> has not been accepted at this time. We appreciate your effort and encourage you to submit again in the future."
 
       _ ->
-        "Your film submission for <i>#{submission.title}</i> status has been updated to #{format_status(new_status)} -- We'll keep you posted on any further updates."
+        "Your film submission for <i>#{submission.title}</i> status has been updated to #{format_status(new_status)}
+
+        We'll keep you posted on any further updates."
     end
   end
 end
