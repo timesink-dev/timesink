@@ -4,13 +4,15 @@ defmodule TimesinkWeb.Accounts.PersonalFilmSubmissionsLive do
   import Ecto.Query
 
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Phoenix.PubSub.subscribe(Timesink.PubSub, "film_submissions")
+    end
+
     submissions =
       Timesink.Cinema.FilmSubmission
       |> where([fs], fs.submitted_by_id == ^socket.assigns.current_user.id)
       |> order_by(desc: :inserted_at)
       |> Timesink.Repo.all()
-
-    assign(socket, submissions: submissions)
 
     {:ok, assign(socket, submissions: submissions)}
   end
@@ -78,6 +80,28 @@ defmodule TimesinkWeb.Accounts.PersonalFilmSubmissionsLive do
       <% end %>
     </section>
     """
+  end
+
+  def handle_info({"film_submission_updated", submission}, socket) do
+    update_submission_if_owned(submission, socket)
+  end
+
+  def handle_info({"backpex:film_submission_updated", submission}, socket) do
+    update_submission_if_owned(submission, socket)
+  end
+
+  defp update_submission_if_owned(submission, socket) do
+    if submission.submitted_by_id == socket.assigns.current_user.id do
+      updated =
+        socket.assigns.submissions
+        |> Enum.map(fn s ->
+          if s.id == submission.id, do: submission, else: s
+        end)
+
+      {:noreply, assign(socket, submissions: updated)}
+    else
+      {:noreply, socket}
+    end
   end
 
   defp format_datetime(dt) do

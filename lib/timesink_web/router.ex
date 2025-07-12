@@ -95,6 +95,7 @@ defmodule TimesinkWeb.Router do
       live_resources "/theaters", Admin.TheaterLive
       live_resources "/genres", Admin.GenreLive
       live_resources "/members", Admin.UserLive
+      live_resources "/film-submissions", Admin.FilmSubmissionLive
       live_resources "/creatives", Admin.CreativeLive
       live_resources "/film_creatives", Admin.FilmCreativeLive
     end
