@@ -42,6 +42,30 @@ defmodule TimesinkWeb.Admin.FilmSubmissionLive do
         module: Backpex.Fields.Textarea,
         label: "Synopsis"
       },
+      video_url: %{
+        module: Backpex.Fields.Text,
+        label: "Video URL"
+      },
+      video_pw: %{
+        module: Backpex.Fields.Text,
+        label: "Video Password"
+      },
+      year: %{
+        module: Backpex.Fields.Number,
+        label: "Year"
+      },
+      duration_min: %{
+        module: Backpex.Fields.Number,
+        label: "Duration (min)"
+      },
+      contact_name: %{
+        module: Backpex.Fields.Text,
+        label: "Contact Name"
+      },
+      contact_email: %{
+        module: Backpex.Fields.Text,
+        label: "Contact Email"
+      },
       status_review: %{
         module: Backpex.Fields.Select,
         label: "Status",
@@ -53,6 +77,10 @@ defmodule TimesinkWeb.Admin.FilmSubmissionLive do
             {"Rejected", :rejected}
           ]
         end
+      },
+      review_notes: %{
+        module: Backpex.Fields.Textarea,
+        label: "Review Notes"
       }
     ]
   end
