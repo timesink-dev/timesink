@@ -47,8 +47,9 @@ defmodule TimesinkWeb.Admin.FilmSubmissionLive do
         label: "Status",
         options: fn _assigns ->
           [
-            {"Pending", :pending},
-            {"Approved", :approved},
+            {"Pending", :received},
+            {"Under Review", :under_review},
+            {"Accepted", :accepted},
             {"Rejected", :rejected}
           ]
         end

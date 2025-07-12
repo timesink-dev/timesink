@@ -50,7 +50,7 @@ defmodule Timesink.Cinema.FilmSubmission do
     timestamps(type: :utc_datetime)
   end
 
-  @valid_statuses ~w(received under_review accepted rejected)
+  @valid_statuses @statuses_review
 
   def changeset(submission, attrs, _metadata \\ []) do
     submission
