@@ -14,17 +14,25 @@ defmodule TimesinkWeb.BlogLive do
   def render(assigns) do
     ~H"""
     <section class="px-6 md:px-24 py-16">
-      <h1 class="text-xl font-gangster uppercase mb-12">Fresh off the press</h1>
+      <div class="mb-12">
+        <h1 class="text-md font-semibold text-gray-100 tracking-widest uppercase">
+          Fresh off the press
+        </h1>
+        <p class="text-xs text-gray-400 mt-2">
+          Featuring op-eds, stories, essays, and insights from guest authors and the TimeSink community
+        </p>
+      </div>
 
       <div class="space-y-12">
         <%= for post <- @posts do %>
-          <article class="border-t border-t-dark-theater-medium border-t-[0.2px] pt-8">
-            <!-- Title -->
-            <a href={~p"/blog/#{post.slug}"}>
-              <h2 class="text-gray-400 text-2xl font-semibold hover:underline mb-4 tracking-tight leading-snug">
-                {post.title}
-              </h2>
-            </a>
+          <article
+            class="hover:cursor-pointer border-t border-t-dark-theater-medium border-t-[0.2px] pt-8"
+            phx-click="navigate_to_post"
+            phx-value-slug={post.slug}
+          >
+            <h2 class="text-gray-400 text-2xl font-semibold hover:underline mb-4 tracking-tight leading-snug">
+              {post.title}
+            </h2>
             
     <!-- Image + Excerpt row -->
             <div class="flex flex-col md:flex-row gap-6">
@@ -37,15 +45,15 @@ defmodule TimesinkWeb.BlogLive do
               </a>
               <div class="flex flex-col justify-between">
                 <div>
-                  <p class="italic text-gray-400 text-sm">
+                  <p class="italic text-gray-400 text-md w-2/3">
                     {if post.excerpt, do: String.slice(post.excerpt, 0, 160) <> "...", else: ""}
                   </p>
-                  <a
+                  <%!-- <a
                     href={~p"/blog/#{post.slug}"}
-                    class="mt-2 inline-block text-xs text-neon-blue-lightest hover:underline"
+                    class="mt-2 text-sm inline-block text-neon-blue-lightest hover:underline"
                   >
-                    Read →
-                  </a>
+                    Read more →
+                  </a> --%>
                 </div>
                 <div class="mt-4 text-xs text-dark-theater-light flex items-center justify-between">
                   <span>By {first_author(post)} — {format_date(post.published_at)}</span>
@@ -72,6 +80,10 @@ defmodule TimesinkWeb.BlogLive do
   #   |> List.first()
   #   |> then(& &1.name)
   # end
+
+  def handle_event("navigate_to_post", %{"slug" => slug}, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/blog/#{slug}")}
+  end
 
   defp first_author(post), do: post.primary_author || "Unknown"
 
