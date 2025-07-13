@@ -45,15 +45,9 @@ defmodule TimesinkWeb.BlogLive do
               </a>
               <div class="flex flex-col justify-between">
                 <div>
-                  <p class="italic text-gray-400 text-md w-2/3">
+                  <p class="italic text-gray-400 text-md lg:w-2/3">
                     {if post.excerpt, do: String.slice(post.excerpt, 0, 160) <> "...", else: ""}
                   </p>
-                  <%!-- <a
-                    href={~p"/blog/#{post.slug}"}
-                    class="mt-2 text-sm inline-block text-neon-blue-lightest hover:underline"
-                  >
-                    Read more →
-                  </a> --%>
                 </div>
                 <div class="mt-4 text-xs text-dark-theater-light flex items-center justify-between">
                   <span>By {first_author(post)} — {format_date(post.published_at)}</span>
