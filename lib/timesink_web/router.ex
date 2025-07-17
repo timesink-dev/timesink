@@ -41,6 +41,7 @@ defmodule TimesinkWeb.Router do
     post "/webhooks/mux.com/:webhook_key", MuxController, :webhook
     post "/webhooks/btc-pay.server", BtcPayController, :webhook
     post "/webhooks/stripe.com", StripeController, :webhook
+    post "/webhooks/ghost.io/:event_type", GhostPublishingController, :webhook
   end
 
   scope "/", TimesinkWeb do

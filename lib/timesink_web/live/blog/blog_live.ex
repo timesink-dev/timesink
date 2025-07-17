@@ -18,8 +18,8 @@ defmodule TimesinkWeb.BlogLive do
         <h1 class="text-md font-semibold text-gray-100 tracking-widest uppercase">
           Fresh off the press
         </h1>
-        <p class="text-xs text-gray-400 mt-2">
-          Featuring op-eds, stories, essays, and insights from guest authors and the TimeSink community
+        <p class="text-xs text-gray-400 mt-2 max-w-lg">
+          Featuring op-eds, stories, essays, analysis and insights from guest authors and the TimeSink community on a wide range of topics from cinema to politics, social commentary, and more.
         </p>
       </div>
 

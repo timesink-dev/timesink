@@ -11,10 +11,14 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
   def render(assigns) do
     ~H"""
     <div class="archives-page px-6 py-10 max-w-6xl mx-auto">
-      <h1 class="text-4xl font-semibold mb-2">Archives</h1>
-      <p class="text-gray-400 text-sm mb-12 max-w-prose">
-        A curated record of our past screenings, presented by theater and showcase.
-      </p>
+      <div class="mb-12">
+        <h1 class="text-md font-semibold text-gray-100 tracking-widest uppercase">
+          Archives
+        </h1>
+        <p class="text-xs text-gray-400 mt-2">
+          A curated index of past screenings and showcases across all TimeSink theaters.
+        </p>
+      </div>
 
       <%= for {showcase, _idx} <- Enum.with_index(@showcases) do %>
         <div class="showcase mb-20 pb-10 border-b border-gray-800">

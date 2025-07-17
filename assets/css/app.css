@@ -76,63 +76,75 @@
 
 // For blog posts
 
-.ghost-blog-title {
-  font-size: 3rem;
-  margin: 10px 0;
-  line-height: 1em;
-}
 
-.ghost-blog-content h2 {
-  font-size: 2rem;
-  margin-top: 10px;
-  margin-bottom: 4px;
-}
+/* Container styles */
+.ghost-post { max-width: 720px; margin: auto; }
 
-.ghost-blog-content p {
-  content: "\a";
-  white-space: preline;
-  margin-bottom: 2em;
-}
-
-.ghost-blog-content img {
-  max-width: 100%;
-  width: 35%;
+/* Figures & images */
+.kg-image-card img,
+.kg-gallery-image img {
   display: block;
-  margin: 0 auto;
+  margin: auto;
+  max-width: 100%;
+  height: auto;
 }
-
-.ghost-blog-content figcaption {
-  font-size: 0.8em;
-  color: #718096;
-  margin-top: 0.5em;
-  margin-bottom: 2em;
-  text-align: center;
-}
-
-.ghost-blog-content blockquote {
-  border-left: 4px solid #e2e8f0;
-  padding: 0.5em 1em;
+.kg-gallery-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75em;
   margin: 1em 0;
-  font-style: italic;
-  color: #718096;
+}
+.kg-gallery-card {
+  width: 100%;
+}
+.kg-gallery-card:nth-child(n+2) {
+  margin-top: 0.75em;
 }
 
+/* Captions */
+figcaption {
+  font-size: 0.875em;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 0.5em;
+}
 
-.ghost-blog-content blockquote::before {
-  content: open-quote;
-}
-.ghost-blog-content blockquote::after {
-  content: close-quote;
+/* Callout cards */
+.kg-callout-card {
+  border-radius: .375rem;
+  background-color: #f9fafb;
+  padding: 1em;
+  margin: 1.5em 0;
 }
 
-.ghost-blog-content blockquote {
-  text-indent: -0.45em;
-  font-size: 20px;
-  /* border-left: 2px solid #e2e8f0; */
+/* Blockquotes */
+blockquote {
+  border-left: 4px solid #d1d5db;
+  padding-left: 1em;
+  color: #4b5563;
+  margin: 1.5em 0;
 }
-@supports (hanging-punctuation: first) {
-  .ghost-blog-content blockquote {
-    text-indent: 0;
-    hanging-punctuation: first;
-  }
+
+/* Code blocks */
+pre,
+pre code {
+  background-color: #f3f4f6;
+  padding: 1em;
+  overflow-x: auto;
+  border-radius: .25rem;
+  font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Links */
+.ghost-post a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+.ghost-post a:hover {
+  color: #1e40af;
+}
+
+/* General typography */
+.ghost-post img {
+  border-radius: .375rem;
 }

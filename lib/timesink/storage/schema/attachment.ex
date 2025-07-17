@@ -24,8 +24,6 @@ defmodule Timesink.Storage.Attachment do
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset(att :: t(), params :: %{optional(atom()) => term()}) ::
-          Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = att, %{} = params) do
     att
     |> cast(params, [:blob_id, :assoc_id, :name])

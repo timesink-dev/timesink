@@ -36,10 +36,11 @@ defmodule TimesinkWeb.BlogPostLive do
           {raw(@post.feature_image_caption)}
         </span>
       </div>
-      <div class="ghost-blog-content first-letter:text-7xl first-letter:float-left first-letter:pr-1 mx-40">
+      <div class="ghost-post first-letter:text-7xl first-letter:float-left first-letter:pr-1 mx-40">
         {raw(@post.html)}
       </div>
       <div class="mx-24">
+        <div class="border-t border-dark-theater-medium my-8" />
         <h3 class="mt-6 mb-4">Comments</h3>
       </div>
     </section>

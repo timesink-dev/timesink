@@ -24,14 +24,14 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
     ~H"""
     <div class="bg-backroom-black py-16 px-6 max-w-7xl mx-auto mt-12">
       <div class="mb-32 md:mb-72 max-w-3xl mx-auto text-center px-4">
-        <h2 class="text-4xl md:text-5xl tracking-tight text-white mb-4 font-brand">
+        <h2 class="text-2xl tracking-widest text-mystery-white font-brand">
           Featured Showcase
         </h2>
-        <div class="h-1 w-20 mt-12 bg-neon-blue-lightest mx-auto mb-6 animate-pulse rounded-full" />
-        <div class="text-xl md:text-2xl font-light text-neon-blue-lightest mb-2">
+        <div class="h-1 w-20 my-8 bg-neon-blue-lightest mx-auto animate-pulse rounded-full" />
+        <div class="text-xl font-light text-neon-blue-lightest mb-2">
           {@showcase.title}
         </div>
-        <div class="text-mystery-white text-sm md:text-lg font-light leading-relaxed max-w-2xl mx-auto font-light">
+        <div class="text-gray-400 text-sm leading-relaxed max-w-lg mx-auto font-light text-left">
           {@showcase.description}
         </div>
       </div>
