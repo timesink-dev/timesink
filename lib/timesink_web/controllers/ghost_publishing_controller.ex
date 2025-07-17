@@ -8,6 +8,8 @@ defmodule TimesinkWeb.GhostPublishingController do
 
   def webhook(%Plug.Conn{assigns: %{raw_body: raw}} = conn, %{"event_type" => type}) do
     with {:ok, data} <- Jason.decode(raw) do
+      Logger.info("Received Ghost webhook data: #{inspect(data)}")
+
       GhostPublishingWebhookHandler.handle_event(%{
         "type" => type,
         "data" => data

@@ -116,8 +116,8 @@ defmodule TimesinkWeb.Router do
       live "/", HomepageLive
       live "/submit", FilmSubmissionLive
       live "/archives", Cinema.ArchivesLive
-      live "/blog", BlogLive
-      live "/blog/:slug", BlogPostLive
+      get "/blog", RedirectController, :ghost_blog
+      get "/blog/:slug", RedirectController, :ghost_blog_post
       live "/upcoming", UpcomingLive
       live "/now-playing", Cinema.NowPlayingLive
       live "/:profile_username", Accounts.ProfileLive

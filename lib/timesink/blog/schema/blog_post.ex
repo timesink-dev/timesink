@@ -4,11 +4,14 @@ defmodule Timesink.BlogPost do
   use Timesink.Schema
   import Ecto.Changeset
 
+  alias Timesink.Comment
+
   @type t :: %{
           __struct__: __MODULE__,
           title: :string,
           content: :string,
           author: :string,
+          slug: :string,
           published_at: :utc_datetime
         }
 
@@ -17,19 +20,20 @@ defmodule Timesink.BlogPost do
 
   schema "blog_post" do
     field :title, :string
+    field :slug, :string
     field :content, :string
     field :author, :string
     field :published_at, :utc_datetime
 
-    has_many :comments, {"blog_post_comments", Timesink.Comment}, foreign_key: :assoc_id
+    has_many :comments, {"blog_post_comments", Comment}, foreign_key: :assoc_id
 
     timestamps(type: :utc_datetime)
   end
 
   def changeset(blog, params) do
     blog
-    |> cast(params, [:title, :content, :author, :published_at])
-    |> validate_required([:title, :content, :author])
+    |> cast(params, [:title, :slug, :content, :author, :published_at])
+    |> validate_required([:title, :slug, :content, :author])
     |> validate_length(:title, min: 1)
     |> validate_length(:content, min: 1)
   end

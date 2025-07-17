@@ -9,7 +9,9 @@ defmodule Timesink.Comment do
           content: :string,
           user_id: Ecto.UUID.t(),
           user: Timesink.Accounts.User.t(),
-          assoc_id: Ecto.UUID.t()
+          assoc_id: Ecto.UUID.t(),
+          parent: Timesink.Comment.t() | nil,
+          parent_id: Ecto.UUID.t() | nil
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -18,17 +20,23 @@ defmodule Timesink.Comment do
   schema "abstract table: comment" do
     field :content, :string
     field :assoc_id, :binary_id
+
+    # the author of the comment
     belongs_to :user, Timesink.Accounts.User
+
+    # Optional parent for threading (1-level replies)
+    belongs_to :parent, __MODULE__
 
     timestamps(type: :utc_datetime)
   end
 
   def changeset(%{__struct__: __MODULE__} = comment, %{} = params) do
     comment
-    |> cast(params, [:content, :assoc_id])
-    |> validate_required([:content, :assoc_id])
+    |> cast(params, [:content, :assoc_id, :user_id, :parent_id])
+    |> validate_required([:content, :assoc_id, :user_id])
     |> validate_length(:content, min: 1)
     |> foreign_key_constraint(:assoc_id)
     |> assoc_constraint(:user)
+    |> assoc_constraint(:parent)
   end
 end
