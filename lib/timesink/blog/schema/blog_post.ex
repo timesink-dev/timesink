@@ -25,7 +25,7 @@ defmodule Timesink.BlogPost do
     field :author, :string
     field :published_at, :utc_datetime
 
-    has_many :comments, {"blog_post_comments", Comment}, foreign_key: :assoc_id
+    has_many :comments, {"blog_post_comment", Comment}, foreign_key: :assoc_id
 
     timestamps(type: :utc_datetime)
   end

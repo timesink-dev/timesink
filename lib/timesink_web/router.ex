@@ -79,6 +79,12 @@ defmodule TimesinkWeb.Router do
     end
   end
 
+  scope "/", TimesinkWeb do
+    pipe_through :browser
+
+    live "/blog/:slug/comments", BlogPostCommentsLive, :show
+  end
+
   scope "/admin", TimesinkWeb do
     pipe_through [:browser, :require_admin]
 

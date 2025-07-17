@@ -14,6 +14,11 @@ alias Timesink.Accounts.User
 alias Timesink.Accounts.Profile
 alias Timesink.Accounts.Location
 
+alias Timesink.Comment
+
+# Timesink.Blog
+alias Timesink.BlogPost
+
 # Timesink.Cinema
 alias Timesink.Cinema
 alias Timesink.Cinema.Creative
