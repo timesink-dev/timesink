@@ -12,7 +12,7 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
     ~H"""
     <div class="archives-page px-6 py-10 max-w-6xl mx-auto">
       <div class="mb-12">
-        <h1 class="text-md font-semibold text-gray-100 tracking-widest uppercase">
+        <h1 class="text-lg font-semibold text-gray-100 tracking-tight uppercase">
           Archives
         </h1>
         <p class="text-xs text-gray-400 mt-2">

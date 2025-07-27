@@ -15,6 +15,10 @@ defmodule TimesinkWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :remove_x_frame_options do
+    plug TimesinkWeb.Plugs.FrameHeader
+  end
+
   pipeline :put_current_user do
     plug TimesinkWeb.Plugs.PutCurrentUser
   end
@@ -79,12 +83,6 @@ defmodule TimesinkWeb.Router do
     end
   end
 
-  scope "/", TimesinkWeb do
-    pipe_through :browser
-
-    live "/blog/:slug/comments", BlogPostCommentsLive, :show
-  end
-
   scope "/admin", TimesinkWeb do
     pipe_through [:browser, :require_admin]
 
@@ -127,6 +125,14 @@ defmodule TimesinkWeb.Router do
       live "/upcoming", UpcomingLive
       live "/now-playing", Cinema.NowPlayingLive
       live "/:profile_username", Accounts.ProfileLive
+    end
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :put_current_user]
+
+    live_session :blog_comments, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
+      live "/blog/:slug/comments", BlogPostCommentsLive
     end
   end
 
