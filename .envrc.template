@@ -6,7 +6,7 @@
 
 
 # Mailer (Resend. https://resend.com)
-# export RESEND_API_KEY="resend_api_key"
+# export TIMESINK_RESEND_API_KEY="resend_api_key"
 
 
 # Storage

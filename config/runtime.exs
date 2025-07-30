@@ -20,7 +20,7 @@ if System.get_env("PHX_SERVER") do
   config :timesink, TimesinkWeb.Endpoint, server: true
 end
 
-config :timesink, Timesink.Mailer, api_key: System.fetch_env!("RESEND_API_KEY")
+config :timesink, Timesink.Mailer, api_key: System.fetch_env!("TIMESINK_RESEND_API_KEY")
 
 database_url =
   System.get_env("DATABASE_URL") ||
@@ -179,9 +179,24 @@ if config_env() in [:prod] do
     access_key_secret: System.fetch_env!("TIMESINK_S3_ACCESS_KEY_SECRET")
 end
 
+if config_env() in [:staging] do
+  config :timesink, Timesink.Storage.S3,
+    host: System.fetch_env!("TIMESINK_STAGING_S3_HOST"),
+    access_key_id: System.fetch_env!("TIMESINK_STAGING_S3_ACCESS_KEY_ID"),
+    access_key_secret: System.fetch_env!("TIMESINK_STAGING_S3_ACCESS_KEY_SECRET"),
+    bucket: System.fetch_env!("TIMESINK_STAGING_S3_BUCKET"),
+    prefix: System.fetch_env!("TIMESINK_STAGING_S3_PREFIX")
+
+  config :timesink, Timesink.Storage.Mux,
+    webhook_key: System.fetch_env!("TIMESINK_STAGING_MUX_WEBHOOK_KEY"),
+    access_key_id: System.fetch_env!("TIMESINK_STAGING_MUX_ACCESS_KEY_ID"),
+    access_key_secret: System.fetch_env!("TIMESINK_STAGING_MUX_ACCESS_KEY_SECRET")
+end
+
 base_url =
   case config_env() do
     :dev -> System.get_env("TIMESINK_DEV_URL") || "http://localhost:4000"
+    :staging -> System.get_env("TIMESINK_STAGING_URL") || "https://staging.timesinkpresents.com"
     :prod -> System.get_env("TIMESINK_PROD_URL") || "https://timesinkpresents.com"
     :test -> "http://localhost:4001"
   end
@@ -197,6 +212,22 @@ if config_env() == :dev do
         "http://localhost:4000/api/btc_pay/webhook"
 end
 
+if config_env() == :staging do
+  config :timesink, :btc_pay,
+    api_key: System.get_env("TIMESINK_STAGING_BTC_PAY_API_KEY") || "staging-api-key",
+    url:
+      System.get_env("TIMESINK_STAGING_BTC_PAY_API_URL") ||
+        "https://mainnet.demo.btcpayserver.org",
+    store_id:
+      System.get_env("TIMESINK_STAGING_BTC_PAY_STORE_ID") ||
+        "FHJN57hrurbPVV5ntabDALMna9bvM7NmDAYV3wnagJXP",
+    webhook_secret:
+      System.get_env("TIMESINK_STAGING_BTC_PAY_WEBHOOK_SECRET") || "staging-webhook-secret",
+    webhook_url:
+      System.get_env("TIMESINK_STAGING_BTC_PAY_WEBHOOK_URL") ||
+        "https://staging.timesinkpresents.com/api/btc_pay/webhook"
+end
+
 if config_env() == :dev do
   config :timesink, :stripe,
     secret_key: System.get_env("TIMESINK_TEST_STRIPE_SECRET_KEY") || "test-api-key",
@@ -206,6 +237,13 @@ end
 
 if config_env() == :dev do
   config :stripity_stripe, api_key: System.get_env("TIMESINK_TEST_STRIPE_SECRET_KEY")
+end
+
+if config_env() == :staging do
+  config :timesink, :stripe,
+    secret_key: System.get_env("TIMESINK_STAGING_STRIPE_SECRET_KEY") || "staging-api-key",
+    publishable_key:
+      System.get_env("TIMESINK_STAGING_STRIPE_PUBLISHABLE_KEY") || "staging-webhook-secret"
 end
 
 config :timesink, base_url: base_url
