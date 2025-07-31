@@ -1,7 +1,9 @@
 defmodule Timesink.Waitlist.Mail do
   use Timesink.Mailer
 
-  @base_url Application.compile_env(:timesink, :base_url)
+  defp base_url do
+    Application.fetch_env!(:timesink, :base_url)
+  end
 
   def send_waitlist_confirmation(to_email, first_name) do
     send_mail(
@@ -24,7 +26,7 @@ defmodule Timesink.Waitlist.Mail do
 
       You're invited to join! Click the link below to create your account:
 
-      #{@base_url}/invite/#{code}
+      #{base_url()}/invite/#{code}
       """
     )
   end
