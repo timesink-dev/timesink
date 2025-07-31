@@ -51,10 +51,12 @@ COPY lib lib
 
 COPY assets assets
 
-# Install Node.js (replace with Bun install if needed)
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-  && apt-get install -y nodejs \
-  && npm install --prefix ./assets
+RUN apt-get update -y && \
+    apt-get install -y curl gnupg && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install --prefix ./assets && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
 # compile assets
