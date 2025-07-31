@@ -23,7 +23,6 @@ defmodule Timesink.Locations.HereMaps do
 
   @suggest_endpoint "https://autocomplete.search.hereapi.com/v1/autocomplete"
   @lookup_endpoint "https://lookup.search.hereapi.com/v1/lookup"
-  @api_key Application.compile_env(:timesink, :here_maps_api_key)
   @http Application.compile_env!(:timesink, :http_client)
 
   @impl true
@@ -34,7 +33,7 @@ defmodule Timesink.Locations.HereMaps do
     query_params =
       URI.encode_query(%{
         q: query,
-        apiKey: @api_key,
+        apiKey: api_key(),
         types: "city",
         limit: 5
       })
@@ -59,7 +58,7 @@ defmodule Timesink.Locations.HereMaps do
     query_params =
       URI.encode_query(%{
         id: place_id,
-        apiKey: @api_key
+        apiKey: api_key()
       })
 
     url = "#{@lookup_endpoint}?#{query_params}"
@@ -99,4 +98,6 @@ defmodule Timesink.Locations.HereMaps do
   end
 
   defp parse_response(_), do: []
+
+  defp api_key, do: Application.fetch_env!(:timesink, :here_maps_api_key)
 end
