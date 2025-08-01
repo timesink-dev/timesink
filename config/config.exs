@@ -88,7 +88,7 @@ config :timesink, Oban,
        #  {"*/1 * * * *", Timesink.Workers.Waitlist.ScheduleInviteJob}
      ]}
   ],
-  queues: [mailer: 10, waitlist: 10]
+  queues: [mailer: 1, waitlist: 1]
 
 config :timesink, :finch, Timesink.Finch
 
