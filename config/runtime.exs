@@ -256,6 +256,8 @@ if config_env() == :staging do
     secret_key: System.get_env("TIMESINK_STAGING_STRIPE_SECRET_KEY") || "staging-api-key",
     publishable_key:
       System.get_env("TIMESINK_STAGING_STRIPE_PUBLISHABLE_KEY") || "staging-webhook-secret"
+
+  config :stripity_stripe, api_key: System.get_env("TIMESINK_STAGING_STRIPE_SECRET_KEY")
 end
 
 config :timesink, base_url: base_url
