@@ -135,7 +135,7 @@ System.get_env("TIMESINK_S3_HOST", "http://localhost:9000")
   config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
 end)
 
-if confi_env() === :prod do
+if config_env() === :prod do
   # Storage.Mux
   config :timesink, Timesink.Storage.Mux,
     webhook_key: System.get_env("TIMESINK_MUX_WEBHOOK_KEY", "MUX_WEBHOOK_KEY/DEV"),
