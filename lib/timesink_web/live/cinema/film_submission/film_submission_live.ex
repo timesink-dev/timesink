@@ -282,6 +282,10 @@ defmodule TimesinkWeb.FilmSubmissionLive do
   end
 
   def handle_info(:create_payment_intent, socket) do
+    IO.inspect(Application.get_env(:stripity_stripe, :api_key),
+      label: ">>> STRIPE KEY AT RUNTIME"
+    )
+
     user = socket.assigns[:current_user]
     user_id = (user && user.id) || nil
 

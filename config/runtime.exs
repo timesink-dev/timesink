@@ -28,6 +28,14 @@ if config_env() === :staging do
   config :timesink, Timesink.Mailer, api_key: System.fetch_env!("TIMESINK_STAGING_RESEND_API_KEY")
 end
 
+if config_env() == :staging do
+  IO.puts(">>> RUNTIME CONFIG: SETTING STRIPE KEY")
+  IO.inspect(System.get_env("TIMESINK_STAGING_STRIPE_SECRET_KEY"))
+
+  config :stripity_stripe,
+    api_key: System.get_env("TIMESINK_STAGING_STRIPE_SECRET_KEY")
+end
+
 database_url =
   System.get_env("DATABASE_URL") ||
     raise """
