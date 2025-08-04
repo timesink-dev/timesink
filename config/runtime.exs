@@ -20,7 +20,13 @@ if System.get_env("PHX_SERVER") do
   config :timesink, TimesinkWeb.Endpoint, server: true
 end
 
-config :timesink, Timesink.Mailer, api_key: System.fetch_env!("TIMESINK_RESEND_API_KEY")
+if config_env() === :prod do
+  config :timesink, Timesink.Mailer, api_key: System.fetch_env!("TIMESINK_RESEND_API_KEY")
+end
+
+if config_env() === :staging do
+  config :timesink, Timesink.Mailer, api_key: System.fetch_env!("TIMESINK_STAGING_RESEND_API_KEY")
+end
 
 database_url =
   System.get_env("DATABASE_URL") ||
@@ -129,19 +135,21 @@ System.get_env("TIMESINK_S3_HOST", "http://localhost:9000")
   config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
 end)
 
-# Storage.Mux
-config :timesink, Timesink.Storage.Mux,
-  webhook_key: System.get_env("TIMESINK_MUX_WEBHOOK_KEY", "MUX_WEBHOOK_KEY/DEV"),
-  access_key_id: System.get_env("TIMESINK_MUX_ACCESS_KEY_ID"),
-  access_key_secret: System.get_env("TIMESINK_MUX_ACCESS_KEY_SECRET")
+if confi_env() === :prod do
+  # Storage.Mux
+  config :timesink, Timesink.Storage.Mux,
+    webhook_key: System.get_env("TIMESINK_MUX_WEBHOOK_KEY", "MUX_WEBHOOK_KEY/DEV"),
+    access_key_id: System.get_env("TIMESINK_MUX_ACCESS_KEY_ID"),
+    access_key_secret: System.get_env("TIMESINK_MUX_ACCESS_KEY_SECRET")
 
-# Storage.S3
-config :timesink, Timesink.Storage.S3,
-  host: System.get_env("TIMESINK_S3_HOST", "http://localhost:9000"),
-  access_key_id: System.get_env("TIMESINK_S3_ACCESS_KEY_ID", "minioadmin"),
-  access_key_secret: System.get_env("TIMESINK_S3_ACCESS_KEY_SECRET", "minioadmin"),
-  bucket: System.get_env("TIMESINK_S3_BUCKET", "timesink-dev"),
-  prefix: System.get_env("TIMESINK_S3_PREFIX", "blobs")
+  # Storage.S3
+  config :timesink, Timesink.Storage.S3,
+    host: System.get_env("TIMESINK_S3_HOST", "http://localhost:9000"),
+    access_key_id: System.get_env("TIMESINK_S3_ACCESS_KEY_ID", "minioadmin"),
+    access_key_secret: System.get_env("TIMESINK_S3_ACCESS_KEY_SECRET", "minioadmin"),
+    bucket: System.get_env("TIMESINK_S3_BUCKET", "timesink-dev"),
+    prefix: System.get_env("TIMESINK_S3_PREFIX", "blobs")
+end
 
 if config_env() in [:test] do
   System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000")
@@ -229,7 +237,7 @@ if config_env() == :staging do
       System.get_env("TIMESINK_STAGING_BTC_PAY_WEBHOOK_SECRET") || "staging-webhook-secret",
     webhook_url:
       System.get_env("TIMESINK_STAGING_BTC_PAY_WEBHOOK_URL") ||
-        "https://staging.timesinkpresents.com/api/btc_pay/webhook"
+        "https://staging.timesinkpresents.com/api/webhooks/btc-pay.server"
 end
 
 if config_env() == :dev do
