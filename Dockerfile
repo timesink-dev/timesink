@@ -93,10 +93,8 @@ WORKDIR "/app"
 RUN chown nobody /app
 
 # set runner ENV
-ENV MIX_ENV=${MIX_ENV}
-
 # Only copy the final release from the build stage
-COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/timesink ./
+COPY config/config.exs config/staging.exs config/
 
 USER nobody
 
