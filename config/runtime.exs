@@ -29,9 +29,6 @@ if config_env() === :staging do
 end
 
 if config_env() == :staging do
-  IO.puts(">>> RUNTIME CONFIG: SETTING STRIPE KEY")
-  IO.inspect(System.get_env("TIMESINK_STAGING_STRIPE_SECRET_KEY"))
-
   config :stripity_stripe,
     api_key: System.get_env("TIMESINK_STAGING_STRIPE_SECRET_KEY")
 end
@@ -51,7 +48,7 @@ config :timesink, Timesink.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   socket_options: maybe_ipv6
 
-if config_env() == :prod do
+if config_env() in [:prod, :staging] do
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
   # want to use a different value for prod and you most likely don't want
