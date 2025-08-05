@@ -48,6 +48,8 @@ config :timesink, Timesink.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   socket_options: maybe_ipv6
 
+config :timesink, :http_client, Timesink.HTTP.FinchClient
+
 if config_env() in [:prod, :staging] do
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
