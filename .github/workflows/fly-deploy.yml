@@ -15,4 +15,5 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
         env:
+          MIX_ENV: "staging"
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
