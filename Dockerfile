@@ -18,7 +18,7 @@ ARG DEBIAN_VERSION=bullseye-20241223-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
-ARG MIX_ENV=prod
+ARG MIX_ENV=staging
 
 
 FROM ${BUILDER_IMAGE} as builder
@@ -92,9 +92,7 @@ ENV LC_ALL en_US.UTF-8
 WORKDIR "/app"
 RUN chown nobody /app
 
-# set runner ENV
-# Only copy the final release from the build stage
-COPY config/config.exs config/staging.exs config/
+COPY config config
 
 USER nobody
 
