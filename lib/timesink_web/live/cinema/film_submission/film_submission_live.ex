@@ -350,9 +350,11 @@ defmodule TimesinkWeb.FilmSubmissionLive do
         %Phoenix.Socket.Broadcast{event: "film_submission_completed", payload: submission},
         socket
       ) do
+    IO.inspect(socket.assigns, label: "SOCKET ASSIGNS FILM SUBMISSION")
+
     Mail.send_film_submission_completion_notification(
-      socket.assigns.data.contact_email,
-      socket.assigns.data.contact_name,
+      submission.contact_email,
+      submission.contact_name,
       submission
     )
 
