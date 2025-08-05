@@ -18,9 +18,6 @@ ARG DEBIAN_VERSION=bullseye-20241223-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
-ARG MIX_ENV=staging
-
-
 FROM ${BUILDER_IMAGE} as builder
 
 # install build dependencies
@@ -35,7 +32,7 @@ RUN mix local.hex --force && \
     mix local.rebar --force
 
 # set build ENV
-ENV MIX_ENV=${MIX_ENV}
+ENV MIX_ENV="prod"
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
@@ -92,7 +89,11 @@ ENV LC_ALL en_US.UTF-8
 WORKDIR "/app"
 RUN chown nobody /app
 
-COPY config config
+# set runner ENV
+ENV MIX_ENV="prod"
+
+# Only copy the final release from the build stage
+COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/timesink ./
 
 USER nobody
 
