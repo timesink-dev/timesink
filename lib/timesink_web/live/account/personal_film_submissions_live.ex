@@ -105,7 +105,6 @@ defmodule TimesinkWeb.Accounts.PersonalFilmSubmissionsLive do
   end
 
   defp format_datetime(nil), do: "—"
-  defp format_datetime(dt), do: Timex.format!(dt, "{Mshort} {D}, {YYYY}, {h12}:{m} {AM}")
 
   defp format_datetime(dt) do
     Timex.format!(dt, "{Mshort} {D}, {YYYY}, {h12}:{m} {AM}")
