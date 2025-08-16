@@ -229,6 +229,14 @@ if config_env() == :dev do
     webhook_url:
       System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_URL") ||
         "http://localhost:4000/api/btc_pay/webhook"
+
+  # Storage.S3
+  config :timesink, Timesink.Storage.S3,
+    host: System.get_env("TIMESINK_S3_HOST", "http://localhost:9000"),
+    access_key_id: System.get_env("TIMESINK_S3_ACCESS_KEY_ID", "minioadmin"),
+    access_key_secret: System.get_env("TIMESINK_S3_ACCESS_KEY_SECRET", "minioadmin"),
+    bucket: System.get_env("TIMESINK_S3_BUCKET", "timesink-dev"),
+    prefix: System.get_env("TIMESINK_S3_PREFIX", "blobs")
 end
 
 if config_env() == :staging do
