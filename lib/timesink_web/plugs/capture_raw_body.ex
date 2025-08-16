@@ -7,16 +7,27 @@ defmodule TimesinkWeb.Plugs.CaptureRawBody do
 
   import Plug.Conn
 
+  @webhook_paths [
+    "/api/webhooks/btc-pay.server",
+    ~r|^/api/webhooks/ghost\.io/.*|
+  ]
+
   def init(opts), do: opts
 
-  def call(%Plug.Conn{request_path: "/api/webhooks/btc-pay.server"} = conn, _opts) do
-    case read_body(conn) do
-      {:ok, body, conn} ->
-        # Save raw body for signature verification
-        assign(conn, :raw_body, body)
+  def call(%Plug.Conn{request_path: path} = conn, _opts) do
+    if Enum.any?(@webhook_paths, fn
+         p when is_binary(p) -> path == p
+         %Regex{} = r -> Regex.match?(r, path)
+       end) do
+      case read_body(conn) do
+        {:ok, body, conn} ->
+          assign(conn, :raw_body, body)
 
-      {:more, _partial, conn} ->
-        assign(conn, :raw_body, nil)
+        {:more, _partial, conn} ->
+          assign(conn, :raw_body, nil)
+      end
+    else
+      conn
     end
   end
 

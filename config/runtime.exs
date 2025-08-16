@@ -187,6 +187,14 @@ if config_env() in [:test] do
     webhook_url:
       System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_URL") ||
         "http://localhost:4000/api/btc_pay/webhook"
+
+  config :timesink, :ghost_publishing,
+    webhook_key:
+      System.get_env("TIMESINK_TEST_GHOST_PUBLISHING_WEBHOOK_KEY") ||
+        "ghost-test",
+    content_api_key:
+      System.get_env("TIMESINK_TEST_GHOST_CONTENT_API_KEY") ||
+        "test-content-api-key"
 end
 
 if config_env() in [:prod] do
@@ -273,6 +281,20 @@ if config_env() == :staging do
       System.get_env("TIMESINK_STAGING_STRIPE_PUBLISHABLE_KEY") || "staging-webhook-secret"
 
   config :stripity_stripe, api_key: System.get_env("TIMESINK_STAGING_STRIPE_SECRET_KEY")
+end
+
+if config_env() == :dev do
+  config :timesink, :ghost_publishing,
+    webhook_key: System.get_env("TIMESINK_TEST_GHOST_PUBLISHING_WEBHOOK_KEY"),
+    content_api_key:
+      System.get_env("TIMESINK_TEST_GHOST_CONTENT_API_KEY") || "test-content-api-key"
+end
+
+if config_env() == :staging do
+  config :timesink, :ghost_publishing,
+    webhook_key: System.get_env("TIMESINK_STAGING_GHOST_PUBLISHING_WEBHOOK_KEY"),
+    content_api_key:
+      System.get_env("TIMESINK_STAGING_GHOST_CONTENT_API_KEY") || "staging-content-api-key"
 end
 
 config :timesink, base_url: base_url

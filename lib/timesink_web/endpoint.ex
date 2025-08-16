@@ -50,6 +50,7 @@ defmodule TimesinkWeb.Endpoint do
 
   plug Plug.MethodOverride
   plug Plug.Head
+  plug TimesinkWeb.Plugs.FrameHeader
   plug Plug.Session, @session_options
   plug TimesinkWeb.Router
 end

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 14px;
+        margin: 0;
+        padding: 1rem;
+        background: #fdfdfd;
+      }
+      .comment {
+        border-bottom: 1px solid #eee;
+        padding: 0.5rem 0;
+      }
+      .author {
+        font-weight: bold;
+      }
+      .content {
+        margin-top: 0.25rem;
+      }
+    </style>
+  </head>
+  <body>
+    <%= for comment <- @post.comments do %>
+      <div class="comment">
+        <div class="author">{comment.author}</div>
+        <div class="content">{comment.content}</div>
+      </div>
+    <% end %>
+  </body>
+</html>

@@ -79,8 +79,18 @@ defmodule TimesinkWeb.TopNav do
             </.form>
             <li><a href="/submit">Submit film</a></li>
           <% else %>
-            <li><a href="/sign_in">Sign in</a></li>
-            <li><a href="/join">Join Waitlist</a></li>
+            <li>
+              <a href="/sign_in">
+                <.button color="tertiary">
+                  Sign in
+                </.button>
+              </a>
+            </li>
+            <li>
+              <a href="/join">
+                <.button color="none">Join Waitlist</.button>
+              </a>
+            </li>
           <% end %>
         </ul>
       </div>
@@ -138,7 +148,7 @@ defmodule TimesinkWeb.TopNav do
               <% else %>
                 <a href="/sign_in">
                   <.button class="w-full md:w-1/2">
-                    Sign In
+                    Sign in
                   </.button>
                 </a>
                 <a href="/join">

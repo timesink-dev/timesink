@@ -42,7 +42,7 @@ defmodule TimesinkWeb.Components.Hero do
             <div class="max-w-md">
               <div class="text-center mb-10">
                 <h2 class="text-4xl font-brand text-white tracking-tight leading-tight">
-                  Fresh Cinema. Real Audiences. No endless scrolls.
+                  Fresh Cinema selected for you. Real Audiences. No endless scrolls.
                 </h2>
                 <p class="mt-4 text-base md:text-md text-mystery-white max-w-xl mx-auto">
                   We bring great filmmakers — of all levels — to the stage.
@@ -51,7 +51,7 @@ defmodule TimesinkWeb.Components.Hero do
                   Real audiences. Real-time reactions. Conversations and moments that last. No noise — pure signal.
                 </p>
                 <a href="/join">
-                  <.button class="mt-6 px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition">
+                  <.button class="mt-6 px-6 py-3 font-medium hover:bg-mystery-white hover:text-black transition">
                     Get started
                   </.button>
                 </a>

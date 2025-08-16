@@ -15,6 +15,10 @@ defmodule TimesinkWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :remove_x_frame_options do
+    plug TimesinkWeb.Plugs.FrameHeader
+  end
+
   pipeline :put_current_user do
     plug TimesinkWeb.Plugs.PutCurrentUser
   end
@@ -41,6 +45,7 @@ defmodule TimesinkWeb.Router do
     post "/webhooks/mux.com/:webhook_key", MuxController, :webhook
     post "/webhooks/btc-pay.server", BtcPayController, :webhook
     post "/webhooks/stripe.com", StripeController, :webhook
+    post "/webhooks/ghost.io/:event_type", GhostPublishingController, :webhook
   end
 
   scope "/", TimesinkWeb do
@@ -115,10 +120,19 @@ defmodule TimesinkWeb.Router do
       live "/", HomepageLive
       live "/submit", FilmSubmissionLive
       live "/archives", Cinema.ArchivesLive
-      live "/blog", BlogLive
+      get "/blog", RedirectController, :ghost_blog
+      get "/blog/:slug", RedirectController, :ghost_blog_post
       live "/upcoming", UpcomingLive
       live "/now-playing", Cinema.NowPlayingLive
       live "/:profile_username", Accounts.ProfileLive
+    end
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :put_current_user]
+
+    live_session :blog_comments, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
+      live "/blog/:slug/comments", BlogPostCommentsLive
     end
   end
 
