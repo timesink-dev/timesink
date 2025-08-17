@@ -72,7 +72,11 @@ if config_env() in [:prod, :staging] do
     url: [host: host, port: 443, scheme: "https"],
     check_origin: [
       "https://timesink-staging.fly.dev",
-      "https://staging.timesinkpresents.com"
+      "https://staging.timesinkpresents.com",
+      "https://timesinkpresents.com",
+      "https://blog.timesinkpresents.com",
+      "https://blog.staging.timesinkpresents.com",
+      "https://uncovered-centipede.pikapod.net"
     ],
     http: [
       # Enable IPv6 and bind on all interfaces.

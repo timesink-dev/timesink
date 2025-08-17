@@ -8,7 +8,8 @@ defmodule TimesinkWeb.Endpoint do
     store: :cookie,
     key: "_timesink_key",
     signing_salt: "xfGNS3d0",
-    same_site: "Lax"
+    same_site: "None",
+    secure: true
   ]
 
   socket "/live", Phoenix.LiveView.Socket,
