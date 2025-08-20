@@ -64,9 +64,9 @@ defmodule TimesinkWeb.Components.Hero do
     <!-- Scroll indicator -->
       <div
         id="scroll-indicator"
-        class="fixed bottom-10 inset-x-0 flex justify-center z-50 animate-bounce opacity-80 transition-opacity"
+        class="invisible md:visible fixed bottom-10 inset-x-0 flex justify-center z-50 animate-bounce opacity-80 transition-opacity"
       >
-        <span class="text-white text-sm">
+        <span class="text-white text-sm ">
           ↓ Scroll to explore cinema
         </span>
       </div>

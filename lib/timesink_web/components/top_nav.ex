@@ -101,8 +101,16 @@ defmodule TimesinkWeb.TopNav do
   defp hamburger_button(assigns) do
     ~H"""
     <div class="md:hidden">
-      <button phx-click={show_hamburger()}>
-        <.icon name="hero-bars-3" />
+      <button
+        phx-click={show_hamburger()}
+        aria-label="Open menu"
+        aria-controls="hamburger-content"
+        class="inline-flex items-center justify-center h-12 w-12 rounded-xl
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+            focus-visible:ring-zinc-400 focus-visible:ring-offset-black"
+      >
+        <.icon name="hero-bars-3" class="h-7 w-7" />
+        <span class="sr-only">Open menu</span>
       </button>
     </div>
     """
@@ -115,6 +123,9 @@ defmodule TimesinkWeb.TopNav do
       <nav
         id="hamburger-content"
         class="rounded fixed top-0 right-0 bottom-0 flex flex-col grow justify-between w-5/6 md:w-1/2 py-2 bg-backroom-black overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Main menu"
       >
         <div class="mx-6">
           <div class="flex items-center mb-4 place-content-between pb-6 py-2 border-solid border-b-[0.5px] border-dark-theater-primary">
@@ -124,7 +135,8 @@ defmodule TimesinkWeb.TopNav do
               </p>
             </div>
             <button class="navbar-close" phx-click={hide_hamburger()}>
-              <.icon name="hero-x-mark-mini" />
+              <span class="sr-only">Close menu</span>
+              <.icon name="hero-x-mark-mini" class="h-6 w-6" />
             </button>
           </div>
           <ul class="flex flex-col justify-start items-start gap-y-4 pt-2.5">

@@ -31,7 +31,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
         <div class="text-xl font-light text-neon-blue-lightest mb-2">
           {@showcase.title}
         </div>
-        <div class="text-gray-400 text-sm leading-relaxed max-w-lg mx-auto font-light text-left">
+        <div class="text-gray-400 text-sm leading-relaxed max-w-lg mx-auto font-light text-center">
           {@showcase.description}
         </div>
       </div>
