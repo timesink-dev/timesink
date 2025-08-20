@@ -8,10 +8,10 @@ defmodule TimesinkWeb.RedirectController do
   end
 
   def ghost_blog(conn, _params) do
-    redirect(conn, external: "https://uncovered-centipede.pikapod.net/")
+    redirect(conn, external: "https://blog.timesinkpresents.com/")
   end
 
   def ghost_blog_post(conn, %{"slug" => slug}) do
-    redirect(conn, external: "https://uncovered-centipede.pikapod.net/#{slug}")
+    redirect(conn, external: "https://blog.timesinkpresents.com/#{slug}")
   end
 end

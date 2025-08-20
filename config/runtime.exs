@@ -74,9 +74,7 @@ if config_env() in [:prod, :staging] do
       "https://timesink-staging.fly.dev",
       "https://staging.timesinkpresents.com",
       "https://timesinkpresents.com",
-      "https://blog.timesinkpresents.com",
-      "https://blog.staging.timesinkpresents.com",
-      "https://uncovered-centipede.pikapod.net"
+      "https://blog.timesinkpresents.com"
     ],
     http: [
       # Enable IPv6 and bind on all interfaces.
