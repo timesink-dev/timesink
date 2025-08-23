@@ -76,6 +76,8 @@ defmodule TimesinkWeb.FilmSubmissionLive do
       id="film-submission"
       class="relative h-[100vh] px-6 md:px-12 py-16 md:py-24 flex flex-col justify-between"
     >
+      <script defer async src="https://js.stripe.com/v3/">
+      </script>
       <div class="flex flex-col-reverse md:flex-row items-center gap-6">
         <div class="w-full">
           <div class="min-h-[calc(100vh-200px)] max-h-[calc(100vh-200px)] overflow-auto">

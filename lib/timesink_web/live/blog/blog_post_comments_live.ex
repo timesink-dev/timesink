@@ -4,19 +4,16 @@ defmodule TimesinkWeb.BlogPostCommentsLive do
   alias Timesink.Comment
 
   def mount(%{"slug" => slug}, _session, socket) do
-    current_user = socket.assigns.current_user || nil
+    current_user = Map.get(socket.assigns, :current_user, nil)
+    IO.puts("this hre")
     {:ok, post} = BlogPost.get_by(slug: slug)
 
-    # Preload all comments (and their authors + parent references)
     post = Timesink.Repo.preload(post, comments: [:user])
-
-    # Build nested comment tree from flat list
     nested_comments = build_comment_tree(post.comments)
 
     {:ok,
      socket
      |> assign(:post, %{post | comments: nested_comments})
-     # if needed
      |> assign(:current_user, current_user)
      |> assign(:active_reply_id, nil), layout: {TimesinkWeb.Layouts, :empty}}
   end
@@ -28,23 +25,23 @@ defmodule TimesinkWeb.BlogPostCommentsLive do
       
     <!-- Join CTA -->
       <div class="mb-6 flex items-center justify-between border border-gray-700 rounded p-4 bg-gray-900">
-        <div class="text-sm text-gray-300 font-medium">
-          Join the conversation
-        </div>
+        <div class="text-sm text-gray-300 font-medium">Join the conversation</div>
         <%= if @current_user do %>
-          <!-- No buttons needed if signed in -->
+          <span class="text-xs text-gray-500">Signed in</span>
         <% else %>
           <div class="flex gap-2">
             <.link
               target="_blank"
               rel="noopener noreferrer"
-              href="https://38509a17a633.ngrok-free.app/sign_in"
+              href="/sign_in"
               class="text-sm text-white bg-black px-3 py-1 rounded-md hover:bg-gray-800"
             >
               Sign in
             </.link>
             <.link
-              href="https://38509a17a633.ngrok-free.app/join"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="/join"
               class="text-sm text-white border border-gray-600 px-3 py-1 rounded-md hover:bg-gray-700"
             >
               Join
@@ -53,9 +50,9 @@ defmodule TimesinkWeb.BlogPostCommentsLive do
         <% end %>
       </div>
       
-    <!-- Comment input if signed in -->
+    <!-- New top-level comment box (no phx-target here!) -->
       <%= if @current_user do %>
-        <form phx-submit="submit_comment" class="mb-6 space-y-2" phx-target={@myself}>
+        <form phx-submit="submit_comment" class="mb-6 space-y-2">
           <textarea
             name="content"
             rows="3"
@@ -85,6 +82,16 @@ defmodule TimesinkWeb.BlogPostCommentsLive do
     """
   end
 
+  def handle_event("set_reply_id", %{"id" => id}, socket) do
+    # id is a UUID string; don't String.to_integer/1 it
+    {:noreply, assign(socket, :active_reply_id, id)}
+  end
+
+  def handle_event("clear_reply_id", _params, socket) do
+    {:noreply, assign(socket, :active_reply_id, nil)}
+  end
+
+  # build one-level nested tree
   defp build_comment_tree(comments) do
     by_parent =
       Enum.group_by(comments, fn
@@ -92,22 +99,14 @@ defmodule TimesinkWeb.BlogPostCommentsLive do
         %Comment{parent_id: pid} -> pid
       end)
 
-    # Recursively attach replies to each comment
     attach_replies(by_parent[:root] || [], by_parent)
   end
 
   defp attach_replies(comments, by_parent) do
-    Enum.map(comments, fn comment ->
-      children = Map.get(by_parent, comment.id, [])
-      %{comment | replies: attach_replies(children, by_parent)}
+    Enum.map(comments, fn c ->
+      children = Map.get(by_parent, c.id, [])
+      # only one level deep
+      %{c | replies: children}
     end)
-  end
-
-  def handle_event("set_reply_id", %{"id" => id}, socket) do
-    {:noreply, assign(socket, :active_reply_id, String.to_integer(id))}
-  end
-
-  def handle_event("clear_reply_id", _params, socket) do
-    {:noreply, assign(socket, :active_reply_id, nil)}
   end
 end

@@ -9,7 +9,7 @@ defmodule TimesinkWeb.BlogPostCommentsList do
   def render(assigns) do
     ~H"""
     <div>
-      
+      dfdfs
     <!-- Comment List -->
       <ul class="space-y-4">
         <%= for comment <- @comments do %>
@@ -40,7 +40,7 @@ defmodule TimesinkWeb.BlogPostCommentsList do
                     phx-value-id={comment.id}
                     class="hover:underline text-gray-400"
                   >
-                    Reply ww
+                    Reply
                   </button>
                 <% else %>
                   <a href="/sign_in" class="hover:underline text-gray-400">Reply</a>
@@ -91,28 +91,6 @@ defmodule TimesinkWeb.BlogPostCommentsList do
           </li>
         <% end %>
       </ul>
-      
-    <!-- New top-level comment box -->
-      <%= if @current_user && is_nil(@active_reply_id) do %>
-        <div class="mt-6">
-          <form phx-submit="submit_comment" class="space-y-2" phx-target={@myself}>
-            <textarea
-              name="content"
-              rows="3"
-              placeholder="Add a comment…"
-              class="w-full bg-gray-800 text-white text-sm p-2 rounded-md border border-gray-600 focus:border-white focus:outline-none resize-none"
-            />
-            <div class="flex justify-end">
-              <button
-                type="submit"
-                class="text-sm text-white bg-mystery-black px-3 py-1 rounded-md hover:bg-gray-700"
-              >
-                Comment
-              </button>
-            </div>
-          </form>
-        </div>
-      <% end %>
     </div>
     """
   end
