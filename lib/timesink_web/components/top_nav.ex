@@ -44,7 +44,7 @@ defmodule TimesinkWeb.TopNav do
             <ul
               id="films-dropdown"
               class="hidden absolute mt-2 w-48 rounded-md bg-dark-theater-primary text-mystery-white shadow-md z-50 overflow-hidden"
-              phx-click-away={JS.toggle(display: "hidden")}
+              phx-click-away={JS.add_class("hidden", to: "#films-dropdown")}
             >
               <li>
                 <a href="/now-playing" class="block px-4 py-2 hover:bg-zinc-700">Now Playing</a>
@@ -72,12 +72,59 @@ defmodule TimesinkWeb.TopNav do
     <!-- Actions -->
         <ul id="nav-actions" class="flex justify-between items-center gap-x-8">
           <%= if @current_user do %>
-            <.form method="post" action="/sign_out" for={}>
-              <.button type="submit" color="tertiary" class="text-mystery-white">
-                Sign Out
+            <!-- Submit link stays as-is -->
+    <!-- Account dropdown replaces the Sign Out button -->
+            <li class="relative">
+              <.button
+                id="account-button"
+                type="button"
+                phx-click={JS.toggle(to: "#account-menu", display: "block")}
+                color="none"
+                class="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-mystery-white hover:bg-zinc-800 focus:outline-none"
+                aria-haspopup="menu"
+                aria-expanded="false"
+              >
+                <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-zinc-700 text-[11px] font-semibold">
+                  {@current_user.first_name |> String.first() |> String.upcase()}
+                </span>
+                <span class="hidden lg:inline">Account</span>
               </.button>
-            </.form>
-            <li><a href="/submit">Submit film</a></li>
+
+              <div
+                id="account-menu"
+                class="hidden absolute right-0 mt-2 w-48 rounded-md bg-dark-theater-primary text-mystery-white shadow-lg z-50 overflow-hidden"
+                phx-click-away={JS.add_class("hidden", to: "#account-menu")}
+                role="menu"
+                aria-label="Account menu"
+              >
+                <a href="/me" class="block px-4 py-2 text-sm hover:bg-zinc-700" role="menuitem">
+                  Overview
+                </a>
+                <a
+                  href="/me/profile"
+                  class="block px-4 py-2 text-sm hover:bg-zinc-700"
+                  role="menuitem"
+                >
+                  Profile
+                </a>
+                <.form method="post" action="/sign_out" for={%{}} class="border-t border-zinc-700">
+                  <button
+                    type="submit"
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-700"
+                    role="menuitem"
+                  >
+                    Sign out
+                  </button>
+                </.form>
+              </div>
+            </li>
+            <li>
+              <a href="/submit">
+                <.button color="tertiary">
+                  Submit film
+                </.button>
+              </a>
+            </li>
           <% else %>
             <li><a href="/sign_in">Sign in</a></li>
             <li><a href="/join">Join Waitlist</a></li>
@@ -125,7 +172,8 @@ defmodule TimesinkWeb.TopNav do
             <hr />
             <div class="w-full flex flex-col gap-y-4">
               <%= if @current_user do %>
-                <.form method="post" action="/sign_out" for={}>
+                <!-- Keep mobile actions unchanged for now -->
+                <.form method="post" action="/sign_out" for={%{}}>
                   <.button type="submit" color="tertiary" class="w-full md:w-1/2">
                     Sign Out
                   </.button>
