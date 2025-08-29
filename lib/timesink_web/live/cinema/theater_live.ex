@@ -267,7 +267,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     @active_panel_tab != :online && "text-gray-400 hover:text-gray-200"
                   ]}
                 >
-                  Online Members
+                  Live Audience
                 </button>
               </div>
             </div>
@@ -378,7 +378,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     @active_panel_tab != :online && "text-gray-400 hover:text-gray-200"
                   ]}
                 >
-                  Online
+                  Live Audience
                 </button>
               </div>
               <button class="text-gray-300" phx-click="toggle_chat" aria-label="Close">✕</button>
