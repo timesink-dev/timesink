@@ -3,6 +3,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   alias Timesink.Cinema.{Theater, Exhibition, Showcase, Film, Creative}
   alias TimesinkWeb.PubSubTopics
   alias Timesink.Repo
+
   require Logger
 
   # ───────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         ])
 
       if connected?(socket) do
+        Phoenix.PubSub.subscribe(Timesink.PubSub, PubSubTopics.chat_topic(theater.id))
         Phoenix.PubSub.subscribe(Timesink.PubSub, PubSubTopics.scheduler_topic(theater.id))
         Phoenix.PubSub.subscribe(Timesink.PubSub, PubSubTopics.presence_topic(theater.id))
 
@@ -46,8 +48,14 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       presence_topic = PubSubTopics.presence_topic(theater.id)
       presence = TimesinkWeb.Presence.list(presence_topic)
 
+      recent_msgs = Timesink.Comment.Theater.list_recent_theater_comments(theater.id, 100)
+
       {:ok,
        socket
+       # efficient diffs
+       |> stream(:messages, recent_msgs)
+       |> assign(:chat_input, "")
+       |> assign(:typing_users, %{})
        |> assign(:theater, theater)
        |> assign(:exhibition, exhibition)
        |> assign(:film, film)
@@ -275,49 +283,51 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <!-- Body (scroll-limited like before) -->
             <div class="bg-zinc-950/60">
               <%= if @active_panel_tab == :chat do %>
-                <ul class="divide-y divide-gray-800 max-h-[60vh] overflow-y-auto">
-                  <li class="px-4 py-3">
-                    <div class="flex items-center justify-between">
-                      <span class="font-medium text-gray-100">Jane</span>
-                      <span class="text-xs text-gray-400">1:20 · 13h</span>
-                    </div>
-                    <p class="text-gray-200 text-sm mt-1">Hello! How’s everyone doing?</p>
-                  </li>
-                  <li class="px-4 py-3">
-                    <div class="flex items-center justify-between">
-                      <span class="font-medium text-gray-100">David</span>
-                      <span class="text-xs text-gray-400">1:21 · 13h</span>
-                    </div>
-                    <p class="text-gray-200 text-sm mt-1">Hi there!</p>
-                  </li>
-                  <li class="px-4 py-3">
-                    <div class="flex items-center justify-between">
-                      <span class="font-medium text-gray-100">Emily</span>
-                      <span class="text-xs text-gray-400">1:34 · 14h</span>
-                    </div>
-                    <p class="text-gray-200 text-sm mt-1">
-                      Great to be here!<br />Yes, this is awesome
-                    </p>
-                  </li>
+                <!-- CHAT LIST -->
+                <ul
+                  id="chat-list"
+                  phx-update="stream"
+                  phx-hook="ChatAutoScroll"
+                  class="divide-y divide-gray-800"
+                >
+                  <%= for {dom_id, msg} <- @streams.messages do %>
+                    <li id={dom_id} class="px-4 py-3">
+                      <div class="flex items-center justify-between">
+                        <span class="font-medium text-gray-100">
+                          {(msg.user && msg.user.username) || "Member"}
+                        </span>
+                        <span class="text-xs text-gray-400">{chat_time(msg.inserted_at)}</span>
+                      </div>
+                      <p class="text-gray-200 text-sm mt-1">{msg.content}</p>
+                    </li>
+                  <% end %>
                 </ul>
-
-                <div class="p-3 border-t border-gray-800">
+                
+    <!-- TYPING -->
+                <%= if map_size(@typing_users) > 0 do %>
+                  <div class="px-4 py-2 text-xs text-gray-400 border-t border-gray-800">
+                    {typing_line(@typing_users, @presence)}
+                  </div>
+                <% end %>
+                
+    <!-- INPUT -->
+                <form phx-submit="chat:send" class="p-3 border-t border-gray-800">
                   <div class="flex items-center gap-2">
                     <input
                       type="text"
+                      name="chat[body]"
+                      value={@chat_input}
                       placeholder="Type a message…"
+                      phx-change="chat:typing"
+                      phx-debounce="500"
                       class="w-full bg-zinc-900/70 border border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
-                      disabled
+                      autocomplete="off"
                     />
-                    <button
-                      class="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-zinc-800 text-gray-200 hover:bg-zinc-700"
-                      disabled
-                      title="Mock UI"
-                    >
+                    <button class="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-zinc-800 text-gray-200 hover:bg-zinc-700">
                       Send
                     </button>
                   </div>
-                </div>
+                </form>
               <% else %>
                 <div class="max-h-[60vh] overflow-y-auto p-3">
                   <ul class="space-y-2">
@@ -497,6 +507,70 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
      socket |> assign(:phase, phase) |> assign(:offset, offset) |> assign(:countdown, countdown)}
   end
 
+  def handle_info({:new_message, msg}, socket) do
+    {:noreply, stream_insert(socket, :messages, msg)}
+  end
+
+  def handle_info({:typing, %{user_id: uid}}, socket) do
+    # reset a 2s timer per user
+    if ref = socket.assigns.typing_users[uid], do: Process.cancel_timer(ref)
+    ref = Process.send_after(self(), {:typing_clear, uid}, 2000)
+    {:noreply, assign(socket, :typing_users, Map.put(socket.assigns.typing_users, uid, ref))}
+  end
+
+  def handle_info({:typing_clear, uid}, socket) do
+    {:noreply, assign(socket, :typing_users, Map.delete(socket.assigns.typing_users, uid))}
+  end
+
+  # debounced on input change
+  def handle_event("chat:typing", _params, socket) do
+    if user = socket.assigns.user do
+      Phoenix.PubSub.broadcast_from(
+        Timesink.PubSub,
+        self(),
+        PubSubTopics.chat_topic(socket.assigns.theater.id),
+        {:typing, %{user_id: user.id, username: user.username}}
+      )
+    end
+
+    {:noreply, socket}
+  end
+
+  # submit new message
+  def handle_event("chat:send", %{"chat" => %{"body" => body}}, socket) do
+    user = socket.assigns.user
+    theater_id = socket.assigns.theater.id
+    body = (body || "") |> String.trim()
+
+    cond do
+      # or flash: sign in to chat
+      is_nil(user) ->
+        {:noreply, socket}
+
+      body == "" ->
+        {:noreply, socket}
+
+      true ->
+        msg =
+          Timesink.Comment.Theater.create_theater_comment!(%{
+            content: body,
+            assoc_id: theater_id,
+            user_id: user.id
+          })
+
+        Phoenix.PubSub.broadcast(
+          Timesink.PubSub,
+          PubSubTopics.chat_topic(theater_id),
+          {:new_message, msg}
+        )
+
+        {:noreply,
+         socket
+         |> assign(:chat_input, "")
+         |> stream_insert(:messages, msg)}
+    end
+  end
+
   # ───────────────────────────────────────────────────────────
   # Helpers (unchanged)
   # ───────────────────────────────────────────────────────────
@@ -532,5 +606,30 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       end
     end)
     |> Enum.join(", ")
+  end
+
+  defp chat_time(%NaiveDateTime{} = ndt), do: chat_time(DateTime.from_naive!(ndt, "Etc/UTC"))
+
+  defp chat_time(%DateTime{} = dt) do
+    time = Calendar.strftime(dt, "%-I:%M")
+    ago = div(DateTime.diff(DateTime.utc_now(), dt, :hour), 1)
+    "#{time} · #{ago}h"
+  end
+
+  # Build "Alice is typing…" using presence usernames
+  defp typing_line(typing_users, presence) do
+    typing_ids = Map.keys(typing_users) |> MapSet.new(fn id -> to_string(id) end)
+
+    names =
+      presence
+      |> Enum.filter(fn {id, _} -> MapSet.member?(typing_ids, id) end)
+      |> Enum.map(fn {_id, %{metas: [%{username: u} | _]}} -> u end)
+
+    case names do
+      [] -> ""
+      [a] -> "#{a} is typing…"
+      [a, b] -> "#{a} and #{b} are typing…"
+      _many -> "Several people are typing…"
+    end
   end
 end
