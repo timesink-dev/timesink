@@ -24,6 +24,8 @@ defmodule Timesink.Cinema.Theater do
     field :start_offset_minutes, :integer, default: 0
     has_one :exhibition, Timesink.Cinema.Exhibition
 
+    has_many :comments, {"theater_comment", Timesink.Comment}, foreign_key: :assoc_id
+
     timestamps(type: :utc_datetime)
   end
 
