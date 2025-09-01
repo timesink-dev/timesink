@@ -587,5 +587,12 @@ Hooks.CopyBus = {
   }
 }
 
+Hooks.ChatAutoScroll = {
+    mounted() { this.scroll() },
+    updated() { this.scroll() },
+    scroll() { this.el.scrollTop = this.el.scrollHeight }
+  }
+
+
 
 export default Hooks;

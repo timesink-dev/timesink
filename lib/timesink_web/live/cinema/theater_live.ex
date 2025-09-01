@@ -48,7 +48,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       presence_topic = PubSubTopics.presence_topic(theater.id)
       presence = TimesinkWeb.Presence.list(presence_topic)
 
-      recent_msgs = Timesink.Comment.Theater.list_recent_theater_comments(theater.id, 100)
+      recent_msgs =
+        Timesink.Comment.Exhibition.list_recent_exhibition_comments(exhibition.id, 100)
 
       {:ok,
        socket
@@ -71,18 +72,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     else
       _ -> {:redirect, socket |> put_flash(:error, "Not found") |> redirect(to: "/")}
     end
-  end
-
-  # ───────────────────────────────────────────────────────────
-  # Events
-  # ───────────────────────────────────────────────────────────
-  def handle_event("toggle_chat", _params, socket) do
-    {:noreply, update(socket, :chat_open, fn v -> not v end)}
-  end
-
-  def handle_event("switch_tab", %{"to" => to}, socket) do
-    tab = if to == "online", do: :online, else: :chat
-    {:noreply, assign(socket, :active_panel_tab, tab)}
   end
 
   # ───────────────────────────────────────────────────────────
@@ -283,34 +272,41 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <!-- Body (scroll-limited like before) -->
             <div class="bg-zinc-950/60">
               <%= if @active_panel_tab == :chat do %>
-                <!-- CHAT LIST -->
-                <ul
-                  id="chat-list"
-                  phx-update="stream"
+                <!-- Scrollable chat body (fixed height) -->
+                <div
+                  id="chat-body-desktop"
+                  class="max-h-[40vh] overflow-y-auto"
                   phx-hook="ChatAutoScroll"
-                  class="divide-y divide-gray-800"
                 >
-                  <%= for {dom_id, msg} <- @streams.messages do %>
-                    <li id={dom_id} class="px-4 py-3">
-                      <div class="flex items-center justify-between">
-                        <span class="font-medium text-gray-100">
-                          {(msg.user && msg.user.username) || "Member"}
-                        </span>
-                        <span class="text-xs text-gray-400">{chat_time(msg.inserted_at)}</span>
-                      </div>
-                      <p class="text-gray-200 text-sm mt-1">{msg.content}</p>
-                    </li>
-                  <% end %>
-                </ul>
-                
+                  <!-- STREAMED LIST (desktop only) -->
+                  <ul
+                    id="chat-list"
+                    phx-hook="ChatAutoScroll"
+                    phx-update="stream"
+                    class="divide-y divide-gray-800"
+                  >
+                    <%= for {dom_id, msg} <- @streams.messages do %>
+                      <li id={dom_id} class="px-4 py-3">
+                        <div class="flex items-center justify-between">
+                          <span class="font-medium text-gray-400 text-sm">
+                            {(msg.user && "@" <> msg.user.username) || "Member"}
+                          </span>
+                          <span class="text-xs text-gray-400">{chat_time(msg.inserted_at)}</span>
+                        </div>
+                        <p class="text-gray-200 text-sm mt-1">{msg.content}</p>
+                      </li>
+                    <% end %>
+                  </ul>
+                  
     <!-- TYPING -->
-                <%= if map_size(@typing_users) > 0 do %>
-                  <div class="px-4 py-2 text-xs text-gray-400 border-t border-gray-800">
-                    {typing_line(@typing_users, @presence)}
-                  </div>
-                <% end %>
+                  <%= if map_size(@typing_users) > 0 do %>
+                    <div class="px-4 py-2 text-xs text-gray-400 border-t border-gray-800">
+                      {typing_line(@typing_users, @presence)}
+                    </div>
+                  <% end %>
+                </div>
                 
-    <!-- INPUT -->
+    <!-- INPUT (outside scroll area) -->
                 <form phx-submit="chat:send" class="p-3 border-t border-gray-800">
                   <div class="flex items-center gap-2">
                     <input
@@ -319,7 +315,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                       value={@chat_input}
                       placeholder="Type a message…"
                       phx-change="chat:typing"
-                      phx-debounce="500"
+                      phx-debounce="100"
                       class="w-full bg-zinc-900/70 border border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
                       autocomplete="off"
                     />
@@ -329,7 +325,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   </div>
                 </form>
               <% else %>
-                <div class="max-h-[60vh] overflow-y-auto p-3">
+                <!-- Live Audience tab unchanged -->
+                <div class="max-h-[65vh] overflow-y-auto p-3">
                   <ul class="space-y-2">
                     <%= for name <- ["Jane", "David", "Emily", "Marco", "Anya", "You"] do %>
                       <li class="flex items-center justify-between rounded-lg border border-gray-800 px-3 py-2">
@@ -394,34 +391,25 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               <button class="text-gray-300" phx-click="toggle_chat" aria-label="Close">✕</button>
             </div>
 
-            <div class="h-[70vh] flex flex-col">
+            <div class="h-[40vh] flex flex-col">
               <div class="flex-1 overflow-y-auto">
                 <%= if @active_panel_tab == :chat do %>
-                  <ul class="divide-y divide-gray-800 text-sm">
-                    <li class="px-4 py-3">
-                      <div class="flex items-center justify-between">
-                        <span class="font-medium text-gray-100">Jane</span>
-                        <span class="text-xs text-gray-400">1:20 · 13h</span>
-                      </div>
-                      <p class="text-gray-200 text-sm mt-1">Hello! How’s everyone doing?</p>
-                    </li>
-                    <li class="px-4 py-3">
-                      <div class="flex items-center justify-between">
-                        <span class="font-medium text-gray-100">David</span>
-                        <span class="text-xs text-gray-400">1:21 · 13h</span>
-                      </div>
-                      <p class="text-gray-200 text-sm mt-1">Hi there!</p>
-                    </li>
-                    <li class="px-4 py-3">
-                      <div class="flex items-center justify-between">
-                        <span class="font-medium text-gray-100">Emily</span>
-                        <span class="text-xs text-gray-400">1:34 · 14h</span>
-                      </div>
-                      <p class="text-gray-200 text-sm mt-1">
-                        Great to be here!<br />Yes, this is awesome
-                      </p>
-                    </li>
-                  </ul>
+                  <div class="flex-1 overflow-y-auto" id="mobile-chat" phx-hook="ChatAutoScroll">
+                    <!-- PLAIN LIST (not streamed) with unique ids -->
+                    <ul class="divide-y divide-gray-800 text-sm">
+                      <%= for {dom_id, msg} <- @streams.messages do %>
+                        <li id={"m-#{dom_id}"} class="px-4 py-3">
+                          <div class="flex items-center justify-between">
+                            <span class="font-medium text-gray-100">
+                              {(msg.user && msg.user.username) || "Member"}
+                            </span>
+                            <span class="text-xs text-gray-400">{chat_time(msg.inserted_at)}</span>
+                          </div>
+                          <p class="text-gray-200 text-sm mt-1">{msg.content}</p>
+                        </li>
+                      <% end %>
+                    </ul>
+                  </div>
                 <% else %>
                   <ul class="p-3 space-y-2">
                     <%= for name <- ["Jane", "David", "Emily", "Marco", "Anya", "You"] do %>
@@ -522,6 +510,18 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     {:noreply, assign(socket, :typing_users, Map.delete(socket.assigns.typing_users, uid))}
   end
 
+  # ───────────────────────────────────────────────────────────
+  # Events
+  # ───────────────────────────────────────────────────────────
+  def handle_event("toggle_chat", _params, socket) do
+    {:noreply, update(socket, :chat_open, fn v -> not v end)}
+  end
+
+  def handle_event("switch_tab", %{"to" => to}, socket) do
+    tab = if to == "online", do: :online, else: :chat
+    {:noreply, assign(socket, :active_panel_tab, tab)}
+  end
+
   # debounced on input change
   def handle_event("chat:typing", _params, socket) do
     if user = socket.assigns.user do
@@ -540,6 +540,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   def handle_event("chat:send", %{"chat" => %{"body" => body}}, socket) do
     user = socket.assigns.user
     theater_id = socket.assigns.theater.id
+    exhibition_id = socket.assigns.exhibition.id
     body = (body || "") |> String.trim()
 
     cond do
@@ -552,9 +553,9 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
       true ->
         msg =
-          Timesink.Comment.Theater.create_theater_comment!(%{
+          Timesink.Comment.Exhibition.create_exhibition_comment!(%{
             content: body,
-            assoc_id: theater_id,
+            assoc_id: exhibition_id,
             user_id: user.id
           })
 
