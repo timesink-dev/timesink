@@ -275,14 +275,16 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 <!-- Scrollable chat body (fixed height) -->
                 <div
                   id="chat-body-desktop"
-                  class="max-h-[40vh] overflow-y-auto"
-                  phx-hook="ChatAutoScroll"
+                  data-scroll-container="#chat-body-desktop"
+                  class="max-h-[40vh] overflow-y-auto relative"
                 >
                   <!-- STREAMED LIST (desktop only) -->
                   <ul
                     id="chat-list"
-                    phx-hook="ChatAutoScroll"
                     phx-update="stream"
+                    phx-hook="ChatAutoScroll"
+                    data-scroll-container="#chat-body-desktop"
+                    data-overlay="fixed"
                     class="divide-y divide-gray-800"
                   >
                     <%= for {dom_id, msg} <- @streams.messages do %>
@@ -394,8 +396,14 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             <div class="h-[40vh] flex flex-col">
               <div class="flex-1 overflow-y-auto">
                 <%= if @active_panel_tab == :chat do %>
-                  <div class="flex-1 overflow-y-auto" id="mobile-chat" phx-hook="ChatAutoScroll">
-                    <!-- PLAIN LIST (not streamed) with unique ids -->
+                  <div
+                    class="flex-1 overflow-y-auto"
+                    id="mobile-chat"
+                    data-list-selector="ul"
+                    phx-hook="ChatAutoScroll"
+                  >
+                    
+    <!-- PLAIN LIST (not streamed) with unique ids -->
                     <ul class="divide-y divide-gray-800 text-sm">
                       <%= for {dom_id, msg} <- @streams.messages do %>
                         <li id={"m-#{dom_id}"} class="px-4 py-3">
