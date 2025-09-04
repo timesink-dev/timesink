@@ -10,14 +10,18 @@
     <.live_title suffix=" · TimeSink">
       {assigns[:page_title] || "Comments"}
     </.live_title>
-
-    <!-- Include the same CSS/JS you use in root -->
+    
+<!-- Include the same CSS/JS you use in root -->
     <link phx-track-static rel="stylesheet" href={~p"/fonts/ano/ano.css"} />
-    <link phx-track-static rel="stylesheet" href={~p"/fonts/gangster_grotesk/gangster-grotesk.css"} />
+    <link
+      phx-track-static
+      rel="stylesheet"
+      href={~p"/fonts/gangster_grotesk/gangster-grotesk.css"}
+    />
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
-    </script>  
-    </head>
+    </script>
+  </head>
 
   <body class="text-mystery-white font-gangster antialiased">
     <header class="px-4 sm:px-6 lg:px-8 font-brand"></header>
