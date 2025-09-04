@@ -1,7 +1,22 @@
-<.top_nav class="h-[30px] mx-4" current_user={@current_user} />
 <main class="px-4 sm:px-6 lg:px-8">
   <div class="min-h-[calc(100vh-60px)]">
-    <.flash_group flash={@flash} /> {@inner_content}
+    <.flash_group flash={@flash} />
+    {@inner_content}
+    <%= if assigns[:current_user] do %>
+      <% root = assigns[:socket] || assigns[:conn] %>
+      <%= if root do %>
+        {live_render(
+          root,
+          TimesinkWeb.OnlinePillLive,
+          id: "online-pill",
+          session: %{
+            "user_id" => assigns[:current_user].id,
+            "username" => assigns[:current_user].username
+          },
+          layout: false
+        )}
+      <% end %>
+    <% end %>
   </div>
 </main>
 <footer class="bg-backroom-black text-mystery-white px-12 md:px-0 font-brand py-20 mt-24">

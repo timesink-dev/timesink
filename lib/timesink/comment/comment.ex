@@ -21,7 +21,6 @@ defmodule Timesink.Comment do
     field :content, :string
     field :assoc_id, :binary_id
     field :replies, {:array, :map}, virtual: true
-
     # the author of the comment
     belongs_to :user, Timesink.Accounts.User
 

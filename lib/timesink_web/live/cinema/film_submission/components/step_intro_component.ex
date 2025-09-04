@@ -11,9 +11,6 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
       <div class="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-start gap-12 md:gap-24">
         <!-- Text Content -->
         <div class="w-full md:w-2/5">
-          <h1 class="text-4xl md:text-5xl font-brand">
-            This is your spotlight.
-          </h1>
           <p class="text-lg mt-4 text-neon-blue-lightest font-medium">$25.00 submission fee</p>
 
           <div class="mt-8 space-y-6 text-base text-gray-300 max-w-prose">
