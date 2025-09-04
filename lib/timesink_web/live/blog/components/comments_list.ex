@@ -46,8 +46,8 @@ defmodule TimesinkWeb.BlogPostCommentsList do
                   <a href="/sign_in" class="hover:underline text-gray-400">Reply</a>
                 <% end %>
               </div>
-              
-    <!-- Reply Input -->
+
+              <%!-- <!-- Reply Input -->
               <%= if @current_user && @active_reply_id == comment.id do %>
                 <form phx-submit="submit_reply" class="mt-2 space-y-2" phx-target={@myself}>
                   <input type="hidden" name="parent_id" value={comment.id} />
@@ -66,7 +66,7 @@ defmodule TimesinkWeb.BlogPostCommentsList do
                     </button>
                   </div>
                 </form>
-              <% end %>
+              <% end %> --%>
               
     <!-- Replies -->
               <%= if @depth == 0 && comment.replies && comment.replies != [] do %>

@@ -39,6 +39,27 @@ defmodule TimesinkWeb.Router do
     plug TimesinkWeb.Plugs.RequireInviteToken
   end
 
+  pipeline :iframe_public do
+    plug :accepts, ["html"]
+    # keep this so CSRF token works, but we won't rely on it for auth
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_secure_browser_headers
+    plug :remove_x_frame_options
+    # DO NOT put put_current_user or require_authenticated_user here
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:iframe_public]
+    get "/auth/iframe_start", AuthController, :iframe_start
+    get "/auth/iframe_complete", AuthController, :iframe_complete
+
+    live_session :iframe_public,
+      layout: {TimesinkWeb.Layouts, :empty} do
+      live "/blog/:slug/comments", BlogPostCommentsLive, :show
+    end
+  end
+
   scope "/api", TimesinkWeb do
     pipe_through :api
 
@@ -128,13 +149,13 @@ defmodule TimesinkWeb.Router do
     end
   end
 
-  scope "/", TimesinkWeb do
-    pipe_through [:browser, :put_current_user]
+  # scope "/", TimesinkWeb do
+  #   pipe_through [:browser, :put_current_user]
 
-    live_session :blog_comments, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
-      live "/blog/:slug/comments", BlogPostCommentsLive
-    end
-  end
+  #   live_session :blog_comments, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
+  #     live "/blog/:slug/comments", BlogPostCommentsLive
+  #   end
+  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:timesink, :dev_routes) do

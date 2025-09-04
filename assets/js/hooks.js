@@ -526,5 +526,31 @@ Hooks.StripePayment = {
   }
 }
 
+Hooks.OpenIframePopup = {
+  // hooks/open_popup.js
+  mounted() {
+    this.el.addEventListener("click", () => {
+      console.log("omg")
+      const w = 480, h = 640
+      const left = (screen.width - w)/2, top = (screen.height - h)/2
+      window.open(this.el.dataset.url, "ts_auth", `width=${w},height=${h},top=${top},left=${left}`)
+    })
+  }
+}
+
+Hooks.AuthBridgeIframe = {
+    mounted() {
+      this._onMsg = (e) => {
+        // Optional: check e.origin starts with your app origin
+        if (!e.data || !e.data.ts_auth_token) return
+        this.pushEvent("auth_token", { token: e.data.ts_auth_token })
+      }
+      window.addEventListener("message", this._onMsg)
+    },
+    destroyed() { window.removeEventListener("message", this._onMsg) }
+  }
+
+
+
 
 export default Hooks;

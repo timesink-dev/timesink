@@ -31,4 +31,34 @@ defmodule TimesinkWeb.AuthController do
     |> put_flash(:info, "Welcome to Timesink!")
     |> redirect(to: "/now-playing")
   end
+
+  def iframe_start(conn, _params) do
+    IO.inspect("HERE")
+
+    if conn.assigns[:current_user] do
+      redirect(conn, to: ~p"/auth/iframe_complete")
+    else
+      redirect(conn, to: ~p"/sign_in?return_to=/auth/iframe_complete")
+    end
+  end
+
+  def iframe_complete(conn, _params) do
+    user = conn.assigns[:current_user] || raise "not signed in"
+    # Put exactly what you want the iframe to know:
+    claims = %{uid: user.id, name: user.first_name, avatar: ""}
+    token = Phoenix.Token.sign(TimesinkWeb.Endpoint, "iframe:auth", claims)
+
+    IO.inspect("YO!")
+
+    html = """
+    <script>
+      try {
+        (window.opener || window.parent).postMessage({ ts_auth_token: #{Jason.encode!(token)} }, "*");
+      } catch(_) {}
+      window.close();
+    </script>
+    """
+
+    Plug.Conn.resp(conn, 200, html)
+  end
 end
