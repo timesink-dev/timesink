@@ -1,6 +1,6 @@
 defmodule TimesinkWeb.BlogPostCommentsLive do
   use TimesinkWeb, :live_view
-  alias Timesink.{BlogPost, Comment, Repo}
+  alias Timesink.{BlogPost, Comment, Accounts, Repo}
 
   @impl true
   def mount(%{"slug" => slug} = params, _session, socket) do
@@ -212,7 +212,7 @@ defmodule TimesinkWeb.BlogPostCommentsLive do
 
   defp authenticate_from_token(token) do
     case Phoenix.Token.verify(TimesinkWeb.Endpoint, "iframe-auth", token, max_age: 60 * 60 * 6) do
-      {:ok, user_id} -> Timesink.Accounts.get_user(user_id)
+      {:ok, user_id} -> Timesink.Accounts.User.get(user_id)
       _ -> nil
     end
   end
