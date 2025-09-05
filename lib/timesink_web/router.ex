@@ -75,9 +75,12 @@ defmodule TimesinkWeb.Router do
   end
 
   scope "/", TimesinkWeb do
-    pipe_through :browser
-
+    pipe_through [:browser, :put_current_user]
     live "/join", WaitlistLive
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through :browser
 
     get "/invite/:token", InvitationController, :validate_invite
   end

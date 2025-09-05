@@ -14,14 +14,19 @@ defmodule TimesinkWeb.WaitlistLive do
 
     spots_remaining = Waitlist.get_wave_spots_remaining()
 
-    {:ok,
-     assign(socket,
-       joined: false,
-       email: "",
-       spots_remaining: spots_remaining,
-       message: message,
-       wait_time: estimated_wait_time
-     ), layout: {TimesinkWeb.Layouts, :empty}}
+    # <-- prevents KeyError anywhere
+    socket =
+      socket
+      |> assign_new(:current_user, fn -> nil end)
+      |> assign(
+        email: "",
+        joined: false,
+        spots_remaining: spots_remaining,
+        message: message,
+        wait_time: estimated_wait_time
+      )
+
+    {:ok, socket, layout: {TimesinkWeb.Layouts, :empty}}
   end
 
   def render(assigns) do
