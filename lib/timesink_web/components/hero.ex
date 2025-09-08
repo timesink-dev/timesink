@@ -65,7 +65,7 @@ defmodule TimesinkWeb.Components.Hero do
                 </p>
 
                 <a href="/join">
-                  <.button class="mt-6 h-12 px-6 text-base font-medium hover:bg-mystery-white hover:text-black transition">
+                  <.button class="mt-6 h-12 px-6 text-base font-medium hover:bg-mystery-white hover:text-black transition primary-button">
                     Get started
                   </.button>
                 </a>
