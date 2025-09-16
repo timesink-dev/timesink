@@ -7,11 +7,7 @@ defmodule TimesinkWeb.RedirectController do
     |> Plug.Conn.halt()
   end
 
-  def ghost_blog(conn, _params) do
-    redirect(conn, external: "https://blog.timesinkpresents.com/")
-  end
-
-  def ghost_blog_post(conn, %{"slug" => slug}) do
-    redirect(conn, external: "https://blog.timesinkpresents.com/#{slug}")
+  def substack_blog(conn, _params) do
+    redirect(conn, external: "https://timesinkpresents.substack.com/")
   end
 end

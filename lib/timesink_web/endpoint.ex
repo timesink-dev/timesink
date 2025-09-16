@@ -8,8 +8,7 @@ defmodule TimesinkWeb.Endpoint do
     store: :cookie,
     key: "_timesink_key",
     signing_salt: "xfGNS3d0",
-    same_site: "None",
-    secure: true
+    same_site: "Lax"
   ]
 
   socket "/live", Phoenix.LiveView.Socket,
@@ -51,7 +50,6 @@ defmodule TimesinkWeb.Endpoint do
 
   plug Plug.MethodOverride
   plug Plug.Head
-  plug TimesinkWeb.Plugs.FrameHeader
   plug Plug.Session, @session_options
   plug TimesinkWeb.Router
 end
