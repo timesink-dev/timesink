@@ -6,4 +6,8 @@ defmodule TimesinkWeb.RedirectController do
     |> Phoenix.Controller.redirect(to: ~p"/admin/showcases")
     |> Plug.Conn.halt()
   end
+
+  def substack_blog(conn, _params) do
+    redirect(conn, external: "https://timesinkpresents.substack.com/")
+  end
 end

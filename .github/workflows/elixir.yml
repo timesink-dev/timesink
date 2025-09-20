@@ -57,7 +57,7 @@ jobs:
 
     env:
       DATABASE_URL: ecto://postgres:postgres@localhost/timesink_test
-      RESEND_API_KEY: "test"
+      TIMESINK_RESEND_API_KEY: "test"
       TIMESINK_S3_ACCESS_KEY_ID: minioadmin
       TIMESINK_S3_ACCESS_KEY_SECRET: minioadmin
       AUTH_TOKEN_SALT: "test_salt"
