@@ -29,7 +29,17 @@ defmodule TimesinkWeb.Accounts.ProfileLive do
     ~H"""
     <div id="profile">
       <div class="profile-section flex flex-col gap-y-2">
-        {Profile.avatar_url(@user.profile.avatar)}
+        <%= if @user.profile.avatar do %>
+          <img
+            src={Profile.avatar_url(@user.profile.avatar)}
+            alt="Profile picture"
+            class="rounded-full w-16 h-16"
+          />
+        <% else %>
+          <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-zinc-700 text-lg font-semibold text-mystery-white">
+            {@user.first_name |> String.first() |> String.upcase()}
+          </span>
+        <% end %>
         <div>
           {@user.first_name} {@user.last_name}
         </div>

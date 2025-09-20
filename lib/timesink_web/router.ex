@@ -107,6 +107,8 @@ defmodule TimesinkWeb.Router do
     # static routes
     get "/info", PageController, :info
 
+    get "/blog", RedirectController, :substack_blog
+
     get "/auth/complete_onboarding", AuthController, :complete_onboarding
     post "/sign_in", AuthController, :sign_in
     post "/sign_out", AuthController, :sign_out
@@ -115,7 +117,6 @@ defmodule TimesinkWeb.Router do
       live "/", HomepageLive
       live "/submit", FilmSubmissionLive
       live "/archives", Cinema.ArchivesLive
-      live "/blog", BlogLive
       live "/upcoming", UpcomingLive
       live "/now-playing", Cinema.NowPlayingLive
       live "/:profile_username", Accounts.ProfileLive
