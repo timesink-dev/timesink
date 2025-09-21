@@ -1,16 +1,16 @@
-defmodule TimesinkWeb.Accounts.ProfileLive do
+defmodule TimesinkWeb.Account.ProfileLive do
   use TimesinkWeb, :live_view
 
-  alias Timesink.Accounts
+  alias Timesink.Account
   import Ecto.Query
-  alias Timesink.Accounts
-  alias Timesink.Accounts.Profile
+  alias Timesink.Account
+  alias Timesink.Account.Profile
 
   def mount(%{"profile_username" => profile_username}, _session, socket) do
     "@" <> username = profile_username
 
     with {:ok, [user]} <-
-           Accounts.query_users(fn query ->
+           Account.query_users(fn query ->
              query
              |> where([u], ilike(u.username, ^username))
              |> join(:inner, [u], p in Profile, on: p.user_id == u.id)

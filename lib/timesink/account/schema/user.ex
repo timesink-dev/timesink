@@ -1,10 +1,10 @@
-defmodule Timesink.Accounts.User do
+defmodule Timesink.Account.User do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   use Timesink.Schema
   import Ecto.Changeset
-  alias Timesink.Accounts
-  alias Timesink.Accounts.User
+  alias Timesink.Account
+  alias Timesink.Account.User
 
   @roles [:admin, :creator]
 
@@ -17,7 +17,7 @@ defmodule Timesink.Accounts.User do
           first_name: String.t(),
           last_name: String.t(),
           roles: list(String.t()),
-          profile: Accounts.Profile.t()
+          profile: Account.Profile.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -32,7 +32,7 @@ defmodule Timesink.Accounts.User do
 
     field :roles, {:array, Ecto.Enum}, values: @roles, default: [], redact: true
 
-    has_one :profile, Accounts.Profile
+    has_one :profile, Account.Profile
     has_many :tokens, Timesink.Token
 
     timestamps(type: :utc_datetime)
@@ -59,7 +59,7 @@ defmodule Timesink.Accounts.User do
     ])
     |> cast_assoc(:profile,
       required: true,
-      with: &Accounts.Profile.changeset/2,
+      with: &Account.Profile.changeset/2,
       message: "Profile is required"
     )
     |> trim_fields([:email, :username, :first_name, :last_name])
@@ -99,6 +99,14 @@ defmodule Timesink.Accounts.User do
     )
   end
 
+  def password_only_changeset(%__MODULE__{} = user, attrs \\ %{}) do
+    user
+    |> cast(attrs, [:password])
+    |> trim_fields([:password])
+    |> validate_required([:password])
+    |> validate_length(:password, min: 8, message: "Password must be at least 8 characters")
+  end
+
   def username_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> cast(params, [:username])
@@ -112,10 +120,10 @@ defmodule Timesink.Accounts.User do
     |> unique_constraint(:username, message: "Username is already taken")
   end
 
-  def location_changeset(%Accounts.Profile{} = struct, params \\ %{}) do
+  def location_changeset(%Account.Profile{} = struct, params \\ %{}) do
     struct
     |> cast(params, [:location])
-    |> cast_embed(:location, with: &Accounts.Location.changeset/2)
+    |> cast_embed(:location, with: &Account.Location.changeset/2)
     |> validate_required([:location])
   end
 

@@ -61,7 +61,9 @@ defmodule TimesinkWeb.Router do
 
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{TimesinkWeb.Auth, :redirect_if_user_is_authenticated}] do
-      live "/sign_in", SignInLive
+      live "/reset-password", Account.PasswordResetRequestLive, :new
+      live "/reset-password/:token", Account.PasswordResetLive, :edit
+      live "/sign-in", SignInLive
     end
   end
 
@@ -70,10 +72,10 @@ defmodule TimesinkWeb.Router do
 
     live_session :authenticated,
       on_mount: {TimesinkWeb.Auth, :ensure_authenticated} do
-      live "/me", Accounts.MeLive
-      live "/me/profile", Accounts.ProfileSettingsLive
-      live "/me/security", Accounts.SecuritySettingsLive
-      live "/me/film-submissions", Accounts.PersonalFilmSubmissionsLive
+      live "/me", Account.MeLive
+      live "/me/profile", Account.ProfileSettingsLive
+      live "/me/security", Account.SecuritySettingsLive
+      live "/me/film-submissions", Account.PersonalFilmSubmissionsLive
       live "/now-playing/:theater_slug", Cinema.TheaterLive
     end
   end
@@ -110,7 +112,7 @@ defmodule TimesinkWeb.Router do
     get "/blog", RedirectController, :substack_blog
 
     get "/auth/complete_onboarding", AuthController, :complete_onboarding
-    post "/sign_in", AuthController, :sign_in
+    post "/sign-in", AuthController, :sign_in
     post "/sign_out", AuthController, :sign_out
 
     live_session :default, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
@@ -119,7 +121,7 @@ defmodule TimesinkWeb.Router do
       live "/archives", Cinema.ArchivesLive
       live "/upcoming", UpcomingLive
       live "/now-playing", Cinema.NowPlayingLive
-      live "/:profile_username", Accounts.ProfileLive
+      live "/:profile_username", Account.ProfileLive
     end
   end
 

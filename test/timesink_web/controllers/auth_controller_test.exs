@@ -19,7 +19,7 @@ defmodule TimesinkWeb.AuthControllerTest do
         |> init_test_session(%{})
         |> fetch_session()
         |> fetch_flash()
-        |> post("/sign_in", params)
+        |> post("/sign-in", params)
 
       assert redirected_to(conn) == "/now-playing"
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Welcome back!"
@@ -40,9 +40,9 @@ defmodule TimesinkWeb.AuthControllerTest do
         |> init_test_session(%{})
         |> fetch_session()
         |> fetch_flash()
-        |> post("/sign_in", params)
+        |> post("/sign-in", params)
 
-      assert redirected_to(conn) == "/sign_in"
+      assert redirected_to(conn) == "/sign-in"
       assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "Invalid credentials"
     end
   end

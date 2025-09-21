@@ -1,7 +1,7 @@
-defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
+defmodule TimesinkWeb.Account.ProfileSettingsLive do
   use TimesinkWeb, :live_view
 
-  alias Timesink.Accounts.{User, Profile, Location}
+  alias Timesink.Account.{User, Profile, Location}
   alias Timesink.Locations
   alias Timesink.Repo
 
@@ -155,7 +155,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
                 </.inputs_for>
 
                 <p class="mt-2 text-xs text-zinc-500">
-                  This helps us plan screenings and build local community.
+                  This helps us plan screenings and build our community.
                 </p>
               </div>
               
@@ -175,34 +175,6 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
     <!-- Account fields -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-zinc-300 mb-2">Username</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">@</span>
-                  <input
-                    type="text"
-                    name={@account_form[:username].name}
-                    value={@user.username}
-                    class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3 pl-8"
-                    placeholder="username"
-                  />
-                </div>
-                <p class="mt-2 text-xs text-zinc-500">Your handle for chat and credits.</p>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-zinc-300 mb-2">Email</label>
-                <.input
-                  type="email"
-                  field={@account_form[:email]}
-                  value={@user.email}
-                  placeholder="you@example.com"
-                  input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
-                  class="md:relative"
-                  error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
-                />
-              </div>
-
-              <div>
                 <label class="block text-sm font-medium text-zinc-300 mb-2">First name</label>
                 <.input
                   field={@account_form[:first_name]}
@@ -219,6 +191,33 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
                   value={@user.last_name}
                   placeholder="Last name"
                   input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-2">Username</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">@</span>
+                  <input
+                    type="text"
+                    name={@account_form[:username].name}
+                    value={@user.username}
+                    class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3 pl-8"
+                    placeholder="username"
+                  />
+                </div>
+                <p class="mt-2 text-xs text-zinc-500">Your public handle on the platform</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-2">Email</label>
+                <.input
+                  type="email"
+                  field={@account_form[:email]}
+                  value={@user.email}
+                  placeholder="you@example.com"
+                  input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
+                  class="md:relative"
+                  error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
                 />
               </div>
             </div>
@@ -319,7 +318,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
     params = Map.update(params, "username", nil, &String.trim_leading(to_string(&1), "@"))
 
     cs =
-      Timesink.Accounts.User.changeset(socket.assigns.user, params)
+      Timesink.Account.User.changeset(socket.assigns.user, params)
       |> Map.put(:action, :validate)
 
     loc_dirty? =

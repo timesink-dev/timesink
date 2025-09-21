@@ -2,7 +2,7 @@ defmodule TimesinkWeb.TopNav do
   import TimesinkWeb.CoreComponents, only: [icon: 1, button: 1]
   use Phoenix.Component
   alias Phoenix.LiveView.JS
-  alias Timesink.Accounts.User
+  alias Timesink.Account.User
 
   attr :class, :string, default: nil
   attr :current_user, User, default: nil
@@ -137,7 +137,7 @@ defmodule TimesinkWeb.TopNav do
             </li>
           <% else %>
             <li>
-              <a href="/sign_in">
+              <a href="/sign-in">
                 <.button color="tertiary">
                   Sign in
                 </.button>
@@ -216,7 +216,7 @@ defmodule TimesinkWeb.TopNav do
                   </.button>
                 </a>
               <% else %>
-                <a href="/sign_in">
+                <a href="/sign-in">
                   <.button class="w-full md:w-1/2">
                     Sign in
                   </.button>

@@ -2,12 +2,12 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
   use TimesinkWeb, :live_component
 
   alias Timesink.Locations
-  alias Timesink.Accounts.Location
+  alias Timesink.Account.Location
 
   def update(assigns, socket) do
     location_data = get_in(assigns.data, ["profile", "location"]) || %{}
 
-    changeset = Timesink.Accounts.Location.changeset(%Timesink.Accounts.Location{}, location_data)
+    changeset = Timesink.Account.Location.changeset(%Timesink.Account.Location{}, location_data)
     form = to_form(changeset, as: "location")
 
     socket =
@@ -132,7 +132,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
 
   def handle_event("save_location", _params, socket) do
     location = socket.assigns.selected_location
-    changeset = Timesink.Accounts.Location.changeset(%Location{}, location)
+    changeset = Timesink.Account.Location.changeset(%Location{}, location)
 
     if changeset.valid? do
       updated_location =

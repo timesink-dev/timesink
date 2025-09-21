@@ -1,8 +1,8 @@
 defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
   use TimesinkWeb, :live_component
   import Ecto.Changeset
-  alias Timesink.Accounts.User
-  alias Timesink.Accounts
+  alias Timesink.Account.User
+  alias Timesink.Account
   import Phoenix.HTML.Form
 
   def update(assigns, socket) do
@@ -106,7 +106,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
   def handle_event("validate", %{"username" => username} = username_params, socket) do
     changeset = User.username_changeset(%User{}, username_params)
 
-    with {:ok, :available} <- Accounts.is_username_available?(username),
+    with {:ok, :available} <- Account.is_username_available?(username),
          {:ok, _validated_data} <- apply_action(changeset, :validate) do
       send(self(), {:update_user_data, to_form(changeset)})
 

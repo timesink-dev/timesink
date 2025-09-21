@@ -16,7 +16,7 @@ defmodule TimesinkWeb.Plugs.RequireAdmin do
     if !user do
       conn
       |> maybe_store_return_to()
-      |> redirect(to: ~p"/sign_in")
+      |> redirect(to: ~p"/sign-in")
       |> halt()
     end
 

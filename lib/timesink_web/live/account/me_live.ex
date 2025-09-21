@@ -1,9 +1,9 @@
-defmodule TimesinkWeb.Accounts.MeLive do
+defmodule TimesinkWeb.Account.MeLive do
   use TimesinkWeb, :live_view
   alias TimesinkWeb.Utils
-  alias Timesink.Accounts.Profile
+  alias Timesink.Account.Profile
 
-  import TimesinkWeb.Accounts.MePageItem
+  import TimesinkWeb.Account.MePageItem
 
   def mount(_params, _session, socket) do
     user = Timesink.Repo.preload(socket.assigns.current_user, profile: [avatar: [:blob]])

@@ -21,7 +21,7 @@ defmodule TimesinkWeb.Auth do
   import Plug.Conn
   import Phoenix.Controller
   alias Timesink.Auth, as: CoreAuth
-  alias Timesink.Accounts.User
+  alias Timesink.Account.User
   use TimesinkWeb, :verified_routes
 
   @remember_me_cookie "_timesink_web_user_remember_me"
@@ -138,7 +138,7 @@ defmodule TimesinkWeb.Auth do
     else
       socket =
         socket
-        |> Phoenix.LiveView.redirect(to: ~p"/sign_in")
+        |> Phoenix.LiveView.redirect(to: ~p"/sign-in")
 
       {:halt, socket}
     end

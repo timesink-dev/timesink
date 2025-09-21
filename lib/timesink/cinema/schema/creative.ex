@@ -8,14 +8,14 @@ defmodule Timesink.Cinema.Creative do
           __struct__: __MODULE__,
           first_name: :string,
           last_name: :string,
-          profile: Timesink.Accounts.Profile.t()
+          profile: Timesink.Account.Profile.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
   schema "creative" do
-    belongs_to :profile, Timesink.Accounts.Profile
+    belongs_to :profile, Timesink.Account.Profile
 
     field :first_name, :string
     field :last_name, :string

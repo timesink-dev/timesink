@@ -13,7 +13,7 @@ defmodule TimesinkWeb.AuthController do
       {:error, :invalid_credentials} ->
         conn
         |> put_flash(:error, "Invalid credentials")
-        |> redirect(to: ~p"/sign_in")
+        |> redirect(to: ~p"/sign-in")
     end
   end
 

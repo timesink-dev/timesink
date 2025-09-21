@@ -1,7 +1,7 @@
 defmodule TimesinkWeb.OnboardingLive do
   use TimesinkWeb, :live_view
 
-  alias Timesink.Accounts
+  alias Timesink.Account
   alias Timesink.Token
   alias Timesink.Auth, as: CoreAuth
   alias TimesinkWeb.Components.Stepper
@@ -106,7 +106,7 @@ defmodule TimesinkWeb.OnboardingLive do
   end
 
   def handle_info({:complete_onboarding, %{params: user_create_params}}, socket) do
-    with {:ok, user} <- Accounts.create_user(user_create_params),
+    with {:ok, user} <- Account.create_user(user_create_params),
          {:ok, _token} <- Token.invalidate_token(socket.assigns.invite_token),
          _maybe_updated <- maybe_mark_applicant_completed(socket.assigns.applicant) do
       token = CoreAuth.generate_token(user)

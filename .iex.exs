@@ -8,11 +8,11 @@ alias Timesink.Storage
 alias Timesink.Storage.Blob
 alias Timesink.Storage.Attachment
 
-# Timesink.Accounts
-alias Timesink.Accounts
-alias Timesink.Accounts.User
-alias Timesink.Accounts.Profile
-alias Timesink.Accounts.Location
+# Timesink.Account
+alias Timesink.Account
+alias Timesink.Account.User
+alias Timesink.Account.Profile
+alias Timesink.Account.Location
 
 # Timesink.Cinema
 alias Timesink.Cinema
