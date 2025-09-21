@@ -33,7 +33,7 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
             phx-submit="save"
             class="space-y-6"
           >
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-zinc-300 mb-2">Current password</label>
                 <.input
@@ -107,7 +107,7 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
       </div>
 
       <div class="mt-10 max-w-2xl mx-auto">
-        <h2 class="w-full bg-neon-red-light/10 px-6 md:px-12 py-6 border border-neon-red-light rounded-2xl text-neon-red-light text-xl font-brand">
+        <h2 class="w-full bg-neon-red-light/10 px-6 md:px-12 py-6 border border-neon-red-light rounded text-neon-red-light text-xl font-brand">
           Danger zone
         </h2>
         <button class="mt-6 py-3 px-6 bg-backroom-black text-neon-red-light font-semibold border border-neon-red-light rounded-xl hover:bg-neon-red-light/5">
