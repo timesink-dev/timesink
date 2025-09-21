@@ -2,6 +2,7 @@ defmodule TimesinkWeb.Account.PasswordResetLive do
   use TimesinkWeb, :live_view
   alias Timesink.Account, as: Account
   alias Timesink.Account.User
+  alias TimesinkWeb.Utils
 
   def mount(%{"token" => token}, _session, socket) do
     case Account.get_user_by_reset_password_token(token) do
@@ -11,7 +12,7 @@ defmodule TimesinkWeb.Account.PasswordResetLive do
            user: user,
            token: token,
            # start with empty form
-           form: to_form(Account.preview_user_password_changeset(%{}), as: "user"),
+           form: to_form(preview_user_password_changeset(%{}), as: "user"),
            ok_token?: true,
            success?: false
          ), layout: {TimesinkWeb.Layouts, :empty}}
@@ -99,7 +100,7 @@ defmodule TimesinkWeb.Account.PasswordResetLive do
   def handle_event("validate", %{"user" => params}, socket) do
     cs =
       params
-      |> Account.preview_user_password_changeset()
+      |> preview_user_password_changeset()
       |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, form: to_form(cs, as: "user"))}
@@ -111,11 +112,24 @@ defmodule TimesinkWeb.Account.PasswordResetLive do
         {:noreply,
          assign(socket,
            success?: true,
-           form: to_form(Account.preview_user_password_changeset(%{}), as: "user")
+           form: to_form(preview_user_password_changeset(%{}), as: "user")
          )}
 
       {:error, cs} ->
         {:noreply, assign(socket, form: to_form(cs, as: "user"))}
     end
+  end
+
+  defp preview_user_password_changeset(attrs) do
+    types = %{password: :string, password_confirmation: :string}
+
+    {%{}, types}
+    |> Ecto.Changeset.cast(attrs, Map.keys(types))
+    |> Utils.trim_fields([:password, :password_confirmation])
+    |> Ecto.Changeset.validate_length(:password,
+      min: 8,
+      message: "Password must be at least 8 characters"
+    )
+    |> Ecto.Changeset.validate_confirmation(:password, required: false, message: "does not match")
   end
 end

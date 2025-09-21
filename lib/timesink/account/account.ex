@@ -6,6 +6,7 @@ defmodule Timesink.Account do
   alias Timesink.Account.User
   alias Timesink.Account.Mail
   alias Timesink.Token
+  alias TimesinkWeb.Utils
 
   # email verification codes
   @code_expiration_minutes 15
@@ -188,9 +189,12 @@ defmodule Timesink.Account do
       {:ok, plain} ->
         hashed = Argon2.hash_pwd_salt(plain)
 
-        case User.update(user, %{"password" => hashed}) do
+        case User.update(
+               user,
+               %{"email" => user.email, "password" => hashed},
+               changeset: &User.email_password_changeset/2
+             ) do
           {:ok, updated} ->
-            # Invalidate ALL active reset tokens for this email
             invalidate_all_password_resets_for_email(updated.email)
             {:ok, updated}
 
@@ -243,19 +247,6 @@ defmodule Timesink.Account do
     end
   end
 
-  def preview_user_password_changeset(attrs \\ %{}) do
-    types = %{password: :string, password_confirmation: :string}
-
-    {%{}, types}
-    |> Ecto.Changeset.cast(attrs, Map.keys(types))
-    |> trim_fields([:password, :password_confirmation])
-    |> Ecto.Changeset.validate_length(:password,
-      min: 8,
-      message: "Password must be at least 8 characters"
-    )
-    |> Ecto.Changeset.validate_confirmation(:password, required: false, message: "does not match")
-  end
-
   # ----------------------------------------
   # Internals (private helpers)
   # ----------------------------------------
@@ -276,7 +267,7 @@ defmodule Timesink.Account do
 
     {%{}, types}
     |> Ecto.Changeset.cast(attrs, Map.keys(types))
-    |> trim_fields([:password, :password_confirmation, :current_password])
+    |> Utils.trim_fields([:password, :password_confirmation, :current_password])
     |> Ecto.Changeset.validate_required([:password, :password_confirmation])
     |> Ecto.Changeset.validate_length(:password,
       min: 8,
@@ -290,8 +281,7 @@ defmodule Timesink.Account do
   end
 
   defp invalidate_all_password_resets_for_email(email) do
-    # We don't have Repo here; rely on your Token API. If you don't have a bulk
-    # invalidate function, we can fetch and invalidate the latest; otherwise, you
+    # If we don't have a bulk invalidate function, we can fetch and invalidate the latest; otherwise, we
     # can create a helper in Token to invalidate all by kind+email.
     with {:ok, token} <-
            Token.get_by(%{
@@ -299,16 +289,10 @@ defmodule Timesink.Account do
              status: :valid,
              email: email
            }) do
-      # Best-effort; if there are multiple, invalidate one-by-one or extend your Token module.
+      # Best-effort; if there are multiple, invalidate one-by-one or extend our Token module.
       Token.invalidate_token(token)
     else
       _ -> :ok
     end
-  end
-
-  defp trim_fields(changeset, fields) do
-    Enum.reduce(fields, changeset, fn field, acc ->
-      Ecto.Changeset.update_change(acc, field, fn val -> val |> to_string() |> String.trim() end)
-    end)
   end
 end
