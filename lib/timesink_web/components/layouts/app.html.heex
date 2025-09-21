@@ -90,24 +90,21 @@
 <!-- Newsletter Signup -->
     <div class="max-w-3xl mx-auto mt-16 border-t border-mystery-white/10 pt-10">
       <p class="text-lg font-semibold mb-2 text-center">
-        Get screening updates & Cinematic transmissions.
+        Get screening updates, op-eds, & Cinematic transmissions from our substack.
       </p>
-      <p class="text-sm text-center text-mystery-white/70 mb-6 font-gangster">
-        Be the first to know about upcoming films, special events, and platform news—no noise, just the good stuff.
+      <p class="text-sm text-center text-mystery-white/70 mb-2 font-gangster w-2/3 mx-auto">
+        Be the first to know about upcoming films, special events, essays, insights, and fresh critique—no noise, just the good stuff.
       </p>
-      <form
-        phx-submit="subscribe"
-        class="flex flex-col sm:flex-row items-center justify-center gap-4"
-      >
-        <input
-          type="email"
-          name="email"
-          required
-          placeholder="Your email"
-          class="font-gangster bg-transparent border border-mystery-white/20 text-sm px-4 py-2 rounded w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-        <.button type="submit" color="primary" class="font-gangster">Subscribe</.button>
-      </form>
+      <div class="mx-auto w-full sm:w-[28rem]">
+        <iframe
+          src="https://timesinkpresents.substack.com/embed"
+          width="480"
+          height="150"
+          frameborder="0"
+          scrolling="no"
+        >
+        </iframe>
+      </div>
     </div>
   </div>
 </footer>

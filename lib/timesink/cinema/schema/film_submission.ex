@@ -45,7 +45,7 @@ defmodule Timesink.Cinema.FilmSubmission do
 
     field :payment_id, :string
 
-    belongs_to :submitted_by, Timesink.Accounts.User
+    belongs_to :submitted_by, Timesink.Account.User
 
     timestamps(type: :utc_datetime)
   end

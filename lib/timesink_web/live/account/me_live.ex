@@ -1,9 +1,9 @@
-defmodule TimesinkWeb.Accounts.MeLive do
+defmodule TimesinkWeb.Account.MeLive do
   use TimesinkWeb, :live_view
   alias TimesinkWeb.Utils
-  alias Timesink.Accounts.Profile
+  alias Timesink.Account.Profile
 
-  import TimesinkWeb.Accounts.MePageItem
+  import TimesinkWeb.Account.MePageItem
 
   def mount(_params, _session, socket) do
     user = Timesink.Repo.preload(socket.assigns.current_user, profile: [avatar: [:blob]])
@@ -14,13 +14,19 @@ defmodule TimesinkWeb.Accounts.MeLive do
   def render(assigns) do
     ~H"""
     <section id="user">
-      <div class="ml-6 mt-8 text-md text-dark-theater-lightest flex flex-col justify-center items-center w-full">
+      <div class="ml-6 mt-8 text-sm text-dark-theater-lightest flex flex-col justify-center items-center w-full">
         <span class="mb-2">
-          <img
-            src={Profile.avatar_url(@current_user.profile.avatar)}
-            alt="Profile picture"
-            class="rounded-full w-16 h-16"
-          />
+          <%= if @current_user.profile.avatar do %>
+            <img
+              src={Profile.avatar_url(@current_user.profile.avatar)}
+              alt="Profile picture"
+              class="rounded-full w-16 h-16"
+            />
+          <% else %>
+            <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-zinc-700 text-lg font-semibold text-mystery-white">
+              {@current_user.first_name |> String.first() |> String.upcase()}
+            </span>
+          <% end %>
         </span>
         <span class="leading-4">
           {"@" <> @current_user.username}

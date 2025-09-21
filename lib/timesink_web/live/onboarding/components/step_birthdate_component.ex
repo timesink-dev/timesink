@@ -1,14 +1,14 @@
 defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
   use TimesinkWeb, :live_component
 
-  alias Timesink.Accounts.Profile
+  alias Timesink.Account.Profile
 
   def update(assigns, socket) do
     birthdate = get_in(assigns.data, ["profile", "birthdate"])
 
     changeset =
-      Timesink.Accounts.Profile.birthdate_changeset(
-        %Timesink.Accounts.Profile{},
+      Timesink.Account.Profile.birthdate_changeset(
+        %Timesink.Account.Profile{},
         if(birthdate, do: %{"birthdate" => birthdate}, else: %{})
       )
 

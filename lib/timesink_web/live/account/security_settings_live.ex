@@ -1,64 +1,120 @@
-defmodule TimesinkWeb.Accounts.SecuritySettingsLive do
-  alias Timesink.Accounts.User
+defmodule TimesinkWeb.Account.SecuritySettingsLive do
   use TimesinkWeb, :live_view
+  alias Timesink.Account
+
+  def mount(_p, _s, socket) do
+    {:ok,
+     assign(socket,
+       form: to_form(preview_user_password_changeset(%{}), as: "user"),
+       dirty: false,
+       can_submit: false
+     )}
+  end
 
   def render(assigns) do
     ~H"""
-    <section class="w-1/2 mx-auto">
-      <div class="my-8">
+    <section class="px-4 md:px-6 py-8">
+      <div class="max-w-2xl mx-auto">
         <.back navigate={~p"/me"}></.back>
-        <h2 class="text-[1.5rem] font-semibold text-mystery-white flex justify-center">
-          Security settings
-        </h2>
       </div>
-      <div>
-        <.simple_form
-          as="security"
-          for={@security_form}
-          phx-submit="save"
-          class="mt-8 mb-8 w-full mx-auto"
-        >
-          <div class="w-full flex flex-col gap-y-2">
-            <.input
-              label="Old Password"
-              field={@security_form[:old_password]}
-              type="password"
-              placeholder="Password"
-              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-              class="w-full"
-            />
-            <.input
-              label="New Password"
-              field={@security_form[:new_password]}
-              type="password"
-              placeholder="Password"
-              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-              class="w-full"
-            />
-            <.input
-              label="Confirm Password"
-              field={@security_form[:confirm_password]}
-              type="password"
-              placeholder="Password"
-              input_class="w-full p-4 outline-width-0 rounded text-mystery-white border-none focus:outline-none outline-none bg-dark-theater-primary"
-              class="w-full"
-            />
-          </div>
-          <:actions>
-            <.button
-              phx-disable-with="Updating..."
-              class="w-full text-backroom-black font-semibold mt-4 px-6 py-4 hover:bg-neon-blue-lightest flex items-center justify-center"
-            >
-              Update password
-            </.button>
-          </:actions>
-        </.simple_form>
+
+      <div class="w-full max-w-2xl mx-auto bg-backroom-black/60 rounded-2xl shadow-lg">
+        <div class="px-6 md:px-8 py-6 border-b border-zinc-800">
+          <h2 class="text-2xl md:text-3xl font-semibold text-mystery-white text-center">
+            Security settings
+          </h2>
+          <p class="text-zinc-400 text-center mt-2">Change your password. Keep your account safe.</p>
+        </div>
+
+        <div class="px-6 md:px-8 py-6">
+          <.simple_form
+            for={@form}
+            as="user"
+            phx-change="validate"
+            phx-submit="save"
+            class="space-y-6"
+          >
+            <div class="md:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-zinc-300 mb-2">Current password</label>
+                <.input
+                  type="password"
+                  field={@form[:current_password]}
+                  placeholder="Enter your current password"
+                  phx-debounce="400"
+                  input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-2">New password</label>
+                <.input
+                  type="password"
+                  placeholder="Enter your new password"
+                  field={@form[:password]}
+                  phx-debounce="400"
+                  input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-2">
+                  Confirm new password
+                </label>
+                <.input
+                  type="password"
+                  placeholder="Confirm your password"
+                  field={@form[:password_confirmation]}
+                  phx-debounce="400"
+                  input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
+                />
+              </div>
+            </div>
+
+            <:actions>
+              <button
+                type="submit"
+                disabled={!@can_submit}
+                aria-disabled={!@can_submit}
+                phx-disable-with="Updating…"
+                class="w-full md:w-auto px-6 py-3 rounded-xl font-semibold bg-neon-blue-lightest text-backroom-black
+                        hover:opacity-90 focus:ring-2 focus:ring-neon-blue-lightest transition
+                        disabled:opacity-40 disabled:cursor-not-allowed phx-submit-loading:opacity-60 phx-submit-loading:cursor-wait"
+              >
+                <span class="inline-flex items-center gap-2 phx-submit-loading:hidden">
+                  Update password
+                </span>
+                <span class="hidden phx-submit-loading:inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    >
+                    </circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4A4 4 0 008 12H4z"
+                    >
+                    </path>
+                  </svg>
+                  Updating…
+                </span>
+              </button>
+            </:actions>
+          </.simple_form>
+        </div>
       </div>
-      <div class="mt-96">
-        <h2 class="w-full bg-neon-red-light bg-opacity-10 px-12 py-6 border-[0.4px] border-neon-red-light rounded text-neon-red-light text-xl font-brand">
-          Danger zone!
+
+      <div class="mt-10 max-w-2xl mx-auto">
+        <h2 class="w-full bg-neon-red-light/10 px-6 md:px-12 py-6 border border-neon-red-light rounded text-neon-red-light text-xl font-brand">
+          Danger zone
         </h2>
-        <button class="mt-6 focus-none py-4 px-16 bg-backroom-black text-neon-red-light font-semibold border-neon-red-light border-[1px]">
+        <button class="mt-6 py-3 px-6 bg-backroom-black text-neon-red-light font-semibold border border-neon-red-light rounded-xl hover:bg-neon-red-light/5">
           Delete account
         </button>
       </div>
@@ -66,12 +122,89 @@ defmodule TimesinkWeb.Accounts.SecuritySettingsLive do
     """
   end
 
-  def mount(_params, _session, socket) do
-    user = socket.assigns.current_user |> Timesink.Repo.preload(:profile)
+  def handle_event("validate", %{"user" => params}, socket) do
+    cs =
+      params
+      |> preview_user_password_changeset()
+      |> Map.put(:action, :validate)
 
-    changeset =
-      User.changeset(user)
+    dirty? = cs.changes != %{}
 
-    {:ok, assign(socket, security_form: to_form(changeset))}
+    {:noreply,
+     assign(socket,
+       form: to_form(cs, as: "user"),
+       dirty: dirty?,
+       can_submit: can_submit_from_changeset(cs, dirty?)
+     )}
+  end
+
+  def handle_event("save", %{"user" => %{"current_password" => current} = params}, socket) do
+    case Account.update_user_password(socket.assigns.current_user, current, params) do
+      {:ok, _user} ->
+        {:noreply,
+         socket
+         |> assign(
+           form: to_form(preview_user_password_changeset(%{}), as: "user"),
+           dirty: false,
+           can_submit: false
+         )
+         |> put_flash(:info, "Password updated")}
+
+      {:error, cs} ->
+        cs = Map.put(cs, :action, :insert)
+        dirty? = cs.changes != %{}
+
+        {:noreply,
+         assign(socket,
+           form: to_form(cs, as: "user"),
+           dirty: dirty?,
+           can_submit: can_submit_from_changeset(cs, dirty?)
+         )}
+    end
+  end
+
+  # --- helpers ---
+
+  defp can_submit_from_changeset(cs, dirty?) do
+    pw = Ecto.Changeset.get_change(cs, :password) || ""
+    pwc = Ecto.Changeset.get_change(cs, :password_confirmation) || ""
+    cur = Ecto.Changeset.get_change(cs, :current_password) || ""
+
+    cur_present? = cur != ""
+    pw_ok? = String.length(pw) >= 8
+    match_ok? = pwc != "" and pw == pwc
+    # preview changeset adds errors for length/mismatch
+    no_errors? = cs.valid?
+
+    dirty? and cur_present? and pw_ok? and match_ok? and no_errors?
+  end
+
+  defp preview_user_password_changeset(attrs) do
+    types = %{current_password: :string, password: :string, password_confirmation: :string}
+
+    {%{}, types}
+    |> Ecto.Changeset.cast(attrs, Map.keys(types))
+    |> TimesinkWeb.Utils.trim_fields([:current_password, :password, :password_confirmation])
+    |> maybe_validate_min_length(:password, 8)
+    |> Ecto.Changeset.validate_confirmation(:password,
+      required: false,
+      message: "The password you have entered does not match"
+    )
+  end
+
+  defp maybe_validate_min_length(cs, field, min) do
+    case Ecto.Changeset.get_change(cs, field) do
+      nil ->
+        cs
+
+      "" ->
+        cs
+
+      _ ->
+        Ecto.Changeset.validate_length(cs, field,
+          min: min,
+          message: "must be at least #{min} characters"
+        )
+    end
   end
 end

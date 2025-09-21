@@ -1,16 +1,16 @@
-defmodule TimesinkWeb.Accounts.ProfileLive do
+defmodule TimesinkWeb.Account.ProfileLive do
   use TimesinkWeb, :live_view
 
-  alias Timesink.Accounts
+  alias Timesink.Account
   import Ecto.Query
-  alias Timesink.Accounts
-  alias Timesink.Accounts.Profile
+  alias Timesink.Account
+  alias Timesink.Account.Profile
 
   def mount(%{"profile_username" => profile_username}, _session, socket) do
     "@" <> username = profile_username
 
     with {:ok, [user]} <-
-           Accounts.query_users(fn query ->
+           Account.query_users(fn query ->
              query
              |> where([u], ilike(u.username, ^username))
              |> join(:inner, [u], p in Profile, on: p.user_id == u.id)
@@ -29,7 +29,17 @@ defmodule TimesinkWeb.Accounts.ProfileLive do
     ~H"""
     <div id="profile">
       <div class="profile-section flex flex-col gap-y-2">
-        {Profile.avatar_url(@user.profile.avatar)}
+        <%= if @user.profile.avatar do %>
+          <img
+            src={Profile.avatar_url(@user.profile.avatar)}
+            alt="Profile picture"
+            class="rounded-full w-16 h-16"
+          />
+        <% else %>
+          <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-zinc-700 text-lg font-semibold text-mystery-white">
+            {@user.first_name |> String.first() |> String.upcase()}
+          </span>
+        <% end %>
         <div>
           {@user.first_name} {@user.last_name}
         </div>

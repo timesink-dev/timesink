@@ -2,8 +2,8 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
   use TimesinkWeb, :live_component
 
   import Phoenix.HTML.Form
-  alias Timesink.Accounts
-  alias Timesink.Accounts.User
+  alias Timesink.Account
+  alias Timesink.Account.User
   import Ecto.Changeset
 
   def mount(socket) do
@@ -100,15 +100,15 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
         socket
       ) do
     changeset =
-      User.email_password_changeset(%Accounts.User{}, %{
+      User.email_password_changeset(%Account.User{}, %{
         "email" => email,
         "password" => password
       })
 
     with {:ok, _validated_data} <- apply_action(changeset, :validate),
-         {:ok, :available} <- Accounts.is_email_available?(email),
-         {:ok, :matched} <- Accounts.verify_password_conformity(password, password_confirmation),
-         {:ok, :sent} <- Accounts.send_email_verification(email) do
+         {:ok, :available} <- Account.is_email_available?(email),
+         {:ok, :matched} <- Account.verify_password_conformity(password, password_confirmation),
+         {:ok, :sent} <- Account.send_email_verification(email) do
       send(self(), {:update_user_data, to_form(changeset)})
       send(self(), {:go_to_step, :next})
       {:noreply, assign(socket, form: to_form(changeset), error: nil)}
@@ -130,7 +130,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
         {:noreply,
          assign(socket,
            form: to_form(changeset),
-           error: "Passwords do not match."
+           error: "The password you have entered does not match."
          )}
 
       {:error, reason} ->
@@ -141,7 +141,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
   def handle_event("validate_email", %{"email" => email}, socket) do
     changeset = User.email_password_changeset(%User{}, %{"email" => email})
 
-    with {:ok, :available} <- Accounts.is_email_available?(email) do
+    with {:ok, :available} <- Account.is_email_available?(email) do
       send(self(), {:update_user_data, to_form(changeset)})
 
       {:noreply, assign(socket, form: to_form(changeset), error: nil)}
