@@ -100,7 +100,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
     email = socket.assigns.data["email"]
 
     if email != "" do
-      with {:ok, :sent} <- Accounts.send_email_verification(email) do
+      with {:ok, :sent} <- Account.send_email_verification(email) do
         socket =
           socket |> push_event("start_countdown", %{to: "resend-btn", duration: 60})
 
@@ -115,7 +115,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
   end
 
   defp valid_verification_code?(code, email) do
-    with {:ok, _token} <- Accounts.validate_email_verification_code(code, email) do
+    with {:ok, _token} <- Account.validate_email_verification_code(code, email) do
       {:ok, :valid_code}
     else
       _ -> {:error, :invalid_or_expired}

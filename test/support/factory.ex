@@ -46,7 +46,7 @@ defmodule Timesink.Factory do
     }
   end
 
-  # Accounts
+  # Account
 
   def applicant_factory do
     %Timesink.Waitlist.Applicant{

@@ -32,7 +32,7 @@ defmodule Timesink.Account.User do
 
     field :roles, {:array, Ecto.Enum}, values: @roles, default: [], redact: true
 
-    has_one :profile, Accounts.Profile
+    has_one :profile, Account.Profile
     has_many :tokens, Timesink.Token
 
     timestamps(type: :utc_datetime)
@@ -97,6 +97,14 @@ defmodule Timesink.Account.User do
     |> validate_format(:last_name, ~r/^[\p{L}\p{M}' -]+$/u,
       message: "Last name contains invalid characters. i.e. @, #, $, %, etc. are not allowed."
     )
+  end
+
+  def password_only_changeset(%__MODULE__{} = user, attrs \\ %{}) do
+    user
+    |> cast(attrs, [:password])
+    |> trim_fields([:password])
+    |> validate_required([:password])
+    |> validate_length(:password, min: 8, message: "Password must be at least 8 characters")
   end
 
   def username_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do

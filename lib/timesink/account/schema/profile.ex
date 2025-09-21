@@ -9,10 +9,10 @@ defmodule Timesink.Account.Profile do
   @type t :: %{
           __struct__: __MODULE__,
           user_id: Ecto.UUID.t(),
-          user: Accounts.User.t(),
+          user: Account.User.t(),
           avatar: Timesink.Storage.Attachment.t(),
           birthdate: Date.t(),
-          location: Accounts.Location.t(),
+          location: Account.Location.t(),
           org_name: String.t(),
           org_position: String.t(),
           bio: String.t()
@@ -22,7 +22,7 @@ defmodule Timesink.Account.Profile do
   @foreign_key_type :binary_id
 
   schema "profile" do
-    belongs_to :user, Accounts.User
+    belongs_to :user, Account.User
 
     has_one :avatar, {"profile_attachment", Storage.Attachment},
       foreign_key: :assoc_id,
@@ -33,7 +33,7 @@ defmodule Timesink.Account.Profile do
     field :org_position, :string
     field :bio, :string
 
-    embeds_one :location, Accounts.Location
+    embeds_one :location, Account.Location
 
     has_one :creative, Timesink.Creative
 
@@ -52,7 +52,7 @@ defmodule Timesink.Account.Profile do
       :bio
     ])
     |> cast_embed(:location, required: false)
-    |> cast_assoc(:user, with: &Accounts.User.changeset/2)
+    |> cast_assoc(:user, with: &Account.User.changeset/2)
   end
 
   def birthdate_changeset(%{__struct__: __MODULE__} = struct, %{} = params) do

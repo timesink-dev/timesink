@@ -1,6 +1,6 @@
 defmodule Timesink.Account do
   @moduledoc """
-  The Accounts context.
+  The Account context.
   """
 
   alias Timesink.Account.User
@@ -230,19 +230,32 @@ defmodule Timesink.Account do
           {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def update_user_password(%User{} = user, current_password, attrs)
       when is_binary(current_password) and is_map(attrs) do
-    with {:ok, _} <- User.valid_password?(user, current_password),
-         {:ok, plain} <- validate_new_password(attrs) do
-      hashed = Argon2.hash_pwd_salt(plain)
-      User.update(user, %{"password" => hashed})
-    else
-      {:error, :invalid_credentials} ->
+    # 1) verify current password
+    case User.valid_password?(user, current_password) do
+      {:ok, _} ->
+        # 2) validate new password (presence/length/confirmation)
+        case validate_new_password(attrs) do
+          {:ok, plain} ->
+            hashed = Argon2.hash_pwd_salt(plain)
+
+            # 3) update using a password-only changeset
+            case User.update(user, %{"password" => hashed},
+                   changeset: &User.password_only_changeset/2
+                 ) do
+              {:ok, updated} -> {:ok, updated}
+              {:error, cs} -> {:error, cs}
+            end
+
+          {:error, cs} ->
+            {:error, cs}
+        end
+
+      # any non-{:ok, _} means invalid current password
+      _ ->
         cs =
           password_validation_changeset(attrs)
           |> Ecto.Changeset.add_error(:current_password, "is not correct")
 
-        {:error, cs}
-
-      {:error, cs} ->
         {:error, cs}
     end
   end

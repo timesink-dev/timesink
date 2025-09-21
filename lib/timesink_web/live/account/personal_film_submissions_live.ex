@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.Accounts.PersonalFilmSubmissionsLive do
+defmodule TimesinkWeb.Account.PersonalFilmSubmissionsLive do
   use TimesinkWeb, :live_view
 
   import Ecto.Query
