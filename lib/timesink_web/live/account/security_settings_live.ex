@@ -6,7 +6,8 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
     {:ok,
      assign(socket,
        form: to_form(preview_user_password_changeset(%{}), as: "user"),
-       dirty: false
+       dirty: false,
+       can_submit: false
      )}
   end
 
@@ -33,12 +34,13 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
             phx-submit="save"
             class="space-y-6"
           >
-            <div class="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-zinc-300 mb-2">Current password</label>
                 <.input
                   type="password"
                   field={@form[:current_password]}
+                  placeholder="Enter your current password"
                   phx-debounce="400"
                   input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
                 />
@@ -48,6 +50,7 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
                 <label class="block text-sm font-medium text-zinc-300 mb-2">New password</label>
                 <.input
                   type="password"
+                  placeholder="Enter your new password"
                   field={@form[:password]}
                   phx-debounce="400"
                   input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
@@ -60,6 +63,7 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
                 </label>
                 <.input
                   type="password"
+                  placeholder="Confirm your password"
                   field={@form[:password_confirmation]}
                   phx-debounce="400"
                   input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
@@ -70,8 +74,8 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
             <:actions>
               <button
                 type="submit"
-                disabled={!@dirty}
-                aria-disabled={!@dirty}
+                disabled={!@can_submit}
+                aria-disabled={!@can_submit}
                 phx-disable-with="Updating…"
                 class="w-full md:w-auto px-6 py-3 rounded-xl font-semibold bg-neon-blue-lightest text-backroom-black
                         hover:opacity-90 focus:ring-2 focus:ring-neon-blue-lightest transition
@@ -125,7 +129,13 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
       |> Map.put(:action, :validate)
 
     dirty? = cs.changes != %{}
-    {:noreply, assign(socket, form: to_form(cs, as: "user"), dirty: dirty?)}
+
+    {:noreply,
+     assign(socket,
+       form: to_form(cs, as: "user"),
+       dirty: dirty?,
+       can_submit: can_submit_from_changeset(cs, dirty?)
+     )}
   end
 
   def handle_event("save", %{"user" => %{"current_password" => current} = params}, socket) do
@@ -133,12 +143,40 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
       {:ok, _user} ->
         {:noreply,
          socket
-         |> assign(form: to_form(preview_user_password_changeset(%{}), as: "user"), dirty: false)
+         |> assign(
+           form: to_form(preview_user_password_changeset(%{}), as: "user"),
+           dirty: false,
+           can_submit: false
+         )
          |> put_flash(:info, "Password updated")}
 
       {:error, cs} ->
-        {:noreply, assign(socket, form: to_form(cs, as: "user"), dirty: cs.changes != %{})}
+        cs = Map.put(cs, :action, :insert)
+        dirty? = cs.changes != %{}
+
+        {:noreply,
+         assign(socket,
+           form: to_form(cs, as: "user"),
+           dirty: dirty?,
+           can_submit: can_submit_from_changeset(cs, dirty?)
+         )}
     end
+  end
+
+  # --- helpers ---
+
+  defp can_submit_from_changeset(cs, dirty?) do
+    pw = Ecto.Changeset.get_change(cs, :password) || ""
+    pwc = Ecto.Changeset.get_change(cs, :password_confirmation) || ""
+    cur = Ecto.Changeset.get_change(cs, :current_password) || ""
+
+    cur_present? = cur != ""
+    pw_ok? = String.length(pw) >= 8
+    match_ok? = pwc != "" and pw == pwc
+    # preview changeset adds errors for length/mismatch
+    no_errors? = cs.valid?
+
+    dirty? and cur_present? and pw_ok? and match_ok? and no_errors?
   end
 
   defp preview_user_password_changeset(attrs) do
@@ -148,7 +186,10 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
     |> Ecto.Changeset.cast(attrs, Map.keys(types))
     |> TimesinkWeb.Utils.trim_fields([:current_password, :password, :password_confirmation])
     |> maybe_validate_min_length(:password, 8)
-    |> Ecto.Changeset.validate_confirmation(:password, required: false, message: "does not match")
+    |> Ecto.Changeset.validate_confirmation(:password,
+      required: false,
+      message: "The password you have entered does not match"
+    )
   end
 
   defp maybe_validate_min_length(cs, field, min) do

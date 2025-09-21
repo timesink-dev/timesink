@@ -205,7 +205,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                     placeholder="username"
                   />
                 </div>
-                <p class="mt-2 text-xs text-zinc-500">Your handle for chatt</p>
+                <p class="mt-2 text-xs text-zinc-500">Your public handle on the platform</p>
               </div>
 
               <div>

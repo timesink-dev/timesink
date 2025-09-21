@@ -32,7 +32,14 @@ defmodule TimesinkWeb.Account.PasswordResetRequestLive do
               phx-disable-with="Sending..."
               class="w-full mt-4 px-4 py-3 bg-neon-blue text-backroom-black font-bold rounded-lg hover:bg-neon-blue-lightest focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neon-blue"
             >
-              Send reset link
+              <%= if @sent? do %>
+                <span class="flex justify-center items-center gap-x-1">
+                  <.icon name="hero-check-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
+                  Request link sent
+                </span>
+              <% else %>
+                Send request link
+              <% end %>
             </.button>
           </:actions>
         </.simple_form>

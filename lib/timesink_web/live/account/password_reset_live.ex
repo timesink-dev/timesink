@@ -130,6 +130,9 @@ defmodule TimesinkWeb.Account.PasswordResetLive do
       min: 8,
       message: "Password must be at least 8 characters"
     )
-    |> Ecto.Changeset.validate_confirmation(:password, required: false, message: "does not match")
+    |> Ecto.Changeset.validate_confirmation(:password,
+      required: false,
+      message: "The password you have entered does not match"
+    )
   end
 end

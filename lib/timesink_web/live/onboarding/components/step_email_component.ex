@@ -130,7 +130,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
         {:noreply,
          assign(socket,
            form: to_form(changeset),
-           error: "Passwords do not match."
+           error: "The password you have entered does not match."
          )}
 
       {:error, reason} ->

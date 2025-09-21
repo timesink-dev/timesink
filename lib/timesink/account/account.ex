@@ -254,7 +254,10 @@ defmodule Timesink.Account do
       _ ->
         cs =
           password_validation_changeset(attrs)
-          |> Ecto.Changeset.add_error(:current_password, "is not correct")
+          |> Ecto.Changeset.add_error(
+            :current_password,
+            "Password entered does not match your current password"
+          )
 
         {:error, cs}
     end
@@ -286,7 +289,9 @@ defmodule Timesink.Account do
       min: 8,
       message: "Password must be at least 8 characters"
     )
-    |> Ecto.Changeset.validate_confirmation(:password, message: "does not match")
+    |> Ecto.Changeset.validate_confirmation(:password,
+      message: "The password you have entered does not match"
+    )
   end
 
   defp random_url_token do
