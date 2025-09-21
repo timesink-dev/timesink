@@ -1,7 +1,7 @@
 defmodule TimesinkWeb.OnboardingLive do
   use TimesinkWeb, :live_view
 
-  alias Timesink.Accounts
+  alias Timesink.Account
   alias Timesink.Token
   alias Timesink.Auth, as: CoreAuth
   alias TimesinkWeb.Components.Stepper

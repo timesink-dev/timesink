@@ -1,6 +1,6 @@
 defmodule TimesinkWeb.Onboarding.StepNameComponent do
   use TimesinkWeb, :live_component
-  alias Timesink.Accounts.User
+  alias Timesink.Account.User
 
   def update(assigns, socket) do
     data = assigns[:data] || %{}

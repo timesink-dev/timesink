@@ -58,7 +58,7 @@ defmodule Timesink.Factory do
   end
 
   def user_factory do
-    %Timesink.Accounts.User{
+    %Timesink.Account.User{
       email: Faker.Internet.email(),
       password: Argon2.hash_pwd_salt("password"),
       username: Faker.Internet.user_name(),
@@ -69,10 +69,10 @@ defmodule Timesink.Factory do
   end
 
   def location_factory do
-    %Timesink.Accounts.Location{
+    %Timesink.Account.Location{
       locality: Faker.Address.city(),
       country: Faker.Address.country(),
-      country_code: Enum.random(Timesink.Accounts.Location.iso3166_countries()),
+      country_code: Enum.random(Timesink.Account.Location.iso3166_countries()),
       state_code: Faker.Address.state_abbr(),
       label: "#{Faker.Address.city()}, #{Faker.Address.state_abbr()}, #{Faker.Address.country()}",
       lat: Faker.Address.latitude(),
@@ -81,7 +81,7 @@ defmodule Timesink.Factory do
   end
 
   def profile_factory do
-    %Timesink.Accounts.Profile{
+    %Timesink.Account.Profile{
       bio: Faker.Lorem.sentence(),
       location: build(:location),
       birthdate: Faker.Date.date_of_birth(),

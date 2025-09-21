@@ -1,3 +1,3 @@
-defmodule Timesink.AccountsTest do
+defmodule Timesink.AccountTest do
   # TODO
 end

@@ -3,7 +3,7 @@ defmodule Timesink.Token do
   use SwissSchema, repo: Timesink.Repo
   use Timesink.Schema
   import Ecto.Changeset
-  alias Timesink.Accounts.User
+  alias Timesink.Account.User
   alias Timesink.Waitlist.Applicant
 
   @type t :: %__MODULE__{

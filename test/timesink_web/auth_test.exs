@@ -2,7 +2,7 @@ defmodule TimesinkWeb.AuthTest do
   use ExUnit.Case, async: true
   use Timesink.DataCase
 
-  alias Timesink.Accounts.User
+  alias Timesink.Account.User
   alias TimesinkWeb.Auth
 
   import Timesink.Factory

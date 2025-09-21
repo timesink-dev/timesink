@@ -1,7 +1,7 @@
 defmodule TimesinkWeb.Accounts.MeLive do
   use TimesinkWeb, :live_view
   alias TimesinkWeb.Utils
-  alias Timesink.Accounts.Profile
+  alias Timesink.Account.Profile
 
   import TimesinkWeb.Accounts.MePageItem
 

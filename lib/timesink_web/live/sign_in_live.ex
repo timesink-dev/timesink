@@ -26,7 +26,7 @@ defmodule TimesinkWeb.SignInLive do
           id="sign_in_form"
           method="post"
           phx-update="ignore"
-          action={~p"/sign_in"}
+          action={~p"/sign-in"}
           class="space-y-5"
         >
           <.input
@@ -44,7 +44,7 @@ defmodule TimesinkWeb.SignInLive do
             required
           />
           <div class="flex justify-between text-sm">
-            <.link navigate="/forgot_password" class="text-brand hover:underline">
+            <.link navigate="/reset-password" class="text-brand hover:underline">
               Forgot password?
             </.link>
           </div>

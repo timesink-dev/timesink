@@ -1,5 +1,5 @@
 defmodule TimesinkWeb.Accounts.SecuritySettingsLive do
-  alias Timesink.Accounts.User
+  alias Timesink.Account.User
   use TimesinkWeb, :live_view
 
   def render(assigns) do

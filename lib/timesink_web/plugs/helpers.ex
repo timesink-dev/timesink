@@ -16,7 +16,7 @@ defmodule TimesinkWeb.Plugs.Helpers do
     with {:ok, claims} <-
            CoreAuth.verify_token(user_token),
          user when not is_nil(user) <-
-           Timesink.Repo.get!(Timesink.Accounts.User, claims[:user_id]) do
+           Timesink.Repo.get!(Timesink.Account.User, claims[:user_id]) do
       user
     else
       _ -> nil

@@ -12,7 +12,7 @@ defmodule TimesinkWeb.Plugs.RedirectIfUserIsAuthenticated do
   def call(conn, _opts) do
     if conn.assigns[:current_user] do
       conn
-      |> redirect(to: ~p"/sign_in")
+      |> redirect(to: ~p"/sign-in")
       |> halt()
     else
       conn

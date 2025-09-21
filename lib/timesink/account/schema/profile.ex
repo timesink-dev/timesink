@@ -1,9 +1,9 @@
-defmodule Timesink.Accounts.Profile do
+defmodule Timesink.Account.Profile do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   use Timesink.Schema
   import Ecto.Changeset
-  alias Timesink.Accounts
+  alias Timesink.Account
   alias Timesink.Storage
 
   @type t :: %{

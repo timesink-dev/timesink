@@ -1,8 +1,8 @@
 defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
   use TimesinkWeb, :live_component
   import Ecto.Changeset
-  alias Timesink.Accounts.User
-  alias Timesink.Accounts
+  alias Timesink.Account.User
+  alias Timesink.Account
   import Phoenix.HTML.Form
 
   def update(assigns, socket) do

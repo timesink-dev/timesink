@@ -1,10 +1,10 @@
-defmodule Timesink.Accounts.User do
+defmodule Timesink.Account.User do
   use Ecto.Schema
   use SwissSchema, repo: Timesink.Repo
   use Timesink.Schema
   import Ecto.Changeset
-  alias Timesink.Accounts
-  alias Timesink.Accounts.User
+  alias Timesink.Account
+  alias Timesink.Account.User
 
   @roles [:admin, :creator]
 
@@ -17,7 +17,7 @@ defmodule Timesink.Accounts.User do
           first_name: String.t(),
           last_name: String.t(),
           roles: list(String.t()),
-          profile: Accounts.Profile.t()
+          profile: Account.Profile.t()
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -59,7 +59,7 @@ defmodule Timesink.Accounts.User do
     ])
     |> cast_assoc(:profile,
       required: true,
-      with: &Accounts.Profile.changeset/2,
+      with: &Account.Profile.changeset/2,
       message: "Profile is required"
     )
     |> trim_fields([:email, :username, :first_name, :last_name])
@@ -112,10 +112,10 @@ defmodule Timesink.Accounts.User do
     |> unique_constraint(:username, message: "Username is already taken")
   end
 
-  def location_changeset(%Accounts.Profile{} = struct, params \\ %{}) do
+  def location_changeset(%Account.Profile{} = struct, params \\ %{}) do
     struct
     |> cast(params, [:location])
-    |> cast_embed(:location, with: &Accounts.Location.changeset/2)
+    |> cast_embed(:location, with: &Account.Location.changeset/2)
     |> validate_required([:location])
   end
 

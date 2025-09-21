@@ -1,5 +1,5 @@
 defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
-  alias Timesink.Accounts
+  alias Timesink.Account
   use TimesinkWeb, :live_component
 
   def mount(socket) do

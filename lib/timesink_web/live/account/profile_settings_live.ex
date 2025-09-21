@@ -1,7 +1,7 @@
 defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
   use TimesinkWeb, :live_view
 
-  alias Timesink.Accounts.{User, Profile, Location}
+  alias Timesink.Account.{User, Profile, Location}
   alias Timesink.Locations
   alias Timesink.Repo
 
@@ -319,7 +319,7 @@ defmodule TimesinkWeb.Accounts.ProfileSettingsLive do
     params = Map.update(params, "username", nil, &String.trim_leading(to_string(&1), "@"))
 
     cs =
-      Timesink.Accounts.User.changeset(socket.assigns.user, params)
+      Timesink.Account.User.changeset(socket.assigns.user, params)
       |> Map.put(:action, :validate)
 
     loc_dirty? =
