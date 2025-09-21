@@ -8,7 +8,7 @@ defmodule Timesink.Comment do
           __struct__: __MODULE__,
           content: :string,
           user_id: Ecto.UUID.t(),
-          user: Timesink.Accounts.User.t(),
+          user: Timesink.Account.User.t(),
           assoc_id: Ecto.UUID.t(),
           parent: Timesink.Comment.t() | nil,
           parent_id: Ecto.UUID.t() | nil
@@ -22,7 +22,7 @@ defmodule Timesink.Comment do
     field :assoc_id, :binary_id
     field :replies, {:array, :map}, virtual: true
     # the author of the comment
-    belongs_to :user, Timesink.Accounts.User
+    belongs_to :user, Timesink.Account.User
 
     # Optional parent for threading (1-level replies)
     belongs_to :parent, __MODULE__
