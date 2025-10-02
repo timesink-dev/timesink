@@ -2,6 +2,8 @@ defmodule TimesinkWeb.Components.Hero do
   use Phoenix.Component
   import TimesinkWeb.CoreComponents
 
+  attr :spots_left, :integer, default: nil
+
   def hero(assigns) do
     ~H"""
     <section id="hero-section" class="relative overflow-hidden">
@@ -20,7 +22,7 @@ defmodule TimesinkWeb.Components.Hero do
           </div>
           
     <!-- Left image -->
-          <div class="relative w-full md:w-2/3 min-h-[40vh] md:h-[70vh] z-10">
+          <div class="relative w-full md:w-2/3 min-h-[40vh] md:h-[75vh] z-10">
             <picture>
               <%!--
                 Provide a mobile-specific crop if available (recommended), otherwise the browser
@@ -65,7 +67,7 @@ defmodule TimesinkWeb.Components.Hero do
                 </p>
 
                 <a href="/join">
-                  <.button class="mt-6 h-12 px-6 text-base font-medium hover:bg-mystery-white hover:text-black transition primary-button">
+                  <.button class="mt-6 h-12 px-6 text-base font-medium hover:bg-mystery-white hover:text-black transition">
                     Get started
                   </.button>
                 </a>

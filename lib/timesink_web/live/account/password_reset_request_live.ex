@@ -18,7 +18,7 @@ defmodule TimesinkWeb.Account.PasswordResetRequestLive do
         </a>
         
     <!-- Reset Request Form -->
-        <.simple_form for={@form} as="req" phx-submit="send" class="space-y-5">
+        <.simple_form for={@form} as="req" phx-submqit="send" class="space-y-5">
           <.input
             field={@form[:email]}
             type="email"
