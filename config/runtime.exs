@@ -138,11 +138,30 @@ if config_env() in [:prod, :staging] do
 end
 
 # ExAws defaults to local, Docker-based MinIO
-System.get_env("TIMESINK_S3_HOST", "http://localhost:9000")
-|> URI.parse()
-|> then(fn %{scheme: scheme, host: host, port: port} ->
-  config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
-end)
+if config_env() in [:dev] do
+  System.get_env("TIMESINK_DEV_S3_HOST", "http://localhost:9000")
+  |> URI.parse()
+  |> then(fn %{scheme: scheme, host: host, port: port} ->
+    config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
+  end)
+end
+
+if config_env() in [:test] do
+  System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000")
+  |> URI.parse()
+  |> then(fn %{scheme: scheme, host: host, port: port} ->
+    config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
+  end)
+end
+
+if config_env() in [:staging, :prod] do
+  config :ex_aws,
+    region: System.fetch_env!("TIMESINK_AWS_REGION")
+
+  config :ex_aws, :s3,
+    scheme: "https://",
+    host: "s3.#{System.fetch_env!("TIMESINK_S3_HOST")}.amazonaws.com"
+end
 
 if config_env() === :prod do
   # Storage.Mux
