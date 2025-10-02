@@ -157,10 +157,6 @@ end
 if config_env() in [:staging, :prod] do
   config :ex_aws,
     region: System.fetch_env!("TIMESINK_AWS_REGION")
-
-  config :ex_aws, :s3,
-    scheme: "https://",
-    host: "s3.#{System.fetch_env!("TIMESINK_S3_HOST")}.amazonaws.com"
 end
 
 if config_env() === :prod do
