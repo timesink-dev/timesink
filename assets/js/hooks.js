@@ -526,5 +526,25 @@ Hooks.StripePayment = {
   }
 }
 
+ Hooks.CopyBus = {
+  mounted() {
+    this.handleEvent("copy_to_clipboard", async ({ text }) => {
+      try {
+        await navigator.clipboard.writeText(text)
+      } catch (e) {
+        // fallback if clipboard API blocked
+        const ta = document.createElement("textarea")
+        ta.value = text
+        document.body.appendChild(ta)
+        ta.select()
+        document.execCommand("copy")
+        ta.remove()
+      }
+    })
+  }
+}
+
+
+
 
 export default Hooks;
