@@ -1,12 +1,8 @@
 defmodule TimesinkWeb.Account.ProfileSettingsLive do
   use TimesinkWeb, :live_view
 
-  import Ecto.Query, only: [from: 2]
-
   alias Timesink.Account.{User, Profile, Location}
   alias Timesink.{Locations, Repo}
-
-  @base_url Application.compile_env(:timesink, :base_url)
 
   def mount(_params, _session, socket) do
     user =
