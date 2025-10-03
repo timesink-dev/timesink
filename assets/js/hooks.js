@@ -526,229 +526,35 @@ Hooks.StripePayment = {
   }
 }
 
-Hooks.OpenIframePopup = {
-  // hooks/open_popup.js
+Hooks.CopyBus = {
   mounted() {
-    this.el.addEventListener("click", () => {
-      console.log("omg")
-      const w = 480, h = 640
-      const left = (screen.width - w)/2, top = (screen.height - h)/2
-      window.open(this.el.dataset.url, "ts_auth", `width=${w},height=${h},top=${top},left=${left}`)
+    this.handleEvent("copy_to_clipboard", async ({ text }) => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(text)
+          return
+        } catch (err) {
+          console.warn("Clipboard API failed:", err)
+        }
+      }
+
+      // Fallback: use ClipboardItem if supported (modern browsers)
+      if (navigator.clipboard && window.ClipboardItem) {
+        try {
+          const blob = new Blob([text], { type: "text/plain" })
+          const data = [new ClipboardItem({ "text/plain": blob })]
+          await navigator.clipboard.write(data)
+          return
+        } catch (err) {
+          console.warn("ClipboardItem fallback failed:", err)
+        }
+      }
+
+      // Last resort: prompt the user to copy manually
+      window.prompt("Copy this text:", text)
     })
   }
 }
 
-Hooks.AuthBridgeIframe = {
-    mounted() {
-      this._onMsg = (e) => {
-        // Optional: check e.origin starts with your app origin
-        if (!e.data || !e.data.ts_auth_token) return
-        this.pushEvent("auth_token", { token: e.data.ts_auth_token })
-      }
-      window.addEventListener("message", this._onMsg)
-    },
-    destroyed() { window.removeEventListener("message", this._onMsg) }
-  }
-
-
-
-
-/**  YouTube-style autoscroll:
- - Only stick to bottom when user is already near the bottom
--  If user scrolls up, stop autoscroll and show a "New messages" button
-- When user clicks the button or scrolls back to bottom, resume autoscroll 
-*/
-
-Hooks.ChatAutoScroll =  {
-  STICKY_THRESHOLD: 64, // px from bottom is "at bottom"
-
-  mounted() {
-    // This hook must be on the UL. We find the scroll container via data attr.
-    const selector = this.el.dataset.scrollContainer;
-    this.container = selector ? document.querySelector(selector) : this.el.parentElement;
-
-    if (!this.container) {
-      console.warn("[ChatAutoScroll] Missing scroll container for", this.el);
-      return;
-    }
-
-    // MODE: inline (default) or fixed overlay (set data-overlay="fixed" on the UL)
-    this.overlayMode = (this.el.dataset.overlay || "").toLowerCase() === "fixed";
-
-    // state
-    this.stickToBottom = true;
-    this.isPointerDown = false;
-    this.prevCount = this.getMessageCount();
-    this.baselineCount = this.prevCount; // count when we left bottom
-    this.newCount = 0;
-
-    // ensure predictable stacking
-    if (!this.overlayMode) {
-      if (!getComputedStyle(this.container).position || getComputedStyle(this.container).position === "static") {
-        this.container.style.position = "relative";
-      }
-      this.container.style.overflowAnchor = "none";
-    }
-
-    this.buildJumpButton();
-    this.bindEvents();
-
-    // init stickiness
-    this.stickToBottom = this.isNearBottom();
-    if (this.stickToBottom) this.scrollToBottom(false);
-  },
-
-  updated() {
-    const currentCount = this.getMessageCount();
-
-    if (this.stickToBottom && !this.isPointerDown) {
-      this.scrollToBottom();
-      this.hideJumpButton();
-      this.baselineCount = currentCount;
-      this.newCount = 0;
-    } else {
-      const diff = Math.max(0, currentCount - this.baselineCount);
-      this.newCount = diff;
-      this.updateJumpButton();
-      if (diff > 0) this.showJumpButton();
-    }
-  },
-
-  destroyed() {
-    this.unbindEvents();
-    if (this.jumpBtn && this.overlayMode) {
-      // tidy up overlay button if we appended to body
-      document.body.contains(this.jumpBtn) && document.body.removeChild(this.jumpBtn);
-    }
-  },
-
-  // ── events ────────────────────────────────────────────────
-  bindEvents() {
-    this.onScroll = this.handleScroll.bind(this);
-    this.onPointerDown = () => { this.isPointerDown = true; };
-    this.onPointerUp = () => { this.isPointerDown = false; };
-    this.onReposition = this.positionOverlay.bind(this);
-
-    this.container.addEventListener("scroll", this.onScroll, { passive: true });
-    this.container.addEventListener("pointerdown", this.onPointerDown, { passive: true });
-    window.addEventListener("pointerup", this.onPointerUp, { passive: true });
-    this.container.addEventListener("touchstart", this.onPointerDown, { passive: true });
-    window.addEventListener("touchend", this.onPointerUp, { passive: true });
-
-    if (this.overlayMode) {
-      window.addEventListener("resize", this.onReposition, { passive: true });
-      window.addEventListener("scroll", this.onReposition, { passive: true });
-      this.positionOverlay(); // initial placement
-    }
-  },
-
-  unbindEvents() {
-    this.container.removeEventListener("scroll", this.onScroll);
-    this.container.removeEventListener("pointerdown", this.onPointerDown);
-    window.removeEventListener("pointerup", this.onPointerUp);
-    this.container.removeEventListener("touchstart", this.onPointerDown);
-    window.removeEventListener("touchend", this.onPointerUp);
-
-    if (this.overlayMode) {
-      window.removeEventListener("resize", this.onReposition);
-      window.removeEventListener("scroll", this.onReposition);
-    }
-  },
-
-  // ── behavior ──────────────────────────────────────────────
-  getMessageCount() {
-    return this.el.querySelectorAll(":scope > li").length; // count direct <li> children
-  },
-
-  handleScroll() {
-    const dist = this.distanceFromBottom();
-    if (dist <= this.STICKY_THRESHOLD) {
-      this.stickToBottom = true;
-      this.baselineCount = this.getMessageCount();
-      this.newCount = 0;
-      this.hideJumpButton();
-    } else {
-      if (this.stickToBottom) this.baselineCount = this.getMessageCount();
-      this.stickToBottom = false;
-      if (this.overlayMode) this.positionOverlay();
-    }
-  },
-
-  isNearBottom() { return this.distanceFromBottom() <= this.STICKY_THRESHOLD; },
-
-  distanceFromBottom() {
-    const el = this.container;
-    return el.scrollHeight - (el.scrollTop + el.clientHeight);
-  },
-
-  scrollToBottom(smooth = true) {
-    const el = this.container;
-    requestAnimationFrame(() => {
-      el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
-    });
-  },
-
-  // ── UI: jump button ───────────────────────────────────────
-  buildJumpButton() {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.title = "Jump to latest";
-    btn.style.display = "none"; // control visibility via inline style
-    btn.className = [
-      "rounded-full", "border", "border-gray-800",
-      "bg-zinc-900/80", "backdrop-blur",
-      "px-3", "py-1.5",
-      "text-xs", "text-gray-100",
-      "shadow", "hover:bg-zinc-800"
-    ].join(" ");
-
-    if (this.overlayMode) {
-      // position: fixed relative to viewport near container’s visible bottom-right
-      btn.style.position = "fixed";
-      btn.style.zIndex = "9999";
-      document.body.appendChild(btn);
-      this.positionOverlay();
-    } else {
-      // position: absolute inside scroll container
-      btn.style.position = "absolute";
-      btn.style.right = "0.75rem";  // right-3
-      btn.style.bottom = "0.75rem"; // bottom-3
-      btn.style.zIndex = "1000";
-      this.container.append(btn);
-    }
-
-    btn.textContent = "New messages";
-    btn.addEventListener("click", () => {
-      this.stickToBottom = true;
-      this.scrollToBottom();
-      const current = this.getMessageCount();
-      this.baselineCount = current;
-      this.newCount = 0;
-      this.hideJumpButton();
-    });
-
-    this.jumpBtn = btn;
-  },
-
-  positionOverlay() {
-    if (!this.overlayMode || !this.jumpBtn) return;
-    const rect = this.container.getBoundingClientRect();
-    // place 12px from bottom-right of the visible container
-    const pad = 12;
-    const x = Math.max(0, rect.right - pad - this.jumpBtn.offsetWidth);
-    const y = Math.max(0, rect.bottom - pad - this.jumpBtn.offsetHeight);
-    this.jumpBtn.style.left = `${x}px`;
-    this.jumpBtn.style.top  = `${y}px`;
-  },
-
-  updateJumpButton() {
-    if (!this.jumpBtn) return;
-    this.jumpBtn.textContent =
-      this.newCount > 0 ? `New messages (${this.newCount})` : "New messages";
-  },
-
-  showJumpButton() { if (this.jumpBtn) this.jumpBtn.style.display = "inline-flex"; },
-  hideJumpButton() { if (this.jumpBtn) this.jumpBtn.style.display = "none"; }
-}
 
 export default Hooks;

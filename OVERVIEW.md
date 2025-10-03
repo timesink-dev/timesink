@@ -18,7 +18,7 @@ Step into **TimeSink Presents**, a virtual cinema that feels as if it’s been n
 
 This isn’t just a digital platform; it’s an imaginary world made real. TimeSink is a timeless theater, an ever-evolving show, drawing people together to share in the mysteries of cinema. The films are just the beginning: it’s the conversations, the creator-audience connections, the palpable community that follow which create something enduring and transformative. Here, imagination, history, and community converge, forming a cinematic experience beyond the screen, alive in the minds of its members. Here, every moment holds the potential for inspiration, sparking the creative spirit. This is a space where cinema becomes real, bridging imagination and reality — something the world needs now more than ever.
 
-![AaronZomback_Fun_cinema_projected_lights_come_from_inside _Peop_b9320108-eaf2-4d4d-8427-c311c85ea1fa copy](https://github.com/user-attachments/assets/c0f6a6ac-cc87-43fe-88ec-23d633156202)
+<img width="1536" height="1024" alt="timesink-lounge" src="https://github.com/user-attachments/assets/4c3fa7bc-91f6-4bc1-a66b-7cd9b96a1841" />
 
 ## 📖 Domain Terms
 
