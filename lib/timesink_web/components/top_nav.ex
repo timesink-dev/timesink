@@ -7,7 +7,6 @@ defmodule TimesinkWeb.TopNav do
   attr :class, :string, default: nil
   attr :current_user, User, default: nil
 
-  @spec top_nav(map()) :: Phoenix.LiveView.Rendered.t()
   def top_nav(assigns) do
     ~H"""
     <header class={["z-40 sticky bg-backgroom-black", @class]}>
