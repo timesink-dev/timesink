@@ -526,24 +526,35 @@ Hooks.StripePayment = {
   }
 }
 
- Hooks.CopyBus = {
+Hooks.CopyBus = {
   mounted() {
     this.handleEvent("copy_to_clipboard", async ({ text }) => {
-      try {
-        await navigator.clipboard.writeText(text)
-      } catch (e) {
-        // fallback if clipboard API blocked
-        const ta = document.createElement("textarea")
-        ta.value = text
-        document.body.appendChild(ta)
-        ta.select()
-        document.execCommand("copy")
-        ta.remove()
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(text)
+          return
+        } catch (err) {
+          console.warn("Clipboard API failed:", err)
+        }
       }
+
+      // Fallback: use ClipboardItem if supported (modern browsers)
+      if (navigator.clipboard && window.ClipboardItem) {
+        try {
+          const blob = new Blob([text], { type: "text/plain" })
+          const data = [new ClipboardItem({ "text/plain": blob })]
+          await navigator.clipboard.write(data)
+          return
+        } catch (err) {
+          console.warn("ClipboardItem fallback failed:", err)
+        }
+      }
+
+      // Last resort: prompt the user to copy manually
+      window.prompt("Copy this text:", text)
     })
   }
 }
-
 
 
 

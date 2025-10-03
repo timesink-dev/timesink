@@ -5,20 +5,15 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
 
   alias Timesink.Account.{User, Profile, Location}
   alias Timesink.{Locations, Repo}
-  alias Timesink.Token
-  alias Timesink.UserGeneratedInvite
 
   @base_url Application.compile_env(:timesink, :base_url)
 
-  # ---------- mount ----------
   def mount(_params, _session, socket) do
     user =
       socket.assigns.current_user
       |> Repo.preload(profile: [avatar: [:blob]])
 
     changeset = User.changeset(user)
-
-    invites = list_invites(user.id)
 
     {loc_query, selected_location} =
       case user.profile && user.profile.location do
@@ -32,33 +27,12 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
      |> assign(
        user: user,
        account_form: to_form(changeset),
-       # invites UI
-       invites: invites,
-       invites_left: max(2 - length(invites), 0),
-       just_copied?: nil,
        # location UI
        loc_query: loc_query,
        loc_results: [],
        selected_location: selected_location,
        dirty: false
      )}
-  end
-
-  # ---------- invite helpers ----------
-  defp list_invites(user_id) do
-    from(t in Token,
-      where: t.user_id == ^user_id and t.kind == :invite,
-      order_by: [desc: t.inserted_at]
-    )
-    |> Repo.all()
-    |> Enum.map(fn t ->
-      %{
-        id: t.id,
-        url: "#{@base_url}/invite/#{t.secret || t.token}",
-        # "valid" | "used"
-        status: (t.status || :valid) |> to_string()
-      }
-    end)
   end
 
   def render(assigns) do
@@ -251,96 +225,6 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                 />
               </div>
             </div>
-            
-    <!-- Invites UI -->
-            <div class="mt-8 rounded-2xl border border-zinc-800 bg-dark-theater-primary/60 p-5 md:p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="text-lg md:text-xl font-semibold text-mystery-white">Invite friends</h3>
-                  <p class="text-sm text-zinc-400">Share a one-time link to skip the waitlist.</p>
-                </div>
-
-                <button
-                  type="button"
-                  phx-click="generate_invite"
-                  disabled={@invites_left == 0}
-                  class={[
-                    "inline-flex items-center gap-2 rounded-xl px-3 py-2 font-medium transition",
-                    if(@invites_left == 0,
-                      do: "bg-zinc-700/60 text-zinc-400 cursor-not-allowed",
-                      else: "bg-emerald-500 text-backroom-black hover:opacity-90"
-                    )
-                  ]}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M11 4a1 1 0 1 1 2 0v7h7a1 1 0 1 1 0 2h-7v7a1 1 0 1 1-2 0v-7H4a1 1 0 1 1 0-2h7V4z" />
-                  </svg>
-                  <span>Generate</span>
-                </button>
-              </div>
-
-              <div class="mt-3 text-xs text-zinc-500">
-                {if @invites_left > 0,
-                  do: "#{@invites_left} of #{2} invites left",
-                  else: "All #{2} invites used"} · No expiration
-              </div>
-
-              <ul class="mt-5 space-y-3">
-                <li
-                  :for={inv <- @invites}
-                  class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-xl border border-zinc-800 bg-backroom-black/40 px-3 py-3"
-                >
-                  <div class="min-w-0">
-                    <div class="flex items-center gap-2">
-                      <span class={[
-                        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-                        inv.status == "valid" &&
-                          "bg-emerald-600/20 text-emerald-300 ring-1 ring-emerald-600/40",
-                        inv.status == "used" && "bg-zinc-700/40 text-zinc-300 ring-1 ring-zinc-600/50"
-                      ]}>
-                        <span class={[
-                          "mr-1.5 h-1.5 w-1.5 rounded-full",
-                          inv.status == "valid" && "bg-emerald-400",
-                          inv.status == "used" && "bg-zinc-400"
-                        ]}>
-                        </span>
-                        {String.capitalize(inv.status)}
-                      </span>
-                    </div>
-                    <div class="mt-1 truncate text-sm text-zinc-300">{inv.url}</div>
-                  </div>
-
-                  <div class="flex items-center gap-2">
-                    <button
-                      type="button"
-                      phx-click="copy_invite"
-                      phx-value-url={inv.url}
-                      class="inline-flex items-center gap-2 rounded-lg bg-zinc-800/70 hover:bg-zinc-700 px-3 py-2 text-sm text-zinc-200 transition"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M8 7a2 2 0 012-2h8a2 2 0 012 2v9a2 2 0 01-2 2h-8a2 2 0 01-2-2V7zm-3 3h1v7a4 4 0 004 4h7v1a2 2 0 01-2 2H7a4 4 0 01-4-4V12a2 2 0 012-2z" />
-                      </svg>
-                      Copy
-                    </button>
-
-                    <span :if={@just_copied? == inv.url} class="text-xs text-emerald-400">
-                      Copied!
-                    </span>
-                  </div>
-                </li>
-              </ul>
-            </div>
 
             <:actions>
               <button
@@ -382,31 +266,6 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
       </div>
     </section>
     """
-  end
-
-  # ---------- invite events ----------
-  def handle_event("generate_invite", _params, socket) do
-    case UserGeneratedInvite.generate_invite(socket.assigns.user.id) do
-      {:ok, _url} ->
-        invites = list_invites(socket.assigns.user.id)
-
-        {:noreply,
-         assign(socket,
-           invites: invites,
-           invites_left: max(2 - length(invites), 0)
-         )}
-
-      {:error, msg} ->
-        {:noreply, put_flash(socket, :error, msg)}
-    end
-  end
-
-  def handle_event("copy_invite", %{"url" => url}, socket) do
-    # Push a client event that a small JS hook will handle via Clipboard API
-    {:noreply,
-     socket
-     |> push_event("copy_to_clipboard", %{text: url})
-     |> assign(just_copied?: url)}
   end
 
   # --- Location search/select (mirrors onboarding) ---
@@ -498,37 +357,6 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         {:noreply, assign(socket, account_form: to_form(cs))}
     end
   end
-
-  # def handle_event("loc_select", params, socket) do
-  #   # ... build `selected` the same way you already do ...
-  #   case Locations.lookup_place(id) do
-  #     {:ok, %{lat: lat, lng: lng}} ->
-  #       selected = %{
-  #         "locality" => city,
-  #         "state_code" => state_code,
-  #         "country_code" => country_code,
-  #         "country" => country,
-  #         "label" => label,
-  #         "lat" => lat,
-  #         "lng" => lng
-  #       }
-
-  #       dirty =
-  #         location_changed?(
-  #           socket.assigns.user.profile && socket.assigns.user.profile.location,
-  #           selected
-  #         )
-
-  #       {:noreply,
-  #        socket
-  #        |> assign(selected_location: selected, loc_query: label, loc_results: [], dirty: dirty)}
-
-  #     _ ->
-  #       {:noreply, put_flash(socket, :error, "Failed to retrieve full location info. Try again.")}
-  #   end
-  # end
-
-  # --- helpers ---
 
   # If the nested location is empty (user didn't pick from dropdown), fall back to previous selection
   defp ensure_location_payload(params, selected_location) do
