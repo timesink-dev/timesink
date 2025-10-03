@@ -313,4 +313,18 @@ defmodule Timesink.Account do
       _ -> :ok
     end
   end
+
+  def generate_email_change_token(%User{id: id, unverified_email: uemail})
+
+  token = Ecto.UUID.generate()
+
+  token_params = %{
+    kind: :email_verification,
+    secret: token,
+    waitlist_id: applicant.id,
+    expires_at: expires_at
+  }
+  when is_binary(uemail) do
+         Token.create()
+       end
 end
