@@ -1,9 +1,12 @@
 defmodule TimesinkWeb.Account.ProfileSettingsLive do
   use TimesinkWeb, :live_view
 
+  import Ecto.Query, only: [from: 2]
+
   alias Timesink.Account.{User, Profile, Location}
-  alias Timesink.Locations
-  alias Timesink.Repo
+  alias Timesink.{Locations, Repo}
+
+  @base_url Application.compile_env(:timesink, :base_url)
 
   def mount(_params, _session, socket) do
     user =
@@ -12,7 +15,6 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
 
     changeset = User.changeset(user)
 
-    # Seed location UX state from existing profile.location when present
     {loc_query, selected_location} =
       case user.profile && user.profile.location do
         %Location{label: label} = loc when is_binary(label) -> {label, to_location_map(loc)}
@@ -20,18 +22,17 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         _ -> {"", %{}}
       end
 
-    socket =
-      socket
-      |> assign(
-        user: user,
-        account_form: to_form(changeset),
-        loc_query: loc_query,
-        loc_results: [],
-        selected_location: selected_location,
-        dirty: false
-      )
-
-    {:ok, socket}
+    {:ok,
+     socket
+     |> assign(
+       user: user,
+       account_form: to_form(changeset),
+       # location UI
+       loc_query: loc_query,
+       loc_results: [],
+       selected_location: selected_location,
+       dirty: false
+     )}
   end
 
   def render(assigns) do
@@ -59,26 +60,43 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
             phx-submit="save"
             class="space-y-8"
           >
-            <!-- Avatar -->
+            <!-- Avatar + Username (moved to the top) -->
             <.inputs_for :let={pf} field={@account_form[:profile]}>
-              <div class="flex items-center gap-4">
+              <div class="flex items-center gap-4 md:gap-6">
                 <div class="relative">
                   <%= if @user.profile && @user.profile.avatar do %>
                     <img
                       src={Profile.avatar_url(@user.profile.avatar)}
                       alt="Profile picture"
-                      class="rounded-full w-14 h-14 object-cover ring-2 ring-zinc-700"
+                      class="rounded-full w-16 h-16 md:w-20 md:h-20 object-cover ring-2 ring-zinc-700"
                     />
                   <% else %>
-                    <span class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-zinc-700 text-lg font-semibold text-mystery-white ring-2 ring-zinc-700">
+                    <span class="inline-flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-zinc-700 text-xl md:text-2xl font-semibold text-mystery-white ring-2 ring-zinc-700">
                       {@user.first_name |> String.first() |> String.upcase()}
                     </span>
                   <% end %>
+                  <span class="absolute -bottom-1 -right-1 inline-flex items-center rounded-full bg-emerald-600/90 text-xs text-white px-2 py-0.5">
+                    You
+                  </span>
                 </div>
-                <div class="text-sm text-zinc-400">
-                  <div class="font-medium text-zinc-200">Avatar</div>
-                  <div>Image uploads coming soon.</div>
+
+                <div class="flex-1 min-w-0">
+                  <label class="block text-sm font-medium text-zinc-300 mb-2">Username</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">@</span>
+                    <input
+                      type="text"
+                      name={@account_form[:username].name}
+                      value={@user.username}
+                      class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3 pl-8"
+                      placeholder="username"
+                    />
+                  </div>
+                  <p class="mt-2 text-xs text-zinc-500 truncate">
+                    Your public handle on the platform
+                  </p>
                 </div>
+
                 <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
               </div>
               
@@ -193,20 +211,6 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                   input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
                 />
               </div>
-              <div>
-                <label class="block text-sm font-medium text-zinc-300 mb-2">Username</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">@</span>
-                  <input
-                    type="text"
-                    name={@account_form[:username].name}
-                    value={@user.username}
-                    class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3 pl-8"
-                    placeholder="username"
-                  />
-                </div>
-                <p class="mt-2 text-xs text-zinc-500">Your public handle on the platform</p>
-              </div>
 
               <div>
                 <label class="block text-sm font-medium text-zinc-300 mb-2">Email</label>
@@ -265,7 +269,6 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
   end
 
   # --- Location search/select (mirrors onboarding) ---
-
   def handle_event("loc_search", %{"location_query" => query}, socket) do
     # When the user types, run the same search as onboarding
     with {:ok, results} <- Locations.get_locations(query) do
@@ -354,37 +357,6 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         {:noreply, assign(socket, account_form: to_form(cs))}
     end
   end
-
-  # def handle_event("loc_select", params, socket) do
-  #   # ... build `selected` the same way you already do ...
-  #   case Locations.lookup_place(id) do
-  #     {:ok, %{lat: lat, lng: lng}} ->
-  #       selected = %{
-  #         "locality" => city,
-  #         "state_code" => state_code,
-  #         "country_code" => country_code,
-  #         "country" => country,
-  #         "label" => label,
-  #         "lat" => lat,
-  #         "lng" => lng
-  #       }
-
-  #       dirty =
-  #         location_changed?(
-  #           socket.assigns.user.profile && socket.assigns.user.profile.location,
-  #           selected
-  #         )
-
-  #       {:noreply,
-  #        socket
-  #        |> assign(selected_location: selected, loc_query: label, loc_results: [], dirty: dirty)}
-
-  #     _ ->
-  #       {:noreply, put_flash(socket, :error, "Failed to retrieve full location info. Try again.")}
-  #   end
-  # end
-
-  # --- helpers ---
 
   # If the nested location is empty (user didn't pick from dropdown), fall back to previous selection
   defp ensure_location_payload(params, selected_location) do

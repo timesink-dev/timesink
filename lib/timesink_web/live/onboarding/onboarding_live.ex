@@ -6,6 +6,7 @@ defmodule TimesinkWeb.OnboardingLive do
   alias Timesink.Auth, as: CoreAuth
   alias TimesinkWeb.Components.Stepper
   alias Timesink.Waitlist
+  alias Timesink.Repo
 
   alias TimesinkWeb.Onboarding.{
     StepEmailComponent,
@@ -106,26 +107,59 @@ defmodule TimesinkWeb.OnboardingLive do
   end
 
   def handle_info({:complete_onboarding, %{params: user_create_params}}, socket) do
-    with {:ok, user} <- Account.create_user(user_create_params),
-         {:ok, _token} <- Token.invalidate_token(socket.assigns.invite_token),
-         _maybe_updated <- maybe_mark_applicant_completed(socket.assigns.applicant) do
-      token = CoreAuth.generate_token(user)
+    result =
+      Repo.transaction(fn ->
+        # 1) Create the user
+        user =
+          case Account.create_user(user_create_params) do
+            {:ok, user} -> user
+            {:error, cs} -> Repo.rollback({:user_error, cs})
+          end
 
-      {:noreply,
-       push_navigate(socket,
-         to: ~p"/auth/complete_onboarding?token=#{token}"
-       )}
-    else
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Something went wrong. Please try again.")}
+        # 2) Invalidate the invite token (struct or raw supported by your Token module)
+        case Token.invalidate_token(socket.assigns.invite_token) do
+          {:ok, _tok} -> :ok
+          {:error, :already_used} -> Repo.rollback(:invite_already_used)
+          {:error, :not_found} -> Repo.rollback(:invite_not_found)
+          {:error, cs} -> Repo.rollback({:token_error, cs})
+          other -> Repo.rollback({:token_error, other})
+        end
+
+        # 3) Mark waitlist applicant completed (no-op if none)
+        case maybe_mark_applicant_completed(socket.assigns.applicant) do
+          {:ok, _} -> :ok
+          {:error, cs} -> Repo.rollback({:waitlist_error, cs})
+        end
+
+        # All good, return user to outer case
+        user
+      end)
+
+    case result do
+      {:ok, user} ->
+        token = CoreAuth.generate_token(user)
+        {:noreply, push_navigate(socket, to: ~p"/auth/complete_onboarding?token=#{token}")}
+
+      {:error, :invite_already_used} ->
+        {:noreply, put_flash(socket, :error, "This invite has already been used.")}
+
+      {:error, :invite_not_found} ->
+        {:noreply, put_flash(socket, :error, "Invite not found or invalid.")}
+
+      {:error, {:user_error, _cs}} ->
+        {:noreply, put_flash(socket, :error, "Could not create your account. Please try again.")}
+
+      {:error, {:token_error, _reason}} ->
+        {:noreply, put_flash(socket, :error, "Could not validate your invite. Please try again.")}
+
+      {:error, {:waitlist_error, _cs}} ->
+        {:noreply,
+         put_flash(socket, :error, "We couldn't finalize onboarding. Please try again.")}
     end
   end
 
-  defp maybe_mark_applicant_completed(nil), do: :ok
-
-  defp maybe_mark_applicant_completed(applicant) do
-    Waitlist.set_status(applicant, :completed)
-  end
+  defp maybe_mark_applicant_completed(nil), do: {:ok, :noop}
+  defp maybe_mark_applicant_completed(applicant), do: Waitlist.set_status(applicant, :completed)
 
   defp determine_step(current_step, :next, verified_email) do
     next_step_index = Enum.find_index(@step_order, &(&1 == current_step)) + 1

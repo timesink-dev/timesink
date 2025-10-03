@@ -23,7 +23,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
   def render(assigns) do
     ~H"""
     <div class="bg-backroom-black py-16 px-6 max-w-7xl mx-auto mt-12">
-      <div class="mb-32 md:mb-72 max-w-3xl mx-auto text-center px-4">
+      <%!-- <div class="mb-32 md:mb-72 max-w-3xl mx-auto text-center px-4">
         <h2 class="text-xl tracking-tight text-mystery-white font-gangter uppercase">
           Featured Showcase
         </h2>
@@ -34,9 +34,9 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
         <div class="text-gray-400 text-sm leading-relaxed max-w-lg mx-auto font-light text-center">
           {@showcase.description}
         </div>
-      </div>
+      </div> --%>
 
-      <div class="hidden lg:flex flex-row gap-24">
+      <div class="hidden lg:flex flex-row gap-12">
         <div class="flex flex-col space-y-12 w-1/5">
           <%= for exhibition <- @exhibitions do %>
             <button
@@ -44,8 +44,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
               phx-value-id={exhibition.theater.id}
               phx-target={@myself}
               class={[
-                "bg-dark-theater-primary rounded-lg p-4 shadow-md cursor-pointer transition text-left",
-                "hover:bg-dark-theater-light",
+                "border border-white/10 bg-gradient-to-r from-white/[0.04] to-white/[0.04] hover:border-white/20 hover:bg-white/[0.04] rounded-lg p-3 shadow-md cursor-pointer transition text-left",
                 @selected_theater_id == exhibition.theater.id && "ring-1 ring-neon-blue-lightest"
               ]}
             >
@@ -58,7 +57,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                   {live_viewer_count(exhibition.theater_id, @presence)}
                 </div>
               </div>
-              <div class="mt-6 text-mystery-white font-semibold text-lg">
+              <div class="mt-6 text-mystery-white font-medium text-md">
                 {exhibition.film.title}
               </div>
             </button>

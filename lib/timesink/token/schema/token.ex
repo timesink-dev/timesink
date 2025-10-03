@@ -11,7 +11,7 @@ defmodule Timesink.Token do
           kind: kind(),
           secret: String.t(),
           status: status(),
-          expires_at: DateTime.t(),
+          expires_at: DateTime.t() | nil,
           email: String.t() | nil,
           user_id: Ecto.UUID.t() | nil,
           waitlist_id: Ecto.UUID.t() | nil,
@@ -59,7 +59,7 @@ defmodule Timesink.Token do
   def changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> cast(params, [:kind, :secret, :status, :expires_at, :user_id, :waitlist_id, :email])
-    |> validate_required([:kind, :secret, :status, :expires_at])
+    |> validate_required([:kind, :secret, :status])
     |> unique_constraint(:secret, message: "Token already exists")
   end
 
@@ -84,6 +84,8 @@ defmodule Timesink.Token do
   end
 
   def invalidate_token(token) do
+    IO.inspect(token, label: "again here is the token fetched from socket assigns")
+
     update(token, %{
       status: :invalid
     })
