@@ -489,12 +489,8 @@ Hooks.StripePayment = {
 
 
     const paymentElement = elements.create("payment", {
-      fields: {
-        billingDetails: {
-          name: "never",
-          email: "never"
-        }
-      }
+      fields: { billingDetails: { name: "never", email: "never" } },
+      wallets: { link: "never"}
     });
 
     paymentElement.mount("#payment-element");
