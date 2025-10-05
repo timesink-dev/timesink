@@ -101,8 +101,8 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
           </div>
         </div>
         <div class="px-2 pt-6">
-          <h2 class="text-mystery-white text-md  font-brand">
-            View All Theaters →
+          <h2 class="text-mystery-white text-md font-gangster">
+            See what's playing →
           </h2>
         </div>
         <div id="embla-thumbs" phx-hook="EmblaThumbs" class="overflow-hidden w-full p-2">
