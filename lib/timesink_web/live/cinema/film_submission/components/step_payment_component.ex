@@ -83,12 +83,22 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
                   data-contact-email={@data["contact_email"]}
                 >
                   <div id="payment-element" />
+
                   <button
+                    id="stripe-submit"
                     type="submit"
-                    class="mt-6 bg-white text-black font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition"
+                    disabled
+                    aria-busy="false"
+                    class="mt-6 bg-white text-black font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition
+           inline-flex items-center justify-center gap-2"
                   >
-                    Pay & Submit
+                    <span>Pay &amp; Submit</span>
+                    <!-- keep width stable even when not spinning -->
+                    <span class="inline-flex items-center justify-center w-4 h-4" aria-hidden="true">
+                    </span>
                   </button>
+
+                  <p id="card-errors" class="mt-3 text-sm text-red-400"></p>
                 </form>
               <% else %>
                 <div class="bg-gray-900/60 border border-gray-800 rounded-lg p-6 space-y-4">
