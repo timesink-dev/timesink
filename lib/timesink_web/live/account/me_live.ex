@@ -30,28 +30,7 @@ defmodule TimesinkWeb.Account.MeLive do
   def render(assigns) do
     ~H"""
     <section id="user-overview" phx-hook="CopyBus">
-      <div class="ml-6 mt-8 text-sm text-dark-theater-lightest flex flex-col justify-center items-center w-full">
-        <span class="mb-2">
-          <%= if @current_user.profile.avatar do %>
-            <img
-              src={Profile.avatar_url(@current_user.profile.avatar)}
-              alt="Profile picture"
-              class="rounded-full w-16 h-16"
-            />
-          <% else %>
-            <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-zinc-700 text-lg font-semibold text-mystery-white">
-              {@current_user.first_name |> String.first() |> String.upcase()}
-            </span>
-          <% end %>
-        </span>
-        <span class="leading-4">
-          {"@" <> @current_user.username}
-        </span>
-        <span>
-          joined {Utils.format_date(@current_user.inserted_at)}
-        </span>
-      </div>
-      <div class="max-w-2xl mx-auto">
+      <div class="max-w-2xl mx-auto" class="mt-8">
         <.me_page_item
           title="Account"
           items={[

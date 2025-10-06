@@ -112,6 +112,6 @@ defmodule Timesink.Storage.S3 do
   @spec public_url(String.t()) :: String.t()
   def public_url(path) do
     config = Storage.config()
-    "#{config.host}/#{config.bucket}/#{path}"
+    "http://localhost:9000/#{config.bucket}/#{path}"
   end
 end

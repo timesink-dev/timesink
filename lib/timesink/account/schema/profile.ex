@@ -4,7 +4,9 @@ defmodule Timesink.Account.Profile do
   use Timesink.Schema
   import Ecto.Changeset
   alias Timesink.Account
-  alias Timesink.Storage
+  alias Timesink.{Repo, Storage}
+  alias Timesink.Account.Profile
+  alias Timesink.Images
 
   @type t :: %{
           __struct__: __MODULE__,
@@ -35,7 +37,7 @@ defmodule Timesink.Account.Profile do
 
     embeds_one :location, Account.Location
 
-    has_one :creative, Timesink.Creative
+    has_one :creative, Timesink.Cinema.Creative
 
     timestamps(type: :utc_datetime)
   end
@@ -44,13 +46,7 @@ defmodule Timesink.Account.Profile do
           Ecto.Changeset.t()
   def changeset(%{__struct__: __MODULE__} = struct, %{} = params) do
     struct
-    |> cast(params, [
-      :user_id,
-      :birthdate,
-      :org_name,
-      :org_position,
-      :bio
-    ])
+    |> cast(params, [:user_id, :birthdate, :org_name, :org_position, :bio])
     |> cast_embed(:location, required: false)
     |> cast_assoc(:user, with: &Account.User.changeset/2)
   end
@@ -62,9 +58,110 @@ defmodule Timesink.Account.Profile do
     |> validate_date()
   end
 
-  def attach_avatar(%{__struct__: __MODULE__} = profile, %Plug.Upload{} = upload) do
-    Storage.create_attachment(profile, :avatar, upload)
+  @doc "Avatar resize/encode spec"
+  def avatar_spec do
+    %{
+      accept_exts: ~w(.jpg .jpeg .png .webp .heic),
+      max_bytes: 8_000_000,
+      variants: %{
+        sm: %{resize: {:fill, 96, 96}, format: :webp, quality: 82},
+        md: %{resize: {:fill, 256, 256}, format: :webp, quality: 82},
+        lg: %{resize: {:limit, 512, 512}, format: :webp, quality: 82}
+      }
+    }
   end
+
+  def avatar_url(avatar, variant \\ :md)
+
+  def avatar_url(nil, _variant),
+    do: "/images/default-avatar.png"
+
+  # def avatar_url(%Timesink.Storage.Attachment{metadata: %{"variants" => vs}}, variant) do
+  #   key =
+  #     vs[Atom.to_string(variant)] ||
+  #       vs["md"] || vs["lg"] || vs["sm"]
+
+  #   Timesink.Storage.S3.public_url(key)
+  # end
+
+  def avatar_url(%Timesink.Storage.Attachment{blob: %{uri: path}}, _variant)
+      when is_binary(path) do
+    Timesink.Storage.S3.public_url(path)
+  end
+
+  @doc """
+  Processes avatar variants with libvips (`image`), uploads each as a Blob,
+  and creates a single `:avatar` Attachment whose metadata contains a `variants` map.
+  """
+
+  def attach_avatar(%{__struct__: __MODULE__} = profile, %Plug.Upload{} = upload, opts \\ []) do
+    attach(profile, upload, opts)
+  end
+
+  defp attach(%Profile{} = profile, %Plug.Upload{} = upload, opts) do
+    user_id = Keyword.get(opts, :user_id, profile.user_id)
+    spec = Profile.avatar_spec()
+
+    variants = Images.process_variants!(upload, spec)
+
+    case Repo.transaction(fn ->
+           # 0) Remove existing avatar (avoid unique constraint on [:assoc_id, :name])
+           profile = Repo.preload(profile, avatar: [:blob])
+
+           if profile.avatar do
+             case Storage.delete_attachment(profile.avatar) do
+               {:ok, :deleted} -> :ok
+               {:error, reason} -> Repo.rollback({:delete_avatar_failed, reason})
+             end
+           end
+
+           # 1) Upload each variant as its own blob
+           blobs_by_name =
+             for {name, %{path: path, content_type: ct}} <- variants, into: %{} do
+               pseudo = %Plug.Upload{
+                 path: path,
+                 filename: variant_name(upload.filename, name),
+                 content_type: ct
+               }
+
+               case Storage.create_blob(pseudo, user_id: user_id) do
+                 {:ok, blob} -> {name, blob}
+                 {:error, reason} -> Repo.rollback({:create_blob_failed, name, reason})
+               end
+             end
+
+           # 2) Build metadata
+           meta_variants =
+             blobs_by_name
+             |> Enum.map(fn {name, blob} -> {Atom.to_string(name), blob.uri} end)
+             |> Enum.into(%{})
+
+           metadata = %{"variants" => meta_variants, "canonical" => "md"}
+
+           # 3) Create the attachment pointing to the canonical blob
+           canonical = blobs_by_name[:md] || blobs_by_name[:lg] || blobs_by_name[:sm]
+
+           case Storage.create_attachment(profile, :avatar, canonical, metadata: metadata) do
+             {:ok, att} -> att
+             {:error, reason} -> Repo.rollback({:create_attachment_failed, reason})
+           end
+         end) do
+      {:ok, %Timesink.Storage.Attachment{} = att} ->
+        {:ok, att}
+
+      {:error, cs} ->
+        require Logger
+        Logger.error("Attachment insert failed: #{inspect(cs.errors)}")
+        {:error, cs}
+    end
+  end
+
+  defp variant_name(orig, name) do
+    base = Path.rootname(orig || "avatar")
+    "#{base}-#{name}.webp"
+  end
+
+  # --- private ---
 
   defp validate_date(changeset) do
     validate_change(changeset, :birthdate, fn :birthdate, date ->
@@ -84,17 +181,6 @@ defmodule Timesink.Account.Profile do
     end)
   end
 
-  defp too_young?(date) do
-    Date.diff(Date.utc_today(), date) < 16 * 365
-  end
-
-  defp too_old_to_believe?(date) do
-    Date.diff(Date.utc_today(), date) > 110 * 365
-  end
-
-  def avatar_url(%Timesink.Storage.Attachment{blob: %{uri: path}}) do
-    Timesink.Storage.S3.public_url(path)
-  end
-
-  def avatar_url(nil), do: "/images/default-avatar.png"
+  defp too_young?(date), do: Date.diff(Date.utc_today(), date) < 16 * 365
+  defp too_old_to_believe?(date), do: Date.diff(Date.utc_today(), date) > 110 * 365
 end

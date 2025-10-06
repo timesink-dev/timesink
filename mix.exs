@@ -43,6 +43,8 @@ defmodule Timesink.MixProject do
       {:resend, "~> 0.4.4"},
       {:stripity_stripe, "~> 3.2"},
       {:oban, "~> 2.19"},
+      {:image, "~> 0.54"},
+      {:vix, "~> 0.31"},
       {:swiss_schema, "~> 0.6.0"},
       {:phoenix, "~> 1.7.20"},
       {:phoenix_ecto, "~> 4.6"},
