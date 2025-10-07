@@ -147,7 +147,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                       >
                         <path d="M12 5l4 4h-3v4h-2V9H8l4-4z" /><path d="M5 18h14v2H5z" />
                       </svg>
-                      <span>Change</span>
+                      <span>Upload profile image</span>
                       <.live_file_input upload={@uploads.avatar} class="hidden" />
                     </label>
                   </form>
