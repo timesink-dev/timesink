@@ -434,11 +434,9 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
     end
   end
 
-  # Called automatically during upload; we only act when entry.done? is true.
-  # Called repeatedly as the upload progresses.
+  # Fire once when client finished sending the file
   def handle_avatar_progress(:avatar, entry, socket) do
     if entry.done? do
-      # Defer consumption to a normal mailbox message to avoid race/double-consume
       send(self(), {:process_avatar_upload, entry.ref})
       {:noreply, assign(socket, avatar_processing: true, avatar_error: nil)}
     else
@@ -447,10 +445,6 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
   end
 
   def handle_info({:process_avatar_upload, _entry_ref}, socket) do
-    # Optional: check what's actually completed (useful in dev)
-    {_completed, _in_progress} = uploaded_entries(socket, :avatar)
-    IO.inspect("handling the informat")
-
     results =
       consume_uploaded_entries(socket, :avatar, fn %{path: path}, entry ->
         plug = %Plug.Upload{
@@ -459,77 +453,45 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
           content_type: entry.client_type
         }
 
-        res =
-          try do
-            case Timesink.Account.Profile.attach_avatar(socket.assigns.user.profile, plug,
-                   user_id: socket.assigns.user.id
-                 ) do
-              {:ok, _att} ->
-                {:noreply,
-                 socket
-                 |> refresh_user()
-                 |> assign(avatar_processing: false, avatar_error: nil)
-                 |> put_flash(:info, "Avatar updated!")}
-
-              {:error, reason} ->
-                {:noreply,
-                 assign(socket, avatar_processing: false, avatar_error: "Upload failed")}
-            end
-          rescue
-            e -> {:error, e}
-          end
-
-        {:ok, res}
+        case Timesink.Account.Profile.attach_avatar(socket.assigns.user.profile, plug,
+               user_id: socket.assigns.user.id
+             ) do
+          {:ok, _att} -> {:ok, :attached}
+          # return a value so it shows up
+          {:error, reason} -> {:ok, {:attach_error, reason}}
+        end
       end)
 
-    case List.first(results) do
-      {:ok, {:ok, %Timesink.Storage.Attachment{} = att}} ->
+    case results do
+      [:attached | _] ->
         user =
-          Timesink.Repo.get!(Timesink.Account.User, socket.assigns.user.id)
-          |> Timesink.Repo.preload(profile: [avatar: [:blob]])
+          Repo.get!(Timesink.Account.User, socket.assigns.user.id)
+          |> Repo.preload(profile: [avatar: [:blob]])
 
+        {:noreply,
+         socket
+         |> assign(user: user, avatar_processing: false, avatar_error: nil)
+         |> put_flash(:info, "Avatar updated!")}
+
+      [{:attach_error, reason} | _] ->
+        {:noreply,
+         socket
+         |> assign(avatar_processing: false, avatar_error: friendly_err(reason))
+         |> put_flash(:error, "Failed to update avatar.")}
+
+      [] ->
+        {:noreply, assign(socket, avatar_processing: false)}
+
+      other ->
+        # Fallback if we ever change the return shape
         {:noreply,
          socket
          |> assign(
-           user: user,
            avatar_processing: false,
-           avatar_error: nil,
-           # cache-buster so the <img> src actually changes
-           avatar_ts: System.system_time(:second)
-         )
-         |> put_flash(:info, "Avatar updated!")}
-
-      {:ok, {:error, reason}} ->
-        {:noreply,
-         socket
-         |> assign(avatar_processing: false, avatar_error: reason)
-         |> put_flash(:error, "Failed to update avatar.")}
-
-      # If nothing was consumed (e.g., a race), just drop the spinner quietly.
-      _ ->
-        {:noreply, assign(socket, avatar_processing: false)}
+           avatar_error: "Unexpected upload result: #{inspect(other)}"
+         )}
     end
   end
-
-  defp refresh_user(socket) do
-    user =
-      Timesink.Repo.get!(Timesink.Account.User, socket.assigns.user.id)
-      |> Timesink.Repo.preload(profile: [avatar: [:blob]])
-
-    assign(socket, user: user)
-  end
-
-  # defp friendly_err(%Image.Error{message: m}), do: m
-  # defp friendly_err(%Ecto.Changeset{}), do: "Validation failed"
-  # defp friendly_err(%RuntimeError{message: m}), do: m
-  # defp friendly_err(%Plug.Upload.Error{message: m}), do: m
-  # defp friendly_err(e) when is_exception(e), do: Exception.message(e)
-  # defp friendly_err(term), do: term |> to_string() |> String.slice(0, 200)
-
-  # defp friendly_err(%Ecto.Changeset{} = cs), do: "Validation failed"
-  # defp friendly_err(%RuntimeError{message: m}), do: m
-  # defp friendly_err(%Plug.Upload.Error{message: m}), do: m
-  # defp friendly_err(term), do: term |> to_string() |> String.slice(0, 160)
 
   # If the nested location is empty (user didn't pick from dropdown), fall back to previous selection
   defp ensure_location_payload(params, selected_location) do
@@ -582,4 +544,9 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
     IO.inspect(Map.take(cur, keys) != Map.take(selected || %{}, keys))
     Map.take(cur, keys) != Map.take(selected || %{}, keys)
   end
+
+  defp friendly_err(%Ecto.Changeset{}), do: "Validation failed"
+  defp friendly_err(%RuntimeError{message: m}), do: m
+  defp friendly_err(%{message: m}) when is_binary(m), do: m
+  defp friendly_err(term), do: term |> to_string() |> String.slice(0, 160)
 end
