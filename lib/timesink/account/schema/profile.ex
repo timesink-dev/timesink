@@ -108,14 +108,14 @@ defmodule Timesink.Account.Profile do
            # 0) Remove existing avatar (avoid unique constraint on [:assoc_id, :name])
            profile = Repo.preload(profile, avatar: [:blob])
 
-           if profile.avatar do
-             case Storage.delete_attachment(profile.avatar) do
-               {:ok, :deleted} -> :ok
-               {:error, reason} -> Repo.rollback({:delete_avatar_failed, reason})
-             end
-           end
+           #  if profile.avatar do
+           #    case Storage.delete_attachment(profile.avatar) do
+           #      {:ok, :deleted} -> :ok
+           #      {:error, reason} -> Repo.rollback({:delete_avatar_failed, reason})
+           #    end
+           #  end
 
-           # 1) Upload each variant as its own blob
+           # Upload each variant as its own blob
            blobs_by_name =
              for {name, %{path: path, content_type: ct}} <- variants, into: %{} do
                pseudo = %Plug.Upload{
@@ -130,7 +130,7 @@ defmodule Timesink.Account.Profile do
                end
              end
 
-           # 2) Build metadata
+           # Build metadata
            meta_variants =
              blobs_by_name
              |> Enum.map(fn {name, blob} -> {Atom.to_string(name), blob.uri} end)
@@ -138,12 +138,12 @@ defmodule Timesink.Account.Profile do
 
            metadata = %{"variants" => meta_variants, "canonical" => "md"}
 
-           # 3) Create the attachment pointing to the canonical blob
+           # Create the attachment pointing to the canonical blob
            canonical = blobs_by_name[:md] || blobs_by_name[:lg] || blobs_by_name[:sm]
 
-           case Storage.create_attachment(profile, :avatar, canonical, metadata: metadata) do
+           case upsert_avatar!(profile, canonical, metadata) do
              {:ok, att} -> att
-             {:error, reason} -> Repo.rollback({:create_attachment_failed, reason})
+             {:error, cs} -> Repo.rollback({:create_or_update_attachment_failed, cs})
            end
          end) do
       {:ok, %Timesink.Storage.Attachment{} = att} ->
@@ -179,6 +179,41 @@ defmodule Timesink.Account.Profile do
           []
       end
     end)
+  end
+
+  alias Timesink.{Repo, Storage}
+  alias Timesink.Storage.Attachment
+
+  defp upsert_avatar!(
+         %Timesink.Account.Profile{} = profile,
+         %Timesink.Storage.Blob{} = canonical_blob,
+         metadata
+       ) do
+    # Load existing avatar (has_one with where name: "avatar")
+    profile = Repo.preload(profile, avatar: [:blob])
+
+    params = %{
+      blob_id: canonical_blob.id,
+      name: "avatar",
+      metadata: metadata
+    }
+
+    case profile.avatar do
+      %Attachment{} = existing ->
+        # UPDATE path
+        existing
+        |> Attachment.changeset(params)
+        # SwissSchema
+        |> Attachment.insert_or_update()
+
+      nil ->
+        # INSERT path (build assoc sets assoc_id for you)
+        profile
+        |> Ecto.build_assoc(:avatar)
+        |> Attachment.changeset(params)
+        # SwissSchema
+        |> Attachment.insert_or_update()
+    end
   end
 
   defp too_young?(date), do: Date.diff(Date.utc_today(), date) < 16 * 365

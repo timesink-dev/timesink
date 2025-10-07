@@ -172,26 +172,6 @@ defmodule Timesink.Storage do
     end)
   end
 
-  def create_or_replace_attachment(struct, assoc_name, %Blob{} = blob, opts \\ []) do
-    metadata = Keyword.get(opts, :metadata, %{})
-    name = Keyword.get(opts, :name, Atom.to_string(assoc_name))
-    now = DateTime.utc_now() |> DateTime.truncate(:second)
-
-    struct
-    |> Ecto.build_assoc(assoc_name, %{blob_id: blob.id, name: name, metadata: metadata})
-    |> Timesink.Repo.insert(
-      on_conflict: [
-        set: [
-          blob_id: blob.id,
-          metadata: metadata,
-          updated_at: now
-        ]
-      ],
-      conflict_target: [:assoc_id, :name],
-      returning: true
-    )
-  end
-
   @spec config() :: config
   def config do
     Application.get_env(:timesink, Timesink.Storage.S3) |> Enum.into(%{})

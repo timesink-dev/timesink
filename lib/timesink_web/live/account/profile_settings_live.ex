@@ -6,7 +6,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
 
   def mount(_params, _session, socket) do
     user =
-      socket.assigns.current_user
+      Repo.get!(Timesink.Account.User, socket.assigns.current_user.id)
       |> Repo.preload(profile: [avatar: [:blob]])
 
     changeset = User.changeset(user)
@@ -30,8 +30,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         # ← server-side processing state
         avatar_processing: false,
         # ← error message to show near control
-        avatar_error: nil,
-        avatar_ts: System
+        avatar_error: nil
       )
       |> allow_upload(:avatar,
         accept: ~w(.jpg .jpeg .png .webp .heic),
@@ -86,19 +85,8 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                   <% else %>
                     <%= if @user.profile && @user.profile.avatar do %>
                       <% url = Profile.avatar_url(@user.profile && @user.profile.avatar) %>
-                      <% bust = @avatar_ts || 0 %>
                       <img
-                        id="avatar-img"
-                        src={
-                          if url,
-                            do:
-                              if(String.contains?(url, "?"),
-                                do: "#{url}&cb=#{bust}",
-                                else: "#{url}?cb=#{bust}"
-                              ),
-                            else: "/images/default-avatar.png"
-                        }
-                        alt="Profile picture"
+                        src={url}
                         class="rounded-full w-16 h-16 md:w-20 md:h-20 object-cover ring-2 ring-zinc-700"
                       />
                     <% else %>
@@ -473,15 +461,19 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
 
         res =
           try do
-            case Timesink.Account.Profile.attach_avatar(
-                   socket.assigns.user.profile,
-                   plug,
+            case Timesink.Account.Profile.attach_avatar(socket.assigns.user.profile, plug,
                    user_id: socket.assigns.user.id
                  ) do
-              {:ok, %Timesink.Storage.Attachment{} = att} -> {:ok, att}
-              %Timesink.Storage.Attachment{} = att -> {:ok, att}
-              {:error, reason} -> {:error, reason}
-              other -> {:error, other}
+              {:ok, _att} ->
+                {:noreply,
+                 socket
+                 |> refresh_user()
+                 |> assign(avatar_processing: false, avatar_error: nil)
+                 |> put_flash(:info, "Avatar updated!")}
+
+              {:error, reason} ->
+                {:noreply,
+                 assign(socket, avatar_processing: false, avatar_error: "Upload failed")}
             end
           rescue
             e -> {:error, e}
@@ -517,6 +509,14 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
       _ ->
         {:noreply, assign(socket, avatar_processing: false)}
     end
+  end
+
+  defp refresh_user(socket) do
+    user =
+      Timesink.Repo.get!(Timesink.Account.User, socket.assigns.user.id)
+      |> Timesink.Repo.preload(profile: [avatar: [:blob]])
+
+    assign(socket, user: user)
   end
 
   # defp friendly_err(%Image.Error{message: m}), do: m
