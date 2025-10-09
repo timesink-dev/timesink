@@ -477,7 +477,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
           avatar_url: new_url
         })
 
-        UserCache.put_avatar_url(user.id, new_url)
+        # UserCache.put_avatar_url(user.id, new_url)
 
         {:noreply,
          socket

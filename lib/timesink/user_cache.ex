@@ -5,9 +5,15 @@ defmodule Timesink.UserCache do
   alias Timesink.Storage.Attachment
   import Ecto.Query
 
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+  def start_link(_opts), do: GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+
+  @impl true
+  def init(_) do
+    :ets.new(__MODULE__, [:named_table, :public, :set, read_concurrency: true])
+    {:ok, %{}}
   end
+
+  # ---------- Public API ----------
 
   def get_or_load(user_id) do
     case :ets.lookup(__MODULE__, user_id) do
@@ -15,8 +21,7 @@ defmodule Timesink.UserCache do
         {:ok, user}
 
       [] ->
-        with user <- load_user(user_id),
-             true <- not is_nil(user) do
+        with user when not is_nil(user) <- load_user(user_id) do
           put(user)
           {:ok, user}
         else
@@ -26,7 +31,7 @@ defmodule Timesink.UserCache do
   end
 
   def put(%{id: id} = user) do
-    :ets.insert(__MODULE__, {id, user})
+    true = :ets.insert(__MODULE__, {id, user})
     :ok
   end
 
@@ -35,15 +40,32 @@ defmodule Timesink.UserCache do
     :ok
   end
 
-  # Callbacks
-
-  @impl true
-  def init(_) do
-    :ets.new(__MODULE__, [:named_table, :public, read_concurrency: true])
-    {:ok, %{}}
+  # Read avatar url from the single row
+  def get_avatar_url(user_id) do
+    case :ets.lookup(__MODULE__, user_id) do
+      [{^user_id, %{avatar_url: url}}] -> url
+      _ -> nil
+    end
   end
 
-  # Internal loader (cheap minimal query)
+  # Update only the avatar fields on the single row
+  def put_avatar_url(user_id, url) do
+    case :ets.lookup(__MODULE__, user_id) do
+      [{^user_id, user}] ->
+        new_user = Map.merge(user, %{avatar_url: url})
+        true = :ets.insert(__MODULE__, {user_id, new_user})
+
+      [] ->
+        # If we don't have a user row yet, insert a minimal one
+        true =
+          :ets.insert(__MODULE__, {user_id, %{id: user_id, avatar_url: url}})
+    end
+
+    :ok
+  end
+
+  # ---------- Internal loader ----------
+
   defp load_user(user_id) do
     Repo.one(
       from u in User,
@@ -83,17 +105,5 @@ defmodule Timesink.UserCache do
           avatar_url: avatar_url
         }
     end
-  end
-
-  def get_avatar_url(user_id) do
-    case :ets.lookup(__MODULE__, {:avatar_url, user_id}) do
-      [{{:avatar_url, ^user_id}, url}] -> url
-      _ -> nil
-    end
-  end
-
-  def put_avatar_url(user_id, url) do
-    true = :ets.insert(__MODULE__, {{:avatar_url, user_id}, url})
-    :ok
   end
 end

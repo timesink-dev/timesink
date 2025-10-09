@@ -104,11 +104,14 @@ defmodule TimesinkWeb.Router do
     end
   end
 
+  pipeline :app_root_layout do
+    plug :put_root_layout, html: {TimesinkWeb.LiveAppLayout, :app}
+    # so @current_user is available
+    plug TimesinkWeb.Plugs.PutCurrentUser
+  end
+
   scope "/", TimesinkWeb do
     pipe_through [:browser, :put_current_user]
-
-    # static routes
-    get "/info", PageController, :info
 
     get "/blog", RedirectController, :substack_blog
 
@@ -120,6 +123,7 @@ defmodule TimesinkWeb.Router do
       on_mount: {TimesinkWeb.Auth, :mount_current_user},
       layout: {TimesinkWeb.LiveAppLayout, :app} do
       live "/", HomepageLive
+      live "/info", InfoPageLive
       live "/submit", FilmSubmissionLive
       live "/archives", Cinema.ArchivesLive
       live "/upcoming", UpcomingLive
