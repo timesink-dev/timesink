@@ -1,13 +1,9 @@
-# lib/timesink/user_cache.ex
 defmodule Timesink.UserCache do
-  @moduledoc false
   use GenServer
   alias Timesink.Repo
   alias Timesink.Account.{User, Profile}
   alias Timesink.Storage.Attachment
   import Ecto.Query
-
-  # Public API
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)

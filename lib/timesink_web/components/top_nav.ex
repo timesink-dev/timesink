@@ -94,14 +94,15 @@ defmodule TimesinkWeb.TopNav do
                 type="button"
                 phx-click={JS.toggle(to: "#account-menu", display: "block")}
                 color="none"
-                class="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-mystery-white hover:bg-zinc-800 focus:outline-none"
+                class="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-mystery-white focus:outline-none"
                 aria-haspopup="menu"
                 aria-expanded="false"
               >
-                <% # 1) prefer injected avatar_url from parent (no flicker)
+                <%!-- # 1) prefer injected avatar_url from parent (no flicker)
                 # 2) cache by current user id
                 # 3) compute from preloaded structs if present
-                resolved_url =
+                 --%>
+                <% resolved_url =
                   (@avatar_url && String.trim(@avatar_url) != "" && @avatar_url) ||
                     (@current_user.id && UserCache.get_avatar_url(@current_user.id)) ||
                     avatar_url_or_nil(@current_user) %>
@@ -114,7 +115,7 @@ defmodule TimesinkWeb.TopNav do
                     avatar_url={resolved_url}
                   />
                 <% else %>
-                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-zinc-700 text-[11px] font-semibold">
+                  <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-zinc-700 text-[11px] font-semibold">
                     {initials(@current_user)}
                   </span>
                 <% end %>
@@ -288,17 +289,6 @@ defmodule TimesinkWeb.TopNav do
     |> JS.remove_class("overflow-hidden", to: "body")
   end
 
-  defp avatar_token(nil), do: {:initials, "?"}
-
-  defp avatar_token(%{profile: %NotLoaded{}} = u), do: {:initials, initials(u)}
-  defp avatar_token(%{profile: nil} = u), do: {:initials, initials(u)}
-
-  defp avatar_token(%{profile: %{avatar: %Attachment{} = att}}),
-    do: {:img, Profile.avatar_url(att)}
-
-  # fallback for anything else
-  defp avatar_token(u), do: {:initials, initials(u)}
-
   defp initials(%{first_name: fnm, last_name: lnm}) do
     f = fnm |> to_string() |> String.trim() |> String.first() || ""
     l = lnm |> to_string() |> String.trim() |> String.first() || ""
@@ -317,13 +307,4 @@ defmodule TimesinkWeb.TopNav do
     do: Profile.avatar_url(att, :md)
 
   defp avatar_url_or_nil(_), do: nil
-
-  defp initials(%{first_name: fnm, last_name: lnm}) do
-    f = fnm |> to_string() |> String.trim() |> String.first() || ""
-    l = lnm |> to_string() |> String.trim() |> String.first() || ""
-    up = String.upcase(f <> l)
-    if up == "", do: "?", else: up
-  end
-
-  defp initials(_), do: "?"
 end

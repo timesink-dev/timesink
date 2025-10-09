@@ -7,7 +7,6 @@ defmodule Timesink.Storage do
   alias Timesink.Repo
   alias Timesink.Storage.Attachment
   alias Timesink.Storage.Blob
-  import Ecto.Query
 
   @type config :: %{
           host: String.t(),
@@ -38,8 +37,8 @@ defmodule Timesink.Storage do
 
     case File.stat(upload.path) do
       {:ok, stats} ->
-        stream = ExAws.S3.Upload.stream_file(upload.path)
-        op = ExAws.S3.upload(stream, config.bucket, obj_path, meta: obj_meta)
+        stream = S3.Upload.stream_file(upload.path)
+        op = S3.upload(stream, config.bucket, obj_path, meta: obj_meta)
 
         case ExAws.request(op) do
           {:ok, %{status_code: sc}} when sc in 200..299 ->

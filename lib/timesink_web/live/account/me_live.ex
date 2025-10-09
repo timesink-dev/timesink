@@ -3,8 +3,6 @@ defmodule TimesinkWeb.Account.MeLive do
   import Ecto.Query, only: [from: 2]
 
   alias Timesink.Repo
-  alias TimesinkWeb.Utils
-  alias Timesink.Account.Profile
   alias Timesink.Token
   alias Timesink.UserGeneratedInvite
   import TimesinkWeb.Account.MePageItem

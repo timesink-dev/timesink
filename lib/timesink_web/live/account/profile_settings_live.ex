@@ -1,17 +1,11 @@
 defmodule TimesinkWeb.Account.ProfileSettingsLive do
-  alias Mix.PubSub
   use TimesinkWeb, :live_view
 
   alias Timesink.Account.{User, Profile, Location}
   alias Timesink.{Locations, Repo}
-  alias TimesinkWeb.PubSubTopics
+  alias Timesink.UserCache
 
   def mount(_params, _session, socket) do
-    Phoenix.PubSub.subscribe(
-      Timesink.PubSub,
-      PubSubTopics.profile_update_topic(socket.assigns.current_user.id)
-    )
-
     user =
       Repo.get!(Timesink.Account.User, socket.assigns.current_user.id)
       |> Repo.preload(profile: [avatar: [:blob]])
@@ -79,85 +73,71 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
             <.inputs_for :let={pf} field={@account_form[:profile]}>
               <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6">
                 <div class="relative">
-                  <!-- Avatar image or initials -->
-                  <%= if @uploads.avatar.entries != [] do %>
-                    <!-- Client-side preview while the file is still uploading -->
-                    <%= for entry <- @uploads.avatar.entries do %>
-                      <.live_img_preview
-                        entry={entry}
-                        class="rounded-full w-16 h-16 md:w-20 md:h-20 object-cover ring-2 ring-zinc-700"
-                      />
-                    <% end %>
-                  <% else %>
-                    <%= if @user.profile && @user.profile.avatar do %>
-                      <% url = Profile.avatar_url(@user.profile && @user.profile.avatar) %>
-                      <img
-                        src={url}
-                        class="rounded-full w-16 h-16 md:w-20 md:h-20 object-cover ring-2 ring-zinc-700"
-                      />
-                    <% else %>
-                      <span class="inline-flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-zinc-700 text-xl md:text-2xl font-semibold text-mystery-white ring-2 ring-zinc-700">
-                        {@user.first_name |> String.first() |> String.upcase()}
-                      </span>
-                    <% end %>
-                  <% end %>
-
-                  <span class="absolute -bottom-1 -right-1 inline-flex items-center rounded-full bg-emerald-600/90 text-xs text-white px-2 py-0.5">
-                    You
-                  </span>
-                  
-    <!-- Subtle loading overlay while server is processing variants -->
-                  <div
-                    :if={@avatar_processing}
-                    class="absolute inset-0 rounded-full bg-black/40 grid place-items-center"
-                  >
-                    <svg
-                      class="animate-spin h-5 w-5 text-white"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      >
-                      </circle>
-                      <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4A4 4 0 008 12H4z"
-                      >
-                      </path>
-                    </svg>
-                  </div>
-                </div>
-                
-    <!-- Small "Change" button + hidden file input -->
-                <div class="flex flex-col items-start gap-1">
                   <form
                     phx-change="upload_avatar"
                     phx-auto-recover="ignore"
-                    class={[@avatar_processing && "pointer-events-none opacity-60"]}
+                    class={[@avatar_processing && "pointer-events-none opacity-60", "cursor-pointer"]}
                   >
-                    <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 cursor-pointer">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
+                    <label class="cursor-pointer">
+                      
+    <!-- Avatar image or initials -->
+                      <%= if @uploads.avatar.entries != [] do %>
+                        <!-- Client-side preview while the file is still uploading -->
+                        <%= for entry <- @uploads.avatar.entries do %>
+                          <.live_img_preview
+                            entry={entry}
+                            class="rounded-full w-16 h-16 md:w-20 md:h-20 object-cover ring-2 ring-zinc-700"
+                          />
+                        <% end %>
+                      <% else %>
+                        <%= if @user.profile && @user.profile.avatar do %>
+                          <% url = Profile.avatar_url(@user.profile && @user.profile.avatar) %>
+                          <img
+                            src={url}
+                            class="rounded-full w-16 h-16 md:w-20 md:h-20 object-cover ring-2 ring-zinc-700"
+                          />
+                        <% else %>
+                          <span class="inline-flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-zinc-700 text-xl md:text-2xl font-semibold text-mystery-white ring-2 ring-zinc-700">
+                            {@user.first_name |> String.first() |> String.upcase()}
+                          </span>
+                        <% end %>
+                      <% end %>
+
+                      <span class="absolute -bottom-1 -right-1 inline-flex items-center rounded-full bg-emerald-600/90 text-xs text-white px-2 py-0.5">
+                        You
+                      </span>
+                      
+    <!-- Subtle loading overlay while server is processing variants -->
+                      <div
+                        :if={@avatar_processing}
+                        class="absolute inset-0 rounded-full bg-black/40 grid place-items-center"
                       >
-                        <path d="M12 5l4 4h-3v4h-2V9H8l4-4z" /><path d="M5 18h14v2H5z" />
-                      </svg>
-                      <span>Upload profile image</span>
+                        <svg
+                          class="animate-spin h-5 w-5 text-white"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          >
+                          </circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4A4 4 0 008 12H4z"
+                          >
+                          </path>
+                        </svg>
+                      </div>
                       <.live_file_input upload={@uploads.avatar} class="hidden" />
                     </label>
                   </form>
-                  
-    <!-- Inline error under the control if server-side fails -->
                   <p :if={@avatar_error} class="text-xs text-red-400 mt-1">{@avatar_error}</p>
                 </div>
 
@@ -483,22 +463,21 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
 
         new_url = Profile.avatar_url(user.profile.avatar)
 
-        # LiveComponent in the top nav (no flicker, instant swap)
         send_update(
-          TimesinkWeb.AvatarLive,
-          id: "avatar-#{user.id}",
-          user_id: user.id,
-          initial_url: new_url
+          TimesinkWeb.NavAvatarLive,
+          id: "nav-avatar-#{user.id}",
+          avatar_url: new_url
         )
 
-        Timesink.UserCache.bust(user.id)
+        UserCache.put(%{
+          id: user.id,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          avatar_url: new_url
+        })
 
-        # (Optional) broadcast for other sessions/tabs
-        Phoenix.PubSub.broadcast(
-          Timesink.PubSub,
-          TimesinkWeb.PubSubTopics.profile_update_topic(user.id),
-          {:avatar_updated, user.id, new_url}
-        )
+        UserCache.put_avatar_url(user.id, new_url)
 
         {:noreply,
          socket
@@ -523,10 +502,9 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
       |> Timesink.Repo.preload(profile: [avatar: [:blob]])
 
     # If you use a stateful avatar component:
-    send_update(TimesinkWeb.AvatarLive,
-      id: "avatar-#{user_id}",
-      user_id: user_id,
-      initial_url: url
+    send_update(TimesinkWeb.NavAvatarLive,
+      # id: "avatar-#{user_id}",
+      avatar_url: url
     )
 
     {:noreply,
