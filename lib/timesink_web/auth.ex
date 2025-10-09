@@ -127,11 +127,11 @@ defmodule TimesinkWeb.Auth do
   """
 
   def on_mount(:mount_current_user, _params, session, socket) do
-    {:cont, mount_current_user(socket, session)}
+    {:cont, assign_current_user(socket, session)}
   end
 
   def on_mount(:ensure_authenticated, _params, session, socket) do
-    socket = mount_current_user(socket, session)
+    socket = assign_current_user(socket, session)
 
     if socket.assigns.current_user do
       {:cont, socket}
@@ -156,14 +156,32 @@ defmodule TimesinkWeb.Auth do
 
   defp mount_current_user(socket, %{"user_token" => user_token} = _session) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
-      with user_token when not is_nil(user_token) <- user_token,
-           user <- get_user_by_session_token(user_token) do
-        user
+      with {:ok, claims} <- CoreAuth.verify_token(user_token),
+           uid when is_binary(uid) <- claims[:user_id],
+           {:ok, user_min} <- Timesink.UserCache.get_or_load(uid) do
+        IO.inspect(user_min, label: "user mind!")
+        user_min
       else
         _ -> nil
       end
     end)
   end
+
+  defp assign_current_user(socket, %{"user_token" => user_token}) do
+    Phoenix.Component.assign_new(socket, :current_user, fn ->
+      with {:ok, claims} <- CoreAuth.verify_token(user_token),
+           uid when is_binary(uid) <- claims[:user_id],
+           {:ok, user_min} <- Timesink.UserCache.get_or_load(uid),
+           :ok <- Timesink.UserCache.put_avatar_url(uid, user_min.avatar_url) do
+        user_min
+      else
+        _ -> nil
+      end
+    end)
+  end
+
+  defp assign_current_user(socket, _),
+    do: Phoenix.Component.assign_new(socket, :current_user, fn -> nil end)
 
   defp mount_current_user(socket, _session) do
     Phoenix.Component.assign_new(socket, :current_user, fn -> nil end)
@@ -191,7 +209,11 @@ defmodule TimesinkWeb.Auth do
 
   defp get_user_by_session_token(user_token) do
     with {:ok, claims} <- CoreAuth.verify_token(user_token),
-         user <- Timesink.Repo.get!(User, claims[:user_id]) do
+         %User{} = user <- Timesink.Repo.get(User, claims[:user_id]) do
+      user =
+        Timesink.Repo.preload(user, profile: [avatar: [:blob]])
+
+      # IO.inspect(user) # now shows preloaded associations
       user
     else
       _ -> nil

@@ -1,10 +1,17 @@
 defmodule TimesinkWeb.Account.ProfileSettingsLive do
+  alias Mix.PubSub
   use TimesinkWeb, :live_view
 
   alias Timesink.Account.{User, Profile, Location}
   alias Timesink.{Locations, Repo}
+  alias TimesinkWeb.PubSubTopics
 
   def mount(_params, _session, socket) do
+    Phoenix.PubSub.subscribe(
+      Timesink.PubSub,
+      PubSubTopics.profile_update_topic(socket.assigns.current_user.id)
+    )
+
     user =
       Repo.get!(Timesink.Account.User, socket.assigns.current_user.id)
       |> Repo.preload(profile: [avatar: [:blob]])
@@ -69,9 +76,8 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
             phx-submit="save"
             class="space-y-8"
           >
-            <!-- Avatar + Username (moved to the top) -->
             <.inputs_for :let={pf} field={@account_form[:profile]}>
-              <div class="flex items-center gap-4 md:gap-6">
+              <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6">
                 <div class="relative">
                   <!-- Avatar image or initials -->
                   <%= if @uploads.avatar.entries != [] do %>
@@ -95,8 +101,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                       </span>
                     <% end %>
                   <% end %>
-                  
-    <!-- "You" badge (unchanged) -->
+
                   <span class="absolute -bottom-1 -right-1 inline-flex items-center rounded-full bg-emerald-600/90 text-xs text-white px-2 py-0.5">
                     You
                   </span>
@@ -445,7 +450,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
   end
 
   def handle_info({:process_avatar_upload, _entry_ref}, socket) do
-    results =
+    outcomes =
       consume_uploaded_entries(socket, :avatar, fn %{path: path}, entry ->
         plug = %Plug.Upload{
           path: path,
@@ -457,40 +462,81 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                user_id: socket.assigns.user.id
              ) do
           {:ok, _att} -> {:ok, :attached}
-          # return a value so it shows up
           {:error, reason} -> {:ok, {:attach_error, reason}}
         end
       end)
 
-    case results do
-      [:attached | _] ->
+    # Pick first result if multiple (we only allow 1 anyway)
+    outcome =
+      Enum.find_value(outcomes, fn
+        {:attach_error, _} = err -> err
+        :attached -> :attached
+        _ -> nil
+      end) || :noop
+
+    case outcome do
+      :attached ->
+        # Reload fresh user with avatar + blob
         user =
           Repo.get!(Timesink.Account.User, socket.assigns.user.id)
           |> Repo.preload(profile: [avatar: [:blob]])
+
+        new_url = Profile.avatar_url(user.profile.avatar)
+
+        # LiveComponent in the top nav (no flicker, instant swap)
+        send_update(
+          TimesinkWeb.AvatarLive,
+          id: "avatar-#{user.id}",
+          user_id: user.id,
+          initial_url: new_url
+        )
+
+        Timesink.UserCache.bust(user.id)
+
+        # (Optional) broadcast for other sessions/tabs
+        Phoenix.PubSub.broadcast(
+          Timesink.PubSub,
+          TimesinkWeb.PubSubTopics.profile_update_topic(user.id),
+          {:avatar_updated, user.id, new_url}
+        )
 
         {:noreply,
          socket
          |> assign(user: user, avatar_processing: false, avatar_error: nil)
          |> put_flash(:info, "Avatar updated!")}
 
-      [{:attach_error, reason} | _] ->
+      {:attach_error, reason} ->
         {:noreply,
          socket
          |> assign(avatar_processing: false, avatar_error: friendly_err(reason))
          |> put_flash(:error, "Failed to update avatar.")}
 
-      [] ->
+      :noop ->
+        # Nothing was consumed (race/cancel). Just stop the spinner.
         {:noreply, assign(socket, avatar_processing: false)}
-
-      other ->
-        # Fallback if we ever change the return shape
-        {:noreply,
-         socket
-         |> assign(
-           avatar_processing: false,
-           avatar_error: "Unexpected upload result: #{inspect(other)}"
-         )}
     end
+  end
+
+  def handle_info({:avatar_updated, user_id, url}, %{assigns: %{user: %{id: user_id}}} = socket) do
+    user =
+      Timesink.Repo.get!(Timesink.Account.User, user_id)
+      |> Timesink.Repo.preload(profile: [avatar: [:blob]])
+
+    # If you use a stateful avatar component:
+    send_update(TimesinkWeb.AvatarLive,
+      id: "avatar-#{user_id}",
+      user_id: user_id,
+      initial_url: url
+    )
+
+    {:noreply,
+     socket
+     |> assign(user: user, avatar_processing: false, avatar_error: nil)}
+  end
+
+  # Ignore updates for other users (good hygiene if you happen to be subscribed widely)
+  def handle_info({:avatar_updated, _other_id, _url}, socket) do
+    {:noreply, socket}
   end
 
   # If the nested location is empty (user didn't pick from dropdown), fall back to previous selection

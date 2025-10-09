@@ -22,6 +22,7 @@ defmodule Timesink.Application do
       TimesinkWeb.Endpoint,
       {Timesink.Locations.Cache, name: Timesink.Locations.Cache},
       Timesink.Cinema.TheaterScheduler,
+      Timesink.UserCache,
       {Task.Supervisor, name: Timesink.TaskSupervisor}
     ]
 

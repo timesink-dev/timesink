@@ -59,48 +59,45 @@ defmodule Timesink.Account.Profile do
   end
 
   @doc "Avatar resize/encode spec"
-  def avatar_spec do
+  def avatar_resize do
     %{
       accept_exts: ~w(.jpg .jpeg .png .webp .heic),
       max_bytes: 8_000_000,
       variants: %{
-        sm: %{resize: {:fill, 96, 96}, format: :webp, quality: 82},
-        md: %{resize: {:fill, 256, 256}, format: :webp, quality: 82},
-        lg: %{resize: {:limit, 512, 512}, format: :webp, quality: 82}
+        md: %{resize: {:fill, 256, 256}, format: :webp, quality: 82}
       }
     }
   end
 
-  def avatar_url(avatar, variant \\ :md)
+  def avatar_url(att, variant \\ :md)
 
   def avatar_url(nil, _variant),
     do: "/images/default-avatar.png"
 
-  # def avatar_url(%Timesink.Storage.Attachment{metadata: %{"variants" => vs}}, variant) do
-  #   key =
-  #     vs[Atom.to_string(variant)] ||
-  #       vs["md"] || vs["lg"] || vs["sm"]
-
-  #   Timesink.Storage.S3.public_url(key)
-  # end
+  def avatar_url(%Timesink.Storage.Attachment{metadata: %{"variants" => vs}}, variant) do
+    key = vs[Atom.to_string(variant)] || vs["md"] || vs["lg"] || vs["sm"]
+    Timesink.Storage.S3.public_url(key)
+  end
 
   def avatar_url(%Timesink.Storage.Attachment{blob: %{uri: path}}, _variant)
       when is_binary(path) do
     Timesink.Storage.S3.public_url(path)
   end
 
+  def avatar_url(_anything, _variant),
+    do: "/images/default-avatar.png"
+
   @doc """
   Processes avatar variants with libvips (`image`), uploads each as a Blob,
   and creates a single `:avatar` Attachment whose metadata contains a `variants` map.
   """
-
   def attach_avatar(%{__struct__: __MODULE__} = profile, %Plug.Upload{} = upload, opts \\ []) do
     attach(profile, upload, opts)
   end
 
   defp attach(%Profile{} = profile, %Plug.Upload{} = upload, opts) do
     user_id = Keyword.get(opts, :user_id, profile.user_id)
-    spec = Profile.avatar_spec()
+    spec = Profile.avatar_resize()
 
     variants = Images.process_variants!(upload, spec)
 
@@ -142,8 +139,12 @@ defmodule Timesink.Account.Profile do
            canonical = blobs_by_name[:md] || blobs_by_name[:lg] || blobs_by_name[:sm]
 
            case upsert_avatar!(profile, canonical, metadata) do
-             {:ok, att} -> att
-             {:error, cs} -> Repo.rollback({:create_or_update_attachment_failed, cs})
+             # or :md based on your UI
+             {:ok, att} ->
+               att
+
+             {:error, cs} ->
+               Repo.rollback({:create_or_update_attachment_failed, cs})
            end
          end) do
       {:ok, %Timesink.Storage.Attachment{} = att} ->

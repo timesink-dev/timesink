@@ -8,7 +8,7 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
   def render(assigns) do
     ~H"""
     <section class="w-full px-6">
-      <div class="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-start gap-12 md:gap-24">
+      <div class="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-start gap-6 md:gap-24">
         <!-- Text Content -->
         <div class="w-full md:w-2/5">
           <h1 class="text-4xl md:text-5xl font-brand">
@@ -53,9 +53,9 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
         
     <!-- Image -->
         <div class="w-full md:w-3/5 self-center">
-          <div class="aspect-[3/2] md:aspect-[16/9] w-full rounded-xl overflow-hidden">
+          <div class="w-full rounded-xl overflow-hidden">
             <img
-              src="/images/submit-2.png"
+              src="/images/submission-asset.webp"
               alt="Film submission visual"
               class="w-full h-full object-cover"
             />

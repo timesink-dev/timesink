@@ -71,7 +71,8 @@ defmodule TimesinkWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :authenticated,
-      on_mount: {TimesinkWeb.Auth, :ensure_authenticated} do
+      on_mount: {TimesinkWeb.Auth, :ensure_authenticated},
+      layout: {TimesinkWeb.LiveAppLayout, :app} do
       live "/me", Account.MeLive
       live "/me/profile", Account.ProfileSettingsLive
       live "/me/security", Account.SecuritySettingsLive
@@ -115,7 +116,9 @@ defmodule TimesinkWeb.Router do
     post "/sign-in", AuthController, :sign_in
     post "/sign_out", AuthController, :sign_out
 
-    live_session :default, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
+    live_session :default,
+      on_mount: {TimesinkWeb.Auth, :mount_current_user},
+      layout: {TimesinkWeb.LiveAppLayout, :app} do
       live "/", HomepageLive
       live "/submit", FilmSubmissionLive
       live "/archives", Cinema.ArchivesLive
