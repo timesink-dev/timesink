@@ -42,7 +42,6 @@ defmodule Timesink.Images do
       src =
         case Operation.autorot(src0) do
           {:ok, {img, _meta}} -> img
-          {:ok, img} -> img
           {:error, _} -> src0
         end
 

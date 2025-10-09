@@ -7,6 +7,7 @@ defmodule Timesink.Account.Profile do
   alias Timesink.{Repo, Storage}
   alias Timesink.Account.Profile
   alias Timesink.Images
+  alias Timesink.Storage.Attachment
 
   @type t :: %{
           __struct__: __MODULE__,
@@ -158,11 +159,9 @@ defmodule Timesink.Account.Profile do
   end
 
   defp variant_name(orig, name) do
-    base = Path.rootname(orig || "avatar")
+    base = Path.rootname(orig)
     "#{base}-#{name}.webp"
   end
-
-  # --- private ---
 
   defp validate_date(changeset) do
     validate_change(changeset, :birthdate, fn :birthdate, date ->
@@ -181,9 +180,6 @@ defmodule Timesink.Account.Profile do
       end
     end)
   end
-
-  alias Timesink.{Repo, Storage}
-  alias Timesink.Storage.Attachment
 
   defp upsert_avatar!(
          %Timesink.Account.Profile{} = profile,
