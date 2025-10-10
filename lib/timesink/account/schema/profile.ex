@@ -3,6 +3,7 @@ defmodule Timesink.Account.Profile do
   use SwissSchema, repo: Timesink.Repo
   use Timesink.Schema
   import Ecto.Changeset
+  import Ecto.Query
   alias Timesink.Account
   alias Timesink.{Repo, Storage}
   alias Timesink.Account.Profile
@@ -99,62 +100,111 @@ defmodule Timesink.Account.Profile do
   defp attach(%Profile{} = profile, %Plug.Upload{} = upload, opts) do
     user_id = Keyword.get(opts, :user_id, profile.user_id)
     spec = Profile.avatar_resize()
-
     variants = Images.process_variants!(upload, spec)
 
-    case Repo.transaction(fn ->
-           # 0) Remove existing avatar (avoid unique constraint on [:assoc_id, :name])
-           profile = Repo.preload(profile, avatar: [:blob])
+    # Load current avatar so we can purge its blobs after we swap
+    profile = Repo.preload(profile, avatar: [:blob])
 
-           #  if profile.avatar do
-           #    case Storage.delete_attachment(profile.avatar) do
-           #      {:ok, :deleted} -> :ok
-           #      {:error, reason} -> Repo.rollback({:delete_avatar_failed, reason})
-           #    end
-           #  end
+    # Collect what we must keep later (new URIs) and what to purge (old)
+    old_att = profile.avatar
+    old_blob_id = old_att && old_att.blob_id
 
-           # Upload each variant as its own blob
-           blobs_by_name =
-             for {name, %{path: path, content_type: ct}} <- variants, into: %{} do
-               pseudo = %Plug.Upload{
-                 path: path,
-                 filename: variant_name(upload.filename, name),
-                 content_type: ct
-               }
+    old_variant_uris =
+      (old_att && get_in(old_att.metadata, ["variants"]))
+      |> case do
+        m when is_map(m) -> Map.values(m)
+        _ -> []
+      end
 
-               case Storage.create_blob(pseudo, user_id: user_id) do
-                 {:ok, blob} -> {name, blob}
-                 {:error, reason} -> Repo.rollback({:create_blob_failed, name, reason})
-               end
-             end
+    result =
+      Repo.transaction(fn ->
+        # upload new blobs
+        blobs_by_name =
+          for {name, %{path: path, content_type: ct}} <- variants, into: %{} do
+            pseudo = %Plug.Upload{
+              path: path,
+              filename: variant_name(upload.filename, name),
+              content_type: ct
+            }
 
-           # Build metadata
-           meta_variants =
-             blobs_by_name
-             |> Enum.map(fn {name, blob} -> {Atom.to_string(name), blob.uri} end)
-             |> Enum.into(%{})
+            case Storage.create_blob(pseudo, user_id: user_id) do
+              {:ok, blob} -> {name, blob}
+              {:error, reason} -> Repo.rollback({:create_blob_failed, name, reason})
+            end
+          end
 
-           metadata = %{"variants" => meta_variants, "canonical" => "md"}
+        # build new metadata
+        meta_variants =
+          blobs_by_name
+          |> Enum.map(fn {name, blob} -> {Atom.to_string(name), blob.uri} end)
+          |> Enum.into(%{})
 
-           # Create the attachment pointing to the canonical blob
-           canonical = blobs_by_name[:md] || blobs_by_name[:lg] || blobs_by_name[:sm]
+        metadata = %{"variants" => meta_variants, "canonical" => "md"}
+        canonical = blobs_by_name[:md] || blobs_by_name[:lg] || blobs_by_name[:sm]
 
-           case upsert_avatar!(profile, canonical, metadata) do
-             # or :md based on your UI
-             {:ok, att} ->
-               att
+        # upsert the single attachment pointing at the new canonical blob
+        case upsert_avatar!(profile, canonical, metadata) do
+          {:ok, att} ->
+            # Return enough info for post-commit purge
+            keep_uris = Map.values(meta_variants)
 
-             {:error, cs} ->
-               Repo.rollback({:create_or_update_attachment_failed, cs})
-           end
-         end) do
-      {:ok, %Timesink.Storage.Attachment{} = att} ->
+            %{
+              attachment: att,
+              keep_uris: keep_uris,
+              old_blob_id: old_blob_id,
+              old_variant_uris: old_variant_uris
+            }
+
+          {:error, cs} ->
+            Repo.rollback({:create_or_update_attachment_failed, cs})
+        end
+      end)
+
+    case result do
+      {:ok,
+       %{
+         attachment: att,
+         keep_uris: keep_uris,
+         old_blob_id: old_blob_id,
+         old_variant_uris: old_variant_uris
+       }} ->
+        # 4) purge AFTER commit so we don’t risk rolling back new writes while S3 deletion already happened
+        Task.start(fn -> purge_old_blobs(old_blob_id, old_variant_uris, keep_uris) end)
         {:ok, att}
 
       {:error, cs} ->
         require Logger
-        Logger.error("Attachment insert failed: #{inspect(cs.errors)}")
+        Logger.error("Attachment insert failed: #{inspect(cs)}")
         {:error, cs}
+    end
+  end
+
+  defp purge_old_blobs(old_blob_id, old_variant_uris, keep_uris) do
+    # Build the set of URIs we should NOT delete (the new ones)
+    keep = MapSet.new(keep_uris || [])
+
+    # Delete the previous canonical blob by id (if any)
+    if is_binary(old_blob_id) do
+      # Prefer a Storage helper that deletes from S3 *and* DB:
+      # Storage.delete_blob/1 (example below)
+      _ = Storage.delete_blob(old_blob_id)
+    end
+
+    # Delete any old variant blobs that aren’t kept
+    uris_to_delete =
+      (old_variant_uris || [])
+      |> Enum.reject(&MapSet.member?(keep, &1))
+
+    if uris_to_delete != [] do
+      # Find blob rows by URI so we can delete them cleanly
+      from(b in Timesink.Storage.Blob,
+        where: b.uri in ^uris_to_delete,
+        select: %{id: b.id, uri: b.uri}
+      )
+      |> Timesink.Repo.all()
+      |> Enum.each(fn %{id: id} ->
+        _ = Storage.delete_blob(id)
+      end)
     end
   end
 
@@ -186,7 +236,7 @@ defmodule Timesink.Account.Profile do
          %Timesink.Storage.Blob{} = canonical_blob,
          metadata
        ) do
-    # Load existing avatar (has_one with where name: "avatar")
+    # Load existing avatar
     profile = Repo.preload(profile, avatar: [:blob])
 
     params = %{
@@ -197,18 +247,14 @@ defmodule Timesink.Account.Profile do
 
     case profile.avatar do
       %Attachment{} = existing ->
-        # UPDATE path
         existing
         |> Attachment.changeset(params)
-        # SwissSchema
         |> Attachment.insert_or_update()
 
       nil ->
-        # INSERT path (build assoc sets assoc_id for you)
         profile
         |> Ecto.build_assoc(:avatar)
         |> Attachment.changeset(params)
-        # SwissSchema
         |> Attachment.insert_or_update()
     end
   end

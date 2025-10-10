@@ -171,6 +171,17 @@ defmodule Timesink.Storage do
     end)
   end
 
+  def delete_blob(blob_id) when is_binary(blob_id) do
+    with {:ok, %Blob{} = blob} <- Blob.get(blob_id),
+         {:ok, _} <- Timesink.Storage.S3.delete(blob.uri),
+         {:ok, _} <- Blob.delete(blob) do
+      {:ok, :deleted}
+    else
+      {:error, :not_found} -> {:ok, :not_found}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   @spec config() :: config
   def config do
     Application.get_env(:timesink, Timesink.Storage.S3) |> Enum.into(%{})
