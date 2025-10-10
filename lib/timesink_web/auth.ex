@@ -159,20 +159,6 @@ defmodule TimesinkWeb.Auth do
       with {:ok, claims} <- CoreAuth.verify_token(user_token),
            uid when is_binary(uid) <- claims[:user_id],
            {:ok, user_min} <- Timesink.UserCache.get_or_load(uid) do
-        IO.inspect(user_min, label: "user mind!")
-        user_min
-      else
-        _ -> nil
-      end
-    end)
-  end
-
-  defp mount_current_user(socket, %{"user_token" => user_token}) do
-    Phoenix.Component.assign_new(socket, :current_user, fn ->
-      with {:ok, claims} <- CoreAuth.verify_token(user_token),
-           uid when is_binary(uid) <- claims[:user_id],
-           {:ok, user_min} <- Timesink.UserCache.get_or_load(uid),
-           :ok <- Timesink.UserCache.put_avatar_url(uid, user_min.avatar_url) do
         user_min
       else
         _ -> nil

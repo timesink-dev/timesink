@@ -71,18 +71,16 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
             class="space-y-8"
           >
             <.inputs_for :let={pf} field={@account_form[:profile]}>
-              <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-                <div class="relative">
+              <div class="grid grid-cols-1 md:grid-cols-[auto,1fr] items-start gap-4 md:gap-6">
+                <div class="relative mx-auto md:mx-0">
                   <form
                     phx-change="upload_avatar"
                     phx-auto-recover="ignore"
                     class={[@avatar_processing && "pointer-events-none opacity-60", "cursor-pointer"]}
                   >
-                    <label class="cursor-pointer">
-                      
-    <!-- Avatar image or initials -->
+                    <label class="cursor-pointer block">
+                      <!-- Avatar image or initials -->
                       <%= if @uploads.avatar.entries != [] do %>
-                        <!-- Client-side preview while the file is still uploading -->
                         <%= for entry <- @uploads.avatar.entries do %>
                           <.live_img_preview
                             entry={entry}
@@ -107,7 +105,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                         You
                       </span>
                       
-    <!-- Subtle loading overlay while server is processing variants -->
+    <!-- Subtle loading overlay while processing -->
                       <div
                         :if={@avatar_processing}
                         class="absolute inset-0 rounded-full bg-black/40 grid place-items-center"
@@ -125,23 +123,25 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                             r="10"
                             stroke="currentColor"
                             stroke-width="4"
-                          >
-                          </circle>
+                          />
                           <path
                             class="opacity-75"
                             fill="currentColor"
                             d="M4 12a8 8 0 018-8v4A4 4 0 008 12H4z"
-                          >
-                          </path>
+                          />
                         </svg>
                       </div>
+
                       <.live_file_input upload={@uploads.avatar} class="hidden" />
                     </label>
                   </form>
-                  <p :if={@avatar_error} class="text-xs text-red-400 mt-1">{@avatar_error}</p>
+                  <p :if={@avatar_error} class="text-xs text-red-400 mt-1 text-center md:text-left">
+                    {@avatar_error}
+                  </p>
                 </div>
-
-                <div class="flex-1 min-w-0">
+                
+    <!-- Username column -->
+                <div class="w-full mt-4 md:mt-0">
                   <label class="block text-sm font-medium text-zinc-300 mb-2">Username</label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">@</span>
@@ -156,9 +156,8 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                   <p class="mt-2 text-xs text-zinc-500 truncate">
                     Your public handle on the platform
                   </p>
+                  <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
                 </div>
-
-                <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
               </div>
               
     <!-- Location (Onboarding-style) -->
@@ -565,7 +564,6 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
 
     # compare only relevant keys
     keys = ~w(locality state_code country_code country label lat lng)
-    IO.inspect(Map.take(cur, keys) != Map.take(selected || %{}, keys))
     Map.take(cur, keys) != Map.take(selected || %{}, keys)
   end
 
