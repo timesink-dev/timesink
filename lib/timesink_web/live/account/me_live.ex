@@ -11,12 +11,13 @@ defmodule TimesinkWeb.Account.MeLive do
   @copy_reset_ms 2000
 
   def mount(_params, _session, socket) do
-    user = Repo.preload(socket.assigns.current_user, profile: [avatar: [:blob]])
+    user = socket.assigns.current_user
+    # user = Repo.preload(socket.assigns.current_user, profile: [avatar: [:blob]])
     invites = list_invites(user.id)
 
     {:ok,
      assign(socket,
-       current_user: user,
+       current_user: socket.assigns.current_user,
        invites: invites,
        invites_left: max(@max_invites - length(invites), 0),
        copied_url: nil,
@@ -26,8 +27,8 @@ defmodule TimesinkWeb.Account.MeLive do
 
   def render(assigns) do
     ~H"""
-    <section id="user-overview" phx-hook="CopyBus" class="mt-12">
-      <div class="max-w-2xl mx-auto">
+    <section id="user-overview" phx-hook="CopyBus">
+      <div class="max-w-2xl mx-auto" class="mt-8">
         <.me_page_item
           title="Account"
           items={[
@@ -90,7 +91,7 @@ defmodule TimesinkWeb.Account.MeLive do
                 "inline-flex items-center gap-2 rounded-xl px-3 py-2 font-medium transition",
                 if(@invites_left == 0,
                   do: "bg-zinc-700/60 text-zinc-400 cursor-not-allowed",
-                  else: "bg-emerald-500 text-backroom-black hover:opacity-90"
+                  else: "bg-dark-theater-primary text-mystery-white hover:opacity-90"
                 )
               ]}
             >

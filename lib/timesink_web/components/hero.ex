@@ -28,9 +28,9 @@ defmodule TimesinkWeb.Components.Hero do
                 Provide a mobile-specific crop if available (recommended), otherwise the browser
                 will still render the <img> fallback.
               --%>
-              <source srcset="/images/hero-minified.webp" media="(max-width: 767px)" />
+              <source srcset="/images/hero_asset.webp" media="(max-width: 767px)" />
               <img
-                src="/images/hero-minified.webp"
+                src="/images/hero_asset.webp"
                 alt="TimeSink marquee with a cinematic glow"
                 class="w-full h-full
                        object-contain md:object-cover

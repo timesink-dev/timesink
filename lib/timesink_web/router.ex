@@ -76,7 +76,8 @@ defmodule TimesinkWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :authenticated,
-      on_mount: {TimesinkWeb.Auth, :ensure_authenticated} do
+      on_mount: {TimesinkWeb.Auth, :ensure_authenticated},
+      layout: {TimesinkWeb.LiveAppLayout, :app} do
       live "/me", Account.MeLive
       live "/me/profile", Account.ProfileSettingsLive
       live "/me/security", Account.SecuritySettingsLive
@@ -108,11 +109,14 @@ defmodule TimesinkWeb.Router do
     end
   end
 
+  pipeline :app_root_layout do
+    plug :put_root_layout, html: {TimesinkWeb.LiveAppLayout, :app}
+    # so @current_user is available
+    plug TimesinkWeb.Plugs.PutCurrentUser
+  end
+
   scope "/", TimesinkWeb do
     pipe_through [:browser, :put_current_user]
-
-    # static routes
-    get "/info", PageController, :info
 
     get "/blog", RedirectController, :substack_blog
 
@@ -120,8 +124,11 @@ defmodule TimesinkWeb.Router do
     post "/sign-in", AuthController, :sign_in
     post "/sign_out", AuthController, :sign_out
 
-    live_session :default, on_mount: {TimesinkWeb.Auth, :mount_current_user} do
+    live_session :default,
+      on_mount: {TimesinkWeb.Auth, :mount_current_user},
+      layout: {TimesinkWeb.LiveAppLayout, :app} do
       live "/", HomepageLive
+      live "/info", InfoPageLive
       live "/submit", FilmSubmissionLive
       live "/archives", Cinema.ArchivesLive
       live "/upcoming", UpcomingLive

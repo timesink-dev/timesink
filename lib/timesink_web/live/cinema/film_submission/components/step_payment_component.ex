@@ -17,7 +17,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
 
     socket =
       socket
-      |> assign(method: assigns[:method] || nil)
+      |> assign(method: assigns[:method] || "card")
       |> assign(btcpay_invoice: assigns[:btcpay_invoice] || nil)
       |> assign(btcpay_loading: assigns[:btcpay_loading] || false)
       |> assign(form: to_form(changeset), data: data)
