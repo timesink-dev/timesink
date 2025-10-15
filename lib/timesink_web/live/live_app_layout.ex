@@ -6,9 +6,9 @@ defmodule TimesinkWeb.LiveAppLayout do
   # This function name must match what you pass in the router tuple, e.g. :app
   def app(assigns) do
     ~H"""
-    <div id="app-shell" class="min-h-screen bg-backroom-black">
-      <TopNav.top_nav current_user={@current_user} class="shadow-sm mx-6" />
-      <main class="px-4 sm:px-6 lg:px-8">
+    <div id="app-shell" class="relative min-h-screen bg-backroom-black">
+      <TopNav.top_nav current_user={@current_user} class="shadow-sm mx-6 absolute top-2 " />
+      <main class="">
         <div class="min-h-[calc(100vh-60px)]">
           <.flash_group flash={@flash} /> {@inner_content}
         </div>

@@ -10,7 +10,7 @@ defmodule TimesinkWeb.Components.Hero do
       <div class="w-full flex justify-center">
         <!-- Mobile: auto height; Desktop: controlled viewport height (original feel) -->
         <div class="relative flex flex-col md:flex-row w-full max-w-8xl
-                    md:h-[80vh] lg:h-[85vh]
+                    md:h-[90vh] lg:h-[65vh]
                     overflow-hidden">
           <%!-- Irregular bottom blend (optional) --%>
           <div
@@ -22,19 +22,19 @@ defmodule TimesinkWeb.Components.Hero do
           </div>
           
     <!-- Left image -->
-          <div class="relative w-full md:w-2/3 min-h-[40vh] md:h-[95vh] z-10">
+          <div class="relative w-full md:w-2/3 min-h-[70vh] md:h-[95vh] z-10">
             <picture>
               <%!--
                 Provide a mobile-specific crop if available (recommended), otherwise the browser
                 will still render the <img> fallback.
               --%>
-              <source srcset="/images/hero_asset.webp" media="(max-width: 767px)" />
+              <source srcset="/images/hero_ts_empire.jpeg" media="(max-width: 1000px)" />
               <img
-                src="/images/hero_asset_2.jpeg"
+                src="/images/hero_ts_empire.jpeg"
                 alt="TimeSink marquee with a cinematic glow"
                 class="w-full h-full
                        object-contain md:object-cover
-                       object-center md:object-[80%_70%]"
+                       object-center md:object-[90%_70%]"
                 loading="eager"
                 fetchpriority="high"
                 width="1920"
