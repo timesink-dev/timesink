@@ -28,51 +28,31 @@ defmodule Timesink.Storage do
     config = config()
     uid = Keyword.get(opts, :user_id)
 
-    # Make S3 key unique to avoid collisions
+    # The blob ID (UUID) is generated upront so we can attach it to S3 objects
+    # before persisting blob info in the database
     blob_id = Ecto.UUID.generate()
+
+    # Make S3 key unique to avoid collisions
     obj_path = Path.join([config.prefix, blob_id, upload.filename])
 
     # ExAws will prefix these as x-amz-meta-...
     obj_meta = [blob_id: blob_id, uploaded_at: System.os_time(:millisecond)]
 
-    case File.stat(upload.path) do
-      {:ok, stats} ->
-        stream = S3.Upload.stream_file(upload.path)
-        op = S3.upload(stream, config.bucket, obj_path, meta: obj_meta)
-
-        case ExAws.request(op) do
-          {:ok, %{status_code: sc}} when sc in 200..299 ->
-            blob_params = %{
-              id: blob_id,
-              user_id: uid,
-              # <— we KNOW the key we wrote
-              uri: obj_path,
-              size: stats.size,
-              mime: upload.content_type,
-              checksum: Timesink.Storage.Blob.checksum(upload.path)
-            }
-
-            case Timesink.Storage.Blob.create(blob_params) do
-              {:ok, blob} ->
-                {:ok, blob}
-
-              {:error, cs_or_reason} ->
-                require Logger
-                Logger.error("Blob DB insert failed: #{inspect(cs_or_reason)}")
-                {:error, cs_or_reason}
-            end
-
-          {:ok, bad} ->
-            require Logger
-            Logger.error("S3 upload unexpected response: #{inspect(bad)}")
-            {:error, {:s3_unexpected_response, bad}}
-
-          {:error, reason} ->
-            require Logger
-            Logger.error("S3 upload failed: #{inspect(reason)}")
-            {:error, {:s3_upload_failed, reason}}
-        end
-
+    with {:ok, stats} <- File.stat(upload.path),
+         stream <- S3.Upload.stream_file(upload.path),
+         op <- S3.upload(stream, config.bucket, obj_path, meta: obj_meta),
+         {:ok, %{status_code: 200, body: %{key: path}}} <- ExAws.request(op),
+         blob_params <- %{
+           id: blob_id,
+           user_id: uid,
+           uri: path,
+           size: stats.size,
+           mime: upload.content_type,
+           checksum: Blob.checksum(upload.path)
+         },
+         {:ok, blob} <- Blob.create(blob_params) do
+      {:ok, blob}
+    else
       {:error, reason} ->
         {:error, {:stat_failed, reason}}
     end

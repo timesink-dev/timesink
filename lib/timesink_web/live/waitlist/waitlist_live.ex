@@ -32,24 +32,9 @@ defmodule TimesinkWeb.WaitlistLive do
           <h1 class="text-3xl">You've joined the line!</h1>
           <p class="py-1.5">{@message}</p>
           <p><strong>Estimated time until ticket invitation:</strong> {@wait_time}</p>
-          <.button color="secondary" class="mt-8 px-4 py-2 border-[1px]">
+          <.button color="primary" class="mt-8 px-4 py-2 border-[1px]">
             <a href="/">Go back outside</a>
           </.button>
-          <div class="relative w-full h-[60vh]">
-            <img
-              src="/images/waitlist_asset.webp"
-              alt="TimeSink Waitlist"
-              class="w-full h-full object-cover"
-            />
-            <div class="absolute inset-0 z-20 pointer-events-none">
-              <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0C0C0C] to-transparent">
-              </div>
-              <div class="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#0C0C0C] to-transparent">
-              </div>
-            </div>
-            <%!-- <div class="absolute bottom-0 left-0 w-full h-16 z-20 pointer-events-none bg-gradient-to-t from-[#0C0C0C] via-[#0C0C0C]/70 to-transparent">
-            </div> --%>
-          </div>
         </div>
       <% else %>
         <.live_component

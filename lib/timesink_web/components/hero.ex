@@ -2,17 +2,20 @@ defmodule TimesinkWeb.Components.Hero do
   use Phoenix.Component
   import TimesinkWeb.CoreComponents
 
-  attr :spots_left, :integer, default: nil
-
   def hero(assigns) do
     ~H"""
     <section id="hero-section" class="relative overflow-hidden">
       <div class="w-full flex justify-center">
-        <!-- Mobile: auto height; Desktop: controlled viewport height (original feel) -->
-        <div class="relative flex flex-col md:flex-row w-full max-w-8xl
-                    md:h-[90vh] lg:h-[65vh]
-                    overflow-hidden">
-          <%!-- Irregular bottom blend (optional) --%>
+        <div class="relative flex flex-col md:flex-row w-full max-w-8xl h-[80vh] overflow-hidden">
+          <%!-- <!-- Irregular top blend -->
+          <div
+            class="absolute top-0 left-0 w-full h-8 z-20 pointer-events-none"
+            style="background: radial-gradient(ellipse at top left, #0C0C0C 40%, transparent 80%),
+                    radial-gradient(ellipse at top right, #0C0C0C 40%, transparent 80%)"
+          >
+          </div> --%>
+
+          <%!-- <!-- Irregular bottom blend -->
           <div
             class="absolute bottom-0 left-0 w-full h-10 z-30 pointer-events-none"
             style="background:
@@ -20,54 +23,35 @@ defmodule TimesinkWeb.Components.Hero do
                   radial-gradient(ellipse 30% 80% at bottom right, #0C0C0C 20%, transparent 60%)"
           >
           </div>
-          
-    <!-- Left image -->
-          <div class="relative w-full md:w-2/3 min-h-[70vh] md:h-[95vh] z-10">
-            <picture>
-              <%!--
-                Provide a mobile-specific crop if available (recommended), otherwise the browser
-                will still render the <img> fallback.
-              --%>
-              <source srcset="/images/hero_ts_empire.jpeg" media="(max-width: 1000px)" />
-              <img
-                src="/images/hero_ts_empire.jpeg"
-                alt="TimeSink marquee with a cinematic glow"
-                class="w-full h-full
-                       object-contain md:object-cover
-                       object-center md:object-[90%_70%]"
-                loading="eager"
-                fetchpriority="high"
-                width="1920"
-                height="1080"
-              />
-            </picture>
-
+           --%>
+          <!-- Left image -->
+          <div class="relative w-full md:w-2/3 h-[70vh] z-10">
+            <img src="/images/hero-17.png" alt="TimeSink Marquee" class="w-full h-full object-cover" />
             <div class="absolute inset-0 z-20 pointer-events-none">
               <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0C0C0C] to-transparent">
               </div>
               <div class="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#0C0C0C] to-transparent">
               </div>
             </div>
+            <%!-- <div class="absolute bottom-0 left-0 w-full h-16 z-20 pointer-events-none bg-gradient-to-t from-[#0C0C0C] via-[#0C0C0C]/70 to-transparent">
+            </div> --%>
           </div>
           
     <!-- Right text -->
-          <div class="mt-6 md:mt-0 w-full md:w-1/3 flex items-center justify-center
-                      px-6 pb-[max(env(safe-area-inset-bottom),1rem)]
-                      text-white text-center md:text-left z-10">
+          <div class="mt-8 lg:mt-0 w-full md:w-1/3 flex items-center justify-center px-6 text-white text-center md:text-left z-10">
             <div class="max-w-md">
               <div class="text-center mb-10">
-                <h2 class="text-3xl md:text-4xl font-brand text-white tracking-tight leading-tight">
-                  Fresh Cinema selected for you. Real Audiences. No endless scrolls.
+                <h2 class="text-4xl font-brand text-white tracking-tight leading-tight">
+                  Fresh Cinema. Real Audiences. No endless scrolls.
                 </h2>
-
-                <p class="mt-4 text-[15px] md:text-md text-mystery-white max-w-prose md:max-w-xl mx-auto">
+                <p class="mt-4 text-base md:text-md text-mystery-white max-w-xl mx-auto">
                   We bring great filmmakers — of all levels — to the stage.
-                  And we don’t waste your time discovering them. Real audiences. Real-time reactions. Conversations and moments that last.
-                  No noise — pure signal.
-                </p>
+                  And we don’t waste your time discovering them.
 
+                  Real audiences. Real-time reactions. Conversations and moments that last. No noise — pure signal.
+                </p>
                 <a href="/join">
-                  <.button class="mt-6 h-12 px-6 text-base font-medium hover:bg-mystery-white hover:text-black transition">
+                  <.button class="mt-6 px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition">
                     Get started
                   </.button>
                 </a>
@@ -77,10 +61,10 @@ defmodule TimesinkWeb.Components.Hero do
         </div>
       </div>
       
-    <!-- Scroll indicator: desktop only to avoid safe-area conflicts on mobile -->
+    <!-- Scroll indicator -->
       <div
         id="scroll-indicator"
-        class="hidden md:flex fixed bottom-10 inset-x-0 justify-center z-50 motion-safe:animate-bounce opacity-80"
+        class="fixed bottom-10 inset-x-0 flex justify-center z-50 animate-bounce opacity-80 transition-opacity"
       >
         <span class="text-white text-sm">
           ↓ Scroll to explore cinema
