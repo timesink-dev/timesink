@@ -14,7 +14,7 @@ defmodule TimesinkWeb.TopNav do
 
   def top_nav(assigns) do
     ~H"""
-    <header class={["z-10 sticky bg-backgroom-black", @class]}>
+    <header class={["z-40 sticky bg-backgroom-black", @class]}>
       <div class="md:hidden flex items-center justify-between border-gray-200 mt-2 text-sm z-40">
         <div class="md:hidden bg-backroom-black font-brand rounded-xl px-2 font-medium leading-6">
           <a id="nav-logo-mobile" href="/" class="font-brand mobile-logo">
@@ -98,10 +98,6 @@ defmodule TimesinkWeb.TopNav do
                 aria-haspopup="menu"
                 aria-expanded="false"
               >
-                <%!-- # 1) prefer injected avatar_url from parent (no flicker)
-                # 2) cache by current user id
-                # 3) compute from preloaded structs if present
-                 --%>
                 <% resolved_url =
                   (@avatar_url && String.trim(@avatar_url) != "" && @avatar_url) ||
                     (@current_user.id && UserCache.get_avatar_url(@current_user.id)) ||
