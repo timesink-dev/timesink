@@ -4,7 +4,7 @@
 #
 
 app = 'timesink-staging'
-primary_region = 'bos'
+primary_region = 'ewr'
 kill_signal = 'SIGTERM'
 
 [build]
