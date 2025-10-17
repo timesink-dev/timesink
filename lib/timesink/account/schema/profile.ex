@@ -168,7 +168,7 @@ defmodule Timesink.Account.Profile do
          old_blob_id: old_blob_id,
          old_variant_uris: old_variant_uris
        }} ->
-        # 4) purge AFTER commit so we don’t risk rolling back new writes while S3 deletion already happened
+        # purge AFTER commit so we don’t risk rolling back new writes while S3 deletion already happened
         Task.start(fn -> purge_old_blobs(old_blob_id, old_variant_uris, keep_uris) end)
         {:ok, att}
 

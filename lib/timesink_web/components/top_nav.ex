@@ -98,10 +98,6 @@ defmodule TimesinkWeb.TopNav do
                 aria-haspopup="menu"
                 aria-expanded="false"
               >
-                <%!-- # 1) prefer injected avatar_url from parent (no flicker)
-                # 2) cache by current user id
-                # 3) compute from preloaded structs if present
-                 --%>
                 <% resolved_url =
                   (@avatar_url && String.trim(@avatar_url) != "" && @avatar_url) ||
                     (@current_user.id && UserCache.get_avatar_url(@current_user.id)) ||
@@ -111,7 +107,7 @@ defmodule TimesinkWeb.TopNav do
                   <.live_component
                     module={TimesinkWeb.NavAvatarLive}
                     id={"nav-avatar-#{@current_user.id}"}
-                    user_id={@current_user.id}
+                    user={@current_user}
                     avatar_url={resolved_url}
                   />
                 <% else %>

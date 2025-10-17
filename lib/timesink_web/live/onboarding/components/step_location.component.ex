@@ -6,19 +6,16 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
 
   def update(assigns, socket) do
     location_data = get_in(assigns.data, ["profile", "location"]) || %{}
-
     changeset = Timesink.Account.Location.changeset(%Timesink.Account.Location{}, location_data)
     form = to_form(changeset, as: "location")
 
-    socket =
-      socket
-      |> assign(assigns)
-      |> assign(:form, form)
-      |> assign(:query, location_data["label"] || "")
-      |> assign(:results, [])
-      |> assign(:selected_location, location_data)
-
-    {:ok, socket}
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign_new(:results, fn -> [] end)
+     |> assign(:form, form)
+     |> assign(:query, location_data["label"] || "")
+     |> assign(:selected_location, location_data)}
   end
 
   def render(assigns) do
@@ -33,7 +30,6 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
         <.simple_form
           for={@form}
           as="location"
-          phx-change="search"
           phx-submit="save_location"
           phx-target={@myself}
           class="mt-6"
@@ -42,10 +38,12 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
             <label class="block text-sm font-medium text-gray-300 mb-2">City</label>
             <input
               type="text"
-              name="query"
+              name="location_query"
               value={@query}
               required
               phx-debounce="300"
+              phx-change="search"
+              phx-target={@myself}
               placeholder="Start typing your city (e.g., Los Angeles)"
               class="w-full p-3 rounded text-white border-none bg-dark-theater-primary focus:outline-none focus:ring-2 focus:ring-neon-blue-lightest"
               autocomplete="off"
@@ -85,9 +83,17 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
     """
   end
 
-  def handle_event("search", %{"query" => query}, socket) do
-    with {:ok, results} <- Locations.get_locations(query) do
-      {:noreply, assign(socket, results: results, query: query)}
+  def handle_event("search", %{"location_query" => q}, socket) do
+    q = String.trim(q || "")
+
+    if q == "" do
+      {:noreply, assign(socket, results: [], query: "")}
+    else
+      with {:ok, results} <- Locations.get_locations(q) do
+        {:noreply, assign(socket, results: results, query: q)}
+      else
+        _ -> {:noreply, assign(socket, results: [], query: q)}
+      end
     end
   end
 

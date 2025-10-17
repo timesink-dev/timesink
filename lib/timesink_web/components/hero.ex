@@ -8,11 +8,16 @@ defmodule TimesinkWeb.Components.Hero do
     ~H"""
     <section id="hero-section" class="relative overflow-hidden">
       <div class="w-full flex justify-center">
-        <!-- Mobile: auto height; Desktop: controlled viewport height (original feel) -->
-        <div class="relative flex flex-col md:flex-row w-full max-w-8xl
-                    md:h-[80vh] lg:h-[85vh]
-                    overflow-hidden">
-          <%!-- Irregular bottom blend (optional) --%>
+        <div class="relative flex flex-col md:flex-row w-full max-w-8xl h-[90vh] overflow-hidden">
+          <%!-- <!-- Irregular top blend -->
+          <div
+            class="absolute top-0 left-0 w-full h-8 z-20 pointer-events-none"
+            style="background: radial-gradient(ellipse at top left, #0C0C0C 40%, transparent 80%),
+                    radial-gradient(ellipse at top right, #0C0C0C 40%, transparent 80%)"
+          >
+          </div> --%>
+
+          <%!-- <!-- Irregular bottom blend -->
           <div
             class="absolute bottom-0 left-0 w-full h-10 z-30 pointer-events-none"
             style="background:
@@ -20,28 +25,14 @@ defmodule TimesinkWeb.Components.Hero do
                   radial-gradient(ellipse 30% 80% at bottom right, #0C0C0C 20%, transparent 60%)"
           >
           </div>
-          
-    <!-- Left image -->
-          <div class="relative w-full md:w-2/3 min-h-[40vh] md:h-[75vh] z-10">
-            <picture>
-              <%!--
-                Provide a mobile-specific crop if available (recommended), otherwise the browser
-                will still render the <img> fallback.
-              --%>
-              <source srcset="/images/hero_asset.webp" media="(max-width: 767px)" />
-              <img
-                src="/images/hero_asset.webp"
-                alt="TimeSink marquee with a cinematic glow"
-                class="w-full h-full
-                       object-contain md:object-cover
-                       object-center md:object-[50%_50%]"
-                loading="eager"
-                fetchpriority="high"
-                width="1920"
-                height="1080"
-              />
-            </picture>
-
+           --%>
+          <!-- Left image -->
+          <div class="relative w-full md:w-2/3 h-[80vh] z-10">
+            <img
+              src="/images/upscale_hero_empire.png"
+              alt="TimeSink Marquee"
+              class="w-full h-full object-cover"
+            />
             <div class="absolute inset-0 z-20 pointer-events-none">
               <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0C0C0C] to-transparent">
               </div>
@@ -56,7 +47,7 @@ defmodule TimesinkWeb.Components.Hero do
                       text-white text-center md:text-left z-10">
             <div class="max-w-md">
               <div class="text-center mb-10">
-                <h2 class="text-3xl md:text-4xl font-brand text-white tracking-tight leading-tight">
+                <h2 class="text-4xl font-brand text-white tracking-tight leading-tight">
                   Fresh Cinema selected for you. Real Audiences. No endless scrolls.
                 </h2>
 

@@ -12,7 +12,7 @@ defmodule TimesinkWeb.Account.MePageItem do
       <h2 class="my-4">{@title}</h2>
       <div
         id={String.replace(String.downcase(@title), " ", "-")}
-        class="rounded-lg bg-zinc-300/10 px-4 py-2 w-full inset-0"
+        class="rounded-2xl border border-zinc-800 bg-dark-theater-primary/60 px-4 py-2 w-full inset-0"
       >
         <%= for item <- @items do %>
           <.link
