@@ -49,8 +49,8 @@ defmodule Timesink.Waitlist do
     message =
       cond do
         position == -1 -> nil
-        position in 1..2 -> "You're next in line! Expect an invite very soon."
-        position in 3..20 -> "You're in the top 10! Stay tuned for your invite."
+        position in 1..2 -> "It looks like you're next. Expect an invite very soon."
+        position in 3..20 -> "You're among the next on the list. Stay tuned for your invite."
         true -> "You're on the priority waitlist. We'll notify you when it's your turn!"
       end
 
@@ -69,8 +69,8 @@ defmodule Timesink.Waitlist do
 
   defp estimate_wait_time(position) do
     cond do
-      position <= 10 -> "less than a day"
-      position <= 50 -> "in 2-3 days"
+      position <= 10 -> "less than 1 hour"
+      position <= 50 -> "less than 24 hours"
       true -> "in 3-5 days"
     end
   end

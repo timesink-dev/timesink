@@ -50,7 +50,7 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
             </div>
           <% end %>
         </div>
-
+        
     <!-- Image -->
         <div class="w-full md:w-3/5 self-center">
           <div class="w-full rounded-xl overflow-hidden">

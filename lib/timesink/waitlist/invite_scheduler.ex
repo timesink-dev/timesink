@@ -2,11 +2,11 @@ defmodule Timesink.Waitlist.InviteScheduler do
   alias Timesink.Workers.Waitlist.SendInviteJob
   alias Oban
 
-  # a random delay between 24 and 72 hours
-  @delay_range 24..72
+  # a random delay between 5 and 60 min
+  @delay_range 5..60
 
-  # 1 hour in seconds
-  @delay_seconds 3600
+  # 1 min in seconds
+  @delay_seconds 60
 
   def schedule_invite(applicant_id) do
     delay_seconds = Enum.random(@delay_range) * @delay_seconds

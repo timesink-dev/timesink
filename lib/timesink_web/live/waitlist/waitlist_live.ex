@@ -26,19 +26,21 @@ defmodule TimesinkWeb.WaitlistLive do
 
   def render(assigns) do
     ~H"""
-    <div class="w-full min-h-screen flex items-center justify-center">
+    <div class="w-full min-h-screen bg-backroom-black flex items-center justify-center overflow-hidden">
       <%= if @joined || @message do %>
-        <section class="relative w-full max-w-[1400px] grid grid-cols-1 md:grid-cols-12 items-center justify-center md:gap-8 px-6 py-12 md:py-24">
-          <!-- TEXT SIDE -->
-          <div class="md:col-span-5 lg:col-span-4 flex flex-col justify-center items-center md:items-start text-center md:text-left space-y-5">
-            <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-white">
-              You've joined the line!
+        <section class="gap-x-16 flex flex-col md:flex-row items-center justify-between w-full max-w-[1600px] px-6 md:px-12 py-8 md:py-0">
+          
+    <!-- TEXT SIDE -->
+          <div class="flex-1 md:basis-[55%] flex flex-col justify-center text-center md:text-left space-y-6 md:space-y-8 max-w-lg z-10">
+            <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-mystery-white leading-tight">
+              You’ve joined the line!
             </h1>
 
-            <p class="text-zinc-300 leading-relaxed max-w-md">
-              {@message}
-            </p>
-
+            <%= if @message do %>
+              <p class="text-zinc-300 text-lg">
+                {@message}
+              </p>
+            <% end %>
             <p class="text-sm text-zinc-400">
               <strong class="font-medium text-zinc-200">
                 Estimated time until ticket invitation:
@@ -46,17 +48,17 @@ defmodule TimesinkWeb.WaitlistLive do
               {@wait_time}
             </p>
 
-            <.button color="primary" class="mt-6 px-4 py-2 border border-white/20">
+            <.button color="primary" class="mt-6 self-center md:self-start">
               <a href="/">Go back outside</a>
             </.button>
           </div>
           
     <!-- IMAGE SIDE -->
-          <div class="md:col-span-7 lg:col-span-8 flex justify-center items-center relative w-full h-[50vh] md:h-[90vh] overflow-hidden">
+          <div class="relative flex-1 md:basis-[85%] flex justify-center md:justify-end items-center overflow-hidden">
             <img
               src="/images/waiting_list.png"
               alt="TimeSink waitlist success"
-              class="object-contain w-full h-full max-h-[90vh]"
+              class="object-cover w-full md:h-[450px]"
             />
           </div>
         </section>

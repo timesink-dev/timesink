@@ -61,7 +61,7 @@ defmodule TimesinkWeb.LiveAppLayout do
               <p class="font-semibold text-base mb-2">Connect</p>
               <div class="flex space-x-4">
                 <a
-                  href="https://instagram.com/timesinkpresents"
+                  href="https://instagram.com/timesink_"
                   target="_blank"
                   class="hover:underline hover:text-white transition"
                 >
@@ -90,15 +90,18 @@ defmodule TimesinkWeb.LiveAppLayout do
           <p class="text-sm text-center text-mystery-white/70 mb-2 font-gangster w-2/3 mx-auto">
             Be the first to know about upcoming films, special events, essays, insights, and fresh critique—no noise, just the good stuff.
           </p>
-          <div class="mx-auto w-full">
-            <iframe
-              src="https://timesinkpresents.substack.com/embed"
-              width="480"
-              height="150"
-              frameborder="0"
-              scrolling="no"
-            >
-            </iframe>
+          <div class="flex justify-center mt-6">
+            <div class="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl px-4">
+              <iframe
+                src="https://timesinkpresents.substack.com/embed"
+                class="w-full mx-auto block rounded-md"
+                style="max-width: 100%; min-height: 150px;"
+                height="80"
+                frameborder="0"
+                scrolling="no"
+              >
+              </iframe>
+            </div>
           </div>
         </div>
       </div>
