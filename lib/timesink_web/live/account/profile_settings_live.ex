@@ -96,7 +96,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                           />
                         <% else %>
                           <span class="inline-flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-zinc-700 text-xl md:text-2xl font-semibold text-mystery-white ring-2 ring-zinc-700">
-                            {@user.first_name |> String.first() |> String.upcase()}
+                            {initials(@user)}
                           </span>
                         <% end %>
                       <% end %>
@@ -565,6 +565,16 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
     # compare only relevant keys
     keys = ~w(locality state_code country_code country label lat lng)
     Map.take(cur, keys) != Map.take(selected || %{}, keys)
+  end
+
+  defp initials(%{first_name: fnm, last_name: lnm}) do
+    f = fnm |> to_string() |> String.trim() |> String.first() || ""
+    l = lnm |> to_string() |> String.trim() |> String.first() || ""
+
+    case String.upcase(f <> l) do
+      "" -> "?"
+      s -> s
+    end
   end
 
   defp friendly_err(%Ecto.Changeset{}), do: "Validation failed"

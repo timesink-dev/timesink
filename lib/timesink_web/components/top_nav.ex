@@ -107,7 +107,7 @@ defmodule TimesinkWeb.TopNav do
                   <.live_component
                     module={TimesinkWeb.NavAvatarLive}
                     id={"nav-avatar-#{@current_user.id}"}
-                    user_id={@current_user.id}
+                    user={@current_user}
                     avatar_url={resolved_url}
                   />
                 <% else %>

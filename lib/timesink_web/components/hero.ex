@@ -6,7 +6,7 @@ defmodule TimesinkWeb.Components.Hero do
     ~H"""
     <section id="hero-section" class="relative overflow-hidden">
       <div class="w-full flex justify-center">
-        <div class="relative flex flex-col md:flex-row w-full max-w-8xl h-[80vh] overflow-hidden">
+        <div class="relative flex flex-col md:flex-row w-full max-w-8xl h-[90vh] overflow-hidden">
           <%!-- <!-- Irregular top blend -->
           <div
             class="absolute top-0 left-0 w-full h-8 z-20 pointer-events-none"
@@ -25,8 +25,12 @@ defmodule TimesinkWeb.Components.Hero do
           </div>
            --%>
           <!-- Left image -->
-          <div class="relative w-full md:w-2/3 h-[70vh] z-10">
-            <img src="/images/hero-17.png" alt="TimeSink Marquee" class="w-full h-full object-cover" />
+          <div class="relative w-full md:w-2/3 h-[80vh] z-10">
+            <img
+              src="/images/upscale_hero_empire.png"
+              alt="TimeSink Marquee"
+              class="w-full h-full object-cover"
+            />
             <div class="absolute inset-0 z-20 pointer-events-none">
               <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0C0C0C] to-transparent">
               </div>
@@ -42,7 +46,7 @@ defmodule TimesinkWeb.Components.Hero do
             <div class="max-w-md">
               <div class="text-center mb-10">
                 <h2 class="text-4xl font-brand text-white tracking-tight leading-tight">
-                  Fresh Cinema. Real Audiences. No endless scrolls.
+                  Fresh Cinema selected for you. Real Audiences. No endless scrolls.
                 </h2>
                 <p class="mt-4 text-base md:text-md text-mystery-white max-w-xl mx-auto">
                   We bring great filmmakers — of all levels — to the stage.
