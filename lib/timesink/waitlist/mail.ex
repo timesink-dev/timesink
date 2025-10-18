@@ -4,28 +4,42 @@ defmodule Timesink.Waitlist.Mail do
   @base_url Application.compile_env(:timesink, :base_url)
 
   def send_waitlist_confirmation(to_email, first_name) do
-    send_mail(
-      to_email,
-      "You're on the waitlist!",
-      """
-      Hey #{first_name},
+    subject = "Welcome to TimeSink: you're on the waitlist"
 
-      You're on the waitlist! We'll let you know when you are the next one in line to join.
-      """
-    )
+    body = """
+    Hi #{first_name},
+
+    Thanks for signing up for early access to TimeSink. You’re officially on the waitlist.
+
+    We introduce new members gradually as we shape the community and programming, and we’ll email you as soon as your spot opens.
+
+    In the meantime, you can get a feel for what we’re building at our blog on our Substack, where we share programming notes, editorials, critiques, and film analysis:
+    https://timesinkpresents.substack.com/
+
+    If you have any questions, just reply to this email.
+
+    The TimeSink Team
+    """
+
+    send_mail(to_email, subject, body)
   end
 
   def send_invite_code(to_email, first_name, code) do
-    send_mail(
-      to_email,
-      "You're invited to join!",
-      """
-      Hey #{first_name},
+    subject = "Your invitation to join TimeSink"
 
-      You're invited to join! Click the link below to create your account:
+    body = """
+    Hi #{first_name},
 
-      #{@base_url}/invite/#{code}
-      """
-    )
+    Your spot is ready — you’re invited to join TimeSink.
+
+    Click the link below to create your account and step inside:
+    #{@base_url}/invite/#{code}
+
+    We’re glad to have you with us.
+
+    The TimeSink Team
+    """
+
+    send_mail(to_email, subject, body)
   end
 end

@@ -2,52 +2,58 @@ defmodule Timesink.Cinema.Mail do
   use Timesink.Mailer
 
   def send_film_submission_completion_notification(to_email, contact_name, submission) do
-    send_mail(
-      to_email,
-      "Film Submission Received",
-      """
-      Hi #{contact_name},
+    subject = "Your film submission has been received"
 
-      Your film submission #{submission.title} has been received! We'll review it and get back to you soon.
+    body = """
+    Hi #{contact_name},
 
-      In the meantime, please feel free to check the status of your submissions in your account film submissions dashboard and if you have any questions, feel free to reach out to us at hello@timesinkpresents.com.
+    We’ve received your film submission, "#{submission.title}." Our team will review it carefully and get back to you soon.
 
-      Thanks for your submission!
-      """
-    )
+    You can check the status of your submission anytime from your film submissions dashboard.
+    If you have any questions, feel free to reach out at hello@timesinkpresents.com.
+
+    Thank you for sharing your work with TimeSink.
+    """
+
+    send_mail(to_email, subject, body)
   end
 
   def send_film_status_update(submission, new_status) do
-    send_mail(
-      submission.contact_email,
-      "Film Submission Status Update",
-      """
-      Hi #{submission.contact_name},
+    subject = "Update on your film submission"
 
-      #{build_status_message(submission, new_status)}
+    body = """
+    Hi #{submission.contact_name},
 
-      If you have any questions or need further assistance, feel free to reach out to us at hello@timesinkpresents.com.
+    #{build_status_message(submission, new_status)}
 
-      Thanks for your patience!
-      """
-    )
+    If you have any questions, you can always reach us at hello@timesinkpresents.com.
+
+    The TimeSink Team
+    """
+
+    send_mail(submission.contact_email, subject, body)
   end
 
-  defp format_status(:received), do: "Received 📨"
-  defp format_status(:under_review), do: "Under Review 🔍"
-  defp format_status(:accepted), do: "Accepted ✅"
-  defp format_status(:rejected), do: "Rejected"
+  defp format_status(:received), do: "received"
+  defp format_status(:under_review), do: "under review"
+  defp format_status(:accepted), do: "accepted"
+  defp format_status(:rejected), do: "not accepted"
 
   def build_status_message(submission, new_status) do
+    title = "\"#{submission.title}\""
+
     case new_status do
       :accepted ->
-        "Congratulations! Your film submission for <i>#{submission.title}</i> has been accepted ✅ and will be featured in an upcoming showcase right here on TimeSink! We'll be in touch with further details soon."
+        "Good news — your film #{title} has been accepted and will be featured in an upcoming showcase on TimeSink. We’ll be in touch soon with further details."
 
       :rejected ->
-        "Unfortunately, your film submission for <i>#{submission.title}</i> has not been accepted at this time. We appreciate your effort and encourage you to submit again in the future."
+        "We wanted to let you know that your film #{title} was not selected this time. We truly appreciate your submission and encourage you to share future work with us."
+
+      :under_review ->
+        "Your film #{title} is currently under review. We’ll notify you as soon as a decision is made."
 
       _ ->
-        "Your film submission for <i>#{submission.title}</i> status has been updated to #{format_status(new_status)} -- We'll keep you posted on any further updates."
+        "The status of your film #{title} has been updated to #{format_status(new_status)}. We’ll keep you informed as things progress."
     end
   end
 end
