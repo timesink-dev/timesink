@@ -1,8 +1,6 @@
 defmodule Timesink.Waitlist.Mail do
   use Timesink.Mailer
 
-  @base_url Application.compile_env(:timesink, :base_url)
-
   def send_waitlist_confirmation(to_email, first_name) do
     subject = "Welcome to TimeSink: you're on the waitlist"
 
@@ -33,7 +31,7 @@ defmodule Timesink.Waitlist.Mail do
     Your spot is ready — you’re invited to join TimeSink.
 
     Click the link below to create your account and step inside:
-    #{@base_url}/invite/#{code}
+    #{base_url()}/invite/#{code}
 
     We’re glad to have you with us.
 
@@ -41,5 +39,9 @@ defmodule Timesink.Waitlist.Mail do
     """
 
     send_mail(to_email, subject, body)
+  end
+
+  defp base_url do
+    Application.fetch_env!(:timesink, :base_url)
   end
 end
