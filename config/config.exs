@@ -82,8 +82,8 @@ config :timesink, Oban,
     {Oban.Plugins.Reindexer, schedule: "@weekly"},
     {Oban.Plugins.Cron,
      crontab: [
-       {"@daily", Timesink.Workers.Waitlist.ScheduleInviteJob}
-
+       # DEPRECATED: we now schedule invites immediately (scheduled_at) on waitlist applicant create/update
+       #  {"@daily", Timesink.Workers.Waitlist.ScheduleInviteJob}
        # Runs every 1 minute for dev env
        #  {"*/1 * * * *", Timesink.Workers.Waitlist.ScheduleInviteJob}
      ]}
