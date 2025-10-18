@@ -27,7 +27,7 @@ defmodule TimesinkWeb.Components.Hero do
           <!-- Left image -->
           <div class="relative w-full md:w-2/3 h-[80vh] z-10">
             <img
-              src="/images/upscale_hero_empire.png"
+              src="/images/timesink_presents_theater.webp"
               alt="TimeSink Marquee"
               class="w-full h-full object-cover"
             />

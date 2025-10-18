@@ -7,6 +7,7 @@ defmodule Timesink.Waitlist do
   alias Timesink.Waitlist.Mail
   alias Timesink.Repo
   alias Timesink.Waitlist.Applicant
+  alias Timesink.Waitlist.InviteScheduler
   import Ecto.Query, only: [from: 2]
 
   @max_wave_size 8
@@ -130,6 +131,8 @@ defmodule Timesink.Waitlist do
                        last_name: last_name
                      }) do
                 Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
+                InviteScheduler.schedule_invite(applicant.id)
+
                 {:ok, applicant}
               else
                 {:error, changeset} ->
@@ -158,6 +161,8 @@ defmodule Timesink.Waitlist do
       _ ->
         with {:ok, applicant} <- Applicant.create(params) do
           Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
+          InviteScheduler.schedule_invite(applicant.id)
+
           {:ok, applicant}
         else
           {:error, changeset} ->

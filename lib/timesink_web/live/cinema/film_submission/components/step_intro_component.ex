@@ -55,7 +55,7 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
         <div class="w-full md:w-3/5 self-center">
           <div class="w-full rounded-xl overflow-hidden">
             <img
-              src="/images/UPSCALE REGISTRATION.png"
+              src="/images/film_submission.webp"
               alt="Film submission visual"
               class="w-full h-full object-cover"
             />

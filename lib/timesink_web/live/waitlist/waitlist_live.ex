@@ -56,7 +56,7 @@ defmodule TimesinkWeb.WaitlistLive do
     <!-- IMAGE SIDE -->
           <div class="relative flex-1 md:basis-[85%] flex justify-center md:justify-end items-center overflow-hidden">
             <img
-              src="/images/waiting_list.png"
+              src="/images/waitlist.webp"
               alt="TimeSink waitlist success"
               class="object-cover w-full md:h-[450px]"
             />
