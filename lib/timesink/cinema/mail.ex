@@ -1,6 +1,8 @@
 defmodule Timesink.Cinema.Mail do
   use Timesink.Mailer
 
+  @base_url Application.compile_env(:timesink, :base_url)
+
   def send_film_submission_completion_notification(to_email, contact_name, submission) do
     subject = "Your film submission has been received"
 
@@ -9,7 +11,8 @@ defmodule Timesink.Cinema.Mail do
 
     We’ve received your film submission, "#{submission.title}." Our team will review it carefully and get back to you soon.
 
-    You can check the status of your submission anytime from your film submissions dashboard.
+    You can check the status of your submission anytime from your film submissions dashboard at #{@base_url}/me/film-submissions.
+
     If you have any questions, feel free to reach out at hello@timesinkpresents.com.
 
     Thank you for sharing your work with TimeSink.
