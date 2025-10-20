@@ -10,15 +10,37 @@ defmodule TimesinkWeb.Account.PasswordResetRequestLive do
   def render(assigns) do
     ~H"""
     <div class="min-h-screen flex items-center justify-center bg-backroom-black px-4">
-      <div class="w-full max-w-md bg-backroom-black bg-opacity-70 border border-dark-theater-medium rounded-2xl p-10">
+      <div class="w-full max-w-md bg-backroom-black bg-opacity-70 border border-dark-theater-medium rounded-2xl p-10 text-center transition-all">
         <!-- Logo -->
-        <a class="flex flex-col items-center mb-6" href={~p"/"}>
+        <a href={~p"/"} class="flex flex-col items-center mb-8">
           <p class="text-4xl font-brand text-white tracking-tight">TimeSink</p>
           <p class="text-center text-sm text-dark-theater-lightest mt-2">Reset your password</p>
         </a>
         
-    <!-- Reset Request Form -->
-        <.simple_form for={@form} as="req" phx-submit="send" class="space-y-5">
+    <!-- Success state -->
+        <div
+          :if={@sent?}
+          class="animate-fade-in flex flex-col items-center justify-center text-center"
+        >
+          <div class="flex flex-col items-center justify-center w-full rounded-xl border border-emerald-500/30 bg-emerald-500/10 py-4 px-4">
+            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 mb-4">
+              <.icon name="hero-check-circle" class="h-8 w-8 text-emerald-400" />
+            </div>
+            <h2 class="text-lg font-semibold text-white">Request link sent</h2>
+            <p class="text-sm text-emerald-100/90 max-w-xs">
+              If your email is in our system, you’ll receive an emailed link shortly.
+            </p>
+          </div>
+        </div>
+        
+    <!-- Request form -->
+        <.simple_form
+          :if={!@sent?}
+          for={@form}
+          as="req"
+          phx-submit="send"
+          class="space-y-5 animate-fade-in"
+        >
           <.input
             field={@form[:email]}
             type="email"
@@ -26,28 +48,15 @@ defmodule TimesinkWeb.Account.PasswordResetRequestLive do
             required
             input_class="w-full p-3 rounded-lg text-mystery-white focus:ring-2 focus:ring-neon-blue-light focus:outline-none"
           />
-
           <:actions>
             <.button
               phx-disable-with="Sending..."
               class="w-full mt-4 px-4 py-3 bg-neon-blue text-backroom-black font-bold rounded-lg hover:bg-neon-blue-lightest focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neon-blue"
             >
-              <%= if @sent? do %>
-                <span class="flex justify-center items-center gap-x-1">
-                  <.icon name="hero-check-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
-                  Request link sent
-                </span>
-              <% else %>
-                Send request link
-              <% end %>
+              Send request link
             </.button>
           </:actions>
         </.simple_form>
-        
-    <!-- Success hint -->
-        <div :if={@sent?} class="mt-4 text-sm text-dark-theater-lightest">
-          If your email is in our system, you’ll receive a link shortly.
-        </div>
       </div>
     </div>
     """
@@ -60,6 +69,6 @@ defmodule TimesinkWeb.Account.PasswordResetRequestLive do
       url(~p"/reset-password/#{token}")
     end)
 
-    {:noreply, assign(socket, form: to_form(%{"email" => email}, as: "req"), sent?: true)}
+    {:noreply, assign(socket, sent?: true)}
   end
 end
