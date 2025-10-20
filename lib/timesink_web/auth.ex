@@ -156,9 +156,10 @@ defmodule TimesinkWeb.Auth do
 
   defp mount_current_user(socket, %{"user_token" => user_token} = _session) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
-      with user_token when not is_nil(user_token) <- user_token,
-           user <- get_user_by_session_token(user_token) do
-        user
+      with {:ok, claims} <- CoreAuth.verify_token(user_token),
+           uid when is_binary(uid) <- claims[:user_id],
+           {:ok, user_min} <- Timesink.UserCache.get_or_load(uid) do
+        user_min
       else
         _ -> nil
       end
@@ -187,15 +188,6 @@ defmodule TimesinkWeb.Auth do
     conn
     |> configure_session(renew: true)
     |> clear_session()
-  end
-
-  defp get_user_by_session_token(user_token) do
-    with {:ok, claims} <- CoreAuth.verify_token(user_token),
-         user <- Timesink.Repo.get!(User, claims[:user_id]) do
-      user
-    else
-      _ -> nil
-    end
   end
 
   defp signed_in_path(_conn), do: ~p"/now-playing"

@@ -24,8 +24,6 @@ defmodule Timesink.Storage do
       iex> Storage.create_blob(%Plug.Upload{...}, user_id: user.id)
       {:ok, %Storage.Blob{...}}
   """
-  @spec create_blob(upload :: Plug.Upload.t(), opts :: Keyword.t()) ::
-          {:ok, Blob.t()} | {:error, Ecto.Changeset.t() | term()}
   def create_blob(%Plug.Upload{} = upload, opts \\ []) do
     config = config()
     uid = Keyword.get(opts, :user_id)
@@ -34,7 +32,10 @@ defmodule Timesink.Storage do
     # before persisting blob info in the database
     blob_id = Ecto.UUID.generate()
 
-    obj_path = "#{config.prefix}/#{upload.filename}"
+    # Make S3 key unique to avoid collisions
+    obj_path = Path.join([config.prefix, blob_id, upload.filename])
+
+    # ExAws will prefix these as x-amz-meta-...
     obj_meta = [blob_id: blob_id, uploaded_at: System.os_time(:millisecond)]
 
     with {:ok, stats} <- File.stat(upload.path),
@@ -51,6 +52,9 @@ defmodule Timesink.Storage do
          },
          {:ok, blob} <- Blob.create(blob_params) do
       {:ok, blob}
+    else
+      {:error, reason} ->
+        {:error, {:stat_failed, reason}}
     end
   end
 
@@ -145,6 +149,17 @@ defmodule Timesink.Storage do
           Repo.rollback(reason)
       end
     end)
+  end
+
+  def delete_blob(blob_id) when is_binary(blob_id) do
+    with {:ok, %Blob{} = blob} <- Blob.get(blob_id),
+         {:ok, _} <- Timesink.Storage.S3.delete(blob.uri),
+         {:ok, _} <- Blob.delete(blob) do
+      {:ok, :deleted}
+    else
+      {:error, :not_found} -> {:ok, :not_found}
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @spec config() :: config

@@ -3,8 +3,6 @@ defmodule TimesinkWeb.Account.MeLive do
   import Ecto.Query, only: [from: 2]
 
   alias Timesink.Repo
-  alias TimesinkWeb.Utils
-  alias Timesink.Account.Profile
   alias Timesink.Token
   alias Timesink.UserGeneratedInvite
   import TimesinkWeb.Account.MePageItem
@@ -14,12 +12,13 @@ defmodule TimesinkWeb.Account.MeLive do
   @copy_reset_ms 2000
 
   def mount(_params, _session, socket) do
-    user = Repo.preload(socket.assigns.current_user, profile: [avatar: [:blob]])
+    user = socket.assigns.current_user
+    # user = Repo.preload(socket.assigns.current_user, profile: [avatar: [:blob]])
     invites = list_invites(user.id)
 
     {:ok,
      assign(socket,
-       current_user: user,
+       current_user: socket.assigns.current_user,
        invites: invites,
        invites_left: max(@max_invites - length(invites), 0),
        copied_url: nil,
@@ -30,28 +29,7 @@ defmodule TimesinkWeb.Account.MeLive do
   def render(assigns) do
     ~H"""
     <section id="user-overview" phx-hook="CopyBus">
-      <div class="ml-6 mt-8 text-sm text-dark-theater-lightest flex flex-col justify-center items-center w-full">
-        <span class="mb-2">
-          <%= if @current_user.profile.avatar do %>
-            <img
-              src={Profile.avatar_url(@current_user.profile.avatar)}
-              alt="Profile picture"
-              class="rounded-full w-16 h-16"
-            />
-          <% else %>
-            <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-zinc-700 text-lg font-semibold text-mystery-white">
-              {@current_user.first_name |> String.first() |> String.upcase()}
-            </span>
-          <% end %>
-        </span>
-        <span class="leading-4">
-          {"@" <> @current_user.username}
-        </span>
-        <span>
-          joined {Utils.format_date(@current_user.inserted_at)}
-        </span>
-      </div>
-      <div class="max-w-2xl mx-auto">
+      <div class="max-w-2xl mx-auto" class="mt-8">
         <.me_page_item
           title="Account"
           items={[
@@ -114,7 +92,7 @@ defmodule TimesinkWeb.Account.MeLive do
                 "inline-flex items-center gap-2 rounded-xl px-3 py-2 font-medium transition",
                 if(@invites_left == 0,
                   do: "bg-zinc-700/60 text-zinc-400 cursor-not-allowed",
-                  else: "bg-emerald-500 text-backroom-black hover:opacity-90"
+                  else: "bg-dark-theater-primary text-mystery-white hover:opacity-90"
                 )
               ]}
             >

@@ -1,16 +1,13 @@
 defmodule TimesinkWeb.Account.ProfileSettingsLive do
   use TimesinkWeb, :live_view
 
-  import Ecto.Query, only: [from: 2]
-
   alias Timesink.Account.{User, Profile, Location}
   alias Timesink.{Locations, Repo}
-
-  @base_url Application.compile_env(:timesink, :base_url)
+  alias Timesink.UserCache
 
   def mount(_params, _session, socket) do
     user =
-      socket.assigns.current_user
+      Repo.get!(Timesink.Account.User, socket.assigns.current_user.id)
       |> Repo.preload(profile: [avatar: [:blob]])
 
     changeset = User.changeset(user)
@@ -22,17 +19,30 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         _ -> {"", %{}}
       end
 
-    {:ok,
-     socket
-     |> assign(
-       user: user,
-       account_form: to_form(changeset),
-       # location UI
-       loc_query: loc_query,
-       loc_results: [],
-       selected_location: selected_location,
-       dirty: false
-     )}
+    socket =
+      socket
+      |> assign(
+        user: user,
+        account_form: to_form(changeset),
+        loc_query: loc_query,
+        loc_results: [],
+        selected_location: selected_location,
+        dirty: false,
+        # ← server-side processing state
+        avatar_processing: false,
+        # ← error message to show near control
+        avatar_error: nil
+      )
+      |> allow_upload(:avatar,
+        accept: ~w(.jpg .jpeg .png .webp .heic),
+        max_entries: 1,
+        max_file_size: 8_000_000,
+        # upload starts as soon as a file is picked
+        auto_upload: true,
+        progress: &handle_avatar_progress/3
+      )
+
+    {:ok, socket}
   end
 
   def render(assigns) do
@@ -60,27 +70,78 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
             phx-submit="save"
             class="space-y-8"
           >
-            <!-- Avatar + Username (moved to the top) -->
             <.inputs_for :let={pf} field={@account_form[:profile]}>
-              <div class="flex items-center gap-4 md:gap-6">
-                <div class="relative">
-                  <%= if @user.profile && @user.profile.avatar do %>
-                    <img
-                      src={Profile.avatar_url(@user.profile.avatar)}
-                      alt="Profile picture"
-                      class="rounded-full w-16 h-16 md:w-20 md:h-20 object-cover ring-2 ring-zinc-700"
-                    />
-                  <% else %>
-                    <span class="inline-flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-zinc-700 text-xl md:text-2xl font-semibold text-mystery-white ring-2 ring-zinc-700">
-                      {@user.first_name |> String.first() |> String.upcase()}
-                    </span>
-                  <% end %>
-                  <span class="absolute -bottom-1 -right-1 inline-flex items-center rounded-full bg-emerald-600/90 text-xs text-white px-2 py-0.5">
-                    You
-                  </span>
-                </div>
+              <div class="grid grid-cols-1 md:grid-cols-[auto,1fr] items-start gap-4 md:gap-6">
+                <div class="relative mx-auto md:mx-0">
+                  <form
+                    phx-change="upload_avatar"
+                    phx-auto-recover="ignore"
+                    class={[@avatar_processing && "pointer-events-none opacity-60", "cursor-pointer"]}
+                  >
+                    <label class="cursor-pointer block">
+                      <!-- Avatar image or initials -->
+                      <%= if @uploads.avatar.entries != [] do %>
+                        <%= for entry <- @uploads.avatar.entries do %>
+                          <.live_img_preview
+                            entry={entry}
+                            class="rounded-full w-16 h-16 md:w-20 md:h-20 object-cover ring-2 ring-zinc-700"
+                          />
+                        <% end %>
+                      <% else %>
+                        <%= if @user.profile && @user.profile.avatar do %>
+                          <% url = Profile.avatar_url(@user.profile && @user.profile.avatar) %>
+                          <img
+                            src={url}
+                            class="rounded-full w-16 h-16 md:w-20 md:h-20 object-cover ring-2 ring-zinc-700"
+                          />
+                        <% else %>
+                          <span class="inline-flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-zinc-700 text-xl md:text-2xl font-semibold text-mystery-white ring-2 ring-zinc-700">
+                            {initials(@user)}
+                          </span>
+                        <% end %>
+                      <% end %>
 
-                <div class="flex-1 min-w-0">
+                      <span class="absolute -bottom-1 -right-1 inline-flex items-center rounded-full bg-emerald-600/90 text-xs text-white px-2 py-0.5">
+                        You
+                      </span>
+                      
+    <!-- Subtle loading overlay while processing -->
+                      <div
+                        :if={@avatar_processing}
+                        class="absolute inset-0 rounded-full bg-black/40 grid place-items-center"
+                      >
+                        <svg
+                          class="animate-spin h-5 w-5 text-white"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          />
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4A4 4 0 008 12H4z"
+                          />
+                        </svg>
+                      </div>
+
+                      <.live_file_input upload={@uploads.avatar} class="hidden" />
+                    </label>
+                  </form>
+                  <p :if={@avatar_error} class="text-xs text-red-400 mt-1 text-center md:text-left">
+                    {@avatar_error}
+                  </p>
+                </div>
+                
+    <!-- Username column -->
+                <div class="w-full mt-4 md:mt-0">
                   <label class="block text-sm font-medium text-zinc-300 mb-2">Username</label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">@</span>
@@ -95,9 +156,8 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                   <p class="mt-2 text-xs text-zinc-500 truncate">
                     Your public handle on the platform
                   </p>
+                  <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
                 </div>
-
-                <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
               </div>
               
     <!-- Location (Onboarding-style) -->
@@ -183,7 +243,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                 <.input
                   field={pf[:bio]}
                   type="textarea"
-                  placeholder="Tell the world about yourself"
+                  placeholder="Tell the world about yourself..."
                   input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3 min-h-[120px]"
                   value={@user.profile.bio}
                 />
@@ -358,6 +418,104 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
     end
   end
 
+  # Fire once when client finished sending the file
+  def handle_avatar_progress(:avatar, entry, socket) do
+    if entry.done? do
+      send(self(), {:process_avatar_upload, entry.ref})
+      {:noreply, assign(socket, avatar_processing: true, avatar_error: nil)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_info({:process_avatar_upload, _entry_ref}, socket) do
+    outcomes =
+      consume_uploaded_entries(socket, :avatar, fn %{path: path}, entry ->
+        plug = %Plug.Upload{
+          path: path,
+          filename: entry.client_name,
+          content_type: entry.client_type
+        }
+
+        case Timesink.Account.Profile.attach_avatar(socket.assigns.user.profile, plug,
+               user_id: socket.assigns.user.id
+             ) do
+          {:ok, _att} -> {:ok, :attached}
+          {:error, reason} -> {:ok, {:attach_error, reason}}
+        end
+      end)
+
+    # Pick first result if multiple (we only allow 1 anyway)
+    outcome =
+      Enum.find_value(outcomes, fn
+        {:attach_error, _} = err -> err
+        :attached -> :attached
+        _ -> nil
+      end) || :noop
+
+    case outcome do
+      :attached ->
+        # Reload fresh user with avatar + blob
+        user =
+          Repo.get!(Timesink.Account.User, socket.assigns.user.id)
+          |> Repo.preload(profile: [avatar: [:blob]])
+
+        new_url = Profile.avatar_url(user.profile.avatar)
+
+        send_update(
+          TimesinkWeb.NavAvatarLive,
+          id: "nav-avatar-#{user.id}",
+          avatar_url: new_url
+        )
+
+        UserCache.put(%{
+          id: user.id,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          avatar_url: new_url
+        })
+
+        # UserCache.put_avatar_url(user.id, new_url)
+
+        {:noreply,
+         socket
+         |> assign(user: user, avatar_processing: false, avatar_error: nil)
+         |> put_flash(:info, "Avatar updated!")}
+
+      {:attach_error, reason} ->
+        {:noreply,
+         socket
+         |> assign(avatar_processing: false, avatar_error: friendly_err(reason))
+         |> put_flash(:error, "Failed to update avatar.")}
+
+      :noop ->
+        # Nothing was consumed (race/cancel). Just stop the spinner.
+        {:noreply, assign(socket, avatar_processing: false)}
+    end
+  end
+
+  def handle_info({:avatar_updated, user_id, url}, %{assigns: %{user: %{id: user_id}}} = socket) do
+    user =
+      Timesink.Repo.get!(Timesink.Account.User, user_id)
+      |> Timesink.Repo.preload(profile: [avatar: [:blob]])
+
+    # If you use a stateful avatar component:
+    send_update(TimesinkWeb.NavAvatarLive,
+      # id: "avatar-#{user_id}",
+      avatar_url: url
+    )
+
+    {:noreply,
+     socket
+     |> assign(user: user, avatar_processing: false, avatar_error: nil)}
+  end
+
+  # Ignore updates for other users (good hygiene if you happen to be subscribed widely)
+  def handle_info({:avatar_updated, _other_id, _url}, socket) do
+    {:noreply, socket}
+  end
+
   # If the nested location is empty (user didn't pick from dropdown), fall back to previous selection
   defp ensure_location_payload(params, selected_location) do
     case get_in(params, ["profile", "location"]) do
@@ -406,7 +564,21 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
 
     # compare only relevant keys
     keys = ~w(locality state_code country_code country label lat lng)
-    IO.inspect(Map.take(cur, keys) != Map.take(selected || %{}, keys))
     Map.take(cur, keys) != Map.take(selected || %{}, keys)
   end
+
+  defp initials(%{first_name: fnm, last_name: lnm}) do
+    f = fnm |> to_string() |> String.trim() |> String.first() || ""
+    l = lnm |> to_string() |> String.trim() |> String.first() || ""
+
+    case String.upcase(f <> l) do
+      "" -> "?"
+      s -> s
+    end
+  end
+
+  defp friendly_err(%Ecto.Changeset{}), do: "Validation failed"
+  defp friendly_err(%RuntimeError{message: m}), do: m
+  defp friendly_err(%{message: m}) when is_binary(m), do: m
+  defp friendly_err(term), do: term |> to_string() |> String.slice(0, 160)
 end

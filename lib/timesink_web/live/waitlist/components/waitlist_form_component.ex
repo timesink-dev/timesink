@@ -11,7 +11,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="min-h-screen bg-backroom-black flex flex-col items-center justify-center px-4 pt-16 pb-24 space-y-6">
+    <div class="max-h-screen bg-backroom-black flex flex-col items-center justify-center px-4 pt-16 pb-24 space-y-6">
       <!-- Card Container -->
       <div class="w-full max-w-2xl rounded-2xl bg-backroom-black bg-opacity-70 border border-dark-theater-medium p-10">
         
@@ -93,7 +93,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             remaining in this cohort
           </p>
           <p>
-            Join <i>now</i> to secure your ticket!
+            Join now to secure your entry ticket!
           </p>
         <% else %>
           <p>

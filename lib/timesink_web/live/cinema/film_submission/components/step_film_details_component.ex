@@ -46,7 +46,6 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
         
     <!-- Left: Form Content -->
         <div class="w-full md:w-3/5">
-          <h2 class="text-3xl font-brand mb-4">Film Submission</h2>
           <p class="text-mystery-white/80 mb-4 text-sm">
             This is where you share the essentials—your film’s name, runtime, synopsis, and how to watch it.
             We also ask for your contact info so we can reach you if your film is selected.

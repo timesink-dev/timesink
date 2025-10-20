@@ -462,47 +462,66 @@ Hooks.StripePayment = {
     if (this.el.dataset.mounted) return;
     this.el.dataset.mounted = "true";
 
-    const appearance = { 
+    const appearance = {
       theme: "night",
       labels: "floating",
-      variables: { 
-        colorDanger: "#FF6640", // Neon red light   
-        colorBackground: '#11182799', // Dark background with slight transparency
-        fontFamily: 'Gangster Grotesk, sans-serif',
+      variables: {
+        colorDanger: "#FF6640",
+        colorBackground: "#11182799",
+        fontFamily: "Gangster Grotesk, sans-serif",
         fontSmooth: "always",
       },
       rules: {
-        ".Input": {
-          backgroundColor: "#11182799",
-          borderColor: "#1f2937",
-        },
-        ".Input:focus": {
-          borderColor: "#ADC9FF"
-        }
-      }
+        ".Input": { backgroundColor: "#11182799", borderColor: "#1f2937" },
+        ".Input:focus": { borderColor: "#ADC9FF" },
+      },
     };
+
     const stripe = Stripe(this.el.dataset.stripeKey);
     const elements = stripe.elements({
       clientSecret: this.el.dataset.stripeSecret,
       appearance
     });
 
-
     const paymentElement = elements.create("payment", {
-      fields: {
-        billingDetails: {
-          name: "never",
-          email: "never"
-        }
-      }
+      fields: { billingDetails: { name: "never", email: "never" } },
+      wallets: { link: "never", applePay: "auto", googlePay: "auto" }
     });
 
     paymentElement.mount("#payment-element");
 
+    const submitBtn = this.el.querySelector("#stripe-submit");
+    const rightSlot = submitBtn?.querySelector("span:last-child"); // our spinner slot
+    const errorEl = this.el.querySelector("#card-errors");
+
+    // Enable the button only when Stripe is ready
+    paymentElement.on("ready", () => {
+      if (submitBtn) submitBtn.disabled = false;
+    });
+
+    const setLoading = (isLoading) => {
+      if (!submitBtn || !rightSlot) return;
+      submitBtn.disabled = !!isLoading;
+      submitBtn.setAttribute("aria-busy", String(!!isLoading));
+
+      if (isLoading) {
+        rightSlot.innerHTML = `
+          <svg aria-hidden="true" role="status" class="w-4 h-4 animate-spin"
+               viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity=".25"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3"></path>
+          </svg>`;
+      } else {
+        rightSlot.innerHTML = ""; // keep the slot, remove spinner
+      }
+    };
+
     this.el.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (errorEl) errorEl.textContent = "";
+      setLoading(true);
 
-      const { error } = await stripe.confirmPayment({
+      const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: window.location.href,
@@ -516,15 +535,27 @@ Hooks.StripePayment = {
         redirect: "if_required"
       });
 
-      const errorEl = document.querySelector("#card-errors");
-
+      // If redirect is needed, Stripe will navigate away — spinner stays until navigation.
+      // If no redirect, we’re still here:
       if (error) {
         console.error("Payment error:", error.message);
         if (errorEl) errorEl.textContent = error.message;
+        setLoading(false);
+        return;
+      }
+
+      // If we get a PI back with succeeded status (no redirect path)
+      if (paymentIntent && paymentIntent.status === "succeeded") {
+        // keep spinner briefly or emit an event if you want to move to the next step
+        // Example: push a LiveView event or submit a hidden form, etc.
+        // setLoading(false); // optionally clear spinner if you stay on the page
+      } else {
+        // e.g., requires_action handled via redirect (won’t hit here), or processing
+        setLoading(false);
       }
     });
   }
-}
+};
 
 Hooks.CopyBus = {
   mounted() {
@@ -555,7 +586,6 @@ Hooks.CopyBus = {
     })
   }
 }
-
 
 
 export default Hooks;

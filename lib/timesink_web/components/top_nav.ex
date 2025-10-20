@@ -1,13 +1,17 @@
 defmodule TimesinkWeb.TopNav do
-  import TimesinkWeb.CoreComponents, only: [icon: 1, button: 1]
   use Phoenix.Component
+  import TimesinkWeb.CoreComponents, only: [icon: 1, button: 1]
   alias Phoenix.LiveView.JS
-  alias Timesink.Account.User
+  alias Timesink.UserCache
+  alias Timesink.Account.Profile
+  alias Timesink.Storage.Attachment
+  alias Ecto.Association.NotLoaded
 
   attr :class, :string, default: nil
-  attr :current_user, User, default: nil
+  attr :current_user, :any, default: nil
+  # allow parent/root LV to seed an avatar_url (so no flicker)
+  attr :avatar_url, :string, default: nil
 
-  @spec top_nav(map()) :: Phoenix.LiveView.Rendered.t()
   def top_nav(assigns) do
     ~H"""
     <header class={["z-40 sticky bg-backgroom-black", @class]}>
@@ -29,6 +33,9 @@ defmodule TimesinkWeb.TopNav do
     </header>
     """
   end
+
+  attr :current_user, :any, default: nil
+  attr :avatar_url, :string, default: nil
 
   defp top_nav_content(assigns) do
     ~H"""
@@ -78,26 +85,36 @@ defmodule TimesinkWeb.TopNav do
             </svg>
           </a>
         </div>
-        
-    <!-- Actions -->
+
         <ul id="nav-actions" class="flex justify-between items-center gap-x-8">
           <%= if @current_user do %>
-            <!-- Submit link stays as-is -->
-    <!-- Account dropdown replaces the Sign Out button -->
             <li class="relative">
               <.button
                 id="account-button"
                 type="button"
                 phx-click={JS.toggle(to: "#account-menu", display: "block")}
                 color="none"
-                class="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-mystery-white hover:bg-zinc-800 focus:outline-none"
+                class="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-mystery-white focus:outline-none"
                 aria-haspopup="menu"
                 aria-expanded="false"
               >
-                <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-zinc-700 text-[11px] font-semibold">
-                  {@current_user.first_name |> String.first() |> String.upcase()}
-                </span>
-                <span class="hidden lg:inline">Account</span>
+                <% resolved_url =
+                  (@avatar_url && String.trim(@avatar_url) != "" && @avatar_url) ||
+                    (@current_user.id && UserCache.get_avatar_url(@current_user.id)) ||
+                    avatar_url_or_nil(@current_user) %>
+
+                <%= if resolved_url do %>
+                  <.live_component
+                    module={TimesinkWeb.NavAvatarLive}
+                    id={"nav-avatar-#{@current_user.id}"}
+                    user={@current_user}
+                    avatar_url={resolved_url}
+                  />
+                <% else %>
+                  <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-zinc-700 text-[11px] font-semibold">
+                    {initials(@current_user)}
+                  </span>
+                <% end %>
               </.button>
 
               <div
@@ -107,15 +124,15 @@ defmodule TimesinkWeb.TopNav do
                 role="menu"
                 aria-label="Account menu"
               >
-                <a href="/me" class="block px-4 py-2 text-sm hover:bg-zinc-700" role="menuitem">
-                  Overview
-                </a>
                 <a
                   href="/me/profile"
                   class="block px-4 py-2 text-sm hover:bg-zinc-700"
                   role="menuitem"
                 >
-                  Profile
+                  View profile
+                </a>
+                <a href="/me" class="block px-4 py-2 text-sm hover:bg-zinc-700" role="menuitem">
+                  Account
                 </a>
                 <.form method="post" action="/sign_out" for={%{}} class="border-t border-zinc-700">
                   <button
@@ -128,19 +145,16 @@ defmodule TimesinkWeb.TopNav do
                 </.form>
               </div>
             </li>
+
             <li>
               <a href="/submit">
-                <.button color="tertiary">
-                  Submit film
-                </.button>
+                <.button color="tertiary">Submit film</.button>
               </a>
             </li>
           <% else %>
             <li>
               <a href="/sign-in">
-                <.button color="tertiary">
-                  Sign in
-                </.button>
+                <.button color="tertiary">Sign in</.button>
               </a>
             </li>
             <li>
@@ -270,4 +284,23 @@ defmodule TimesinkWeb.TopNav do
     |> JS.hide(to: "#hamburger-container", transition: {"block", "block", "hidden"})
     |> JS.remove_class("overflow-hidden", to: "body")
   end
+
+  defp initials(%{first_name: fnm, last_name: lnm}) do
+    f = fnm |> to_string() |> String.trim() |> String.first() || ""
+    l = lnm |> to_string() |> String.trim() |> String.first() || ""
+
+    case String.upcase(f <> l) do
+      "" -> "?"
+      s -> s
+    end
+  end
+
+  # Try current_user.profile first (if preloaded). Otherwise nil.
+  defp avatar_url_or_nil(%{profile: %NotLoaded{}}), do: nil
+  defp avatar_url_or_nil(%{profile: nil}), do: nil
+
+  defp avatar_url_or_nil(%{profile: %{avatar: %Attachment{} = att}}),
+    do: Profile.avatar_url(att, :md)
+
+  defp avatar_url_or_nil(_), do: nil
 end

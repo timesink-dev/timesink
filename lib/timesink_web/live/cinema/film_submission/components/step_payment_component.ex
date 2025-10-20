@@ -17,12 +17,11 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
 
     socket =
       socket
-      |> assign(method: assigns[:method] || nil)
+      |> assign(method: assigns[:method] || "card")
       |> assign(btcpay_invoice: assigns[:btcpay_invoice] || nil)
       |> assign(btcpay_loading: assigns[:btcpay_loading] || false)
       |> assign(form: to_form(changeset), data: data)
       |> assign(:stripe_public_key, Timesink.Payment.Stripe.config().publishable_key)
-      |> assign(:stripe_secret, Timesink.Payment.Stripe.config().secret_key)
       |> assign(:stripe_client_secret, stripe_client_secret)
 
     {:ok, socket}
@@ -84,12 +83,22 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
                   data-contact-email={@data["contact_email"]}
                 >
                   <div id="payment-element" />
+
                   <button
+                    id="stripe-submit"
                     type="submit"
-                    class="mt-6 bg-white text-black font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition"
+                    disabled
+                    aria-busy="false"
+                    class="mt-6 bg-white text-black font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition
+           inline-flex items-center justify-center gap-2"
                   >
-                    Pay & Submit
+                    <span>Pay &amp; Submit</span>
+                    <!-- keep width stable even when not spinning -->
+                    <span class="inline-flex items-center justify-center w-4 h-4" aria-hidden="true">
+                    </span>
                   </button>
+
+                  <p id="card-errors" class="mt-3 text-sm text-red-400"></p>
                 </form>
               <% else %>
                 <div class="bg-gray-900/60 border border-gray-800 rounded-lg p-6 space-y-4">
@@ -129,32 +138,36 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
                   type="button"
                   phx-click="create_btcpay_invoice"
                   phx-target={@myself}
-                  class="w-full border border-orange-500 text-orange-400 font-semibold px-6 py-3 rounded-md shadow hover:bg-orange-500/10 transition"
+                  disabled={@btcpay_loading}
+                  aria-busy={to_string(@btcpay_loading)}
+                  class={[
+                    "w-full border border-orange-500 text-orange-400 font-semibold px-6 py-3 rounded-md shadow transition",
+                    "flex items-center justify-center gap-2",
+                    if(@btcpay_loading, do: "opacity-90 cursor-wait", else: "hover:bg-orange-500/10")
+                  ]}
                 >
-                  <%= if @btcpay_loading do %>
-                    <span class="inline-flex items-center">
+                  <span>Generate Bitcoin Invoice</span>
+                  <span class="inline-flex items-center justify-center w-4 h-4">
+                    <%= if @btcpay_loading do %>
                       <svg
                         aria-hidden="true"
                         role="status"
-                        class="inline w-4 h-4 me-3 text-orange-600 animate-spin"
-                        viewBox="0 0 100 101"
+                        class="w-4 h-4 animate-spin text-orange-400"
+                        viewBox="0 0 24 24"
                         fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
                       >
-                        <path
-                          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                          fill="#ffa366"
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          opacity=".25"
                         />
-                        <path
-                          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                          fill="currentColor"
-                        />
+                        <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" />
                       </svg>
-                      Generating Bitcoin Invoice...
-                    </span>
-                  <% else %>
-                    Generate Bitcoin Invoice
-                  <% end %>
+                    <% end %>
+                  </span>
                 </button>
               <% end %>
             </div>
@@ -208,10 +221,6 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
       |> assign(:method, "card")
 
     {:noreply, socket}
-
-    # {:error, err} ->
-    #   Logger.error("Stripe error: #{inspect(err)}")
-    #   {:noreply, assign(socket, :method, "card")}
   end
 
   # Bitcoin selected – create BTCPay invoice
@@ -257,7 +266,8 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
       submitted_by_id: user_id
     }
 
+    # 1) show spinner immediately
     send(self(), {:create_btcpay_invoice, metadata})
-    {:noreply, socket}
+    {:noreply, assign(socket, :btcpay_loading, true)}
   end
 end
