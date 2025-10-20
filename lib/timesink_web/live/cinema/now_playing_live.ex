@@ -135,7 +135,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                 Welcome to TimeSink
               </h2>
               <p class="mt-3 text-sm md:text-base text-zinc-400 leading-relaxed">
-                Before getting started, it helps to add a profile image and a short bio.
+                Before getting started in the theaters, it helps to add a profile image and a short bio so you can be more expressive.
               </p>
             </div>
 
@@ -146,7 +146,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
               class="mt-6 md:mt-8 space-y-6 md:space-y-8 w-full mx-auto max-w-sm md:max-w-lg"
             >
               <!-- Avatar row: stacked on mobile, side-by-side on md+ -->
-              <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6">
+              <div class="flex flex-col md:flex-row items-center md:items-start gap-4">
                 <div class="relative">
                   <!-- Avatar circle scales up slightly on desktop -->
                   <div class="grid h-16 w-16 md:h-16 md:w-16 lg:h-20 lg:w-20 place-items-center overflow-hidden rounded-full bg-zinc-900
