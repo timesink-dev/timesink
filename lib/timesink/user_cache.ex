@@ -78,6 +78,7 @@ defmodule Timesink.UserCache do
           username: u.username,
           first_name: u.first_name,
           last_name: u.last_name,
+          email: u.email,
           avatar_meta: a.metadata,
           blob_uri: b.uri
         }
@@ -102,6 +103,7 @@ defmodule Timesink.UserCache do
           username: row.username,
           first_name: row.first_name,
           last_name: row.last_name,
+          email: row.email,
           avatar_url: avatar_url
         }
     end

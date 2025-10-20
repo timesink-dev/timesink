@@ -232,6 +232,9 @@ defmodule TimesinkWeb.CoreComponents do
   """
   attr :type, :string, default: nil
   attr :class, :string, default: nil
+  # for internal lists or conditional classes
+  attr :classes, :list, default: nil
+
   attr :color, :string, default: "primary"
   attr :rest, :global, include: ~w(disabled form name value)
 
@@ -240,7 +243,7 @@ defmodule TimesinkWeb.CoreComponents do
   def button(assigns) do
     assigns =
       assigns
-      |> assign_new(:classes, fn ->
+      |> assign_new(:color_classes, fn ->
         case assigns.color do
           "primary" ->
             "bg-neon-blue-lightest text-backroom-black"
@@ -260,9 +263,10 @@ defmodule TimesinkWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded px-4 py-2 rounded-lg",
-        @classes,
-        @class
+        "phx-submit-loading:opacity-75 rounded px-4 py-2",
+        @color_classes,
+        @class,
+        @classes
       ]}
       {@rest}
     >

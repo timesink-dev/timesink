@@ -1,9 +1,7 @@
 defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
   use TimesinkWeb, :live_component
 
-  def mount(socket) do
-    {:ok, socket}
-  end
+  def mount(socket), do: {:ok, socket}
 
   def render(assigns) do
     ~H"""
@@ -12,26 +10,26 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
         <!-- Text Content -->
         <div class="w-full md:w-2/5">
           <h1 class="text-4xl md:text-5xl font-brand">
-            This is your spotlight.
+            Submit your film.
           </h1>
-          <p class="text-lg mt-4 text-neon-blue-lightest font-medium">$25.00 submission fee</p>
+          <p class="text-lg mt-4 text-neon-blue-lightest font-medium">
+            $25.00 submission fee
+    <!-- Human review badge -->
+            <p class="mt-2 inline-flex items-center gap-2 text-sm text-emerald-300 bg-emerald-900/30 border border-emerald-600 rounded-lg px-2 py-1">
+              <.icon name="hero-shield-check" class="h-4 w-4" />
+              <strong>Human reviewed — no automated filters</strong>
+            </p>
+          </p>
 
-          <div class="mt-8 space-y-6 text-base text-gray-300 max-w-prose">
+          <div class="mt-8 space-y-4 text-base text-gray-300 max-w-prose">
+            <p>TimeSink Presents screens for a live, global audience.</p>
+            <p>All formats and genres welcome.</p>
             <p>
-              Welcome to <strong>TimeSink Presents</strong> — our stage, your screen.
+              <strong>
+                Every submission gets a human review by our programming team from start to finish.
+              </strong>
             </p>
-            <p>
-              We’re not just curating films — we’re curating moments. Intimate premieres. Global audiences. Real-time connection.
-            </p>
-            <p>
-              Got a short that sparks? A feature that won’t be ignored? We want it. All genres. All tones. All visions — as long as they’re yours.
-            </p>
-            <p>
-              Every submission gets a human review by our programming team. If it moves us, we’ll move mountains to share it.
-            </p>
-            <p>
-              So go on. Submit your work. Step into the room. The lights are bright. The reel is rolling. The music is playing. The spotlight is yours.
-            </p>
+            <p>If it moves us we’ll follow up with next steps.</p>
           </div>
 
           <.button
@@ -39,13 +37,13 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
             class="w-full md:w-1/2 py-3 text-lg mt-12 mb-4"
             phx-click={JS.push("go_to_step", value: %{step: "next"})}
           >
-            Begin film submission
+            Start submission
           </.button>
 
           <%= if @data.user do %>
             <div class="mt-8">
               <p class="text-sm text-green-300 bg-green-900/30 p-3 rounded border border-green-600">
-                You're signed in as {"@" <> @data.user.username}. We’ll pre-fill your details.
+                Signed in as {"@" <> @data.user.username}. We’ll pre-fill your details.
               </p>
             </div>
           <% end %>
@@ -58,6 +56,8 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
               src="/images/film_submission.webp"
               alt="Film submission visual"
               class="w-full h-full object-cover"
+              loading="eager"
+              decoding="async"
             />
           </div>
         </div>
