@@ -1,25 +1,4 @@
-<main>
-  <section class="px-4 sm:px-6 lg:px-8">
-    <div class="min-h-[calc(100vh-60px)]">
-      <.flash_group flash={@flash} />
-      {@inner_content}
-      <%= if assigns[:current_user] do %>
-        <% root = assigns[:socket] || assigns[:conn] %>
-        <%= if root do %>
-          {live_render(
-            root,
-            TimesinkWeb.OnlinePillLive,
-            id: "online-pill",
-            session: %{
-              "user_id" => assigns[:current_user].id,
-              "username" => assigns[:current_user].username
-            },
-            layout: false
-          )}
-        <% end %>
-      <% end %>
-    </div>
-  </section>
+<main class="px-4 sm:px-6 lg:px-8">
   <div class="min-h-[calc(100vh-60px)]">
     <.flash_group flash={@flash} /> {@inner_content}
   </div>
@@ -31,7 +10,7 @@
 <!-- Column 1: Branding and Contact -->
       <div class="space-y-2.5 md:mx-auto md:text-left">
         <p class="text-xl sm:text-2xl font-semibold">TimeSink Presents</p>
-        <p class="text-sm opacity-70">Real audiences. Real time. Real cinema.</p>
+        <p class="text-sm opacity-70">Real time. Real Audiences. Real Cinema.</p>
         <p class="font-gangster font-light text-xs sm:text-sm">hello@timesinkpresents.com</p>
       </div>
       
@@ -101,9 +80,7 @@
       <p class="text-sm text-center text-mystery-white/70 mb-2 font-gangster w-2/3 mx-auto">
         Be the first to know about upcoming films, special events, essays, insights, and fresh critique—no noise, just the good stuff.
       </p>
-      
-<!-- Centered, responsive iframe -->
-      <div class="mx-auto w-full max-w-md sm:max-w-lg">
+      <div class="mx-auto w-full">
         <iframe
           src="https://timesinkpresents.substack.com/embed"
           class="block w-full"

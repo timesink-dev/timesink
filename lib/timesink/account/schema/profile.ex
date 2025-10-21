@@ -74,7 +74,7 @@ defmodule Timesink.Account.Profile do
   def avatar_url(att, variant \\ :md)
 
   def avatar_url(nil, _variant),
-    do: "/images/default-avatar.png"
+    do: nil
 
   def avatar_url(%Timesink.Storage.Attachment{metadata: %{"variants" => vs}}, variant) do
     key = vs[Atom.to_string(variant)] || vs["md"] || vs["lg"] || vs["sm"]
@@ -85,9 +85,6 @@ defmodule Timesink.Account.Profile do
       when is_binary(path) do
     Timesink.Storage.S3.public_url(path)
   end
-
-  def avatar_url(_anything, _variant),
-    do: "/images/default-avatar.png"
 
   @doc """
   Processes avatar variants with libvips (`image`), uploads each as a Blob,

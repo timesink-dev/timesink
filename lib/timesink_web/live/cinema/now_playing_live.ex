@@ -4,8 +4,12 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
   alias TimesinkWeb.Presence
   alias Timesink.Cinema
   alias TimesinkWeb.{TheaterShowcaseComponent, PubSubTopics}
+  alias Timesink.{Repo, UserCache}
+  alias Timesink.Account.{User, Profile}
 
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
+    current_user = socket.assigns[:current_user]
+
     with showcase when not is_nil(showcase) <- Cinema.get_active_showcase_with_exhibitions() do
       exhibitions =
         (showcase.exhibitions || [])
@@ -14,14 +18,27 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
 
       playback_states = Timesink.Cinema.compute_initial_playback_states(exhibitions, showcase)
 
+      show_welcome_modal = params["welcome"] == "1" and needs_avatar?(current_user)
+
       socket =
         assign(socket,
+          show_welcome_modal: show_welcome_modal,
+          welcome_bio: "",
+          welcome_avatar_error: nil,
           showcase: showcase,
           exhibitions: exhibitions,
           playback_states: playback_states,
           presence: %{},
           upcoming_showcase: nil,
           no_showcase: false
+        )
+
+      socket =
+        allow_upload(socket, :welcome_avatar,
+          accept: ~w(.jpg .jpeg .png .webp .heic),
+          max_entries: 1,
+          max_file_size: 8_000_000,
+          auto_upload: false
         )
 
       if connected?(socket), do: send(self(), :connected)
@@ -99,6 +116,96 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
             </p>
           </div>
       <% end %>
+      <%= if @show_welcome_modal do %>
+        <.modal id="welcome-modal" show={@show_welcome_modal} on_cancel={JS.push("dismiss_welcome")}>
+          <div class="mx-auto w-full max-w-lg md:max-w-xl lg:max-w-xl px-6 py-8 md:px-10 md:py-10">
+            <div class="text-center">
+              <div class="mx-auto mb-4 h-1 w-16 rounded-full bg-gradient-to-r from-neon-blue-lightest/70 to-transparent">
+              </div>
+              <h2
+                id="welcome-title"
+                class="text-2xl md:text-3xl font-semibold tracking-tight text-mystery-white"
+              >
+                Welcome to TimeSink
+              </h2>
+              <p class="mt-3 text-sm md:text-base text-zinc-400 leading-relaxed">
+                Before getting started in the theaters, it helps to add a profile image and a short bio to make this place more vibrant.
+              </p>
+            </div>
+
+            <.simple_form
+              for={%{}}
+              phx-submit="save_welcome_profile"
+              phx-change="welcome_upload_change"
+              class="mt-6 md:mt-8 space-y-6 md:space-y-8 w-full mx-auto max-w-sm md:max-w-lg"
+            >
+              <!-- Avatar row: stacked on mobile, side-by-side on md+ -->
+              <div class="flex flex-col md:flex-row items-center md:items-center gap-4">
+                <div class="relative">
+                  <!-- Avatar circle scales up slightly on desktop -->
+                  <div class="grid h-16 w-16 md:h-16 md:w-16 lg:h-20 lg:w-20 place-items-center overflow-hidden rounded-full bg-zinc-900
+                      ring-1 ring-zinc-700 transition hover:ring-neon-blue-lightest/50 focus-within:ring-neon-blue-lightest/70">
+                    <%= if @uploads.welcome_avatar.entries != [] do %>
+                      <%= for entry <- @uploads.welcome_avatar.entries do %>
+                        <.live_img_preview entry={entry} class="h-full w-full object-cover" />
+                      <% end %>
+                    <% else %>
+                      <span class="text-xs text-zinc-300">Upload</span>
+                    <% end %>
+                  </div>
+                  
+    <!-- Clickable overlay (keeps input interactive without layout shift) -->
+                  <.live_file_input
+                    upload={@uploads.welcome_avatar}
+                    class="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                </div>
+
+                <p class="text-xs text-zinc-500 text-center md:text-left leading-snug md:max-w-[260px]">
+                  JPG, PNG, WEBP — up to 8&nbsp;MB.
+                </p>
+              </div>
+
+              <p
+                :if={@welcome_avatar_error}
+                class="text-xs text-red-400 -mt-2 md:-mt-3 text-center md:text-left"
+              >
+                {@welcome_avatar_error}
+              </p>
+              
+    <!-- Bio -->
+              <div>
+                <label class="mb-2 block text-sm font-medium text-zinc-300 text-left">Bio</label>
+                <textarea
+                  name="bio"
+                  placeholder="Tell the world about yourself in one line or less — or more if you'd like.."
+                  phx-debounce="300"
+                  phx-change="welcome_bio_change"
+                  class="min-h-[100px] w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
+                >{@welcome_bio}</textarea>
+                <p class="mt-2 text-xs text-zinc-500 text-left">
+                  Don't worry you can edit these details anytime in your profile settings.
+                </p>
+              </div>
+              
+    <!-- Actions: full-width on mobile, right-aligned on md+ -->
+              <div class="flex flex-col md:flex-row justify-end gap-3 pt-1 md:pt-2">
+                <.button
+                  type="button"
+                  color="secondary"
+                  class="w-full md:w-auto"
+                  phx-click="dismiss_welcome"
+                >
+                  Skip for now
+                </.button>
+                <.button type="submit" color="primary" class="w-full md:w-auto">
+                  Save
+                </.button>
+              </div>
+            </.simple_form>
+          </div>
+        </.modal>
+      <% end %>
     </div>
     """
   end
@@ -138,4 +245,106 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
     updated = Presence.list(topic)
     {:noreply, update(socket, :presence, &Map.put(&1, topic, updated))}
   end
+
+  # Bio input
+  def handle_event("welcome_bio_change", %{"bio" => bio}, socket) do
+    {:noreply, assign(socket, welcome_bio: to_string(bio))}
+  end
+
+  def handle_event("welcome_upload_change", _params, socket) do
+    # This causes LV to track the selected file and populate @uploads...entries
+    {:noreply, socket}
+  end
+
+  # Save button (updates bio; avatar handled separately by upload flow)
+  def handle_event("save_welcome_profile", %{"bio" => bio}, socket) do
+    user = load_user!(socket.assigns.current_user.id)
+    profile = user.profile || raise "User has no profile"
+
+    # attach image only if the user picked one; get URL from the returned attachment
+    {avatar_url, attached?} =
+      consume_uploaded_entries(socket, :welcome_avatar, fn %{path: path}, entry ->
+        plug = %Plug.Upload{
+          path: path,
+          filename: entry.client_name,
+          content_type: entry.client_type
+        }
+
+        case Timesink.Account.Profile.attach_avatar(profile, plug, user_id: user.id) do
+          {:ok, att} -> {:ok, {:url, Timesink.Account.Profile.avatar_url(att)}}
+          {:error, reason} -> {:ok, {:error, reason}}
+        end
+      end)
+      |> Enum.reduce({nil, false}, fn
+        {:url, url}, _acc -> {url, true}
+        {:error, _}, acc -> acc
+        _, acc -> acc
+      end)
+
+    # update bio
+    params = %{"profile" => %{"id" => profile.id, "bio" => to_string(bio)}}
+
+    case Timesink.Account.User.update(user, params) do
+      {:ok, updated_user} ->
+        # Prefer the URL we just built from the attachment; if none, fall back to current
+        final_url = avatar_url || Timesink.Account.Profile.avatar_url(updated_user.profile.avatar)
+
+        Timesink.UserCache.put(%{
+          id: updated_user.id,
+          username: updated_user.username,
+          first_name: updated_user.first_name,
+          last_name: updated_user.last_name,
+          email: updated_user.email,
+          avatar_url: final_url
+        })
+
+        {:noreply,
+         socket
+         |> assign(current_user: updated_user)
+         |> assign(show_welcome_modal: false, welcome_bio: "")
+         |> put_flash(:info, "Profile updated — welcome!")}
+
+      {:error, _cs} ->
+        {:noreply, put_flash(socket, :error, "Could not save your profile. Please try again.")}
+    end
+  end
+
+  def handle_event("dismiss_welcome", _, socket) do
+    {:noreply, assign(socket, show_welcome_modal: false)}
+  end
+
+  # helpers
+  defp load_user!(id),
+    do:
+      Repo.get!(User, id)
+      |> Repo.preload(profile: [avatar: [:blob]])
+
+  defp reload_user_with_avatar!(id), do: load_user!(id)
+
+  defp needs_avatar?(nil), do: true
+
+  defp needs_avatar?(%{avatar_url: url}) do
+    # mini-map shape from UserCache
+    not (is_binary(url) and url != "")
+  end
+
+  defp needs_avatar?(%User{} = u) do
+    u = Repo.preload(u, profile: [avatar: [:blob]])
+
+    case u.profile do
+      %Profile{avatar: att} when not is_nil(att) ->
+        url = Profile.avatar_url(att)
+        not (is_binary(url) and url != "")
+
+      _ ->
+        true
+    end
+  end
+
+  defp needs_avatar?(_), do: true
+
+  defp friendly_err(%Ecto.Changeset{}), do: "Validation failed"
+  defp friendly_err(%RuntimeError{message: m}), do: m
+  defp friendly_err(%{message: m}) when is_binary(m), do: m
+  defp friendly_err(term), do: term |> to_string() |> String.slice(0, 160)
 end
