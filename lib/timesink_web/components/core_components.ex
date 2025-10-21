@@ -59,7 +59,9 @@ defmodule TimesinkWeb.CoreComponents do
       <!-- Backdrop -->
       <div
         id={"#{@id}-bg"}
-        class={@backdrop_class || "fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"}
+        class={
+          @backdrop_class || "fixed inset-0 bg-backroom-black/10 backdrop-blur-sm transition-opacity"
+        }
         aria-hidden="true"
       />
 

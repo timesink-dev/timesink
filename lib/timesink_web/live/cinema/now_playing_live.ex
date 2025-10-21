@@ -18,11 +18,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
 
       playback_states = Timesink.Cinema.compute_initial_playback_states(exhibitions, showcase)
 
-      IO.inspect(current_user, label: "current dawg")
-
-      needs_avatar? = true
-
-      show_welcome_modal = params["welcome"] == "1" and needs_avatar?
+      show_welcome_modal = params["welcome"] == "1" and needs_avatar?(current_user)
 
       socket =
         assign(socket,
@@ -122,9 +118,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
       <% end %>
       <%= if @show_welcome_modal do %>
         <.modal id="welcome-modal" show={@show_welcome_modal} on_cancel={JS.push("dismiss_welcome")}>
-          <!-- Wrapper: tighter on mobile, roomy on md+ -->
           <div class="mx-auto w-full max-w-lg md:max-w-xl lg:max-w-xl px-6 py-8 md:px-10 md:py-10">
-            <!-- Header: centered on all sizes, extra breathing room on md+ -->
             <div class="text-center">
               <div class="mx-auto mb-4 h-1 w-16 rounded-full bg-gradient-to-r from-neon-blue-lightest/70 to-transparent">
               </div>
@@ -135,7 +129,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                 Welcome to TimeSink
               </h2>
               <p class="mt-3 text-sm md:text-base text-zinc-400 leading-relaxed">
-                Before getting started in the theaters, it helps to add a profile image and a short bio so you can be more expressive.
+                Before getting started in the theaters, it helps to add a profile image and a short bio to make this place more vibrant.
               </p>
             </div>
 
@@ -146,7 +140,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
               class="mt-6 md:mt-8 space-y-6 md:space-y-8 w-full mx-auto max-w-sm md:max-w-lg"
             >
               <!-- Avatar row: stacked on mobile, side-by-side on md+ -->
-              <div class="flex flex-col md:flex-row items-center md:items-start gap-4">
+              <div class="flex flex-col md:flex-row items-center md:items-center gap-4">
                 <div class="relative">
                   <!-- Avatar circle scales up slightly on desktop -->
                   <div class="grid h-16 w-16 md:h-16 md:w-16 lg:h-20 lg:w-20 place-items-center overflow-hidden rounded-full bg-zinc-900
@@ -184,12 +178,10 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                 <label class="mb-2 block text-sm font-medium text-zinc-300 text-left">Bio</label>
                 <textarea
                   name="bio"
-                  placeholder="Tell the world about yourself in one line or less (or more if you'd like)..."
+                  placeholder="Tell the world about yourself in one line or less — or more if you'd like.."
                   phx-debounce="300"
                   phx-change="welcome_bio_change"
-                  class="min-h-[100px] w-full rounded-xl bg-dark-theater-primary text-mystery-white
-                 placeholder:text-zinc-500 outline-none ring-1 ring-zinc-700
-                 focus:ring-2 focus:ring-neon-blue-lightest/80 px-4 py-3"
+                  class="min-h-[100px] w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
                 >{@welcome_bio}</textarea>
                 <p class="mt-2 text-xs text-zinc-500 text-left">
                   Don't worry you can edit these details anytime in your profile settings.
@@ -231,71 +223,6 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
     {:noreply, assign(socket, :presence, presence)}
   end
 
-  def handle_info({:process_welcome_avatar, _ref}, socket) do
-    outcomes =
-      consume_uploaded_entries(socket, :welcome_avatar, fn %{path: path}, entry ->
-        plug = %Plug.Upload{
-          path: path,
-          filename: entry.client_name,
-          content_type: entry.client_type
-        }
-
-        user = load_user!(socket.assigns.current_user.id)
-
-        profile =
-          case user.profile do
-            %Timesink.Account.Profile{} = p -> p
-            _ -> raise "User has no profile loaded; cannot attach avatar"
-          end
-
-        case Timesink.Account.Profile.attach_avatar(profile, plug, user_id: user.id) do
-          {:ok, _att} -> {:ok, :attached}
-          {:error, reason} -> {:ok, {:attach_error, reason}}
-        end
-      end)
-
-    outcome =
-      Enum.find_value(outcomes, fn
-        {:attach_error, _} = err -> err
-        :attached -> :attached
-        _ -> nil
-      end) || :noop
-
-    IO.inspect("sneind update!")
-
-    case outcome do
-      :attached ->
-        user = reload_user_with_avatar!(socket.assigns.current_user.id)
-        new_url = Profile.avatar_url(user.profile.avatar)
-
-        # update nav + cache
-        send_update(TimesinkWeb.NavAvatarLive, id: "nav-avatar-#{user.id}", avatar_url: new_url)
-        IO.inspect("sneind update!")
-
-        UserCache.put(%{
-          id: user.id,
-          username: user.username,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          avatar_url: new_url
-        })
-
-        {:noreply, assign(socket, welcome_avatar_error: nil)}
-
-      {:attach_error, reason} ->
-        {:noreply,
-         assign(socket,
-           welcome_avatar_error: friendly_err(reason)
-         )}
-
-      :noop ->
-        IO.inspect("sneind update!")
-
-        {:noreply, socket}
-    end
-  end
-
   def handle_info(
         %{
           event: "phase_change",
@@ -334,7 +261,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
     user = load_user!(socket.assigns.current_user.id)
     profile = user.profile || raise "User has no profile"
 
-    # 1) Attach image only if the user picked one; get URL from the returned attachment
+    # attach image only if the user picked one; get URL from the returned attachment
     {avatar_url, attached?} =
       consume_uploaded_entries(socket, :welcome_avatar, fn %{path: path}, entry ->
         plug = %Plug.Upload{
@@ -354,20 +281,13 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
         _, acc -> acc
       end)
 
-    # 2) Update bio
+    # update bio
     params = %{"profile" => %{"id" => profile.id, "bio" => to_string(bio)}}
 
     case Timesink.Account.User.update(user, params) do
       {:ok, updated_user} ->
         # Prefer the URL we just built from the attachment; if none, fall back to current
         final_url = avatar_url || Timesink.Account.Profile.avatar_url(updated_user.profile.avatar)
-
-        if attached? do
-          send_update(TimesinkWeb.NavAvatarLive,
-            id: "nav-avatar-#{updated_user.id}",
-            avatar_url: final_url
-          )
-        end
 
         Timesink.UserCache.put(%{
           id: updated_user.id,
@@ -378,8 +298,12 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
           avatar_url: final_url
         })
 
+        # updated_current =
+        #   Map.put(socket.assigns.current_user, :avatar_url, final_url)
+
         {:noreply,
          socket
+         |> assign(current_user: updated_user)
          |> assign(show_welcome_modal: false, welcome_bio: "")
          |> put_flash(:info, "Profile updated — welcome!")}
 
@@ -399,6 +323,28 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
       |> Repo.preload(profile: [avatar: [:blob]])
 
   defp reload_user_with_avatar!(id), do: load_user!(id)
+
+  defp needs_avatar?(nil), do: true
+
+  defp needs_avatar?(%{avatar_url: url}) do
+    # mini-map shape from UserCache
+    not (is_binary(url) and url != "")
+  end
+
+  defp needs_avatar?(%User{} = u) do
+    u = Repo.preload(u, profile: [avatar: [:blob]])
+
+    case u.profile do
+      %Profile{avatar: att} when not is_nil(att) ->
+        url = Profile.avatar_url(att)
+        not (is_binary(url) and url != "")
+
+      _ ->
+        true
+    end
+  end
+
+  defp needs_avatar?(_), do: true
 
   defp friendly_err(%Ecto.Changeset{}), do: "Validation failed"
   defp friendly_err(%RuntimeError{message: m}), do: m

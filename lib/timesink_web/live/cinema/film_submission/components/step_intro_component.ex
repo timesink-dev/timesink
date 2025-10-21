@@ -14,11 +14,6 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
           </h1>
           <p class="text-lg mt-4 text-neon-blue-lightest font-medium">
             $25.00 submission fee
-    <!-- Human review badge -->
-            <p class="mt-2 inline-flex items-center gap-2 text-sm text-emerald-300 bg-emerald-900/30 border border-emerald-600 rounded-lg px-2 py-1">
-              <.icon name="hero-shield-check" class="h-4 w-4" />
-              <strong>Human reviewed — no automated filters</strong>
-            </p>
           </p>
 
           <div class="mt-8 space-y-4 text-base text-gray-300 max-w-prose">
