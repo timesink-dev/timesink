@@ -298,9 +298,6 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
           avatar_url: final_url
         })
 
-        # updated_current =
-        #   Map.put(socket.assigns.current_user, :avatar_url, final_url)
-
         {:noreply,
          socket
          |> assign(current_user: updated_user)
