@@ -28,7 +28,6 @@ defmodule TimesinkWeb.AuthController do
     conn
     |> put_session(:user_token, token)
     |> configure_session(renew: true)
-    |> put_flash(:info, "Welcome to Timesink!")
-    |> redirect(to: "/now-playing")
+    |> redirect(to: "/now-playing?welcome=1")
   end
 end
