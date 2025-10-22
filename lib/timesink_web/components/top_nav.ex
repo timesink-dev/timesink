@@ -210,20 +210,38 @@ defmodule TimesinkWeb.TopNav do
               <.icon name="hero-x-mark-mini" class="h-6 w-6" />
             </button>
           </div>
+
           <ul class="flex flex-col justify-start items-start gap-y-4 pt-2.5">
             <li><a href="/now-playing">Now Playing</a></li>
             <li><a href="/archives">Archives</a></li>
             <li><a href="/blog">Blog</a></li>
             <li><a href="/info">Info</a></li>
-            <hr />
+
+            <%= if @current_user do %>
+              <!-- Nice labeled separator -->
+              <hr class="w-full border-dark-theater-primary/60 mt-2" />
+              
+    <!-- My Account link styled to match -->
+              <li class="w-full">
+                <a
+                  href="/me"
+                  class="flex items-center gap-3 w-full rounded-lg px-3 py-2 text-mystery-white"
+                >
+                  <span>My Account</span>
+                </a>
+              </li>
+            <% end %>
+
+            <hr class="w-full border-dark-theater-primary/60 mt-2 mb-4" />
+
             <div class="w-full flex flex-col gap-y-4">
               <%= if @current_user do %>
-                <!-- Keep mobile actions unchanged for now -->
                 <.form method="post" action="/sign_out" for={%{}}>
                   <.button type="submit" color="tertiary" class="w-full md:w-1/2">
                     Sign Out
                   </.button>
                 </.form>
+
                 <a href="/submit">
                   <.button color="primary" class="w-full md:w-1/2">
                     Submit film

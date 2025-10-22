@@ -287,11 +287,11 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
             </div>
 
             <:actions>
-              <button
+              <.button
                 type="submit"
                 disabled={!@dirty}
                 aria-disabled={!@dirty}
-                class="w-full md:w-auto px-6 py-3 rounded-xl font-semibold bg-neon-blue-lightest text-backroom-black
+                class="w-full md:w-auto px-6 py-3 bg-neon-blue-lightest text-backroom-black
           hover:opacity-90 focus:ring-2 focus:ring-neon-blue-lightest focus:outline-none transition
           disabled:opacity-40 disabled:cursor-not-allowed phx-submit-loading:opacity-60 phx-submit-loading:cursor-wait"
                 phx-disable-with="Updating…"
@@ -319,7 +319,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                   </svg>
                   Updating…
                 </span>
-              </button>
+              </.button>
             </:actions>
           </.simple_form>
         </div>
