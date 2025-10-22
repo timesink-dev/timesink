@@ -81,7 +81,7 @@ defmodule TimesinkWeb.CoreComponents do
             phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
             class={
               @panel_class ||
-                "relative hidden rounded-2xl bg-backroom-black/90 text-mystery-white \
+                "relative hidden rounded-2xl bg-backroom-black text-mystery-white \
                  ring-1 ring-zinc-800 shadow-2xl backdrop-blur-md w-full max-w-2xl"
             }
           >

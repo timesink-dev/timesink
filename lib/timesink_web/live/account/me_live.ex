@@ -12,7 +12,6 @@ defmodule TimesinkWeb.Account.MeLive do
 
   def mount(_params, _session, socket) do
     user = socket.assigns.current_user
-    # user = Repo.preload(socket.assigns.current_user, profile: [avatar: [:blob]])
     invites = list_invites(user.id)
 
     {:ok,
@@ -27,8 +26,8 @@ defmodule TimesinkWeb.Account.MeLive do
 
   def render(assigns) do
     ~H"""
-    <section id="user-overview" phx-hook="CopyBus">
-      <div class="max-w-2xl mx-auto" class="mt-8">
+    <section id="user-overview" phx-hook="CopyBus" class="mt-16">
+      <div class="max-w-2xl mx-auto">
         <.me_page_item
           title="Account"
           items={[
@@ -71,7 +70,7 @@ defmodule TimesinkWeb.Account.MeLive do
         />
         <!-- Invites UI -->
         <div class="mt-8 rounded-2xl border border-zinc-800 bg-dark-theater-primary/60 p-5 md:p-6">
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between gap-x-8 md:gap-x-2">
             <div>
               <h3 class="flex items-center gap-2 text-lg md:text-lg text-mystery-white pb-1">
                 <span> Invites </span>

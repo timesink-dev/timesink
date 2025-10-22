@@ -118,18 +118,18 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
       <% end %>
       <%= if @show_welcome_modal do %>
         <.modal id="welcome-modal" show={@show_welcome_modal} on_cancel={JS.push("dismiss_welcome")}>
-          <div class="mx-auto w-full max-w-lg md:max-w-xl lg:max-w-xl px-6 py-8 md:px-10 md:py-10">
+          <div class="mx-auto w-full max-w-lg md:max-w-xl lg:max-w-xl px-6 py-4 md:px-10 md:py-6">
             <div class="text-center">
               <div class="mx-auto mb-4 h-1 w-16 rounded-full bg-gradient-to-r from-neon-blue-lightest/70 to-transparent">
               </div>
               <h2
                 id="welcome-title"
-                class="text-2xl md:text-3xl font-semibold tracking-tight text-mystery-white"
+                class="text-2xl md:text-3xl font-semibold tracking-tight text-mystery-white pb-1"
               >
                 Welcome to TimeSink
               </h2>
               <p class="mt-3 text-sm md:text-base text-zinc-400 leading-relaxed">
-                Before getting started in the theaters, it helps to add a profile image and a short bio to make this place more vibrant.
+                Before getting started in the theaters, it helps to add a profile image and a short bio to make you even more interesting.
               </p>
             </div>
 
@@ -137,7 +137,8 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
               for={%{}}
               phx-submit="save_welcome_profile"
               phx-change="welcome_upload_change"
-              class="mt-6 md:mt-8 space-y-6 md:space-y-8 w-full mx-auto max-w-sm md:max-w-lg"
+              class="mt-6 md:mt-8 space-y-6 md:space-y-8 w-full mx-auto max-w-sm md:max-w-lg
+         phx-submit-loading:opacity-70 phx-submit-loading:pointer-events-none"
             >
               <!-- Avatar row: stacked on mobile, side-by-side on md+ -->
               <div class="flex flex-col md:flex-row items-center md:items-center gap-4">
@@ -189,19 +190,54 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
               </div>
               
     <!-- Actions: full-width on mobile, right-aligned on md+ -->
-              <div class="flex flex-col md:flex-row justify-end gap-3 pt-1 md:pt-2">
-                <.button
-                  type="button"
-                  color="secondary"
-                  class="w-full md:w-auto"
-                  phx-click="dismiss_welcome"
-                >
-                  Skip for now
-                </.button>
-                <.button type="submit" color="primary" class="w-full md:w-auto">
-                  Save
-                </.button>
-              </div>
+              <:actions>
+                <div class="flex flex-col md:flex-row justify-end gap-3 pt-1 md:pt-2">
+                  <.button
+                    type="button"
+                    color="secondary"
+                    class="w-full md:w-auto"
+                    phx-click="dismiss_welcome"
+                  >
+                    Skip for now
+                  </.button>
+
+                  <.button
+                    type="submit"
+                    color="primary"
+                    classes={[
+                      "w-full md:w-auto phx-submit-loading:cursor-wait phx-submit-loading:opacity-80",
+                      (String.trim(@welcome_bio || "") == "" and @uploads.welcome_avatar.entries == []) &&
+                        "opacity-50 cursor-not-allowed"
+                    ]}
+                    disabled={
+                      String.trim(@welcome_bio || "") == "" and @uploads.welcome_avatar.entries == []
+                    }
+                  >
+                    <span class="inline-flex items-center gap-2 phx-submit-loading:hidden">
+                      Save
+                    </span>
+                    <span class="hidden phx-submit-loading:inline-flex items-center gap-2">
+                      <svg
+                        class="w-4 h-4 animate-spin"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          opacity=".25"
+                        />
+                        <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" />
+                      </svg>
+                      Saving…
+                    </span>
+                  </.button>
+                </div>
+              </:actions>
             </.simple_form>
           </div>
         </.modal>
@@ -262,7 +298,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
     profile = user.profile || raise "User has no profile"
 
     # attach image only if the user picked one; get URL from the returned attachment
-    {avatar_url, attached?} =
+    {avatar_url, _attached?} =
       consume_uploaded_entries(socket, :welcome_avatar, fn %{path: path}, entry ->
         plug = %Plug.Upload{
           path: path,
@@ -289,7 +325,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
         # Prefer the URL we just built from the attachment; if none, fall back to current
         final_url = avatar_url || Timesink.Account.Profile.avatar_url(updated_user.profile.avatar)
 
-        Timesink.UserCache.put(%{
+        UserCache.put(%{
           id: updated_user.id,
           username: updated_user.username,
           first_name: updated_user.first_name,
@@ -300,9 +336,9 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
 
         {:noreply,
          socket
-         |> assign(current_user: updated_user)
          |> assign(show_welcome_modal: false, welcome_bio: "")
-         |> put_flash(:info, "Profile updated — welcome!")}
+         |> assign(current_user: updated_user)
+         |> put_flash(:info, "Profile updated — welcome to the show!")}
 
       {:error, _cs} ->
         {:noreply, put_flash(socket, :error, "Could not save your profile. Please try again.")}
@@ -318,8 +354,6 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
     do:
       Repo.get!(User, id)
       |> Repo.preload(profile: [avatar: [:blob]])
-
-  defp reload_user_with_avatar!(id), do: load_user!(id)
 
   defp needs_avatar?(nil), do: true
 
@@ -342,9 +376,4 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
   end
 
   defp needs_avatar?(_), do: true
-
-  defp friendly_err(%Ecto.Changeset{}), do: "Validation failed"
-  defp friendly_err(%RuntimeError{message: m}), do: m
-  defp friendly_err(%{message: m}) when is_binary(m), do: m
-  defp friendly_err(term), do: term |> to_string() |> String.slice(0, 160)
 end
