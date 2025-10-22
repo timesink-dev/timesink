@@ -79,7 +79,7 @@ defmodule TimesinkWeb.TopNav do
                 Now Playing
               </a>
               <a
-                href="/"
+                href="/upcoming"
                 class="block px-4 py-2 hover:bg-dark-theater-medium"
                 role="menuitem"
                 phx-click={close_dd("#films-dropdown")}
