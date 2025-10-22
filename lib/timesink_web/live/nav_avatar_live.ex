@@ -1,8 +1,7 @@
 defmodule TimesinkWeb.NavAvatarLive do
   use Phoenix.LiveComponent
 
-  def update(%{avatar_url: url} = assigns, socket) do
-    IO.inspect(url, label: "inside av live")
+  def update(%{avatar_url: _url} = assigns, socket) do
     {:ok, assign(socket, assigns)}
   end
 
