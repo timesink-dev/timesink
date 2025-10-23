@@ -46,28 +46,55 @@ defmodule TimesinkWeb.TopNav do
           <li class="relative hidden md:block">
             <button
               type="button"
-              phx-click={JS.toggle(to: "#films-dropdown", display: "block")}
+              phx-click={open_dd("#films-dropdown")}
+              aria-haspopup="menu"
+              aria-expanded="false"
               class="inline-flex items-end gap-1 text-sm font-medium text-mystery-white hover:underline focus:outline-none"
             >
-              <span> Cinema </span>
+              <span>Cinema</span>
               <.icon name="hero-chevron-down" class="h-4 w-4 mt-[1px] transition-transform" />
             </button>
 
-            <ul
+            <div
               id="films-dropdown"
-              class="hidden absolute mt-2 w-48 rounded-md bg-dark-theater-primary text-mystery-white shadow-md z-50 overflow-hidden"
-              phx-click-away={JS.add_class("hidden", to: "#films-dropdown")}
+              class="dd hidden absolute mt-2 w-56 rounded-md bg-dark-theater-primary text-mystery-white shadow-lg z-100 overflow-hidden"
+              phx-click-away={close_dd("#films-dropdown")}
+              phx-window-keydown={close_dd("#films-dropdown")}
+              phx-key="escape"
+              role="menu"
+              aria-label="Cinema menu"
             >
-              <li>
-                <a href="/now-playing" class="block px-4 py-2 hover:bg-zinc-700">Now Playing</a>
-              </li>
-              <li>
-                <a href="/" class="block px-4 py-2 hover:bg-zinc-700">Upcoming</a>
-              </li>
-              <li>
-                <a href="/archives" class="block px-4 py-2 hover:bg-zinc-700">Archives</a>
-              </li>
-            </ul>
+              <!-- header label -->
+              <div class="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-zinc-400">
+                Explore
+              </div>
+              <div class="my-1 h-px bg-zinc-700/50"></div>
+
+              <a
+                href="/now-playing"
+                class="block px-4 py-2 hover:bg-dark-theater-medium"
+                role="menuitem"
+                phx-click={close_dd("#films-dropdown")}
+              >
+                Now Playing
+              </a>
+              <a
+                href="/upcoming"
+                class="block px-4 py-2 hover:bg-dark-theater-medium"
+                role="menuitem"
+                phx-click={close_dd("#films-dropdown")}
+              >
+                Upcoming
+              </a>
+              <a
+                href="/archives"
+                class="block px-4 py-2 hover:bg-dark-theater-medium"
+                role="menuitem"
+                phx-click={close_dd("#films-dropdown")}
+              >
+                Archives
+              </a>
+            </div>
           </li>
 
           <li><a href="/blog">Blog</a></li>
@@ -92,7 +119,7 @@ defmodule TimesinkWeb.TopNav do
               <.button
                 id="account-button"
                 type="button"
-                phx-click={JS.toggle(to: "#account-menu", display: "block")}
+                phx-click={open_dd("#account-menu")}
                 color="none"
                 class="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-mystery-white focus:outline-none"
                 aria-haspopup="menu"
@@ -119,26 +146,38 @@ defmodule TimesinkWeb.TopNav do
 
               <div
                 id="account-menu"
-                class="hidden absolute right-0 mt-2 w-48 rounded-md bg-dark-theater-primary text-mystery-white shadow-lg z-50 overflow-hidden"
-                phx-click-away={JS.add_class("hidden", to: "#account-menu")}
+                class="dd hidden absolute right-0 mt-2 w-56 rounded-md bg-dark-theater-primary  text-mystery-white shadow-lg z-50 overflow-hidden"
+                phx-click-away={close_dd("#account-menu")}
+                phx-window-keydown={close_dd("#account-menu")}
+                phx-key="escape"
                 role="menu"
                 aria-label="Account menu"
               >
                 <a
                   href="/me/profile"
-                  class="block px-4 py-2 text-sm hover:bg-zinc-700"
+                  class="block px-4 py-2 text-sm hover:bg-dark-theater-medium"
                   role="menuitem"
+                  phx-click={close_dd("#account-menu")}
                 >
                   View profile
                 </a>
-                <a href="/me" class="block px-4 py-2 text-sm hover:bg-zinc-700" role="menuitem">
+                <a
+                  href="/me"
+                  class="block px-4 py-2 text-sm hover:bg-dark-theater-medium"
+                  role="menuitem"
+                  phx-click={close_dd("#account-menu")}
+                >
                   Account
                 </a>
-                <.form method="post" action="/sign_out" for={%{}} class="border-t border-zinc-700">
+
+                <div class="my-1 h-px bg-zinc-700/50"></div>
+
+                <.form method="post" action="/sign_out" for={%{}}>
                   <button
                     type="submit"
-                    class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-700"
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-dark-theater-medium"
                     role="menuitem"
+                    phx-click={close_dd("#account-menu")}
                   >
                     Sign out
                   </button>
@@ -210,20 +249,38 @@ defmodule TimesinkWeb.TopNav do
               <.icon name="hero-x-mark-mini" class="h-6 w-6" />
             </button>
           </div>
+
           <ul class="flex flex-col justify-start items-start gap-y-4 pt-2.5">
             <li><a href="/now-playing">Now Playing</a></li>
             <li><a href="/archives">Archives</a></li>
             <li><a href="/blog">Blog</a></li>
             <li><a href="/info">Info</a></li>
-            <hr />
+
+            <%= if @current_user do %>
+              <!-- Nice labeled separator -->
+              <hr class="w-full border-dark-theater-primary/60 mt-2" />
+              
+    <!-- My Account link styled to match -->
+              <li class="w-full">
+                <a
+                  href="/me"
+                  class="flex items-center gap-3 w-full rounded-lg px-3 py-2 text-mystery-white"
+                >
+                  <span>My Account</span>
+                </a>
+              </li>
+            <% end %>
+
+            <hr class="w-full border-dark-theater-primary/60 mt-2 mb-4" />
+
             <div class="w-full flex flex-col gap-y-4">
               <%= if @current_user do %>
-                <!-- Keep mobile actions unchanged for now -->
                 <.form method="post" action="/sign_out" for={%{}}>
                   <.button type="submit" color="tertiary" class="w-full md:w-1/2">
                     Sign Out
                   </.button>
                 </.form>
+
                 <a href="/submit">
                   <.button color="primary" class="w-full md:w-1/2">
                     Submit film
@@ -303,4 +360,14 @@ defmodule TimesinkWeb.TopNav do
     do: Profile.avatar_url(att, :md)
 
   defp avatar_url_or_nil(_), do: nil
+
+  defp open_dd(js \\ %JS{}, id) do
+    js
+    |> JS.add_class("hidden", to: ".dd")
+    |> JS.remove_class("hidden", to: id)
+  end
+
+  defp close_dd(js \\ %JS{}, id) do
+    JS.add_class(js, "hidden", to: id)
+  end
 end
