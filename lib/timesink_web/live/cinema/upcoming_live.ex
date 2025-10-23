@@ -378,7 +378,7 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
     do: Calendar.strftime(dt, "%b %-d")
 
   # Countdown like "2d 04:12:09" (floors at zero)
-  defp format_countdown(now, nil), do: "TBD"
+  defp format_countdown(_now, nil), do: "TBD"
 
   defp format_countdown(%DateTime{} = now, %NaiveDateTime{} = ndt),
     do: format_countdown(now, DateTime.from_naive!(ndt, "Etc/UTC"))

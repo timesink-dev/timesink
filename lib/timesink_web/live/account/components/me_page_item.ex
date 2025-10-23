@@ -40,12 +40,12 @@ defmodule TimesinkWeb.Account.MePageItem do
             <!-- Clickable row (link) -->
             <.link
               navigate={item[:link]}
-              class="group py-4 border-b-[1px] border-zinc-600/20 flex items-center gap-x-3 last:border-b-0 rounded-md -mx-2 px-2 hover:bg-zinc-800/30 transition"
+              class="group py-4 border-b-[1px] border-zinc-600/20 flex items-center gap-x-3 last:border-b-0 rounded-md -mx-2 px-2"
             >
               <span class="rounded-lg px-2 py-2 flex items-center justify-center bg-zinc-500/10">
-                <.icon name={item[:icon]} class="h-4 w-4 opacity-100 group-hover:opacity-70" />
+                <.icon name={item[:icon]} class="h-4 w-4 opacity-100" />
               </span>
-              <h3 class="text-sm font-medium group-hover:text-primary">
+              <h3 class="text-sm font-medium">
                 {item[:title]}
               </h3>
             </.link>
