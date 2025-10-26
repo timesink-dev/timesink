@@ -47,7 +47,7 @@ defmodule TimesinkWeb.Components.Hero do
                       text-white text-center md:text-left z-10">
             <div class="max-w-md">
               <div class="text-center mb-10">
-                <h2 class="text-4xl font-brand text-white tracking-tight leading-tight">
+                <h2 class="text-4xl font-brand text-white tracking-tight leading-0">
                   Fresh Cinema selected for you. Real Audiences. No endless scrolls.
                 </h2>
 

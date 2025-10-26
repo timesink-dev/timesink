@@ -68,15 +68,14 @@ defmodule TimesinkWeb.HomepageLive do
       <div id="cinema-barrier" class="h-16" phx-hook="ScrollObserver" />
 
       <div id="bridge" class="relative isolate">
-        <!-- subtle top divider glow -->
-        <div class="pointer-events-none absolute inset-x-0 -top-4 h-8 bg-gradient-to-b from-black/30 to-transparent">
-        </div>
-
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
           <!-- value proposition -->
           <div class="text-center mb-10">
             <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">
-              An electronic arthouse spectacle—curated films, real-time conversation.
+              Cinema is alive again. <br />
+              <span class="ml-6">
+                No algorithms, no noise. Just the way it should be.
+              </span>
             </h2>
             <p class="mt-3 text-balance text-base md:text-lg text-zinc-400">
               Watch together. Chat live. Discover voices and films you won’t find on the multiplex billboard.
@@ -113,7 +112,7 @@ defmodule TimesinkWeb.HomepageLive do
               </div>
               <h3 class="text-lg font-medium">Hand-picked lineup</h3>
               <p class="mt-1 text-sm text-zinc-400">
-                Spotlight on festival favorites, hidden gems, and filmmaker premieres.
+                Spotlight on retrospectives, festival favorites, hidden gems, and filmmaker premieres.
               </p>
             </div>
 
@@ -129,9 +128,11 @@ defmodule TimesinkWeb.HomepageLive do
                   <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z" />
                 </svg>
               </div>
-              <h3 class="text-lg font-medium">Live chat that feels alive</h3>
+              <h3 class="text-lg font-medium">
+                A live thread for every screening
+              </h3>
               <p class="mt-1 text-sm text-zinc-400">
-                Lean-in conversations with cinephiles, not noisy comment walls.
+                Lean-in live chats with real people, not noisy comment walls.
               </p>
             </div>
 
@@ -149,7 +150,7 @@ defmodule TimesinkWeb.HomepageLive do
               </div>
               <h3 class="text-lg font-medium">Global community</h3>
               <p class="mt-1 text-sm text-zinc-400">
-                Join screenings with viewers from everywhere—discover, discuss, repeat.
+                Join a network of viewers from everywhere—discover, discuss, connect, repeat.
               </p>
             </div>
           </div>
@@ -158,7 +159,7 @@ defmodule TimesinkWeb.HomepageLive do
           <div class="mt-10 rounded-2xl border border-white/10 bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-5">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <p class="text-sm uppercase tracking-wider text-zinc-400">This week</p>
+                <p class="text-sm uppercase tracking-wider text-zinc-400">This Week</p>
                 <h4 class="mt-1 text-lg font-medium">Upcoming screenings &amp; special events</h4>
               </div>
               <div class="flex items-center gap-2 text-sm">
@@ -175,16 +176,22 @@ defmodule TimesinkWeb.HomepageLive do
               </div>
             </div>
             
-    <!-- pills-style items; replace with dynamic events later -->
+    <!-- pills-style schedule items (demo preview) -->
             <div class="mt-4 flex flex-wrap gap-2">
               <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs md:text-sm">
-                Thu 20:00 — Director Q&A
+                Thu 19:00 — <span class="text-zinc-200">*Fragments of a City*</span> (Premiere)
               </span>
               <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs md:text-sm">
-                Sat 18:30 — Shorts Block: New Voices
+                Fri 21:00 — <span class="text-zinc-200">*Electric Gardens*</span> (Director Q&amp;A)
               </span>
               <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs md:text-sm">
-                Sun 21:15 — Midnight Cult Classic
+                Sat 18:30 — <span class="text-zinc-200">Shorts Block: New Voices</span>
+              </span>
+              <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs md:text-sm">
+                Sun 20:15 — <span class="text-zinc-200">*The Lighthouse Revisited*</span> (Encore)
+              </span>
+              <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs md:text-sm">
+                Mon 22:00 — <span class="text-zinc-200">*Cinema in Transit*</span>
               </span>
             </div>
           </div>
