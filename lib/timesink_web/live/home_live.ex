@@ -72,7 +72,7 @@ defmodule TimesinkWeb.HomepageLive do
           <!-- value proposition -->
           <div class="text-center mb-10">
             <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">
-              Cinema is alive again. <br />
+              Cinema is live again. <br />
               <span class="ml-6">
                 No algorithms, no noise. Just the way it should be.
               </span>
@@ -129,7 +129,7 @@ defmodule TimesinkWeb.HomepageLive do
                 </svg>
               </div>
               <h3 class="text-lg font-medium">
-                A live thread for every screening
+                Live for every screening
               </h3>
               <p class="mt-1 text-sm text-zinc-400">
                 Lean-in live chats with real people, not noisy comment walls.
