@@ -49,10 +49,9 @@ defmodule TimesinkWeb.TopNav do
               phx-click={open_dd("#films-dropdown")}
               aria-haspopup="menu"
               aria-expanded="false"
-              class="inline-flex items-end gap-1 text-sm font-medium text-mystery-white hover:underline focus:outline-none"
+              class="inline-flex items-end gap-1 font-medium text-mystery-white hover:underline focus:outline-none"
             >
               <span>Cinema</span>
-              <.icon name="hero-chevron-down" class="h-4 w-4 mt-[1px] transition-transform" />
             </button>
 
             <div
@@ -252,6 +251,7 @@ defmodule TimesinkWeb.TopNav do
 
           <ul class="flex flex-col justify-start items-start gap-y-4 pt-2.5">
             <li><a href="/now-playing">Now Playing</a></li>
+            <li><a href="/upcoming">Upcoming</a></li>
             <li><a href="/archives">Archives</a></li>
             <li><a href="/blog">Blog</a></li>
             <li><a href="/info">Info</a></li>
