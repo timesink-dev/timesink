@@ -5,8 +5,6 @@ defmodule TimesinkWeb.Account.ProfileLive do
   alias Timesink.{Repo}
   alias Timesink.Account.{User, Profile}
 
-  # @avatar_size "w-28 h-28 md:w-32 md:h-32"
-
   # /u/@username -> param arrives like "@aaron"
   def mount(%{"profile_username" => raw}, _session, socket) do
     username =
@@ -63,48 +61,39 @@ defmodule TimesinkWeb.Account.ProfileLive do
     ~H"""
     <section id="profile-page" class="px-4 md:px-6 pb-16">
       <!-- Header / Cover -->
-      <div class="relative mx-auto max-w-5xl">
-        <div class="h-36 md:h-44 w-full rounded-2xl bg-gradient-to-br from-zinc-900 via-backroom-black to-zinc-900
-                 ring-1 ring-inset ring-zinc-800/60 overflow-hidden">
-          <!-- Soft vignette -->
-          <div
-            class="absolute inset-0 pointer-events-none"
-            style="background: radial-gradient(110% 60% at 50% 100%, rgba(12,12,12,0) 40%, rgba(12,12,12,0.7) 100%);"
-          >
-          </div>
-        </div>
-        
-    <!-- Avatar overlaps the banner -->
-        <div class="px-4 md:px-8">
-          <div class="relative -mt-12 md:-mt-16 flex items-end gap-4">
-            <div class="relative shrink-0">
+      <div class="mx-auto max-w-5xl mt-24">
+        <!-- Avatar overlaps the banner -->
+        <div class="px-4 md:px-6 w-full rounded-2xl bg-gradient-to-br from-zinc-900 via-backroom-black to-zinc-900
+            ring-1 ring-inset ring-zinc-800/60 overflow-hidden">
+          <div class="flex items-start gap-3 py-4">
+            <div class="shrink-0">
               <%= if avatar_url(@profile) do %>
                 <img
                   src={avatar_url(@profile)}
                   alt={"#{display_name(@user)} avatar"}
-                  class={["rounded-full object-cover ring-2 ring-zinc-700"]}
+                  class={["rounded-full object-cover ring-1 ring-zinc-700", avatar_size()]}
                 />
               <% else %>
                 <span class={[
-                  "inline-flex items-center justify-center rounded-full bg-zinc-700 text-3xl md:text-4xl font-semibold text-mystery-white ring-2 ring-zinc-700"
+                  "inline-flex items-center justify-center rounded-full bg-zinc-700 text-lg md:text-xl font-semibold text-mystery-white ring-1 ring-zinc-700",
+                  avatar_size()
                 ]}>
                   {initials(@user)}
                 </span>
               <% end %>
             </div>
-            
-    <!-- Name + username + location -->
-            <div class="pb-2">
-              <h1 class="text-2xl md:text-3xl font-semibold text-mystery-white">
+
+            <div class="pb-1">
+              <h1 class={["font-semibold text-mystery-white leading-tight pb-1.5", h1_size()]}>
                 {display_name(@user)}
               </h1>
-              <div class="mt-1 flex flex-wrap items-center gap-2 text-sm">
+              <div class="mt-0.5 flex flex-wrap items-center gap-4 text-[13px] md:text-sm leading-tight">
                 <span class="text-zinc-400">@{@user.username}</span>
                 <span
                   :if={location_label(@profile)}
-                  class="inline-flex items-center gap-1 rounded-full bg-zinc-800/70 px-2 py-0.5 text-zinc-300 ring-1 ring-zinc-700"
+                  class="inline-flex items-center gap-1 rounded-full bg-zinc-800/70 px-2.5 py-0.5 text-zinc-300 ring-1 ring-zinc-700 text-xs"
                 >
-                  <.icon name="hero-map-pin" class="h-4 w-4" /> {location_label(@profile)}
+                  <.icon name="hero-map-pin" class="h-3.5 w-3.5" /> {location_label(@profile)}
                 </span>
               </div>
             </div>
@@ -113,59 +102,44 @@ defmodule TimesinkWeb.Account.ProfileLive do
       </div>
       
     <!-- Body -->
-      <div class="mx-auto max-w-5xl mt-6 grid grid-cols-1 md:grid-cols-[1.2fr,2fr] gap-6">
-        <!-- Left: About card -->
+      <div class="mx-auto max-w-5xl mt-5 grid grid-cols-1 md:grid-cols-[1.2fr,2fr] gap-5">
         <section class="rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800">
-          <div class="px-6 py-5 border-b border-zinc-800">
-            <h2 class="text-lg font-medium text-mystery-white">About</h2>
+          <div class={[card_pad_x(), "py-3 border-b border-zinc-800"]}>
+            <h2 class="text-base font-medium text-mystery-white">About</h2>
           </div>
-          <div class="px-6 py-5">
-            <p :if={@profile && present?(@profile.bio)} class="text-zinc-300 leading-relaxed">
+          <div class={[card_pad_x(), card_pad_y()]}>
+            <p
+              :if={@profile && present?(@profile.bio)}
+              class="text-zinc-300 leading-relaxed text-[15px]"
+            >
               {@profile.bio}
             </p>
-            <p :if={not (@profile && present?(@profile.bio))} class="text-zinc-500">
+            <p :if={not (@profile && present?(@profile.bio))} class="text-zinc-500 text-[15px]">
               No bio yet.
             </p>
 
-            <dl class="mt-6 space-y-3 text-sm">
+            <dl class="mt-5 space-y-2.5 text-[13px] md:text-sm">
               <div :if={location_label(@profile)} class="flex items-start gap-2">
-                <dt class="text-zinc-500 w-24">Location</dt>
+                <dt class="text-zinc-500 w-20">Location</dt>
                 <dd class="text-zinc-300">{location_label(@profile)}</dd>
               </div>
               <div class="flex items-start gap-2">
-                <dt class="text-zinc-500 w-24">Member</dt>
-                <dd class="text-zinc-300">
-                  <!-- If you track inserted_at on users, you can show a real date -->
-                  Since
-                  {Calendar.strftime(@user.inserted_at, "%b %Y")}
-                </dd>
+                <dt class="text-zinc-500 w-20">Member</dt>
+                <dd class="text-zinc-300">Since {Calendar.strftime(@user.inserted_at, "%b %Y")}</dd>
               </div>
             </dl>
           </div>
         </section>
-        
-    <!-- Right: Activity / Films / Comments -->
-        <section class="rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800">
-          <div class="px-6 py-5 border-b border-zinc-800 flex items-center justify-between">
-            <h2 class="text-lg font-medium text-mystery-white">Activity</h2>
-            <!-- Future: tabs for "Films", "Comments", "Likes" -->
-            <!-- <div class="text-sm text-zinc-400">Films · Comments</div> -->
-          </div>
 
-          <div class="px-6 py-8">
-            <p class="text-zinc-500">No recent activity yet.</p>
-            <!--
-            TODO: Replace with a list like:
-            <ul class="space-y-4">
-              <li class="flex items-start gap-3">
-                <img class="h-10 w-10 rounded object-cover" src={poster_url} />
-                <div>
-                  <p class="text-zinc-300"><.link navigate={~p"/films/#{film.id}"} class="hover:underline">{film.title}</.link></p>
-                  <p class="text-sm text-zinc-500">Added to favorites · 2h ago</p>
-                </div>
-              </li>
-            </ul>
-            -->
+        <section class="rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800">
+          <div class={[
+            card_pad_x(),
+            "py-3 border-b border-zinc-800 flex items-center justify-between"
+          ]}>
+            <h2 class="text-base font-medium text-mystery-white">Activity</h2>
+          </div>
+          <div class={[card_pad_x(), "py-6"]}>
+            <p class="text-zinc-500 text-[15px]">No recent activity yet.</p>
           </div>
         </section>
       </div>
@@ -222,4 +196,9 @@ defmodule TimesinkWeb.Account.ProfileLive do
   defp to_s(nil), do: ""
   defp to_s(v) when is_binary(v), do: v
   defp to_s(v), do: to_string(v)
+
+  defp avatar_size(), do: "w-14 h-14 md:w-16 md:h-16"
+  defp h1_size(), do: "text-lg md:text-xl"
+  defp card_pad_x(), do: "px-5 md:px-6"
+  defp card_pad_y(), do: "py-4"
 end

@@ -60,7 +60,7 @@ defmodule TimesinkWeb.HomepageLive do
     <div id="homepage">
       <div
         id="hero"
-        class="h-screen w-full bg-backroom-black text-white flex items-center justify-center"
+        class="h-screen relative w-full bg-backroom-black text-white flex items-center justify-center"
       >
         <.hero />
       </div>
