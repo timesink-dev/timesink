@@ -74,7 +74,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     ~H"""
     <section
       id="film-submission"
-      class="relative h-[100vh] px-6 md:px-12 py-16 md:py-24 flex flex-col justify-between"
+      class="relative h-screen px-6 md:px-12 py-16 md:py-24 flex flex-col justify-between"
     >
       <script defer async src="https://js.stripe.com/v3/">
       </script>
