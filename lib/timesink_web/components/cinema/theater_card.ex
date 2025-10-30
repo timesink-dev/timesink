@@ -14,7 +14,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
     <div>
       <% film = @exhibition.film %>
       <div class="mb-6 h-20">
-        <h3 class="text-xl font-bold mb-1 text-left text-white drop-shadow-md font-brand">
+        <h3 class="text-xl font-bold mb-1 text-left text-white drop-shadow-md font-gangster">
           {@exhibition.theater.name}
         </h3>
         <p class="text-sm text-white/60 text-left">

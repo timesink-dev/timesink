@@ -68,10 +68,6 @@ defmodule TimesinkWeb.HomepageLive do
       <div id="cinema-barrier" class="h-16" phx-hook="ScrollObserver" />
 
       <div id="bridge" class="relative isolate">
-        <!-- subtle top divider glow -->
-        <div class="pointer-events-none absolute inset-x-0 -top-4 h-8 bg-gradient-to-b from-black/30 to-transparent">
-        </div>
-
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
           <!-- value proposition -->
           <div class="text-center mb-10">
