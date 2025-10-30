@@ -280,7 +280,7 @@ defmodule TimesinkWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded px-4 py-2",
+        "phx-submit-loading:opacity-75 rounded-md px-4 py-2",
         @color_classes,
         @class,
         @classes

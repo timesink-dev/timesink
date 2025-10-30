@@ -82,7 +82,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <div id="theater" class="max-w-7xl mx-auto px-4 md:px-6 mt-10 text-gray-100">
       <!-- Header -->
       <div class="border-b border-gray-800 pb-5 mb-6 md:mb-8">
-        <h1 class="text-2xl md:text-3xl font-bold font-brand">{@theater.name}</h1>
+        <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
         <p class="text-gray-400 mt-2 text-sm md:text-base">{@theater.description}</p>
       </div>
       
