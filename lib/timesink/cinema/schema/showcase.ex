@@ -74,4 +74,34 @@ defmodule Timesink.Cinema.Showcase do
     end)
     |> Enum.sort_by(fn s -> s.start_at || s.inserted_at end, {:desc, Date})
   end
+
+  def list_upcoming_showcases do
+    Repo.all(
+      from s in Timesink.Cinema.Showcase,
+        where: s.status == :upcoming,
+        preload: [
+          exhibitions: [
+            :theater,
+            film: [
+              {:poster, [:blob]},
+              :genres,
+              directors: [:creative],
+              writers: [:creative],
+              producers: [:creative],
+              cast: [:creative],
+              crew: [:creative]
+            ]
+          ]
+        ]
+    )
+    |> Enum.map(fn showcase ->
+      sorted_exhibitions =
+        Enum.sort_by(showcase.exhibitions, fn ex ->
+          String.downcase(ex.theater.name)
+        end)
+
+      %{showcase | exhibitions: sorted_exhibitions}
+    end)
+    |> Enum.sort_by(fn s -> s.start_at || s.inserted_at end, {:desc, Date})
+  end
 end

@@ -7,7 +7,7 @@ defmodule TimesinkWeb.LiveAppLayout do
   def app(assigns) do
     ~H"""
     <TopNav.top_nav current_user={@current_user} class="h-[30px] mx-4" />
-    <main class="px-4 sm:px-6 lg:px-8">
+    <main>
       <div class="min-h-[calc(100vh-60px)]">
         <.flash_group flash={@flash} /> {@inner_content}
       </div>

@@ -72,12 +72,12 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
             </div>
 
             <:actions>
-              <button
+              <.button
                 type="submit"
                 disabled={!@can_submit}
                 aria-disabled={!@can_submit}
                 phx-disable-with="Updating…"
-                class="w-full md:w-auto px-6 py-3 rounded-xl font-semibold bg-neon-blue-lightest text-backroom-black
+                class="w-full md:w-auto px-6 py-3 bg-neon-blue-lightest text-backroom-black
                         hover:opacity-90 focus:ring-2 focus:ring-neon-blue-lightest transition
                         disabled:opacity-40 disabled:cursor-not-allowed phx-submit-loading:opacity-60 phx-submit-loading:cursor-wait"
               >
@@ -104,20 +104,21 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
                   </svg>
                   Updating…
                 </span>
-              </button>
+              </.button>
             </:actions>
           </.simple_form>
         </div>
       </div>
 
-      <div class="mt-10 max-w-2xl mx-auto">
+      <%!-- <div class="mt-10 max-w-2xl mx-auto">
+      TODO for later if/when user requests/needs to remove their account
         <h2 class="w-full bg-neon-red-light/10 px-6 md:px-12 py-6 border border-neon-red-light rounded text-neon-red-light text-xl font-brand">
           Danger zone
         </h2>
         <button class="mt-6 py-3 px-6 bg-backroom-black text-neon-red-light font-semibold border border-neon-red-light rounded-xl hover:bg-neon-red-light/5">
           Delete account
         </button>
-      </div>
+      </div> --%>
     </section>
     """
   end
