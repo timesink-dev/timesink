@@ -69,7 +69,7 @@ defmodule TimesinkWeb.Account.MeLive do
           ]}
         />
         <!-- Invites UI -->
-        <div class="mt-8 rounded-2xl border border-zinc-800 bg-dark-theater-primary/60 p-5 md:p-6">
+        <%!-- <div class="mt-8 rounded-2xl border border-zinc-800 bg-dark-theater-primary/60 p-5 md:p-6">
           <div class="flex items-center justify-between gap-x-8 md:gap-x-2">
             <div>
               <h3 class="flex items-center gap-2 text-lg md:text-lg text-mystery-white pb-1">
@@ -179,7 +179,7 @@ defmodule TimesinkWeb.Account.MeLive do
               </div>
             </li>
           </ul>
-        </div>
+        </div> --%>
       </div>
     </section>
     """

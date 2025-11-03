@@ -10,7 +10,7 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
         <!-- Text Content -->
         <div class="w-full md:w-2/5">
           <h1 class="text-3xl font-brand">
-            Film submissions
+            Film submission
           </h1>
           <p class="text-lg mt-4 text-neon-blue-lightest font-medium">
             $25.00 submission fee

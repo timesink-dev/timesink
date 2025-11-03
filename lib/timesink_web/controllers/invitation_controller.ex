@@ -11,6 +11,7 @@ defmodule TimesinkWeb.InvitationController do
         {:ok, applicant} ->
           conn
           |> put_session(:invite_token, token)
+          |> put_session(:email, applicant.email)
           |> put_session(:applicant, applicant)
           |> redirect(to: "/onboarding")
 

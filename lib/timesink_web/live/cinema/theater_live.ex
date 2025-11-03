@@ -79,36 +79,17 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   # ───────────────────────────────────────────────────────────
   def render(assigns) do
     ~H"""
-    <div id="theater" class="max-w-7xl mx-auto px-4 md:px-6 mt-10 text-gray-100">
-      <!-- Header -->
-      <div class="border-b border-gray-800 pb-5 mb-6 md:mb-8">
-        <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
-        <p class="text-gray-400 mt-2 text-sm md:text-base">{@theater.description}</p>
-      </div>
-      
-    <!-- Toolbar -->
-      <div class="flex justify-between items-center mb-4">
-        <div></div>
-        <button
-          phx-click="toggle_chat"
-          class={[
-            @chat_open && "invisible md:visible",
-            "bg-dark-theater-primary text-sm text-gray-300 hover:text-white px-3 py-1 rounded bg-zinc-900/60 border border-gray-700"
-          ]}
-          aria-haspopup="dialog"
-          aria-expanded="false"
-        >
-          {if @chat_open, do: "Hide Chat", else: "Show Chat"}
-        </button>
-      </div>
-      
-    <!-- Main layout (mobile-first: stacked) -->
-      <div class="flex flex-col md:flex-row md:gap-6">
-        <!-- Left: Player + Film Info -->
-        <div class={[
-          "min-w-0 md:flex-1 transition-all",
-          not @chat_open && "md:max-w-5xl md:mx-auto"
-        ]}>
+    <div
+      id="theater"
+      class="max-w-4xl mx-auto p-6 space-y-8 text-gray-100 mt-16 flex justify-between gap-x-12"
+    >
+      <div class="flex-1">
+        <div class="border-b border-gray-700 pb-4 mb-10">
+          <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
+          <p class="text-gray-400 mt-2 text-sm">{@theater.description}</p>
+        </div>
+
+        <div>
           <% playback_id = Film.get_mux_playback_id(@film.video) %>
           <%= if @phase == :playing and playback_id do %>
             <div id="simulated-live-player" data-offset={@offset} phx-hook="SimulatedLivePlayback">
