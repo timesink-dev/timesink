@@ -69,7 +69,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
                 <.icon name="hero-check-circle-mini" class="mt-0.5 h-5 w-5 mr-2 flex-none" />
                 You’re on the List!
               <% else %>
-                Join the Waitlist
+                Get your ticket
               <% end %>
             </.button>
           </:actions>
@@ -90,7 +90,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             <strong class="text-mystery-white">
               {@spots_remaining} spot{if @spots_remaining > 1, do: "s"}
             </strong>
-            remaining in this cohort
+            remaining in the current queue
           </p>
           <p>
             Join now to secure your entry ticket!

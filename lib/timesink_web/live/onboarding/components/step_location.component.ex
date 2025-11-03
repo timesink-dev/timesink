@@ -41,7 +41,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
               name="location_query"
               value={@query}
               required
-              phx-debounce="300"
+              phx-debounce="200"
               phx-change="search"
               phx-target={@myself}
               placeholder="Start typing your city (e.g., Los Angeles)"
