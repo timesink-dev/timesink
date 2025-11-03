@@ -4,8 +4,6 @@ defmodule Timesink.Waitlist do
   """
 
   alias Timesink.Waitlist.Applicant
-  alias Timesink.Waitlist.Mail
-  alias Timesink.Repo
   alias Timesink.Waitlist.Applicant
   alias Timesink.Waitlist.InviteScheduler
   import Ecto.Query, only: [from: 2]
