@@ -40,7 +40,7 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
                   type={(@show_password && "text") || "password"}
                   field={@form[:password]}
                   required
-                  input_class="w-full pr-10 py-3 text-mystery-white border-none"
+                  input_class="w-full px-3 pr-10 py-3 text-mystery-white border-none"
                   error_class="mt-2 text-sm text-neon-red-light"
                   placeholder="Enter your password"
                   phx-debounce="500"
@@ -50,7 +50,7 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
                   type="button"
                   phx-click="toggle_password_visibility"
                   phx-target={@myself}
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                  class="absolute right-3 top-3 text-gray-400 hover:text-gray-300"
                 >
                   <.icon name={(@show_password && "hero-eye-slash") || "hero-eye"} class="h-5 w-5" />
                 </button>
@@ -64,7 +64,7 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
                   type={(@show_password_confirmation && "text") || "password"}
                   field={@form[:password_confirmation]}
                   required
-                  input_class="w-full pr-10 py-3 text-mystery-white border-none"
+                  input_class="w-full px-3 pr-10 py-3 text-mystery-white border-none"
                   error_class="mt-2 text-sm text-neon-red-light"
                   placeholder="Confirm your password"
                   phx-debounce="500"
@@ -74,7 +74,7 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
                   type="button"
                   phx-click="toggle_password_confirmation_visibility"
                   phx-target={@myself}
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                  class="absolute right-3 top-3 text-gray-400 hover:text-gray-300"
                 >
                   <.icon
                     name={(@show_password_confirmation && "hero-eye-slash") || "hero-eye"}

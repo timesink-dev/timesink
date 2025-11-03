@@ -437,7 +437,7 @@ defmodule TimesinkWeb.CoreComponents do
             @errors == [] && "border-zinc-300 focus:border-zinc-400",
             @errors != [] && "border-rose-400 focus:border-rose-400",
             @addon_icon_right != [] && "pr-10",
-            "rounded-lg bg-dark-theater-primary"
+            "rounded-md bg-dark-theater-primary"
           ]}
           {@rest}
         />

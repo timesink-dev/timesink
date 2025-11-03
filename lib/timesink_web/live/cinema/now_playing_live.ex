@@ -151,7 +151,9 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                         <.live_img_preview entry={entry} class="h-full w-full object-cover" />
                       <% end %>
                     <% else %>
-                      <span class="text-xs text-zinc-300">Upload</span>
+                      <span class="inline-flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-zinc-700 text-xl md:text-2xl font-semibold text-mystery-white ring-2 ring-zinc-700">
+                        {initials(@current_user)}
+                      </span>
                     <% end %>
                   </div>
                   
@@ -354,6 +356,16 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
     do:
       Repo.get!(User, id)
       |> Repo.preload(profile: [avatar: [:blob]])
+
+  defp initials(%{first_name: fnm, last_name: lnm}) do
+    f = fnm |> to_string() |> String.trim() |> String.first() || ""
+    l = lnm |> to_string() |> String.trim() |> String.first() || ""
+
+    case String.upcase(f <> l) do
+      "" -> "?"
+      s -> s
+    end
+  end
 
   defp needs_avatar?(nil), do: true
 

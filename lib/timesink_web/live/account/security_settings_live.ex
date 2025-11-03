@@ -42,7 +42,7 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
                   field={@form[:current_password]}
                   placeholder="Enter your current password"
                   phx-debounce="400"
-                  input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
+                  input_class="w-full bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
                 />
               </div>
 
@@ -53,7 +53,7 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
                   placeholder="Enter your new password"
                   field={@form[:password]}
                   phx-debounce="400"
-                  input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
+                  input_class="w-full bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
                 />
               </div>
 
@@ -66,7 +66,7 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
                   placeholder="Confirm your password"
                   field={@form[:password_confirmation]}
                   phx-debounce="400"
-                  input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
+                  input_class="w-full bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
                 />
               </div>
             </div>

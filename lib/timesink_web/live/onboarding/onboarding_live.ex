@@ -11,18 +11,17 @@ defmodule TimesinkWeb.OnboardingLive do
   alias TimesinkWeb.Onboarding.{
     # StepEmailComponent,
     # StepVerifyEmailComponent,
-    StepNameComponent,
+    # StepNameComponent,
     StepBirthdateComponent,
     StepLocationComponent,
     StepUsernameComponent,
     StepPasswordComponent
   }
 
-  @step_order [:name, :birthdate, :location, :username, :password]
+  @step_order [:location, :birthdate, :username, :password]
   @steps %{
-    name: StepNameComponent,
-    birthdate: StepBirthdateComponent,
     location: StepLocationComponent,
+    birthdate: StepBirthdateComponent,
     username: StepUsernameComponent,
     password: StepPasswordComponent
   }
@@ -31,17 +30,26 @@ defmodule TimesinkWeb.OnboardingLive do
     invite_token = session["invite_token"]
     applicant = session["applicant"] || nil
 
-    # Authoritative email from applicant if present; fallback to session["email"]
-    invite_email =
+    # Extract user info from applicant if present
+    {invite_email, first_name, last_name} =
       case applicant do
-        %{email: email} when is_binary(email) -> email
-        _ -> session["email"]
+        %{email: email, first_name: fname, last_name: lname}
+        when is_binary(email) and is_binary(fname) and is_binary(lname) ->
+          {email, fname, lname}
+
+        %{email: email} when is_binary(email) ->
+          {email, "", ""}
+
+        _ ->
+          {session["email"], "", ""}
       end
 
     socket =
       socket
-      # Seed user_data with the invite email (locked/verified)
-      |> assign_new(:user_data, fn -> initial_user_data(invite_email) end)
+      # Seed user_data with info from applicant/session
+      |> assign_new(:user_data, fn ->
+        initial_user_data(invite_email, first_name, last_name)
+      end)
       # Mark verified if we have an invite email
       |> assign_new(:verified_email, fn -> not is_nil(invite_email) and invite_email != "" end)
       |> assign(:invite_token, invite_token)
@@ -166,19 +174,19 @@ defmodule TimesinkWeb.OnboardingLive do
 
   defp determine_step(_, step, _), do: String.to_existing_atom(step)
 
-  # --- Step resolution: default to :name (email step is removed) ---
+  # --- Step resolution: default to :location (first step) ---
   defp get_step_from_params(%{"step" => step}), do: String.to_existing_atom(step)
-  defp get_step_from_params(_params), do: :name
+  defp get_step_from_params(_params), do: :location
 
   # --- Seed helpers ---
 
-  # Accept an optional email so we can prefill from the invite session/applicant.
-  defp initial_user_data(invite_email) do
+  # Prefill user data from the invite session/applicant.
+  defp initial_user_data(invite_email, first_name, last_name) do
     %{
       "email" => invite_email || "",
       "password" => "",
-      "first_name" => "",
-      "last_name" => "",
+      "first_name" => first_name || "",
+      "last_name" => last_name || "",
       "username" => "",
       "profile" => %{
         "bio" => nil,
