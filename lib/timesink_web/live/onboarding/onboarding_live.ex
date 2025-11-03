@@ -185,8 +185,8 @@ defmodule TimesinkWeb.OnboardingLive do
     %{
       "email" => invite_email || "",
       "password" => "",
-      "first_name" => first_name || "",
-      "last_name" => last_name || "",
+      "first_name" => first_name,
+      "last_name" => last_name,
       "username" => "",
       "profile" => %{
         "bio" => nil,
