@@ -146,8 +146,8 @@ if env == :dev do
     api_key: System.get_env("TIMESINK_TEST_STRIPE_SECRET_KEY")
 
   config :timesink, :resend,
-    api_key: System.fetch_env!("TIMESINK_RESEND_API_KEY"),
-    audience_id: System.fetch_env!("TIMESINK_RESEND_AUDIENCE_ID")
+    api_key: System.get_env("TIMESINK_RESEND_API_KEY", "dev-api-key"),
+    audience_id: System.get_env("TIMESINK_RESEND_AUDIENCE_ID", "dev-audience-id")
 end
 
 # ─────────────────────────────────────────────────────────────
@@ -185,11 +185,6 @@ if env == :test do
     webhook_url:
       System.get_env("TIMESINK_TEST_BTC_PAY_WEBHOOK_URL") ||
         "http://localhost:4000/api/btc_pay/webhook"
-
-  # Ghost (test)
-  config :timesink, :ghost_publishing,
-    webhook_key: System.get_env("TIMESINK_TEST_GHOST_PUBLISHING_WEBHOOK_KEY", "ghost-test"),
-    content_api_key: System.get_env("TIMESINK_TEST_GHOST_CONTENT_API_KEY", "test-content-api-key")
 end
 
 # ─────────────────────────────────────────────────────────────
