@@ -27,7 +27,7 @@ defmodule TimesinkWeb.Account.MeLive do
 
   def render(assigns) do
     ~H"""
-    <section id="user-overview" phx-hook="CopyBus" class="mt-16">
+    <section id="user-overview" phx-hook="CopyBus" class="mt-16 mx-4">
       <div class="max-w-2xl mx-auto">
         <.me_page_item
           title="Account"
