@@ -30,10 +30,10 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col items-center justify-center min-h-screen bg-backroom-black px-6">
-      <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-8 text-white text-center">
-        <h1 class="text-3xl font-bold">What's your birthday?</h1>
-        <p class="text-gray-400 mt-2">
+    <div class="flex flex-col items-center justify-center h-screen overflow-hidden bg-backroom-black px-4 sm:px-6 py-4">
+      <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-4 sm:p-8 text-white text-center">
+        <h1 class="text-2xl font-bold">What's your birthday?</h1>
+        <p class="text-sm sm:text-base text-gray-400 mt-2">
           Time reveals all illusions — even our favorite cinema. Knowing your age helps us better tailor screenings and platform vibes.
         </p>
 
@@ -42,7 +42,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
           as="birthdate"
           phx-target={@myself}
           phx-submit="submit_birthdate"
-          class="mt-6"
+          class="mt-4 sm:mt-6"
         >
           <div class="flex justify-center gap-x-2">
             <.input
@@ -53,7 +53,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
               placeholder="MM"
               inputmode="numeric"
               value={@birth_month}
-              input_class="w-full p-3 pl-4 rounded text-left text-mystery-white border-none"
+              input_class="w-full p-3 pl-3 sm:pl-4 rounded text-left text-mystery-white border-none text-sm sm:text-base"
             />
             <.input
               type="text"
@@ -63,7 +63,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
               placeholder="DD"
               inputmode="numeric"
               value={@birth_day}
-              input_class="w-full p-3 pl-4 rounded text-left text-mystery-white border-none"
+              input_class="w-full p-3 pl-3 sm:pl-4 rounded text-left text-mystery-white border-none text-sm sm:text-base"
             />
             <.input
               type="text"
@@ -73,23 +73,30 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
               inputmode="numeric"
               phx-hook="DigitsOnlyAutoTab"
               value={@birth_year}
-              input_class="w-full p-3 pl-4 rounded text-left text-mystery-white border-none"
+              input_class="w-full p-3 pl-3 sm:pl-4 rounded text-left text-mystery-white border-none text-sm sm:text-base"
             />
           </div>
 
           <%= if @error do %>
-            <p class="text-neon-red-light text-sm mt-2">
-              <.icon name="hero-exclamation-circle-mini" class="h-5 w-5 inline" />
+            <p class="text-neon-red-light text-xs sm:text-sm mt-2">
+              <.icon name="hero-exclamation-circle-mini" class="h-4 w-4 sm:h-5 sm:w-5 inline" />
               {@error}
             </p>
           <% end %>
 
           <:actions>
-            <.button color="primary" class="w-full py-3 text-lg mt-6">Continue</.button>
+            <.button color="primary" class="w-full py-3 text-base sm:text-lg mt-4 sm:mt-6">
+              Continue
+            </.button>
           </:actions>
         </.simple_form>
       </div>
-      <.button color="none" class="mt-6 p-0 text-center" phx-click="go_back" phx-target={@myself}>
+      <.button
+        color="none"
+        class="mt-4 sm:mt-6 p-0 text-center text-sm sm:text-base"
+        phx-click="go_back"
+        phx-target={@myself}
+      >
         ← Back
       </.button>
     </div>

@@ -46,10 +46,6 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
         
     <!-- Left: Form Content -->
         <div class="w-full md:w-3/5">
-          <p class="text-mystery-white/80 mb-4 text-sm">
-            This is where you share the essentials—your film’s name, runtime, synopsis, and how to watch it.
-            We also ask for your contact info so we can reach you if your film is selected.
-          </p>
           <.simple_form
             for={@form}
             phx-submit="save_film_details"
@@ -103,10 +99,10 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
               </div>
               <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <.input
-                  type="url"
+                  type="text"
                   field={@form[:video_url]}
                   label="Link to your film"
-                  placeholder="e.g. https://vimeo.com/123456"
+                  placeholder="i.e. vimeo.com/123456"
                   required
                   input_class="w-full p-3 rounded text-mystery-white border-none"
                 />
@@ -159,6 +155,8 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
   end
 
   def handle_event("validate", %{"film_submission" => params}, socket) do
+    params = ensure_https_prefix(params)
+
     changeset =
       %FilmSubmission{}
       |> FilmSubmission.changeset(params)
@@ -168,6 +166,7 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
   end
 
   def handle_event("save_film_details", %{"film_submission" => params}, socket) do
+    params = ensure_https_prefix(params)
     changeset = FilmSubmission.changeset(%FilmSubmission{}, params)
 
     if changeset.valid? do
@@ -213,4 +212,20 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
 
   defp user_email(%{email: email}) when is_binary(email), do: email
   defp user_email(_), do: ""
+
+  # Ensure video_url has https:// prefix
+  defp ensure_https_prefix(%{"video_url" => url} = params) when is_binary(url) and url != "" do
+    prefixed_url =
+      cond do
+        String.starts_with?(url, "http://") or String.starts_with?(url, "https://") ->
+          url
+
+        true ->
+          "https://#{url}"
+      end
+
+    Map.put(params, "video_url", prefixed_url)
+  end
+
+  defp ensure_https_prefix(params), do: params
 end

@@ -20,11 +20,14 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col items-center justify-center min-h-screen bg-backroom-black px-6">
-      <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-8 text-white">
-        <h1 class="text-3xl font-bold text-center">Where are you joining us from?</h1>
-        <p class="text-gray-400 text-center mt-2">
-          We're building TimeSink together. Knowing where our community comes from helps shape our world and future screenings.
+    <div class="flex flex-col items-center justify-center h-screen overflow-hidden bg-backroom-black px-4 sm:px-6 py-4">
+      <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-4 sm:p-8 text-white">
+        <p class="text-base text-mystery-white text-center mb-3 sm:mb-4">
+          Let's finalize your membership...
+        </p>
+        <h1 class="text-2xl font-bold text-center">Where are you joining us from?</h1>
+        <p class="text-sm sm:text-base text-gray-400 text-center mt-2">
+          At TimeSink we're building a global community. Knowing where you come from helps shape our world and future screenings.
         </p>
 
         <.simple_form
@@ -41,18 +44,18 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
               name="location_query"
               value={@query}
               required
-              phx-debounce="300"
+              phx-debounce="200"
               phx-change="search"
               phx-target={@myself}
-              placeholder="Start typing your city (e.g., Los Angeles)"
-              class="w-full p-3 rounded text-white border-none bg-dark-theater-primary focus:outline-none focus:ring-2 focus:ring-neon-blue-lightest"
+              placeholder="Start typing your city (e.g., Lyon, France)"
+              class="w-full p-3 rounded text-white border-none bg-dark-theater-primary focus:outline-none focus:ring-2 focus:ring-neon-blue-lightest text-sm sm:text-base"
               autocomplete="off"
             />
           </div>
 
           <ul
             :if={@results != []}
-            class="bg-dark-theater-primary shadow-md rounded mt-2 text-mystery-white max-h-60 overflow-auto"
+            class="bg-dark-theater-primary shadow-md rounded mt-2 text-mystery-white max-h-40 sm:max-h-60 overflow-auto text-sm sm:text-base"
           >
             <li
               :for={result <- @results}
@@ -64,21 +67,26 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
               phx-value-country_code={result.country_code}
               phx-value-country={result.country}
               phx-target={@myself}
-              class="cursor-pointer px-4 py-2 hover:bg-zinc-700"
+              class="cursor-pointer px-3 sm:px-4 py-2 hover:bg-zinc-700"
             >
               {result.label}
             </li>
           </ul>
           <:actions>
-            <.button class="mt-6 w-full py-3 text-lg" color="primary">
+            <.button class="mt-4 sm:mt-6 w-full py-3 text-base sm:text-lg" color="primary">
               Continue
             </.button>
           </:actions>
         </.simple_form>
       </div>
-      <.button color="none" class="mt-6 p-0 text-center" phx-click="go_back" phx-target={@myself}>
+      <%!-- <.button
+        color="none"
+        class="mt-4 sm:mt-6 p-0 text-center text-sm sm:text-base"
+        phx-click="go_back"
+        phx-target={@myself}
+      >
         ← Back
-      </.button>
+      </.button> --%>
     </div>
     """
   end

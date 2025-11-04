@@ -197,7 +197,7 @@ defmodule TimesinkWeb.TopNav do
             </li>
             <li>
               <a href="/join">
-                <.button color="none">Join Waitlist</.button>
+                <.button color="none">Get early access</.button>
               </a>
             </li>
           <% end %>
@@ -214,9 +214,8 @@ defmodule TimesinkWeb.TopNav do
         phx-click={show_hamburger()}
         aria-label="Open menu"
         aria-controls="hamburger-content"
-        class="inline-flex items-center justify-center h-12 w-12 rounded-xl
-             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-            focus-visible:ring-zinc-400 focus-visible:ring-offset-black"
+        class="inline-flex items-center justify-center h-12 w-12 rounded-xl border border-zinc-700             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+            focus-visible:ring-zinc-400 focus-visible:ring-offset-black "
       >
         <.icon name="hero-bars-3" class="h-7 w-7" />
         <span class="sr-only">Open menu</span>
@@ -294,7 +293,7 @@ defmodule TimesinkWeb.TopNav do
                 </a>
                 <a href="/join">
                   <.button color="tertiary" class="w-full md:w-1/2">
-                    Join Waitlist
+                    Get early access
                   </.button>
                 </a>
               <% end %>

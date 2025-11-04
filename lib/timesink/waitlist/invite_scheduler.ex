@@ -2,8 +2,8 @@ defmodule Timesink.Waitlist.InviteScheduler do
   alias Timesink.Workers.Waitlist.SendInviteJob
   alias Oban
 
-  # a random delay between 5 and 60 min
-  @delay_range 5..60
+  # omit waitlist strategy for now, users can join instantly
+  @delay_range 0..0
 
   # 1 min in seconds
   @delay_seconds 60

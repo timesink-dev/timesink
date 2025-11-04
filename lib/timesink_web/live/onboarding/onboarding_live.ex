@@ -9,35 +9,53 @@ defmodule TimesinkWeb.OnboardingLive do
   alias Timesink.Repo
 
   alias TimesinkWeb.Onboarding.{
-    StepEmailComponent,
-    StepVerifyEmailComponent,
-    StepNameComponent,
+    # StepEmailComponent,
+    # StepVerifyEmailComponent,
+    # StepNameComponent,
     StepBirthdateComponent,
     StepLocationComponent,
-    StepUsernameComponent
+    StepUsernameComponent,
+    StepPasswordComponent
   }
 
-  @step_order [:email, :verify_email, :name, :birthdate, :location, :username]
+  @step_order [:location, :birthdate, :username, :password]
   @steps %{
-    email: StepEmailComponent,
-    verify_email: StepVerifyEmailComponent,
-    name: StepNameComponent,
-    birthdate: StepBirthdateComponent,
     location: StepLocationComponent,
-    username: StepUsernameComponent
+    birthdate: StepBirthdateComponent,
+    username: StepUsernameComponent,
+    password: StepPasswordComponent
   }
 
   def mount(_params, session, socket) do
     invite_token = session["invite_token"]
     applicant = session["applicant"] || nil
 
+    # Extract user info from applicant if present
+    {invite_email, first_name, last_name} =
+      case applicant do
+        %{email: email, first_name: fname, last_name: lname}
+        when is_binary(email) and is_binary(fname) and is_binary(lname) ->
+          {email, fname, lname}
+
+        %{email: email} when is_binary(email) ->
+          {email, "", ""}
+
+        _ ->
+          {session["email"], "", ""}
+      end
+
     socket =
       socket
-      |> assign_new(:user_data, fn -> initial_user_data() end)
-      |> assign_new(:verified_email, fn -> false end)
+      # Seed user_data with info from applicant/session
+      |> assign_new(:user_data, fn ->
+        initial_user_data(invite_email, first_name, last_name)
+      end)
+      # Mark verified if we have an invite email
+      |> assign_new(:verified_email, fn -> not is_nil(invite_email) and invite_email != "" end)
       |> assign(:invite_token, invite_token)
       |> assign(:applicant, applicant)
       |> assign(:steps, @steps)
+      # Start at the first *kept* step
       |> assign(:step, hd(@step_order))
 
     {:ok, socket, layout: {TimesinkWeb.Layouts, :empty}}
@@ -57,20 +75,12 @@ defmodule TimesinkWeb.OnboardingLive do
 
   def handle_params(params, _uri, socket) do
     invite_token = socket.assigns.invite_token
-    user_data = socket.assigns.user_data
 
-    current_step =
-      case params["step"] do
-        nil -> :email
-        step -> String.to_existing_atom(step)
-      end
-
+    # Only validate token now; do NOT gate on "missing email"
     with true <- Token.is_valid?(invite_token),
-         false <- missing_data?(user_data),
-         step <- get_step_from_params(params, socket.assigns.verified_email) do
+         step <- get_step_from_params(params) do
       {:noreply, assign(socket, step: step)}
     else
-      # invalid token
       false ->
         {:noreply,
          socket
@@ -79,14 +89,6 @@ defmodule TimesinkWeb.OnboardingLive do
            "Invalid or expired invite token. Please check the link and try again."
          )
          |> redirect(to: "/")}
-
-      # missing data and not already on first step
-      true when current_step != hd(@step_order) ->
-        {:noreply, push_patch(socket, to: "/onboarding?step=#{hd(@step_order)}")}
-
-      # missing data but already on the first step
-      true ->
-        {:noreply, assign(socket, step: hd(@step_order))}
     end
   end
 
@@ -96,27 +98,22 @@ defmodule TimesinkWeb.OnboardingLive do
   end
 
   def handle_info({:update_user_data, %{params: params}}, socket) do
-    socket = assign(socket, user_data: Map.merge(socket.assigns.user_data, params))
-
-    {:noreply, socket}
+    {:noreply, assign(socket, user_data: Map.merge(socket.assigns.user_data, params))}
   end
 
   def handle_info(:email_verified, socket) do
-    socket = socket |> assign(verified_email: true)
-    {:noreply, socket}
+    {:noreply, assign(socket, verified_email: true)}
   end
 
   def handle_info({:complete_onboarding, %{params: user_create_params}}, socket) do
     result =
       Repo.transaction(fn ->
-        # 1) Create the user
         user =
           case Account.create_user(user_create_params) do
             {:ok, user} -> user
             {:error, cs} -> Repo.rollback({:user_error, cs})
           end
 
-        # 2) Invalidate the invite token (struct or raw supported by your Token module)
         case Token.invalidate_token(socket.assigns.invite_token) do
           {:ok, _tok} -> :ok
           {:error, :already_used} -> Repo.rollback(:invite_already_used)
@@ -125,13 +122,11 @@ defmodule TimesinkWeb.OnboardingLive do
           other -> Repo.rollback({:token_error, other})
         end
 
-        # 3) Mark waitlist applicant completed (no-op if none)
         case maybe_mark_applicant_completed(socket.assigns.applicant) do
           {:ok, _} -> :ok
           {:error, cs} -> Repo.rollback({:waitlist_error, cs})
         end
 
-        # All good, return user to outer case
         user
       end)
 
@@ -161,47 +156,37 @@ defmodule TimesinkWeb.OnboardingLive do
   defp maybe_mark_applicant_completed(nil), do: {:ok, :noop}
   defp maybe_mark_applicant_completed(applicant), do: Waitlist.set_status(applicant, :completed)
 
+  # Keep this if you might re-enable verify later; otherwise it’s harmless.
   defp determine_step(current_step, :next, verified_email) do
     next_step_index = Enum.find_index(@step_order, &(&1 == current_step)) + 1
 
     case Enum.at(@step_order, next_step_index) do
-      # Skip verify_email if already verified
       :verify_email when verified_email -> Enum.at(@step_order, next_step_index + 1)
       step when not is_nil(step) -> step
-      # Stay on the last step if already there
       _ -> current_step
     end
   end
 
   defp determine_step(current_step, :back, _verified_email) do
     prev_step_index = Enum.find_index(@step_order, &(&1 == current_step)) - 1
-
-    # Prevent stepping back before first step
     Enum.at(@step_order, max(prev_step_index, 0))
   end
 
   defp determine_step(_, step, _), do: String.to_existing_atom(step)
 
-  defp get_step_from_params(%{"step" => step}, true) when step == "verify_email",
-    do: :name
+  # --- Step resolution: default to :location (first step) ---
+  defp get_step_from_params(%{"step" => step}), do: String.to_existing_atom(step)
+  defp get_step_from_params(_params), do: :location
 
-  defp get_step_from_params(%{"step" => step}, _verified_email),
-    do: String.to_existing_atom(step)
+  # --- Seed helpers ---
 
-  defp get_step_from_params(_params, _verified_email),
-    do: :email
-
-  defp missing_data?(%{"email" => email}) when is_binary(email),
-    do: String.trim(email) == ""
-
-  defp missing_data?(_), do: true
-
-  defp initial_user_data do
+  # Prefill user data from the invite session/applicant.
+  defp initial_user_data(invite_email, first_name, last_name) do
     %{
-      "email" => "",
+      "email" => invite_email || "",
       "password" => "",
-      "first_name" => "",
-      "last_name" => "",
+      "first_name" => first_name,
+      "last_name" => last_name,
       "username" => "",
       "profile" => %{
         "bio" => nil,
