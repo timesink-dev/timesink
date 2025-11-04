@@ -8,6 +8,9 @@
 # Mailer (Resend. https://resend.com)
 # export TIMESINK_RESEND_API_KEY="resend_api_key"
 
+# Newsletter subscribers
+# export TIMESINK_RESEND_AUDIENCE_ID="resend_audience_id"
+
 
 # Storage
 #
