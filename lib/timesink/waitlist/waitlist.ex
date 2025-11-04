@@ -4,8 +4,8 @@ defmodule Timesink.Waitlist do
   """
 
   alias Timesink.Waitlist.Applicant
-  alias Timesink.Waitlist.Applicant
   alias Timesink.Waitlist.InviteScheduler
+  alias Timesink.Repo
   import Ecto.Query, only: [from: 2]
 
   @max_wave_size 8
