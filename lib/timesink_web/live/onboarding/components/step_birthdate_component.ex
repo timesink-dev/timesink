@@ -30,7 +30,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col items-center min-h-screen md:h-screen md:justify-center bg-backroom-black px-4 sm:px-6 py-4">
+    <div class="flex flex-col items-center justify-center h-screen bg-backroom-black px-4 sm:px-6 py-4">
       <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-4 sm:p-8 text-white text-center">
         <h1 class="text-2xl font-bold">What's your birthday?</h1>
         <p class="text-sm sm:text-base text-gray-400 mt-2">
