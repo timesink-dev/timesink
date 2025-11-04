@@ -17,7 +17,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col items-center min-h-screen md:h-screen md:justify-center bg-backroom-black px-4 sm:px-6 py-4">
+    <div class="flex flex-col items-center justify-center h-screen overflow-hidden bg-backroom-black px-4 sm:px-6 py-4">
       <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-4 sm:p-8 text-white">
         <h1 class="text-2xl font-bold text-center">Claim your handle</h1>
         <p class="text-sm sm:text-base text-gray-400 text-center mt-2">
@@ -45,7 +45,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
                 phx-debounce="400"
                 required
                 field={@form[:username]}
-                input_class="w-full pl-9 pr-10 py-2 sm:py-3 text-mystery-white border-none text-sm sm:text-base"
+                input_class="w-full pl-9 pr-10 py-3 text-mystery-white border-none text-sm sm:text-base"
                 error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
                 placeholder="Claim your unique handle"
               >
@@ -72,7 +72,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
 
           <:actions>
             <div class="mt-4 sm:mt-6">
-              <.button color="primary" class="w-full py-2 sm:py-3 text-base sm:text-lg">
+              <.button color="primary" class="w-full py-3 text-base sm:text-lg">
                 Continue
               </.button>
             </div>

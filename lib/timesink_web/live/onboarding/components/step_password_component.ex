@@ -19,7 +19,7 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col items-center min-h-screen md:h-screen md:justify-center bg-backroom-black px-4 sm:px-6 py-4">
+    <div class="flex flex-col items-center justify-center h-screen overflow-hidden bg-backroom-black px-4 sm:px-6 py-4">
       <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-4 sm:p-8 text-white">
         <h1 class="text-2xl font-bold text-center">Create a secure password</h1>
         <p class="text-sm sm:text-base text-gray-400 text-center mt-2">
@@ -41,7 +41,7 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
                   type={(@show_password && "text") || "password"}
                   field={@form[:password]}
                   required
-                  input_class="w-full px-3 pr-10 py-2 sm:py-3 text-mystery-white border-none text-sm sm:text-base"
+                  input_class="w-full px-3 pr-10 py-3 text-mystery-white border-none text-sm sm:text-base"
                   error_class="mt-1 sm:mt-2 text-xs sm:text-sm text-neon-red-light"
                   placeholder="Enter your password"
                   phx-debounce="500"
@@ -68,7 +68,7 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
                   type={(@show_password_confirmation && "text") || "password"}
                   field={@form[:password_confirmation]}
                   required
-                  input_class="w-full px-3 pr-10 py-2 sm:py-3 text-mystery-white border-none text-sm sm:text-base"
+                  input_class="w-full px-3 pr-10 py-3 text-mystery-white border-none text-sm sm:text-base"
                   error_class="mt-1 sm:mt-2 text-xs sm:text-sm text-neon-red-light"
                   placeholder="Confirm your password"
                   phx-debounce="500"
@@ -94,7 +94,7 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
               <.button
                 color="primary"
                 classes={[
-                  "w-full py-2 sm:py-3 text-base sm:text-lg inline-flex items-center justify-center gap-2",
+                  "w-full py-3 text-base sm:text-lg inline-flex items-center justify-center gap-2",
                   (@loading? && "opacity-80 cursor-not-allowed") || ""
                 ]}
                 disabled={@loading?}

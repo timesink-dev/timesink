@@ -30,7 +30,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col items-center min-h-screen md:h-screen md:justify-center bg-backroom-black px-4 sm:px-6 py-4">
+    <div class="flex flex-col items-center justify-center h-screen overflow-hidden bg-backroom-black px-4 sm:px-6 py-4">
       <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-4 sm:p-8 text-white text-center">
         <h1 class="text-2xl font-bold">What's your birthday?</h1>
         <p class="text-sm sm:text-base text-gray-400 mt-2">
@@ -53,7 +53,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
               placeholder="MM"
               inputmode="numeric"
               value={@birth_month}
-              input_class="w-full p-2 sm:p-3 pl-3 sm:pl-4 rounded text-left text-mystery-white border-none text-sm sm:text-base"
+              input_class="w-full p-3 pl-3 sm:pl-4 rounded text-left text-mystery-white border-none text-sm sm:text-base"
             />
             <.input
               type="text"
@@ -63,7 +63,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
               placeholder="DD"
               inputmode="numeric"
               value={@birth_day}
-              input_class="w-full p-2 sm:p-3 pl-3 sm:pl-4 rounded text-left text-mystery-white border-none text-sm sm:text-base"
+              input_class="w-full p-3 pl-3 sm:pl-4 rounded text-left text-mystery-white border-none text-sm sm:text-base"
             />
             <.input
               type="text"
@@ -73,7 +73,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
               inputmode="numeric"
               phx-hook="DigitsOnlyAutoTab"
               value={@birth_year}
-              input_class="w-full p-2 sm:p-3 pl-3 sm:pl-4 rounded text-left text-mystery-white border-none text-sm sm:text-base"
+              input_class="w-full p-3 pl-3 sm:pl-4 rounded text-left text-mystery-white border-none text-sm sm:text-base"
             />
           </div>
 
@@ -85,7 +85,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
           <% end %>
 
           <:actions>
-            <.button color="primary" class="w-full py-2 sm:py-3 text-base sm:text-lg mt-4 sm:mt-6">
+            <.button color="primary" class="w-full py-3 text-base sm:text-lg mt-4 sm:mt-6">
               Continue
             </.button>
           </:actions>
