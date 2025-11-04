@@ -19,20 +19,21 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col items-center justify-center min-h-screen bg-backroom-black px-6">
-      <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-8 text-white">
-        <p class="text-gray-400 text-center mt-2">
-          Create a secure password for your account. Your password must be at least 8 characters long.
+    <div class="flex flex-col items-center justify-center h-screen bg-backroom-black px-4 sm:px-6 py-4">
+      <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-4 sm:p-8 text-white">
+        <h1 class="text-2xl font-bold text-center">Create a secure password</h1>
+        <p class="text-sm sm:text-base text-gray-400 text-center mt-2">
+          Your password must be at least 8 characters long.
         </p>
 
         <.simple_form
-          class="mt-6 space-y-4 w-full"
+          class="mt-4 sm:mt-6 space-y-3 sm:space-y-4 w-full"
           phx-submit="save_password"
           phx-change="validate"
           phx-target={@myself}
           for={@form}
         >
-          <div class="space-y-4">
+          <div class="space-y-3 sm:space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-300">Password</label>
               <div class="relative">
@@ -40,8 +41,8 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
                   type={(@show_password && "text") || "password"}
                   field={@form[:password]}
                   required
-                  input_class="w-full px-3 pr-10 py-3 text-mystery-white border-none"
-                  error_class="mt-2 text-sm text-neon-red-light"
+                  input_class="w-full px-3 pr-10 py-2 sm:py-3 text-mystery-white border-none text-sm sm:text-base"
+                  error_class="mt-1 sm:mt-2 text-xs sm:text-sm text-neon-red-light"
                   placeholder="Enter your password"
                   phx-debounce="500"
                   autocomplete="new-password"
@@ -50,9 +51,12 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
                   type="button"
                   phx-click="toggle_password_visibility"
                   phx-target={@myself}
-                  class="absolute right-3 top-3 text-gray-400 hover:text-gray-300"
+                  class="absolute right-3 top-2 sm:top-3 text-gray-400 hover:text-gray-300"
                 >
-                  <.icon name={(@show_password && "hero-eye-slash") || "hero-eye"} class="h-5 w-5" />
+                  <.icon
+                    name={(@show_password && "hero-eye-slash") || "hero-eye"}
+                    class="h-4 w-4 sm:h-5 sm:w-5"
+                  />
                 </button>
               </div>
             </div>
@@ -64,8 +68,8 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
                   type={(@show_password_confirmation && "text") || "password"}
                   field={@form[:password_confirmation]}
                   required
-                  input_class="w-full px-3 pr-10 py-3 text-mystery-white border-none"
-                  error_class="mt-2 text-sm text-neon-red-light"
+                  input_class="w-full px-3 pr-10 py-2 sm:py-3 text-mystery-white border-none text-sm sm:text-base"
+                  error_class="mt-1 sm:mt-2 text-xs sm:text-sm text-neon-red-light"
                   placeholder="Confirm your password"
                   phx-debounce="500"
                   autocomplete="new-password"
@@ -74,11 +78,11 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
                   type="button"
                   phx-click="toggle_password_confirmation_visibility"
                   phx-target={@myself}
-                  class="absolute right-3 top-3 text-gray-400 hover:text-gray-300"
+                  class="absolute right-3 top-2 sm:top-3 text-gray-400 hover:text-gray-300"
                 >
                   <.icon
                     name={(@show_password_confirmation && "hero-eye-slash") || "hero-eye"}
-                    class="h-5 w-5"
+                    class="h-4 w-4 sm:h-5 sm:w-5"
                   />
                 </button>
               </div>
@@ -86,11 +90,11 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
           </div>
 
           <:actions>
-            <div class="mt-6">
+            <div class="mt-4 sm:mt-6">
               <.button
                 color="primary"
                 classes={[
-                  "w-full py-3 text-lg inline-flex items-center justify-center gap-2",
+                  "w-full py-2 sm:py-3 text-base sm:text-lg inline-flex items-center justify-center gap-2",
                   (@loading? && "opacity-80 cursor-not-allowed") || ""
                 ]}
                 disabled={@loading?}
@@ -129,7 +133,10 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
 
       <.button
         color="none"
-        classes={["mt-6 p-0 text-center", (@loading? && "opacity-50 cursor-not-allowed") || ""]}
+        classes={[
+          "mt-4 sm:mt-6 p-0 text-center text-sm sm:text-base",
+          (@loading? && "opacity-50 cursor-not-allowed") || ""
+        ]}
         phx-click="go_back"
         phx-target={@myself}
         disabled={@loading?}
