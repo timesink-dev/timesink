@@ -1,4 +1,3 @@
-# lib/timesink_web/layouts/live_app_layout.ex
 defmodule TimesinkWeb.LiveAppLayout do
   use TimesinkWeb, :html
   alias TimesinkWeb.TopNav
@@ -85,24 +84,21 @@ defmodule TimesinkWeb.LiveAppLayout do
     <!-- Newsletter Signup -->
         <div class="max-w-3xl mx-auto mt-16 border-t border-mystery-white/10 pt-10">
           <p class="text-lg font-semibold mb-2 text-center">
-            Get screening updates, op-eds, & Cinematic transmissions from our substack.
+            Get screening updates & Cinematic transmissions from our newsletter
           </p>
-          <p class="text-sm text-center text-mystery-white/70 mb-2 font-gangster w-2/3 mx-auto">
-            Be the first to know about upcoming films, special events, essays, insights, and fresh critique—no noise, just the good stuff.
+          <p class="text-sm text-center text-mystery-white/70 mb-4 font-gangster w-2/3 mx-auto">
+            Be the first to know about upcoming films, special events, and platform news, just the good stuff.
           </p>
-          <div class="flex justify-center mt-6">
-            <div class="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl px-4">
-              <iframe
-                src="https://timesinkpresents.substack.com/embed"
-                class="w-full mx-auto block rounded-md"
-                style="max-width: 100%; min-height: 150px;"
-                height="80"
-                frameborder="0"
-                scrolling="no"
-              >
-              </iframe>
-            </div>
-          </div>
+          <form class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="Your email"
+              class="font-gangster bg-transparent border border-mystery-white/20 text-sm px-4 py-2 rounded w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <.button type="submit" color="primary" class="font-gangster">Subscribe</.button>
+          </form>
         </div>
       </div>
     </footer>
