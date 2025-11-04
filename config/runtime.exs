@@ -145,10 +145,9 @@ if env == :dev do
   config :stripity_stripe,
     api_key: System.get_env("TIMESINK_TEST_STRIPE_SECRET_KEY")
 
-  # Ghost (dev)
-  config :timesink, :ghost_publishing,
-    webhook_key: System.get_env("TIMESINK_TEST_GHOST_PUBLISHING_WEBHOOK_KEY"),
-    content_api_key: System.get_env("TIMESINK_TEST_GHOST_CONTENT_API_KEY", "test-content-api-key")
+  config :timesink, :resend,
+    api_key: System.fetch_env!("TIMESINK_RESEND_API_KEY"),
+    audience_id: System.fetch_env!("TIMESINK_RESEND_AUDIENCE_ID")
 end
 
 # ─────────────────────────────────────────────────────────────
@@ -199,6 +198,10 @@ end
 if env == :staging do
   # Mailer
   config :timesink, Timesink.Mailer, api_key: System.fetch_env!("TIMESINK_STAGING_RESEND_API_KEY")
+
+  config :timesink, :resend,
+    api_key: System.fetch_env!("TIMESINK_STAGING_RESEND_API_KEY"),
+    audience_id: System.fetch_env!("TIMESINK_STAGING_RESEND_AUDIENCE_ID")
 
   # Stripe (staging)
   config :timesink, :stripe,
@@ -252,6 +255,10 @@ end
 if env == :prod do
   # Mailer
   config :timesink, Timesink.Mailer, api_key: System.fetch_env!("TIMESINK_RESEND_API_KEY")
+
+  config :timesink, :resend,
+    api_key: System.fetch_env!("TIMESINK_RESEND_API_KEY"),
+    audience_id: System.fetch_env!("TIMESINK_RESEND_AUDIENCE_ID")
 
   # S3 (prod) — require all secret envs explicitly
   config :timesink, Timesink.Storage.S3,

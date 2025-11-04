@@ -1,6 +1,7 @@
 defmodule TimesinkWeb.LiveAppLayout do
   use TimesinkWeb, :html
   alias TimesinkWeb.TopNav
+  alias TimesinkWeb.NewsletterLive
 
   # This function name must match what you pass in the router tuple, e.g. :app
   def app(assigns) do
@@ -82,24 +83,7 @@ defmodule TimesinkWeb.LiveAppLayout do
         </div>
         
     <!-- Newsletter Signup -->
-        <div class="max-w-3xl mx-auto mt-16 border-t border-mystery-white/10 pt-10">
-          <p class="text-lg font-semibold mb-2 text-center">
-            Get screening updates & Cinematic transmissions from our newsletter
-          </p>
-          <p class="text-sm text-center text-mystery-white/70 mb-4 font-gangster w-2/3 mx-auto">
-            Be the first to know about upcoming films, special events, and platform news, just the good stuff.
-          </p>
-          <form class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <input
-              type="email"
-              name="email"
-              required
-              placeholder="Your email"
-              class="font-gangster bg-transparent border border-mystery-white/20 text-sm px-4 py-2 rounded w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <.button type="submit" color="primary" class="font-gangster">Subscribe</.button>
-          </form>
-        </div>
+        <.live_component module={NewsletterLive} id="newsletter-footer" />
       </div>
     </footer>
     """

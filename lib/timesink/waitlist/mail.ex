@@ -28,14 +28,12 @@ defmodule Timesink.Waitlist.Mail do
     body = """
     Hi #{first_name},
 
-    Your spot is ready — you’re invited to join TimeSink.
+    Great news! Your spot is ready. You’re now officially invited to join TimeSink.
 
     Click the link below to create your account and step inside:
     #{base_url()}/invite/#{code}
 
     We’re glad to have you with us.
-
-    See you around,
 
     The TimeSink Team
     """
