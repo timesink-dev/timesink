@@ -133,6 +133,10 @@ defmodule TimesinkWeb.OnboardingLive do
     case result do
       {:ok, user} ->
         token = CoreAuth.generate_token(user)
+
+        # sign them up to the newsletter
+        Timesink.Newsletter.Resend.subscribe(user.email)
+
         {:noreply, push_navigate(socket, to: ~p"/auth/complete_onboarding?token=#{token}")}
 
       {:error, :invite_already_used} ->
