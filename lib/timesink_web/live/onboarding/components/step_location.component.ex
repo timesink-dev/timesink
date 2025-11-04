@@ -20,7 +20,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col items-center justify-center h-screen bg-backroom-black px-4 sm:px-6 py-4">
+    <div class="flex flex-col items-center justify-center h-screen overflow-hidden bg-backroom-black px-4 sm:px-6 py-4">
       <div class="w-full max-w-md bg-backroom-black shadow-lg rounded-2xl p-4 sm:p-8 text-white">
         <p class="text-base text-mystery-white text-center mb-3 sm:mb-4">
           Let's finalize your membership...
@@ -35,7 +35,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
           as="location"
           phx-submit="save_location"
           phx-target={@myself}
-          class="mt-4 sm:mt-6"
+          class="mt-6"
         >
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">City</label>
@@ -48,7 +48,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
               phx-change="search"
               phx-target={@myself}
               placeholder="Start typing your city (e.g., Lyon, France)"
-              class="w-full p-2 sm:p-3 rounded text-white border-none bg-dark-theater-primary focus:outline-none focus:ring-2 focus:ring-neon-blue-lightest text-sm sm:text-base"
+              class="w-full p-3 rounded text-white border-none bg-dark-theater-primary focus:outline-none focus:ring-2 focus:ring-neon-blue-lightest text-sm sm:text-base"
               autocomplete="off"
             />
           </div>
@@ -73,7 +73,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
             </li>
           </ul>
           <:actions>
-            <.button class="mt-4 sm:mt-6 w-full py-2 sm:py-3 text-base sm:text-lg" color="primary">
+            <.button class="mt-4 sm:mt-6 w-full py-3 text-base sm:text-lg" color="primary">
               Continue
             </.button>
           </:actions>
