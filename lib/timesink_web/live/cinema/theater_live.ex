@@ -281,7 +281,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           
     <!-- Body (scroll-limited like before) -->
           <div class="bg-white/[0.01]">
-            <%= if @active_panel_tab == :chat do %>
+            <!-- Chat Tab Content -->
+            <div class={@active_panel_tab == :chat || "hidden"}>
               <!-- Scrollable chat body (fixed height) -->
               <div
                 id="chat-body-desktop"
@@ -336,17 +337,22 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   </button>
                 </div>
               </form>
-            <% else %>
-              <!-- Live Audience tab -->
-              <div class="max-h-[65vh] overflow-y-auto p-3">
+            </div>
+            
+    <!-- Live Audience Tab Content -->
+            <div class={[
+              "max-h-[65vh] overflow-y-auto p-3",
+              @active_panel_tab == :online || "hidden"
+            ]}>
+              <%= if map_size(@presence) > 0 do %>
                 <ul class="space-y-2">
-                  <%= for name <- ["Jane", "David", "Emily", "Marco", "Anya", "You"] do %>
+                  <%= for {_user_id, %{metas: [meta | _]}} <- @presence do %>
                     <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-white/[0.02] hover:bg-white/[0.04] transition">
                       <div class="flex items-center gap-3">
                         <div class="h-7 w-7 rounded-full bg-white/[0.08] text-gray-100 flex items-center justify-center text-[11px] font-semibold">
-                          {String.first(name) |> String.upcase()}
+                          {meta.username |> String.first() |> String.upcase()}
                         </div>
-                        <span class="text-sm text-gray-100">{name}</span>
+                        <span class="text-sm text-gray-100">{meta.username}</span>
                       </div>
                       <span class="flex items-center gap-1 text-xs text-zinc-400">
                         <span class="relative inline-flex h-2 w-2">
@@ -359,8 +365,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     </li>
                   <% end %>
                 </ul>
-              </div>
-            <% end %>
+              <% else %>
+                <div class="text-center text-zinc-400 text-sm py-8">
+                  No one is currently watching
+                </div>
+              <% end %>
+            </div>
           </div>
         </aside>
       </div>
@@ -407,12 +417,13 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           </div>
 
           <div class="h-[50vh] flex flex-col">
-            <div
-              id="mobile-chat-scroll"
-              data-scroll-container="#mobile-chat-scroll"
-              class="flex-1 overflow-y-auto overscroll-contain"
-            >
-              <%= if @active_panel_tab == :chat do %>
+            <div class="flex-1 overflow-y-auto overscroll-contain">
+              <!-- Mobile Chat Tab Content -->
+              <div
+                id="mobile-chat-scroll"
+                data-scroll-container="#mobile-chat-scroll"
+                class={@active_panel_tab == :chat || "hidden"}
+              >
                 <!-- Mobile chat list with streaming -->
                 <ul
                   id="mobile-chat-list"
@@ -433,28 +444,41 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     </li>
                   <% end %>
                 </ul>
-              <% else %>
-                <ul class="p-3 space-y-2">
-                  <%= for name <- ["Jane", "David", "Emily", "Marco", "Anya", "You"] do %>
-                    <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-white/[0.02]">
-                      <div class="flex items-center gap-3">
-                        <div class="h-7 w-7 rounded-full bg-white/[0.08] text-gray-100 flex items-center justify-center text-[11px] font-semibold">
-                          {String.first(name) |> String.upcase()}
+              </div>
+              
+    <!-- Mobile Live Audience Tab Content -->
+              <div class={[
+                "p-3",
+                @active_panel_tab == :online || "hidden"
+              ]}>
+                <%= if map_size(@presence) > 0 do %>
+                  <ul class="space-y-2">
+                    <%= for {_user_id, %{metas: [meta | _]}} <- @presence do %>
+                      <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-white/[0.02]">
+                        <div class="flex items-center gap-3">
+                          <div class="h-7 w-7 rounded-full bg-white/[0.08] text-gray-100 flex items-center justify-center text-[11px] font-semibold">
+                            {meta.username |> String.first() |> String.upcase()}
+                          </div>
+                          <span class="text-sm text-gray-100">{meta.username}</span>
                         </div>
-                        <span class="text-sm text-gray-100">{name}</span>
-                      </div>
-                      <span class="flex items-center gap-1 text-xs text-zinc-400">
-                        <span class="relative inline-flex h-2 w-2">
-                          <span class="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping">
+                        <span class="flex items-center gap-1 text-xs text-zinc-400">
+                          <span class="relative inline-flex h-2 w-2">
+                            <span class="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping">
+                            </span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500">
+                            </span>
                           </span>
-                          <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                          online
                         </span>
-                        online
-                      </span>
-                    </li>
-                  <% end %>
-                </ul>
-              <% end %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <div class="text-center text-zinc-400 text-sm py-8">
+                    No one is currently watching
+                  </div>
+                <% end %>
+              </div>
             </div>
 
             <%= if @active_panel_tab == :chat do %>

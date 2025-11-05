@@ -11,16 +11,16 @@ defmodule TimesinkWeb.InfoPageLive do
         <div>
           <h2 class="text-white font-semibold text-lg">What is TimeSink?</h2>
           <p class="mt-1">
-            TimeSink is a virtual cinema for people who care about film as an art form. We host curated, time-based screenings—real films, real audiences, real moments. No algorithms, no endless scrolling. We're going back to the human touch. Just show up at showtime and watch something worth your attention.
+            TimeSink is a virtual cinema for people who are curious about film. We host curated, time-based screenings. Just show up at showtime and watch something worth your attention.
           </p>
         </div>
 
         <div>
           <h2 class="text-white font-semibold text-lg">
-            Why should I care when I already have Netflix / Mubi / YouTube / etc?
+            Why should I care when there are other platforms like Netflix / YouTube / etc?
           </h2>
           <p class="mt-1">
-            Because those are content libraries. TimeSink is a theater. One screen, one showing, one moment shared with others. No autoplay, no algorithm recommendations, no binging. We curate bold, distinctive films that earn your time. If you're tired of scrolling and want cinema that actually moves you, this is it.
+            Because those are content libraries finely-tuned by machines. TimeSink is a theater. One screen, one showing, one moment shared with others. No autoplay, no algorithm recommendations, no binging. We curate bold, distinctive films that earn your time. If you're tired of scrolling and want cinema that actually moves you, this is it.
           </p>
         </div>
 
@@ -34,7 +34,7 @@ defmodule TimesinkWeb.InfoPageLive do
         <div>
           <h2 class="text-white font-semibold text-lg">What kind of films do you show?</h2>
           <p class="mt-1">
-            Short films, features, documentaries, hybrids, experiments—anything with a strong voice and vision. Format doesn't matter. iPhone or cinema camera, we don't care. If it's compelling and well-made, it's in. The only rule: no boring, no pandering.
+            Short films, features, documentaries, comedies, hybrids, experiments—anything with a strong voice and vision. Format doesn't matter. iPhone or cinema camera, we don't care. If it's compelling and well-made, it's in. The only rule: no boring, no pandering.
           </p>
         </div>
 
