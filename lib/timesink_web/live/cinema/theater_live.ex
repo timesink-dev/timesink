@@ -109,10 +109,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <!-- Main layout (mobile-first: stacked) -->
       <div class="flex flex-col md:flex-row md:gap-6 md:items-start">
         <!-- Left: Player + Film Info -->
-        <div class={[
-          "min-w-0 transition-all duration-300",
-          if(@chat_open, do: "md:flex-1", else: "md:w-full md:max-w-4xl md:mx-auto")
-        ]}>
+        <div class="min-w-0 md:flex-1 transition-all duration-300">
           <% playback_id = Film.get_mux_playback_id(@film.video) %>
           <%= if @phase == :playing and playback_id do %>
             <div id="simulated-live-player" data-offset={@offset} phx-hook="SimulatedLivePlayback">
@@ -243,13 +240,17 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         </div>
         
     <!-- Right: Desktop side panel -->
-        <aside class={[
-          "md:w-96 md:sticky md:top-20 md:self-start border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02] transition-opacity duration-200 ease-in-out",
-          if(@chat_open,
-            do: "hidden md:block opacity-100",
-            else: "hidden md:block opacity-0 pointer-events-none scale-0"
-          )
-        ]}>
+        <aside class={
+          [
+            "md:sticky md:top-20 md:self-start border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02]",
+            "md:block md:transform-gpu transition-all duration-200",
+            # keep it anchored on the right and slide in
+            if(@chat_open,
+              do: "opacity-100 md:w-96 md:translate-x-0",
+              else: "opacity-0 md:w-0 md:translate-x-4 pointer-events-none"
+            )
+          ]
+        }>
           <!-- Tabs -->
           <div class="flex items-center justify-between bg-white/[0.03] px-4 py-3 border-b border-white/10">
             <div class="flex gap-6 text-sm">
