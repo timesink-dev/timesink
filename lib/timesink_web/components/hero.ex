@@ -38,7 +38,7 @@ defmodule TimesinkWeb.Components.Hero do
         ">
           <div class="w-full max-w-[24rem] text-center">
             <h2 class="font-brand text-3xl md:text-4xl tracking-tight">
-              Fresh Cinema selected for you. Real Audiences. No endless scrolls.
+              Fresh Film selected for you. Real Audiences. No endless scrolls.
             </h2>
 
             <p class="mt-3 text-mystery-white">

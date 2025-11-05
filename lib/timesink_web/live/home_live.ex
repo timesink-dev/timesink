@@ -129,7 +129,7 @@ defmodule TimesinkWeb.HomepageLive do
                 </svg>
               </div>
               <h3 class="text-lg font-medium">
-                Live for every screening
+                Live for every showing
               </h3>
               <p class="mt-1 text-sm text-zinc-400">
                 Lean-in live chats with real people, not noisy comment walls.
@@ -150,7 +150,7 @@ defmodule TimesinkWeb.HomepageLive do
               </div>
               <h3 class="text-lg font-medium">Global community</h3>
               <p class="mt-1 text-sm text-zinc-400">
-                Join a network of viewers from everywhere—discover, discuss, connect, repeat.
+                Join a network of viewers from everywhere. Discover, discuss, connect, repeat.
               </p>
             </div>
           </div>
@@ -164,20 +164,21 @@ defmodule TimesinkWeb.HomepageLive do
               </div>
               <div class="flex items-center gap-2 text-sm">
                 <div class="inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-3 py-1">
-                  <div class="h-2 w-2 rounded-full animate-pulse bg-current"></div>
+                  <div class="h-2 w-2 rounded-full animate-pulse bg-current text-neon-red-light">
+                  </div>
                   Live showings every 30 minutes
                 </div>
-                <a
-                  href="/now"
-                  class="rounded-full border border-white/15 px-3 py-1 hover:bg-white/[0.06]"
-                >
+                <button class="rounded-full border border-white/15 px-3 py-1 hover:bg-white/[0.06] hover:cursor-not-allowed">
                   View schedule
-                </a>
+                </button>
               </div>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2 text-sm">
+              No events yet...
             </div>
             
     <!-- pills-style schedule items (demo preview) -->
-            <div class="mt-4 flex flex-wrap gap-2">
+            <%!-- <div class="mt-4 flex flex-wrap gap-2">
               <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs md:text-sm">
                 Thu 19:00 — <span class="text-zinc-200">*Fragments of a City*</span> (Premiere)
               </span>
@@ -193,7 +194,7 @@ defmodule TimesinkWeb.HomepageLive do
               <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs md:text-sm">
                 Mon 22:00 — <span class="text-zinc-200">*Cinema in Transit*</span>
               </span>
-            </div>
+            </div> --%>
           </div>
         </div>
       </div>
@@ -226,19 +227,69 @@ defmodule TimesinkWeb.HomepageLive do
             </p>
           </div>
         <% @no_showcase -> %>
-          <div class="text-center text-white my-32 px-6 max-w-xl mx-auto h-[100vh] flex flex-col items-center justify-center">
-            <.icon name="hero-film" class="h-16 w-16 mb-6 text-neon-blue-lightest" />
-            <h1 class="text-4xl font-bold mb-4">No Showcases Available</h1>
-            <p class="text-gray-400 mb-8">
-              It seems like there are no active or upcoming showcases at the moment.
-              Check back later for new screenings!
-            </p>
-            <p class="text-gray-500 text-sm">
-              In the meantime, feel free to explore our
-              <a href="/blog" class="text-neon-blue-lightest hover:underline">blog</a>
-              for insights and updates.
-            </p>
-          </div>
+          <section class="text-white my-8 px-6 max-w-3xl mx-auto min-h-[80vh] flex items-center">
+            <div class="w-full text-center">
+              <div class="mx-auto mb-3 h-9 w-9 rounded-full bg-zinc-900 ring-1 ring-zinc-800
+                      flex items-center justify-center text-zinc-300">
+                📌
+              </div>
+
+              <h1 class="text-4xl font-bold tracking-tight mb-3">
+                We’re working on our first showcase.
+              </h1>
+              <p class="text-zinc-400 text-balance max-w-2xl mx-auto">
+                TimeSink is a live, curated cinema. When there isn’t an active release, we’re busy selecting the next one. Keep checking back soon.
+              </p>
+              
+    <!-- Feature highlights -->
+              <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
+                  <div class="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06]">
+                    <.icon name="hero-bolt" class="h-4 w-4 text-neon-blue-lightest" />
+                  </div>
+                  <div class="text-sm text-zinc-300">
+                    Both rookie and veteran filmmakers welcome
+                  </div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
+                  <div class="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06]">
+                    <.icon name="hero-chat-bubble-left-right" class="h-4 w-4 text-neon-blue-lightest" />
+                  </div>
+                  <div class="text-sm text-zinc-300">
+                    Live screenings with real-time audiences
+                  </div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
+                  <div class="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06]">
+                    <.icon name="hero-play" class="h-4 w-4 text-neon-blue-lightest" />
+                  </div>
+                  <div class="text-sm text-zinc-300">Live showtimes every 30 minutes</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
+                  <div class="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06]">
+                    <.icon name="hero-sparkles" class="h-4 w-4 text-neon-blue-lightest" />
+                  </div>
+                  <div class="text-sm text-zinc-300">Retrospectives, premieres, hidden gems</div>
+                </div>
+              </div>
+              
+    <!-- CTAs -->
+              <div class="mt-8 flex items-center justify-center gap-3">
+                <.link
+                  navigate="/submit"
+                  class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2 text-sm text-white hover:bg-white/[0.10] transition"
+                >
+                  <.icon name="hero-arrow-up-tray" class="h-4 w-4" /> Submit your film
+                </.link>
+                <.link
+                  navigate="/about"
+                  class="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/[0.06] transition"
+                >
+                  <.icon name="hero-information-circle" class="h-4 w-4" /> How programming works
+                </.link>
+              </div>
+            </div>
+          </section>
       <% end %>
     </div>
     """
