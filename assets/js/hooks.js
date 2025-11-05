@@ -587,5 +587,215 @@ Hooks.CopyBus = {
   }
 }
 
+/**  YouTube-style autoscroll:
+ - Only stick to bottom when user is already near the bottom
+-  If user scrolls up, stop autoscroll and show a "New messages" button
+- When user clicks the button or scrolls back to bottom, resume autoscroll 
+*/
+
+Hooks.ChatAutoScroll =  {
+  STICKY_THRESHOLD: 64, // px from bottom is "at bottom"
+
+  mounted() {
+    // This hook must be on the UL. We find the scroll container via data attr.
+    const selector = this.el.dataset.scrollContainer;
+    this.container = selector ? document.querySelector(selector) : this.el.parentElement;
+
+    if (!this.container) {
+      console.warn("[ChatAutoScroll] Missing scroll container for", this.el);
+      return;
+    }
+
+    // MODE: inline (default) or fixed overlay (set data-overlay="fixed" on the UL)
+    this.overlayMode = (this.el.dataset.overlay || "").toLowerCase() === "fixed";
+
+    // state
+    this.stickToBottom = true;
+    this.isPointerDown = false;
+    this.prevCount = this.getMessageCount();
+    this.baselineCount = this.prevCount; // count when we left bottom
+    this.newCount = 0;
+
+    // ensure predictable stacking
+    if (!this.overlayMode) {
+      if (!getComputedStyle(this.container).position || getComputedStyle(this.container).position === "static") {
+        this.container.style.position = "relative";
+      }
+      this.container.style.overflowAnchor = "none";
+    }
+
+    this.buildJumpButton();
+    this.bindEvents();
+
+    // init stickiness
+    this.stickToBottom = this.isNearBottom();
+    if (this.stickToBottom) this.scrollToBottom(false);
+  },
+
+  updated() {
+    const currentCount = this.getMessageCount();
+
+    if (this.stickToBottom && !this.isPointerDown) {
+      this.scrollToBottom();
+      this.hideJumpButton();
+      this.baselineCount = currentCount;
+      this.newCount = 0;
+    } else {
+      const diff = Math.max(0, currentCount - this.baselineCount);
+      this.newCount = diff;
+      this.updateJumpButton();
+      if (diff > 0) this.showJumpButton();
+    }
+  },
+
+  destroyed() {
+    this.unbindEvents();
+    if (this.jumpBtn && this.overlayMode) {
+      // tidy up overlay button if we appended to body
+      document.body.contains(this.jumpBtn) && document.body.removeChild(this.jumpBtn);
+    }
+  },
+
+  // ── events ────────────────────────────────────────────────
+  bindEvents() {
+    this.onScroll = this.handleScroll.bind(this);
+    this.onPointerDown = () => { this.isPointerDown = true; };
+    this.onPointerUp = () => { this.isPointerDown = false; };
+    this.onReposition = this.positionOverlay.bind(this);
+
+    this.container.addEventListener("scroll", this.onScroll, { passive: true });
+    this.container.addEventListener("pointerdown", this.onPointerDown, { passive: true });
+    window.addEventListener("pointerup", this.onPointerUp, { passive: true });
+    this.container.addEventListener("touchstart", this.onPointerDown, { passive: true });
+    window.addEventListener("touchend", this.onPointerUp, { passive: true });
+
+    if (this.overlayMode) {
+      window.addEventListener("resize", this.onReposition, { passive: true });
+      window.addEventListener("scroll", this.onReposition, { passive: true });
+      this.positionOverlay(); // initial placement
+    }
+  },
+
+  unbindEvents() {
+    this.container.removeEventListener("scroll", this.onScroll);
+    this.container.removeEventListener("pointerdown", this.onPointerDown);
+    window.removeEventListener("pointerup", this.onPointerUp);
+    this.container.removeEventListener("touchstart", this.onPointerDown);
+    window.removeEventListener("touchend", this.onPointerUp);
+
+    if (this.overlayMode) {
+      window.removeEventListener("resize", this.onReposition);
+      window.removeEventListener("scroll", this.onReposition);
+    }
+  },
+
+  // ── behavior ──────────────────────────────────────────────
+  getMessageCount() {
+    return this.el.querySelectorAll(":scope > li").length; // count direct <li> children
+  },
+
+  handleScroll() {
+    const dist = this.distanceFromBottom();
+    if (dist <= this.STICKY_THRESHOLD) {
+      this.stickToBottom = true;
+      this.baselineCount = this.getMessageCount();
+      this.newCount = 0;
+      this.hideJumpButton();
+    } else {
+      if (this.stickToBottom) this.baselineCount = this.getMessageCount();
+      this.stickToBottom = false;
+      if (this.overlayMode) this.positionOverlay();
+    }
+  },
+
+  isNearBottom() { return this.distanceFromBottom() <= this.STICKY_THRESHOLD; },
+
+  distanceFromBottom() {
+    const el = this.container;
+    return el.scrollHeight - (el.scrollTop + el.clientHeight);
+  },
+
+  scrollToBottom(smooth = true) {
+    const el = this.container;
+    requestAnimationFrame(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
+    });
+  },
+
+  // ── UI: jump button ───────────────────────────────────────
+  buildJumpButton() {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.title = "Jump to latest";
+    btn.style.display = "none"; // control visibility via inline style
+    btn.className = [
+      "inline-flex", "items-center", "gap-2",
+      "rounded-full", "border", "border-white/10",
+      "bg-white/[0.06]", "backdrop-blur",
+      "px-4", "py-2",
+      "text-xs", "font-medium", "text-gray-100",
+      "shadow-lg", "hover:bg-white/[0.10]",
+      "transition-all", "duration-200",
+      "animate-in", "slide-in-from-bottom-2"
+    ].join(" ");
+
+    if (this.overlayMode) {
+      // position: fixed relative to viewport near container's visible bottom-right
+      btn.style.position = "fixed";
+      btn.style.zIndex = "9999";
+      document.body.appendChild(btn);
+      this.positionOverlay();
+    } else {
+      // position: absolute inside scroll container
+      btn.style.position = "absolute";
+      btn.style.right = "1rem";  // right-4
+      btn.style.bottom = "1rem"; // bottom-4
+      btn.style.zIndex = "1000";
+      this.container.append(btn);
+    }
+
+    // Add icon and text
+    btn.innerHTML = `
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+      </svg>
+      <span>New messages</span>
+    `;
+
+    btn.addEventListener("click", () => {
+      this.stickToBottom = true;
+      this.scrollToBottom();
+      const current = this.getMessageCount();
+      this.baselineCount = current;
+      this.newCount = 0;
+      this.hideJumpButton();
+    });
+
+    this.jumpBtn = btn;
+  },
+
+  positionOverlay() {
+    if (!this.overlayMode || !this.jumpBtn) return;
+    const rect = this.container.getBoundingClientRect();
+    // place 16px from bottom center of the visible container for better visibility
+    const pad = 16;
+    const btnWidth = this.jumpBtn.offsetWidth;
+    const x = Math.max(0, rect.left + (rect.width - btnWidth) / 2);
+    const y = Math.max(0, rect.bottom - pad - this.jumpBtn.offsetHeight);
+    this.jumpBtn.style.left = `${x}px`;
+    this.jumpBtn.style.top  = `${y}px`;
+  },
+
+  updateJumpButton() {
+    if (!this.jumpBtn) return;
+    const span = this.jumpBtn.querySelector('span');
+    if (span) {
+      span.textContent = this.newCount > 0 ? `${this.newCount} new message${this.newCount > 1 ? 's' : ''}` : "New messages";
+    }
+  },
+
+  showJumpButton() { if (this.jumpBtn) this.jumpBtn.style.display = "inline-flex"; },
+  hideJumpButton() { if (this.jumpBtn) this.jumpBtn.style.display = "none"; }
+}
 
 export default Hooks;
