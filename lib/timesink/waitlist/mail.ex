@@ -35,8 +35,6 @@ defmodule Timesink.Waitlist.Mail do
 
     We’re glad to have you with us.
 
-    See you around,
-
     The TimeSink Team
     """
 

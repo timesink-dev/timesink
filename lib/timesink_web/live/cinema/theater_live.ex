@@ -49,7 +49,11 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       presence = TimesinkWeb.Presence.list(presence_topic)
 
       recent_msgs =
-        Timesink.Comment.Exhibition.list_recent_exhibition_comments(exhibition.id, 100)
+        Timesink.Comment.Exhibition.list_recent_exhibition_comments(exhibition.id)
+
+      Logger.info(
+        "Loaded #{length(recent_msgs)} existing comments for exhibition #{exhibition.id}. Comment IDs: #{Enum.map(recent_msgs, & &1.id) |> Enum.join(", ")}"
+      )
 
       {:ok,
        socket
@@ -79,17 +83,33 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   # ───────────────────────────────────────────────────────────
   def render(assigns) do
     ~H"""
-    <div
-      id="theater"
-      class="max-w-4xl mx-auto p-6 space-y-8 text-gray-100 mt-16 flex justify-between gap-x-12"
-    >
-      <div class="flex-1">
-        <div class="border-b border-gray-700 pb-4 mb-10">
-          <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
-          <p class="text-gray-400 mt-2 text-sm">{@theater.description}</p>
-        </div>
-
-        <div>
+    <div id="theater" class="max-w-7xl md:max-w-4xl mx-auto px-4 md:px-6 mt-16 text-gray-100">
+      <!-- Header -->
+      <div class="border-b border-white/10 pb-4 mb-10">
+        <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
+        <p class="text-zinc-400 mt-2 text-sm">{@theater.description}</p>
+      </div>
+      
+    <!-- Toolbar -->
+      <div class="flex justify-between items-center mb-4">
+        <div></div>
+        <button
+          phx-click="toggle_chat"
+          class={[
+            @chat_open && "invisible md:visible",
+            "text-sm px-4 py-2 rounded-lg border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-gray-300 hover:text-white transition"
+          ]}
+          aria-haspopup="dialog"
+          aria-expanded="false"
+        >
+          {if @chat_open, do: "Hide Chat", else: "Show Chat"}
+        </button>
+      </div>
+      
+    <!-- Main layout (mobile-first: stacked) -->
+      <div class="flex flex-col md:flex-row md:gap-6 md:items-start">
+        <!-- Left: Player + Film Info -->
+        <div class="min-w-0 md:flex-1 transition-all duration-300">
           <% playback_id = Film.get_mux_playback_id(@film.video) %>
           <%= if @phase == :playing and playback_id do %>
             <div id="simulated-live-player" data-offset={@offset} phx-hook="SimulatedLivePlayback">
@@ -219,233 +239,270 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           <% end %>
         </div>
         
-    <!-- Right: Desktop side panel (reverted to earlier height/feel) -->
-        <%= if @chat_open do %>
-          <aside class="hidden md:block md:w-96 md:sticky md:top-20 md:self-start border border-gray-800 rounded-xl overflow-hidden bg-zinc-950/60">
-            <!-- Tabs -->
-            <div class="flex items-center justify-between bg-zinc-900/70 px-4 py-3 border-b border-gray-800">
-              <div class="flex gap-6 text-sm">
-                <button
-                  phx-click="switch_tab"
-                  phx-value-to="chat"
-                  class={[
-                    "pb-2",
-                    @active_panel_tab == :chat && "text-white border-b-2 border-white",
-                    @active_panel_tab != :chat && "text-gray-400 hover:text-gray-200"
-                  ]}
-                >
-                  Chat
-                </button>
-                <button
-                  phx-click="switch_tab"
-                  phx-value-to="online"
-                  class={[
-                    "pb-2",
-                    @active_panel_tab == :online && "text-white border-b-2 border-white",
-                    @active_panel_tab != :online && "text-gray-400 hover:text-gray-200"
-                  ]}
-                >
-                  Live Audience
-                </button>
-              </div>
+    <!-- Right: Desktop side panel -->
+        <aside class={
+          [
+            "md:sticky md:top-20 md:self-start border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02]",
+            "md:block md:transform-gpu transition-all duration-200",
+            # keep it anchored on the right and slide in
+            if(@chat_open,
+              do: "opacity-100 md:w-96 md:translate-x-0",
+              else: "opacity-0 md:w-0 md:translate-x-4 pointer-events-none"
+            )
+          ]
+        }>
+          <!-- Tabs -->
+          <div class="flex items-center justify-between bg-white/[0.03] px-4 py-3 border-b border-white/10">
+            <div class="flex gap-6 text-sm">
+              <button
+                phx-click="switch_tab"
+                phx-value-to="chat"
+                class={[
+                  "pb-2",
+                  @active_panel_tab == :chat && "text-white border-b-2 border-white",
+                  @active_panel_tab != :chat && "text-gray-400 hover:text-gray-200"
+                ]}
+              >
+                Chat
+              </button>
+              <button
+                phx-click="switch_tab"
+                phx-value-to="online"
+                class={[
+                  "pb-2",
+                  @active_panel_tab == :online && "text-white border-b-2 border-white",
+                  @active_panel_tab != :online && "text-gray-400 hover:text-gray-200"
+                ]}
+              >
+                Live Audience
+              </button>
             </div>
-            
-    <!-- Body (scroll-limited like before) -->
-            <div class="bg-zinc-950/60">
-              <%= if @active_panel_tab == :chat do %>
-                <!-- Scrollable chat body (fixed height) -->
-                <div
-                  id="chat-body-desktop"
-                  data-scroll-container="#chat-body-desktop"
-                  class="max-h-[40vh] overflow-y-auto relative"
-                >
-                  <!-- STREAMED LIST (desktop only) -->
-                  <ul
-                    id="chat-list"
-                    phx-update="stream"
-                    phx-hook="ChatAutoScroll"
-                    data-scroll-container="#chat-body-desktop"
-                    data-overlay="fixed"
-                    class="divide-y divide-gray-800"
-                  >
-                    <%= for {dom_id, msg} <- @streams.messages do %>
-                      <li id={dom_id} class="px-4 py-3">
-                        <div class="flex items-center justify-between">
-                          <span class="font-medium text-gray-400 text-sm">
-                            {(msg.user && "@" <> msg.user.username) || "Member"}
-                          </span>
-                          <span class="text-xs text-gray-400">{chat_time(msg.inserted_at)}</span>
-                        </div>
-                        <p class="text-gray-200 text-sm mt-1">{msg.content}</p>
-                      </li>
-                    <% end %>
-                  </ul>
-                  
-    <!-- TYPING -->
-                  <%= if map_size(@typing_users) > 0 do %>
-                    <div class="px-4 py-2 text-xs text-gray-400 border-t border-gray-800">
-                      {typing_line(@typing_users, @presence)}
-                    </div>
-                  <% end %>
-                </div>
-                
-    <!-- INPUT (outside scroll area) -->
-                <form phx-submit="chat:send" class="p-3 border-t border-gray-800">
-                  <div class="flex items-center gap-2">
-                    <input
-                      type="text"
-                      name="chat[body]"
-                      value={@chat_input}
-                      placeholder="Type a message…"
-                      phx-change="chat:typing"
-                      phx-debounce="100"
-                      class="w-full bg-zinc-900/70 border border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
-                      autocomplete="off"
-                    />
-                    <button class="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-zinc-800 text-gray-200 hover:bg-zinc-700">
-                      Send
-                    </button>
-                  </div>
-                </form>
-              <% else %>
-                <!-- Live Audience tab unchanged -->
-                <div class="max-h-[65vh] overflow-y-auto p-3">
-                  <ul class="space-y-2">
-                    <%= for name <- ["Jane", "David", "Emily", "Marco", "Anya", "You"] do %>
-                      <li class="flex items-center justify-between rounded-lg border border-gray-800 px-3 py-2">
-                        <div class="flex items-center gap-3">
-                          <div class="h-7 w-7 rounded-full bg-zinc-700 text-gray-100 flex items-center justify-center text-[11px] font-semibold">
-                            {String.first(name) |> String.upcase()}
-                          </div>
-                          <span class="text-sm text-gray-100">{name}</span>
-                        </div>
-                        <span class="flex items-center gap-1 text-xs text-gray-400">
-                          <span class="relative inline-flex h-2 w-2">
-                            <span class="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping">
-                            </span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500">
-                            </span>
-                          </span>
-                          online
-                        </span>
-                      </li>
-                    <% end %>
-                  </ul>
-                </div>
-              <% end %>
-            </div>
-          </aside>
-        <% end %>
-      </div>
-      
-    <!-- Mobile chat drawer (unchanged, still great) -->
-      <%= if @chat_open do %>
-        <div class="md:hidden fixed inset-0 z-50">
-          <!-- backdrop -->
-          <div class="absolute inset-0 bg-black/60" phx-click="toggle_chat" aria-hidden="true"></div>
+          </div>
           
-    <!-- sheet -->
-          <div class="absolute inset-x-0 bottom-0 rounded-t-2xl border-t border-gray-800 bg-zinc-950/95">
-            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-800">
-              <div class="flex gap-4 text-sm">
-                <button
-                  phx-click="switch_tab"
-                  phx-value-to="chat"
-                  class={[
-                    "pb-2",
-                    @active_panel_tab == :chat && "text-white border-b-2 border-white",
-                    @active_panel_tab != :chat && "text-gray-400 hover:text-gray-200"
-                  ]}
+    <!-- Body (scroll-limited like before) -->
+          <div class="bg-white/[0.01]">
+            <!-- Chat Tab Content -->
+            <div class={@active_panel_tab == :chat || "hidden"}>
+              <!-- Scrollable chat body (fixed height) -->
+              <div
+                id="chat-body-desktop"
+                data-scroll-container="#chat-body-desktop"
+                class="max-h-[40vh] overflow-y-auto relative"
+              >
+                <!-- STREAMED LIST (desktop only) -->
+                <ul
+                  id="chat-list"
+                  phx-update="stream"
+                  phx-hook="ChatAutoScroll"
+                  data-scroll-container="#chat-body-desktop"
+                  data-overlay="fixed"
+                  class="divide-y divide-white/5"
                 >
-                  Chat
-                </button>
-                <button
-                  phx-click="switch_tab"
-                  phx-value-to="online"
-                  class={[
-                    "pb-2",
-                    @active_panel_tab == :online && "text-white border-b-2 border-white",
-                    @active_panel_tab != :online && "text-gray-400 hover:text-gray-200"
-                  ]}
-                >
-                  Live Audience
-                </button>
-              </div>
-              <button class="text-gray-300" phx-click="toggle_chat" aria-label="Close">✕</button>
-            </div>
-
-            <div class="h-[40vh] flex flex-col">
-              <div class="flex-1 overflow-y-auto">
-                <%= if @active_panel_tab == :chat do %>
-                  <div
-                    class="flex-1 overflow-y-auto"
-                    id="mobile-chat"
-                    data-list-selector="ul"
-                    phx-hook="ChatAutoScroll"
-                  >
-                    
-    <!-- PLAIN LIST (not streamed) with unique ids -->
-                    <ul class="divide-y divide-gray-800 text-sm">
-                      <%= for {dom_id, msg} <- @streams.messages do %>
-                        <li id={"m-#{dom_id}"} class="px-4 py-3">
-                          <div class="flex items-center justify-between">
-                            <span class="font-medium text-gray-100">
-                              {(msg.user && msg.user.username) || "Member"}
-                            </span>
-                            <span class="text-xs text-gray-400">{chat_time(msg.inserted_at)}</span>
-                          </div>
-                          <p class="text-gray-200 text-sm mt-1">{msg.content}</p>
-                        </li>
-                      <% end %>
-                    </ul>
-                  </div>
-                <% else %>
-                  <ul class="p-3 space-y-2">
-                    <%= for name <- ["Jane", "David", "Emily", "Marco", "Anya", "You"] do %>
-                      <li class="flex items-center justify-between rounded-lg border border-gray-800 px-3 py-2">
-                        <div class="flex items-center gap-3">
-                          <div class="h-7 w-7 rounded-full bg-zinc-700 text-gray-100 flex items-center justify-center text-[11px] font-semibold">
-                            {String.first(name) |> String.upcase()}
-                          </div>
-                          <span class="text-sm text-gray-100">{name}</span>
-                        </div>
-                        <span class="flex items-center gap-1 text-xs text-gray-400">
-                          <span class="relative inline-flex h-2 w-2">
-                            <span class="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping">
-                            </span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500">
-                            </span>
-                          </span>
-                          online
+                  <%= for {dom_id, msg} <- @streams.messages do %>
+                    <li id={dom_id} class="px-4 py-3">
+                      <div class="flex items-center justify-between">
+                        <span class="font-medium text-zinc-300 text-sm">
+                          {(msg.user && "@" <> msg.user.username) || "Member"}
                         </span>
-                      </li>
-                    <% end %>
-                  </ul>
+                        <span class="text-xs text-zinc-400">{chat_time(msg.inserted_at)}</span>
+                      </div>
+                      <p class="text-gray-100 text-sm mt-1">{msg.content}</p>
+                    </li>
+                  <% end %>
+                </ul>
+                
+    <!-- TYPING -->
+                <%= if map_size(@typing_users) > 0 do %>
+                  <div class="px-4 py-2 text-xs text-zinc-400 border-t border-white/5">
+                    {typing_line(@typing_users, @presence)}
+                  </div>
                 <% end %>
               </div>
-
-              <%= if @active_panel_tab == :chat do %>
-                <div class="p-3 border-t border-gray-800">
-                  <div class="flex items-center gap-2">
-                    <input
-                      type="text"
-                      placeholder="Type a message…"
-                      class="w-full bg-zinc-900/70 border border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
-                      disabled
-                    />
-                    <button
-                      class="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-zinc-800 text-gray-200"
-                      disabled
-                    >
-                      Send
-                    </button>
-                  </div>
+              
+    <!-- INPUT (outside scroll area) -->
+              <form phx-submit="chat:send" class="p-3 border-t border-white/10">
+                <div class="flex items-center gap-2">
+                  <input
+                    type="text"
+                    name="chat[body]"
+                    value={@chat_input}
+                    placeholder="Type a message…"
+                    phx-change="chat:typing"
+                    phx-debounce="100"
+                    class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
+                    autocomplete="off"
+                  />
+                  <button class="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/[0.06] text-gray-200 hover:bg-white/[0.10] transition">
+                    Send
+                  </button>
+                </div>
+              </form>
+            </div>
+            
+    <!-- Live Audience Tab Content -->
+            <div class={[
+              "max-h-[65vh] overflow-y-auto p-3",
+              @active_panel_tab == :online || "hidden"
+            ]}>
+              <%= if map_size(@presence) > 0 do %>
+                <ul class="space-y-2">
+                  <%= for {_user_id, %{metas: [meta | _]}} <- @presence do %>
+                    <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-white/[0.02] hover:bg-white/[0.04] transition">
+                      <div class="flex items-center gap-3">
+                        <div class="h-7 w-7 rounded-full bg-white/[0.08] text-gray-100 flex items-center justify-center text-[11px] font-semibold">
+                          {meta.username |> String.first() |> String.upcase()}
+                        </div>
+                        <span class="text-sm text-gray-100">{meta.username}</span>
+                      </div>
+                      <span class="flex items-center gap-1 text-xs text-zinc-400">
+                        <span class="relative inline-flex h-2 w-2">
+                          <span class="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping">
+                          </span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                        </span>
+                        online
+                      </span>
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <div class="text-center text-zinc-400 text-sm py-8">
+                  No one is currently watching
                 </div>
               <% end %>
             </div>
           </div>
+        </aside>
+      </div>
+      
+    <!-- Mobile chat drawer -->
+      <div class={[
+        "md:hidden fixed inset-0 z-50 flex items-end transition-opacity duration-200",
+        if(@chat_open, do: "opacity-100 pointer-events-auto", else: "opacity-0 pointer-events-none")
+      ]}>
+        <!-- backdrop -->
+        <div class="absolute inset-0 bg-black/70" phx-click="toggle_chat" aria-hidden="true"></div>
+        
+    <!-- sheet -->
+        <div class={[
+          "relative w-full rounded-t-2xl border-t border-white/10 bg-backroom-black transition-transform duration-300 ease-out",
+          if(@chat_open, do: "translate-y-0", else: "translate-y-full")
+        ]}>
+          <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
+            <div class="flex gap-4 text-sm">
+              <button
+                phx-click="switch_tab"
+                phx-value-to="chat"
+                class={[
+                  "pb-2",
+                  @active_panel_tab == :chat && "text-white border-b-2 border-white",
+                  @active_panel_tab != :chat && "text-gray-400 hover:text-gray-200"
+                ]}
+              >
+                Chat
+              </button>
+              <button
+                phx-click="switch_tab"
+                phx-value-to="online"
+                class={[
+                  "pb-2",
+                  @active_panel_tab == :online && "text-white border-b-2 border-white",
+                  @active_panel_tab != :online && "text-gray-400 hover:text-gray-200"
+                ]}
+              >
+                Live Audience
+              </button>
+            </div>
+            <button class="text-gray-300" phx-click="toggle_chat" aria-label="Close">✕</button>
+          </div>
+
+          <div class="h-[50vh] flex flex-col">
+            <div class="flex-1 overflow-y-auto overscroll-contain">
+              <!-- Mobile Chat Tab Content -->
+              <div
+                id="mobile-chat-scroll"
+                data-scroll-container="#mobile-chat-scroll"
+                class={@active_panel_tab == :chat || "hidden"}
+              >
+                <!-- Mobile chat list with streaming -->
+                <ul
+                  id="mobile-chat-list"
+                  phx-update="stream"
+                  phx-hook="ChatAutoScroll"
+                  data-scroll-container="#mobile-chat-scroll"
+                  class="divide-y divide-white/5 text-sm"
+                >
+                  <%= for {dom_id, msg} <- @streams.messages do %>
+                    <li id={"m-#{dom_id}"} class="px-4 py-3">
+                      <div class="flex items-center justify-between">
+                        <span class="font-medium text-zinc-300">
+                          {(msg.user && msg.user.username) || "Member"}
+                        </span>
+                        <span class="text-xs text-zinc-400">{chat_time(msg.inserted_at)}</span>
+                      </div>
+                      <p class="text-gray-100 text-sm mt-1">{msg.content}</p>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+              
+    <!-- Mobile Live Audience Tab Content -->
+              <div class={[
+                "p-3",
+                @active_panel_tab == :online || "hidden"
+              ]}>
+                <%= if map_size(@presence) > 0 do %>
+                  <ul class="space-y-2">
+                    <%= for {_user_id, %{metas: [meta | _]}} <- @presence do %>
+                      <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-white/[0.02]">
+                        <div class="flex items-center gap-3">
+                          <div class="h-7 w-7 rounded-full bg-white/[0.08] text-gray-100 flex items-center justify-center text-[11px] font-semibold">
+                            {meta.username |> String.first() |> String.upcase()}
+                          </div>
+                          <span class="text-sm text-gray-100">{meta.username}</span>
+                        </div>
+                        <span class="flex items-center gap-1 text-xs text-zinc-400">
+                          <span class="relative inline-flex h-2 w-2">
+                            <span class="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping">
+                            </span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500">
+                            </span>
+                          </span>
+                          online
+                        </span>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <div class="text-center text-zinc-400 text-sm py-8">
+                    No one is currently watching
+                  </div>
+                <% end %>
+              </div>
+            </div>
+
+            <%= if @active_panel_tab == :chat do %>
+              <form phx-submit="chat:send" class="p-3 border-t border-white/10 bg-backroom-black">
+                <div class="flex items-center gap-2">
+                  <input
+                    type="text"
+                    name="chat[body]"
+                    value={@chat_input}
+                    placeholder="Type a message…"
+                    phx-change="chat:typing"
+                    phx-debounce="100"
+                    class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
+                    autocomplete="off"
+                  />
+                  <button class="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/[0.06] text-gray-200 hover:bg-white/[0.10] transition">
+                    Send
+                  </button>
+                </div>
+              </form>
+            <% end %>
+          </div>
         </div>
-      <% end %>
+      </div>
     </div>
     """
   end
@@ -548,6 +605,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             user_id: user.id
           })
 
+        Logger.info(
+          "Created comment: id=#{msg.id}, content=#{msg.content}, user_id=#{msg.user_id}, assoc_id=#{msg.assoc_id}"
+        )
+
         Phoenix.PubSub.broadcast(
           Timesink.PubSub,
           PubSubTopics.chat_topic(theater_id),
@@ -601,9 +662,32 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   defp chat_time(%NaiveDateTime{} = ndt), do: chat_time(DateTime.from_naive!(ndt, "Etc/UTC"))
 
   defp chat_time(%DateTime{} = dt) do
-    time = Calendar.strftime(dt, "%-I:%M")
-    ago = div(DateTime.diff(DateTime.utc_now(), dt, :hour), 1)
-    "#{time} · #{ago}h"
+    now = DateTime.utc_now()
+    diff_seconds = DateTime.diff(now, dt, :second)
+
+    cond do
+      # Less than 60 seconds ago
+      diff_seconds < 60 ->
+        "just now"
+
+      # Less than 60 minutes ago
+      diff_seconds < 3600 ->
+        minutes = div(diff_seconds, 60)
+        "#{minutes}m ago"
+
+      # Less than 24 hours ago
+      diff_seconds < 86_400 ->
+        hours = div(diff_seconds, 3600)
+        "#{hours}h ago"
+
+      # Less than 7 days ago - show day name
+      diff_seconds < 604_800 ->
+        Calendar.strftime(dt, "%a %-I:%M %p")
+
+      # Older - show date
+      true ->
+        Calendar.strftime(dt, "%b %-d")
+    end
   end
 
   # Build "Alice is typing…" using presence usernames

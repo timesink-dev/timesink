@@ -20,14 +20,12 @@ defmodule Timesink.Comment do
   schema "abstract table: comment" do
     field :content, :string
     field :assoc_id, :binary_id
-    field :replies, {:array, :map}, virtual: true
+
     # the author of the comment
     belongs_to :user, Timesink.Account.User
 
     # Optional parent for threading (1-level replies)
     belongs_to :parent, __MODULE__
-
-    # has_many :replies, __MODULE__, foreign_key: :parent_id
 
     timestamps(type: :utc_datetime)
   end
