@@ -729,15 +729,18 @@ Hooks.ChatAutoScroll =  {
     btn.title = "Jump to latest";
     btn.style.display = "none"; // control visibility via inline style
     btn.className = [
-      "rounded-full", "border", "border-gray-800",
-      "bg-zinc-900/80", "backdrop-blur",
-      "px-3", "py-1.5",
-      "text-xs", "text-gray-100",
-      "shadow", "hover:bg-zinc-800"
+      "inline-flex", "items-center", "gap-2",
+      "rounded-full", "border", "border-white/10",
+      "bg-white/[0.06]", "backdrop-blur",
+      "px-4", "py-2",
+      "text-xs", "font-medium", "text-gray-100",
+      "shadow-lg", "hover:bg-white/[0.10]",
+      "transition-all", "duration-200",
+      "animate-in", "slide-in-from-bottom-2"
     ].join(" ");
 
     if (this.overlayMode) {
-      // position: fixed relative to viewport near container’s visible bottom-right
+      // position: fixed relative to viewport near container's visible bottom-right
       btn.style.position = "fixed";
       btn.style.zIndex = "9999";
       document.body.appendChild(btn);
@@ -745,13 +748,20 @@ Hooks.ChatAutoScroll =  {
     } else {
       // position: absolute inside scroll container
       btn.style.position = "absolute";
-      btn.style.right = "0.75rem";  // right-3
-      btn.style.bottom = "0.75rem"; // bottom-3
+      btn.style.right = "1rem";  // right-4
+      btn.style.bottom = "1rem"; // bottom-4
       btn.style.zIndex = "1000";
       this.container.append(btn);
     }
 
-    btn.textContent = "New messages";
+    // Add icon and text
+    btn.innerHTML = `
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+      </svg>
+      <span>New messages</span>
+    `;
+
     btn.addEventListener("click", () => {
       this.stickToBottom = true;
       this.scrollToBottom();
@@ -767,9 +777,10 @@ Hooks.ChatAutoScroll =  {
   positionOverlay() {
     if (!this.overlayMode || !this.jumpBtn) return;
     const rect = this.container.getBoundingClientRect();
-    // place 12px from bottom-right of the visible container
-    const pad = 12;
-    const x = Math.max(0, rect.right - pad - this.jumpBtn.offsetWidth);
+    // place 16px from bottom center of the visible container for better visibility
+    const pad = 16;
+    const btnWidth = this.jumpBtn.offsetWidth;
+    const x = Math.max(0, rect.left + (rect.width - btnWidth) / 2);
     const y = Math.max(0, rect.bottom - pad - this.jumpBtn.offsetHeight);
     this.jumpBtn.style.left = `${x}px`;
     this.jumpBtn.style.top  = `${y}px`;
@@ -777,8 +788,10 @@ Hooks.ChatAutoScroll =  {
 
   updateJumpButton() {
     if (!this.jumpBtn) return;
-    this.jumpBtn.textContent =
-      this.newCount > 0 ? `New messages (${this.newCount})` : "New messages";
+    const span = this.jumpBtn.querySelector('span');
+    if (span) {
+      span.textContent = this.newCount > 0 ? `${this.newCount} new message${this.newCount > 1 ? 's' : ''}` : "New messages";
+    }
   },
 
   showJumpButton() { if (this.jumpBtn) this.jumpBtn.style.display = "inline-flex"; },

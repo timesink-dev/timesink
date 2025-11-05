@@ -5,11 +5,10 @@ defmodule Timesink.Comment.Exhibition do
 
   @exhibition_source "exhibition_comment"
 
-  def list_recent_exhibition_comments(exhibition_id, limit \\ 100) do
+  def list_recent_exhibition_comments(exhibition_id) do
     from(c in {@exhibition_source, Comment},
       where: c.assoc_id == ^exhibition_id,
-      order_by: [asc: c.inserted_at],
-      limit: ^limit
+      order_by: [asc: c.inserted_at]
     )
     |> preload(:user)
     |> Repo.all()
