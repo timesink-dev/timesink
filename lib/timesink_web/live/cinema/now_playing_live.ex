@@ -9,21 +9,35 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
 
   def mount(params, _session, socket) do
     current_user = socket.assigns[:current_user]
+
+    # Common welcome modal setup - applies regardless of showcase state
     show_welcome_modal = params["welcome"] == "1" and needs_avatar?(current_user)
 
-    with showcase when not is_nil(showcase) <- Cinema.get_active_showcase_with_exhibitions() do
-      exhibitions =
-        (showcase.exhibitions || [])
-        |> Cinema.preload_exhibitions()
-        |> Enum.sort_by(& &1.theater.name, :asc)
+    socket =
+      socket
+      |> assign(
+        show_welcome_modal: show_welcome_modal,
+        welcome_bio: "",
+        welcome_avatar_error: nil
+      )
+      |> allow_upload(:welcome_avatar,
+        accept: ~w(.jpg .jpeg .png .webp .heic),
+        max_entries: 1,
+        max_file_size: 8_000_000,
+        auto_upload: false
+      )
 
-      playback_states = Timesink.Cinema.compute_initial_playback_states(exhibitions, showcase)
+    # Showcase-specific logic
+    socket =
+      with showcase when not is_nil(showcase) <- Cinema.get_active_showcase_with_exhibitions() do
+        exhibitions =
+          (showcase.exhibitions || [])
+          |> Cinema.preload_exhibitions()
+          |> Enum.sort_by(& &1.theater.name, :asc)
 
-      socket =
+        playback_states = Timesink.Cinema.compute_initial_playback_states(exhibitions, showcase)
+
         assign(socket,
-          show_welcome_modal: show_welcome_modal,
-          welcome_bio: "",
-          welcome_avatar_error: nil,
           showcase: showcase,
           exhibitions: exhibitions,
           playback_states: playback_states,
@@ -31,46 +45,33 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
           upcoming_showcase: nil,
           no_showcase: false
         )
+      else
+        nil ->
+          case Cinema.get_upcoming_showcase() do
+            %{} = upcoming ->
+              assign(socket,
+                showcase: nil,
+                exhibitions: [],
+                playback_states: %{},
+                presence: %{},
+                upcoming_showcase: upcoming,
+                no_showcase: false
+              )
 
-      socket =
-        allow_upload(socket, :welcome_avatar,
-          accept: ~w(.jpg .jpeg .png .webp .heic),
-          max_entries: 1,
-          max_file_size: 8_000_000,
-          auto_upload: false
-        )
+            nil ->
+              assign(socket,
+                showcase: nil,
+                exhibitions: [],
+                playback_states: %{},
+                presence: %{},
+                upcoming_showcase: nil,
+                no_showcase: true
+              )
+          end
+      end
 
-      if connected?(socket), do: send(self(), :connected)
-
-      {:ok, socket}
-    else
-      nil ->
-        case Cinema.get_upcoming_showcase() do
-          %{} = upcoming ->
-            {:ok,
-             assign(socket,
-               showcase: nil,
-               exhibitions: [],
-               playback_states: %{},
-               presence: %{},
-               upcoming_showcase: upcoming,
-               no_showcase: false,
-               show_welcome_modal: show_welcome_modal
-             )}
-
-          nil ->
-            {:ok,
-             assign(socket,
-               showcase: nil,
-               exhibitions: [],
-               playback_states: %{},
-               presence: %{},
-               upcoming_showcase: nil,
-               no_showcase: true,
-               show_welcome_modal: show_welcome_modal
-             )}
-        end
-    end
+    if connected?(socket), do: send(self(), :connected)
+    {:ok, socket}
   end
 
   def render(assigns) do
@@ -125,7 +126,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                     <.icon name="hero-video-camera" class="h-4 w-4 text-neon-blue-lightest" />
                   </div>
                   <div class="text-sm text-zinc-300">
-                    Both rookie and veteran filmmakers welcome
+                    All levels of filmmakers welcome
                   </div>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
@@ -304,9 +305,10 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
     """
   end
 
-  def handle_info(:connected, socket) do
+  def handle_info(:connected, %{assigns: %{showcase: %{exhibitions: exhibitions}}} = socket)
+      when is_list(exhibitions) do
     presence =
-      socket.assigns.showcase.exhibitions
+      exhibitions
       |> Enum.map(fn ex ->
         presence_topic = PubSubTopics.presence_topic(ex.theater_id)
         Phoenix.PubSub.subscribe(Timesink.PubSub, presence_topic)
@@ -315,6 +317,11 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
       |> Enum.into(%{})
 
     {:noreply, assign(socket, :presence, presence)}
+  end
+
+  def handle_info(:connected, socket) do
+    # No active showcase, nothing to subscribe to
+    {:noreply, socket}
   end
 
   def handle_info(

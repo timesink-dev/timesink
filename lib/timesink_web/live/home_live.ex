@@ -248,7 +248,7 @@ defmodule TimesinkWeb.HomepageLive do
                     <.icon name="hero-video-camera" class="h-4 w-4 text-neon-blue-lightest" />
                   </div>
                   <div class="text-sm text-zinc-300">
-                    Both rookie and veteran filmmakers welcome
+                    All levels of filmmakers welcome
                   </div>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
