@@ -132,7 +132,7 @@ defmodule TimesinkWeb.HomepageLive do
                 Live for every showing
               </h3>
               <p class="mt-1 text-sm text-zinc-400">
-                Lean-in live chats with real people, not noisy comment walls.
+                Live chats to engage with real people, not noisy comment walls.
               </p>
             </div>
 
@@ -235,7 +235,7 @@ defmodule TimesinkWeb.HomepageLive do
               </div>
 
               <h1 class="text-4xl font-bold tracking-tight mb-3">
-                We’re working on our first showcase.
+                We’re working on our first showcase...
               </h1>
               <p class="text-zinc-400 text-balance max-w-2xl mx-auto">
                 TimeSink is a live, curated cinema. When there isn’t an active release, we’re busy selecting the next one. Keep checking back soon.
@@ -245,7 +245,7 @@ defmodule TimesinkWeb.HomepageLive do
               <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
                   <div class="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06]">
-                    <.icon name="hero-bolt" class="h-4 w-4 text-neon-blue-lightest" />
+                    <.icon name="hero-video-camera" class="h-4 w-4 text-neon-blue-lightest" />
                   </div>
                   <div class="text-sm text-zinc-300">
                     Both rookie and veteran filmmakers welcome
@@ -282,12 +282,16 @@ defmodule TimesinkWeb.HomepageLive do
                   <.icon name="hero-arrow-up-tray" class="h-4 w-4" /> Submit your film
                 </.link>
                 <.link
-                  navigate="/about"
+                  navigate="/info"
                   class="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/[0.06] transition"
                 >
                   <.icon name="hero-information-circle" class="h-4 w-4" /> How programming works
                 </.link>
               </div>
+              <p class="mt-6 text-sm text-zinc-500">
+                Have any questions? contact
+                hello@timesinkpresents.com
+              </p>
             </div>
           </section>
       <% end %>

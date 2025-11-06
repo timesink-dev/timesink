@@ -38,7 +38,7 @@ defmodule TimesinkWeb.Components.Hero do
         ">
           <div class="w-full max-w-[24rem] text-center">
             <h2 class="font-brand text-3xl md:text-4xl tracking-tight">
-              Fresh Film selected for you. Real Audiences. No endless scrolls.
+              Fresh Movies selected for you. Real Audiences. No endless scrolls.
             </h2>
 
             <p class="mt-3 text-mystery-white">
@@ -59,7 +59,7 @@ defmodule TimesinkWeb.Components.Hero do
     <!-- Scroll cue (desktop only) -->
       <div
         id="scroll-indicator"
-        class="hidden md:flex fixed bottom-8 inset-x-0 justify-center z-20 motion-safe:animate-bounce opacity-80"
+        class="hidden md:flex fixed bottom-4 inset-x-0 justify-center z-20 motion-safe:animate-bounce opacity-80"
       >
         <span class="text-white text-sm">↓ Scroll to explore cinema</span>
       </div>
