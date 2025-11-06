@@ -4,7 +4,7 @@ defmodule TimesinkWeb.HomepageLive do
   alias TimesinkWeb.Presence
   alias Timesink.Cinema
   alias TimesinkWeb.{TheaterShowcaseComponent, PubSubTopics}
-  import TimesinkWeb.Components.Hero
+  import TimesinkWeb.Components.{Hero, NoShowcase}
 
   def mount(_params, _session, socket) do
     with showcase when not is_nil(showcase) <- Cinema.get_active_showcase_with_exhibitions() do
@@ -227,73 +227,7 @@ defmodule TimesinkWeb.HomepageLive do
             </p>
           </div>
         <% @no_showcase -> %>
-          <section class="text-white my-8 px-6 max-w-3xl mx-auto min-h-[80vh] flex items-center">
-            <div class="w-full text-center">
-              <div class="mx-auto mb-3 h-9 w-9 rounded-full bg-zinc-900 ring-1 ring-zinc-800
-                      flex items-center justify-center text-zinc-300">
-                📌
-              </div>
-
-              <h1 class="text-4xl font-bold tracking-tight mb-3">
-                We’re working on our first showcase...
-              </h1>
-              <p class="text-zinc-400 text-balance max-w-2xl mx-auto">
-                TimeSink is a live, curated cinema. When there isn’t an active release, we’re busy selecting the next one. Keep checking back soon.
-              </p>
-              
-    <!-- Feature highlights -->
-              <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
-                  <div class="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06]">
-                    <.icon name="hero-video-camera" class="h-4 w-4 text-neon-blue-lightest" />
-                  </div>
-                  <div class="text-sm text-zinc-300">
-                    All levels of filmmakers welcome
-                  </div>
-                </div>
-                <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
-                  <div class="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06]">
-                    <.icon name="hero-chat-bubble-left-right" class="h-4 w-4 text-neon-blue-lightest" />
-                  </div>
-                  <div class="text-sm text-zinc-300">
-                    Live screenings with real-time audiences
-                  </div>
-                </div>
-                <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
-                  <div class="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06]">
-                    <.icon name="hero-play" class="h-4 w-4 text-neon-blue-lightest" />
-                  </div>
-                  <div class="text-sm text-zinc-300">Live showtimes every 30 minutes</div>
-                </div>
-                <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left">
-                  <div class="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06]">
-                    <.icon name="hero-sparkles" class="h-4 w-4 text-neon-blue-lightest" />
-                  </div>
-                  <div class="text-sm text-zinc-300">Retrospectives, premieres, hidden gems</div>
-                </div>
-              </div>
-              
-    <!-- CTAs -->
-              <div class="mt-8 flex items-center justify-center gap-3">
-                <.link
-                  navigate="/submit"
-                  class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2 text-sm text-white hover:bg-white/[0.10] transition"
-                >
-                  <.icon name="hero-arrow-up-tray" class="h-4 w-4" /> Submit your film
-                </.link>
-                <.link
-                  navigate="/info"
-                  class="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/[0.06] transition"
-                >
-                  <.icon name="hero-information-circle" class="h-4 w-4" /> How programming works
-                </.link>
-              </div>
-              <p class="mt-6 text-sm text-zinc-500">
-                Have any questions? contact
-                hello@timesinkpresents.com
-              </p>
-            </div>
-          </section>
+          <.no_showcase />
       <% end %>
     </div>
     """
