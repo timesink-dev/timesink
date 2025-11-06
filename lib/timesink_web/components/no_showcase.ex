@@ -21,7 +21,7 @@ defmodule TimesinkWeb.Components.NoShowcase do
           📌
         </div>
 
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3">
+        <h1 class="text-2xl font-semibold tracking-tight mb-3">
           We're working on picking the first showcase...
         </h1>
         <p class="text-zinc-400 text-balance max-w-2xl mx-auto">
