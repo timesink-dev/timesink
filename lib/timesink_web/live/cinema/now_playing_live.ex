@@ -106,7 +106,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
             </p>
           </div>
         <% @no_showcase -> %>
-          <.no_showcase />
+          <.no_showcase class="mt-16" />
       <% end %>
       <%= if @show_welcome_modal do %>
         <.modal id="welcome-modal" show={@show_welcome_modal} on_cancel={JS.push("dismiss_welcome")}>

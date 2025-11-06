@@ -68,6 +68,9 @@ defmodule TimesinkWeb.Components.NoShowcase do
         </div>
         
     <!-- CTAs -->
+        <p class="my-3 mt-12 text-zinc-400 text-balance max-w-2xl mx-auto">
+          📣 Submissions are open — if you’ve made a film or know someone who has, spread the word and send it our way.
+        </p>
         <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
           <.link
             navigate="/submit"
@@ -86,10 +89,7 @@ defmodule TimesinkWeb.Components.NoShowcase do
         </div>
 
         <p class="mt-6 text-sm text-zinc-500">
-          Questions?
-          <span class="">
-            contact hello@timesinkpresents.com
-          </span>
+          Questions? <span>contact hello@timesinkpresents.com</span>
         </p>
       </div>
     </section>
