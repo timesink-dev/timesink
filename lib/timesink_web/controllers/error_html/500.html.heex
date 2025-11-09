@@ -5,33 +5,33 @@
     class="pointer-events-none absolute inset-0 opacity-20 blur-3xl"
     style="
       background:
-        radial-gradient(50% 40% at 50% 40%, rgba(115, 168, 255, 0.08), transparent 70%),
-        radial-gradient(30% 30% at 70% 60%, rgba(236, 32, 19, 0.06), transparent 60%);
+        radial-gradient(50% 40% at 50% 40%, rgba(236, 32, 19, 0.10), transparent 70%),
+        radial-gradient(30% 30% at 70% 60%, rgba(255, 180, 0, 0.08), transparent 60%);
     "
   >
   </div>
   
 <!-- minimalistic centered content -->
   <div class="relative z-10 text-center px-6 max-w-2xl mx-auto">
-    <!-- 404 badge -->
-    <div class="mb-8 inline-flex items-center gap-2 rounded-full border border-neon-blue-lightest/20 bg-neon-blue-lightest/5 px-4 py-2 text-sm font-medium text-neon-blue-lightest">
-      <span class="inline-flex h-2 w-2 rounded-full animate-pulse bg-neon-blue-lightest"></span>
-      Error 404
+    <!-- 500 badge -->
+    <div class="mb-8 inline-flex items-center gap-2 rounded-full border border-neon-red-primary/20 bg-neon-red-primary/5 px-4 py-2 text-sm font-medium text-neon-red-primary">
+      <span class="inline-flex h-2 w-2 rounded-full animate-pulse bg-neon-red-primary"></span>
+      Error 500
     </div>
     
 <!-- main headline with brand font -->
     <h1 class="font-brand text-2xl md:text-6xl lg:text-3xl text-mystery-white mb-6 leading-tight">
-      Uh oh, the Projector Broke
+      Technical Difficulties
     </h1>
     
 <!-- subheadline -->
     <p class="text-lg text-dark-theater-lightest mb-3 font-light">
-      Well, not really, but this page doesn't exist
+      Elevator music...
     </p>
     
 <!-- body copy -->
     <p class="text-base text-gray-display-primary/80 max-w-md mx-auto mb-12 leading-relaxed">
-      Why don't you head back to the lobby?
+      Our projectionists are working on it. Please give us a moment and try again.
     </p>
     
 <!-- single prominent CTA -->
@@ -45,18 +45,19 @@
         Back to Home
       </a>
 
-      <a
-        href={~p"/now-playing"}
+      <button
+        onclick="window.location.reload()"
         class="inline-flex items-center justify-center rounded-md px-8 py-3 text-base font-semibold
                border border-neon-blue-lightest/30 text-neon-blue-lightest hover:bg-neon-blue-lightest/10 transition-all duration-200"
       >
-        See What's Playing
-      </a>
+        Try Again
+      </button>
     </div>
     
 <!-- subtle footer help text -->
     <p class="mt-16 text-sm text-zinc-400">
-      Lost? <span class="text-mystery-white">Contact hello@timesinkpresents.com</span>
+      Still having trouble?
+      <span class="text-mystery-white">Contact hello@timesinkpresents.com</span>
     </p>
   </div>
   

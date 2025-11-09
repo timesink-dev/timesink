@@ -22,7 +22,7 @@ config :timesink, TimesinkWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,
   code_reloader: true,
-  debug_errors: true,
+  debug_errors: false,
   secret_key_base: "AjNCRi5mTOMRbWckvNGmYOYfGejmUsOWZK5Y1I1Kk0SRmFekHL+IerBDg/5QeMwk",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:timesink, ~w(--sourcemap=inline --watch)]},
