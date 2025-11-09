@@ -112,6 +112,14 @@ defmodule Timesink.Account.User do
     |> validate_length(:password, min: 8, message: "Password must be at least 8 characters")
   end
 
+  def email_only_changeset(%__MODULE__{} = user, attrs \\ %{}) do
+    user
+    |> cast(attrs, [:email, :unverified_email])
+    |> trim_fields([:email])
+    |> validate_format(:email, ~r/@/, message: "Invalid email format")
+    |> unique_constraint(:email, message: "Email already exists")
+  end
+
   def username_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do
     struct
     |> cast(params, [:username])

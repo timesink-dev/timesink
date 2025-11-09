@@ -14,9 +14,9 @@ defmodule Timesink.Account.Mail do
   end
 
   @doc """
-  Sends an email change verification code to the new email address.
+  Sends an email change verification link to the new email address.
   """
-  def send_email_change_verification(email, code) do
+  def send_email_change_verification(email, url) do
     send_mail(
       email,
       "Verify your new email address",
@@ -25,11 +25,11 @@ defmodule Timesink.Account.Mail do
 
       You requested to change your email address for your TimeSink account.
 
-      Please verify your new email address by entering the following code:
+      Please verify your new email address by clicking the link below:
 
-      #{code}
+      #{url}
 
-      This code will expire in 15 minutes.
+      This link will expire in 15 minutes.
 
       If you didn't request this change, you can safely ignore this email.
 
