@@ -31,7 +31,11 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         # ← server-side processing state
         avatar_processing: false,
         # ← error message to show near control
-        avatar_error: nil
+        avatar_error: nil,
+        # ← email verification modal state
+        show_verify_modal: false,
+        verification_code: "",
+        verification_error: nil
       )
       |> allow_upload(:avatar,
         accept: ~w(.jpg .jpeg .png .webp .heic),
@@ -273,7 +277,35 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-zinc-300 mb-2">Email</label>
+                <div class="flex items-center justify-between mb-2">
+                  <label class="block text-sm font-medium text-zinc-300">Email</label>
+                  <%= if @user.unverified_email do %>
+                    <div class="flex items-center gap-2">
+                      <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 text-xs font-medium text-amber-400">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-3 w-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        Pending Verification
+                      </span>
+                      <button
+                        type="button"
+                        phx-click="show_verify_email"
+                        class="text-xs text-neon-blue-lightest hover:text-neon-blue-light underline underline-offset-2"
+                      >
+                        Verify now
+                      </button>
+                    </div>
+                  <% end %>
+                </div>
                 <.input
                   type="email"
                   field={@account_form[:email]}
@@ -283,6 +315,12 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                   class="md:relative"
                   error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
                 />
+                <%= if @user.unverified_email do %>
+                  <p class="mt-2 text-xs text-amber-400">
+                    Awaiting verification of:
+                    <span class="font-semibold">{@user.unverified_email}</span>
+                  </p>
+                <% end %>
               </div>
             </div>
 
@@ -324,6 +362,72 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
           </.simple_form>
         </div>
       </div>
+      
+    <!-- Email Verification Modal -->
+      <.modal
+        :if={@show_verify_modal}
+        id="verify-email-modal"
+        show
+        on_cancel={JS.push("close_verify_modal")}
+      >
+        <div class="text-center">
+          <h3 class="text-xl font-semibold text-mystery-white mb-2">
+            Verify Your New Email
+          </h3>
+          <p class="text-sm text-zinc-400 mb-6">
+            Enter the 6-digit code we sent to
+            <span class="font-semibold text-mystery-white">{@user.unverified_email}</span>
+          </p>
+
+          <form phx-submit="verify_email_code" class="space-y-4">
+            <div>
+              <input
+                type="text"
+                name="code"
+                value={@verification_code}
+                phx-change="update_verification_code"
+                maxlength="6"
+                placeholder="000000"
+                class="w-full text-center text-2xl tracking-widest rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-500 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
+                autocomplete="off"
+              />
+              <%= if @verification_error do %>
+                <p class="mt-2 text-sm text-neon-red-primary">{@verification_error}</p>
+              <% end %>
+            </div>
+
+            <div class="flex gap-3">
+              <button
+                type="button"
+                phx-click="close_verify_modal"
+                class="flex-1 rounded-md px-4 py-2 text-sm font-semibold border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="flex-1 rounded-md px-4 py-2 text-sm font-semibold bg-neon-blue-lightest text-backroom-black hover:bg-neon-blue-light transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={String.length(@verification_code) != 6}
+              >
+                Verify
+              </button>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-zinc-800">
+              <p class="text-xs text-zinc-500">
+                Didn't receive the code?
+                <button
+                  type="button"
+                  phx-click="resend_verification"
+                  class="text-neon-blue-lightest hover:text-neon-blue-light underline underline-offset-2"
+                >
+                  Resend
+                </button>
+              </p>
+            </div>
+          </form>
+        </div>
+      </.modal>
     </section>
     """
   end
@@ -393,25 +497,134 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
     {:noreply, assign(socket, account_form: to_form(cs), dirty: cs.changes != %{} or loc_dirty?)}
   end
 
+  # --- Email Verification Modal Handlers ---
+  def handle_event("show_verify_email", _params, socket) do
+    {:noreply, assign(socket, show_verify_modal: true, verification_error: nil)}
+  end
+
+  def handle_event("close_verify_modal", _params, socket) do
+    {:noreply,
+     assign(socket, show_verify_modal: false, verification_code: "", verification_error: nil)}
+  end
+
+  def handle_event("update_verification_code", %{"code" => code}, socket) do
+    # Only allow digits and max 6 characters
+    cleaned_code = code |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 6)
+    {:noreply, assign(socket, verification_code: cleaned_code, verification_error: nil)}
+  end
+
+  def handle_event("verify_email_code", %{"code" => code}, socket) do
+    case Timesink.Account.verify_email_change(socket.assigns.user, code) do
+      {:ok, updated_user} ->
+        {:noreply,
+         socket
+         |> assign(
+           user: updated_user,
+           show_verify_modal: false,
+           verification_code: "",
+           verification_error: nil,
+           account_form: to_form(User.changeset(updated_user))
+         )
+         |> put_flash(:info, "Email address verified successfully!")}
+
+      {:error, :invalid_or_expired} ->
+        {:noreply,
+         assign(socket,
+           verification_error: "Invalid or expired code. Please try again."
+         )}
+
+      {:error, :no_pending_email} ->
+        {:noreply,
+         socket
+         |> assign(show_verify_modal: false)
+         |> put_flash(:error, "No pending email verification found.")}
+
+      {:error, _reason} ->
+        {:noreply,
+         assign(socket,
+           verification_error: "Failed to verify email. Please try again."
+         )}
+    end
+  end
+
+  def handle_event("resend_verification", _params, socket) do
+    user = socket.assigns.user
+
+    if user.unverified_email do
+      case Timesink.Account.initiate_email_change(user, user.unverified_email) do
+        {:ok, _updated_user} ->
+          {:noreply,
+           socket
+           |> put_flash(:info, "Verification code resent to #{user.unverified_email}")
+           |> assign(verification_error: nil)}
+
+        {:error, _reason} ->
+          {:noreply,
+           assign(socket, verification_error: "Failed to resend code. Please try again.")}
+      end
+    else
+      {:noreply,
+       socket
+       |> assign(show_verify_modal: false)
+       |> put_flash(:error, "No pending email verification found.")}
+    end
+  end
+
   def handle_event("save", %{"user" => user_params}, socket) do
     username = user_params["username"] |> to_string() |> String.trim_leading("@")
+    current_user = socket.assigns.user
+    new_email = user_params["email"] |> to_string() |> String.trim() |> String.downcase()
+    email_changed? = current_user.email != new_email
 
     updated_params =
       user_params
       |> Map.put("username", username)
+      # Remove email from params - we'll handle it separately if changed
+      |> Map.delete("email")
       |> ensure_location_payload(socket.assigns.selected_location)
 
-    with {:ok, updated_user} <- User.update(socket.assigns.user, updated_params) do
+    # First update other fields (username, name, profile)
+    with {:ok, updated_user} <- User.update(current_user, updated_params) do
+      # If email changed, initiate email change verification flow
+      updated_user_with_flash =
+        if email_changed? do
+          case Timesink.Account.initiate_email_change(updated_user, new_email) do
+            {:ok, user_with_pending_email} ->
+              socket
+              |> assign(user: user_with_pending_email)
+              |> put_flash(
+                :info,
+                "Profile updated. We've sent a verification code to #{new_email}. Check your inbox to confirm your new email address."
+              )
+
+            {:error, :email_already_in_use} ->
+              socket
+              |> assign(user: updated_user)
+              |> put_flash(:error, "That email address is already in use by another account.")
+
+            {:error, %Ecto.Changeset{} = cs} ->
+              socket
+              |> assign(account_form: to_form(cs))
+              |> put_flash(:error, "Failed to update email address.")
+
+            {:error, _reason} ->
+              socket
+              |> assign(user: updated_user)
+              |> put_flash(:error, "Failed to send verification email. Please try again.")
+          end
+        else
+          socket
+          |> assign(user: updated_user)
+          |> put_flash(:info, "Profile updated successfully")
+        end
+
       {:noreply,
-       socket
+       updated_user_with_flash
        |> assign(
-         user: updated_user,
-         account_form: to_form(User.changeset(updated_user)),
-         # ✅ new baseline
+         account_form: to_form(User.changeset(updated_user_with_flash.assigns.user)),
          selected_location: to_location_map(updated_user.profile.location),
          dirty: false
-       )
-       |> put_flash(:info, "Profile updated successfully")}
+       )}
     else
       {:error, cs} ->
         {:noreply, assign(socket, account_form: to_form(cs))}
