@@ -17,7 +17,7 @@ config :timesink, TimesinkWeb.Endpoint,
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: TimesinkWeb.ErrorHTML, json: TimesinkWeb.ErrorJSON],
-    layout: false
+    layout: {TimesinkWeb.Layouts, :root}
   ],
   pubsub_server: Timesink.PubSub,
   live_view: [signing_salt: "/iQY4AR5"]

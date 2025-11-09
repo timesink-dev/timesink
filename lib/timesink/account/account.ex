@@ -313,4 +313,139 @@ defmodule Timesink.Account do
       _ -> :ok
     end
   end
+
+  # ----------------------------------------
+  # Email Change Verification
+  # ----------------------------------------
+
+  @doc """
+  Initiates email change process by storing new email in unverified_email
+  and sending a verification link.
+
+  Takes a URL function that will generate the verification link URL from the token.
+
+  Returns {:ok, user} if successful, {:error, reason} otherwise.
+  """
+  @spec initiate_email_change(User.t(), String.t(), (binary() -> String.t())) ::
+          {:ok, User.t()} | {:error, term()}
+  def initiate_email_change(%User{} = user, new_email, url_fun)
+      when is_binary(new_email) and is_function(url_fun, 1) do
+    new_email = String.trim(new_email) |> String.downcase()
+
+    # Check if email is already taken
+    case is_email_available?(new_email) do
+      {:ok, :available} ->
+        # Update unverified_email field
+        case User.update(user, %{"unverified_email" => new_email}) do
+          {:ok, updated_user} ->
+            # Generate and send verification link
+            case send_email_change_verification(updated_user, url_fun) do
+              {:ok, :sent} -> {:ok, updated_user}
+              {:error, reason} -> {:error, reason}
+            end
+
+          {:error, changeset} ->
+            {:error, changeset}
+        end
+
+      {:error, :email_taken} ->
+        {:error, :email_already_in_use}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  # Sends an email with a one-click verification link to the user's current email address.
+  # The token stores the unverified_email so it can be moved to email upon verification.
+  @spec send_email_change_verification(User.t(), (binary() -> String.t())) ::
+          {:ok, :sent} | {:error, term()}
+  defp send_email_change_verification(%User{} = user, url_fun)
+       when is_function(url_fun, 1) do
+    # Generate a URL-safe token
+    token = random_url_token()
+    expires_at = DateTime.add(DateTime.utc_now(), @code_expiration_minutes * 60, :second)
+
+    with {:ok, _token} <-
+           Token.create(%{
+             kind: :email_verification,
+             secret: token,
+             expires_at: expires_at,
+             # Store the unverified_email (new email) in the token so we can update to it later
+             email: user.unverified_email,
+             user_id: user.id
+           }) do
+      # Generate the verification URL using the provided function
+      url = url_fun.(token)
+      # Send to the current (old) email for security verification
+      Mail.send_email_change_verification(user.email, url)
+      {:ok, :sent}
+    else
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  @doc """
+  Verifies the email change token from the email link and updates the user's email.
+
+  On success:
+  - Moves unverified_email to email
+  - Clears unverified_email
+  - Invalidates the token
+
+  Returns {:ok, user} or {:error, reason}
+  """
+  @spec verify_email_change_token(String.t()) ::
+          {:ok, User.t()} | {:error, :invalid_or_expired | :no_pending_email}
+  def verify_email_change_token(token) when is_binary(token) do
+    with {:ok, token_record} <-
+           Token.get_by(%{
+             secret: token,
+             kind: :email_verification,
+             status: :valid
+           }),
+         false <- Token.is_expired?(token_record),
+         {:ok, user} <- User.get(token_record.user_id) do
+      case User.update(user, %{"email" => token_record.email, "unverified_email" => nil},
+             changeset: &User.email_only_changeset/2
+           ) do
+        {:ok, updated_user} ->
+          Token.invalidate_token(token_record)
+          {:ok, updated_user}
+
+        {:error, changeset} ->
+          {:error, changeset}
+      end
+    else
+      {:error, :not_found} -> {:error, :invalid_or_expired}
+      true -> {:error, :invalid_or_expired}
+      _ -> {:error, :invalid_or_expired}
+    end
+  end
+
+  @doc """
+  Cancels a pending email change by clearing the unverified_email field
+  and invalidating any related tokens.
+  """
+  @spec cancel_email_change(User.t()) :: {:ok, User.t()} | {:error, term()}
+  def cancel_email_change(%User{unverified_email: nil} = user), do: {:ok, user}
+
+  def cancel_email_change(%User{unverified_email: email} = user) when is_binary(email) do
+    # Invalidate any pending tokens
+    with {:ok, token} <-
+           Token.get_by(%{
+             kind: :email_verification,
+             status: :valid,
+             email: email,
+             user_id: user.id
+           }) do
+      Token.invalidate_token(token)
+    else
+      _ -> :ok
+    end
+
+    # Clear unverified_email
+    User.update(user, %{"unverified_email" => nil})
+  end
 end

@@ -17,6 +17,7 @@ defmodule Timesink.Account.User do
           first_name: String.t(),
           last_name: String.t(),
           roles: list(String.t()),
+          unverified_email: String.t(),
           profile: Account.Profile.t()
         }
 
@@ -29,6 +30,7 @@ defmodule Timesink.Account.User do
     field :username, :string
     field :first_name, :string
     field :last_name, :string
+    field :unverified_email, :string
 
     field :roles, {:array, Ecto.Enum}, values: @roles, default: [], redact: true
 
@@ -55,7 +57,8 @@ defmodule Timesink.Account.User do
       :username,
       :first_name,
       :last_name,
-      :roles
+      :roles,
+      :unverified_email
     ])
     |> cast_assoc(:profile,
       required: true,
@@ -65,7 +68,9 @@ defmodule Timesink.Account.User do
     |> trim_fields([:email, :username, :first_name, :last_name])
     |> validate_required(@required_fields)
     |> validate_format(:email, ~r/@/)
+    |> validate_format(:unverified_email, ~r/@/)
     |> unique_constraint(:email, message: "Email already exists")
+    |> unique_constraint(:unverified_email, message: "Email already exists")
     |> validate_length(:password, min: 8, message: "Password must be at least 8 characters")
     |> validate_length(:first_name, min: 1)
     |> validate_length(:last_name, min: 1)
@@ -105,6 +110,14 @@ defmodule Timesink.Account.User do
     |> trim_fields([:password])
     |> validate_required([:password])
     |> validate_length(:password, min: 8, message: "Password must be at least 8 characters")
+  end
+
+  def email_only_changeset(%__MODULE__{} = user, attrs \\ %{}) do
+    user
+    |> cast(attrs, [:email, :unverified_email])
+    |> trim_fields([:email])
+    |> validate_format(:email, ~r/@/, message: "Invalid email format")
+    |> unique_constraint(:email, message: "Email already exists")
   end
 
   def username_changeset(%{__struct__: __MODULE__} = struct, params \\ %{}) do

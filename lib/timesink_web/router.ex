@@ -121,6 +121,7 @@ defmodule TimesinkWeb.Router do
     get "/blog", RedirectController, :substack_blog
 
     get "/auth/complete_onboarding", AuthController, :complete_onboarding
+    get "/auth/verify-email/:token", AuthController, :verify_email
     post "/sign-in", AuthController, :sign_in
     post "/sign_out", AuthController, :sign_out
 
@@ -133,7 +134,7 @@ defmodule TimesinkWeb.Router do
       live "/archives", Cinema.ArchivesLive
       live "/upcoming", Cinema.UpcomingLive
       live "/now-playing", Cinema.NowPlayingLive
-      live "/:profile_username", Account.ProfileLive
+      live "/@:profile_username", Account.ProfileLive
     end
   end
 

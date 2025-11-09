@@ -84,8 +84,6 @@ defmodule Timesink.Token do
   end
 
   def invalidate_token(token) do
-    IO.inspect(token, label: "again here is the token fetched from socket assigns")
-
     update(token, %{
       status: :invalid
     })
