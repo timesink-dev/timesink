@@ -9,7 +9,7 @@ defmodule Timesink.Workers.Account.CleanupExpiredEmailVerificationJob do
   For each expired token, clears the user's unverified_email field back to nil,
   since the email change verification link has expired.
   """
-  use Oban.Worker, queue: :mailer, max_attempts: 3
+  use Oban.Worker, queue: :account, max_attempts: 3
 
   alias Timesink.Token
   alias Timesink.Account.User

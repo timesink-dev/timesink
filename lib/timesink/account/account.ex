@@ -13,7 +13,7 @@ defmodule Timesink.Account do
   # password reset tokens (link valid for 60 minutes)
   @reset_expiration_minutes 60
 
-  @update_email_hours 48
+  @verify_updated_email_expiration_hours 48
 
   @doc """
   Query users through a function hook using the [Ecto.Query API](https://hexdocs.pm/ecto/Ecto.Query.html).
@@ -366,7 +366,9 @@ defmodule Timesink.Account do
        when is_function(url_fun, 1) do
     # Generate a URL-safe token
     token = random_url_token()
-    expires_at = DateTime.add(DateTime.utc_now(), @update_email_hours * 3600, :second)
+
+    expires_at =
+      DateTime.add(DateTime.utc_now(), @verify_updated_email_expiration_hours * 3600, :second)
 
     with {:ok, _token} <-
            Token.create(%{
