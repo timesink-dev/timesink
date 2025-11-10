@@ -57,6 +57,16 @@ defmodule Timesink.Factory do
     }
   end
 
+  def token_factory do
+    %Timesink.Token{
+      kind: Enum.random([:invite, :email_verification, :password_reset]),
+      secret: Ecto.UUID.generate(),
+      status: :valid,
+      expires_at: DateTime.utc_now() |> DateTime.add(24 * 60 * 60, :second),
+      email: Faker.Internet.email()
+    }
+  end
+
   def user_factory do
     %Timesink.Account.User{
       email: Faker.Internet.email(),

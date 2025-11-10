@@ -30,4 +30,31 @@ defmodule TimesinkWeb.AuthController do
     |> configure_session(renew: true)
     |> redirect(to: "/now-playing?welcome=1")
   end
+
+  @doc """
+  Handles email verification from the link sent to the user's new email address.
+  Verifies the token and updates the user's email if valid.
+  """
+  @spec verify_email(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def verify_email(conn, %{"token" => token}) do
+    case Timesink.Account.verify_email_change_token(token) do
+      {:ok, _updated_user} ->
+        conn
+        |> put_flash(:info, "Email address verified successfully!")
+        |> redirect(to: ~p"/me/profile")
+
+      {:error, :invalid_or_expired} ->
+        conn
+        |> put_flash(
+          :error,
+          "This verification link is invalid or has expired. Please try again."
+        )
+        |> redirect(to: ~p"/me/profile")
+
+      {:error, __reason} ->
+        conn
+        |> put_flash(:error, "Failed to verify email address. Please try again.")
+        |> redirect(to: ~p"/me/profile")
+    end
+  end
 end

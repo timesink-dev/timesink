@@ -14,6 +14,31 @@ defmodule Timesink.Account.Mail do
   end
 
   @doc """
+  Sends an email change verification link to the new email address.
+  """
+  def send_email_change_verification(email, url) do
+    send_mail(
+      email,
+      "Verify your new email address",
+      """
+      Hi,
+
+      You requested to change your email address for your TimeSink account.
+
+      Please verify your new email address by clicking the link below:
+
+      #{url}
+
+      This link will expire in 48 hours.
+
+      If you didn't request this change, you can safely ignore this email.
+
+      — The TimeSink Team
+      """
+    )
+  end
+
+  @doc """
   Sends a password reset email with a link to set a new password.
   """
   def send_password_reset(email, url) do
@@ -29,7 +54,7 @@ defmodule Timesink.Account.Mail do
 
       #{url}
 
-      If you didn’t request this, you can safely ignore this email and your password will remain unchanged.
+      If you didn't request this, you can safely ignore this email and your password will remain unchanged.
 
       — The TimeSink Team
       """

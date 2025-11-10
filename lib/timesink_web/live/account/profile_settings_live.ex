@@ -273,16 +273,41 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-zinc-300 mb-2">Email</label>
+                <div class="flex items-center justify-between mb-2">
+                  <label class="block text-sm font-medium text-zinc-300">Email</label>
+                  <%= if @user.unverified_email do %>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 text-xs font-medium text-amber-400">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3 w-3"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      Pending Verification
+                    </span>
+                  <% end %>
+                </div>
                 <.input
                   type="email"
                   field={@account_form[:email]}
-                  value={@user.email}
+                  value={@user.unverified_email || @user.email}
                   placeholder="you@example.com"
                   input_class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
                   class="md:relative"
                   error_class="md:absolute md:-bottom-8 md:left-0 md:items-center md:gap-1"
                 />
+                <%= if @user.unverified_email do %>
+                  <p class="mt-2 text-xs text-mystery-white">
+                    We've sent a verification link to <span class="font-semibold">{@user.email}</span>.
+                    Please check your inbox (and spam folder) to verify this change.
+                  </p>
+                <% end %>
               </div>
             </div>
 
@@ -395,23 +420,65 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
 
   def handle_event("save", %{"user" => user_params}, socket) do
     username = user_params["username"] |> to_string() |> String.trim_leading("@")
+    current_user = socket.assigns.user
+    new_email = user_params["email"] |> to_string() |> String.trim() |> String.downcase()
+    email_change_request? = current_user.email != new_email
 
     updated_params =
       user_params
       |> Map.put("username", username)
+      # Remove email from params - we'll handle it separately if changed
+      |> Map.delete("email")
       |> ensure_location_payload(socket.assigns.selected_location)
 
-    with {:ok, updated_user} <- User.update(socket.assigns.user, updated_params) do
+    # First update other fields (username, name, profile)
+    with {:ok, updated_user} <- User.update(current_user, updated_params) do
+      # If email changed, initiate email change verification flow
+      updated_user_with_flash =
+        if email_change_request? do
+          case Timesink.Account.initiate_email_change(
+                 updated_user,
+                 new_email,
+                 fn token ->
+                   url(~p"/auth/verify-email/#{token}")
+                 end
+               ) do
+            {:ok, user_with_pending_email} ->
+              socket
+              |> assign(user: user_with_pending_email)
+              |> put_flash(
+                :info,
+                "Profile updated. We've sent a verification link to #{current_user.email}."
+              )
+
+            {:error, :email_already_in_use} ->
+              socket
+              |> assign(user: updated_user)
+              |> put_flash(:error, "That email address is already in use by another account.")
+
+            {:error, %Ecto.Changeset{} = cs} ->
+              socket
+              |> assign(account_form: to_form(cs))
+              |> put_flash(:error, "Failed to update email address.")
+
+            {:error, _reason} ->
+              socket
+              |> assign(user: updated_user)
+              |> put_flash(:error, "Failed to send verification email. Please try again.")
+          end
+        else
+          socket
+          |> assign(user: updated_user)
+          |> put_flash(:info, "Profile updated successfully")
+        end
+
       {:noreply,
-       socket
+       updated_user_with_flash
        |> assign(
-         user: updated_user,
-         account_form: to_form(User.changeset(updated_user)),
-         # ✅ new baseline
+         account_form: to_form(User.changeset(updated_user_with_flash.assigns.user)),
          selected_location: to_location_map(updated_user.profile.location),
          dirty: false
-       )
-       |> put_flash(:info, "Profile updated successfully")}
+       )}
     else
       {:error, cs} ->
         {:noreply, assign(socket, account_form: to_form(cs))}
