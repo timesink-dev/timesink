@@ -409,7 +409,7 @@ defmodule Timesink.Account do
              kind: :email_verification,
              status: :valid
            }),
-         false <- Token.is_valid?(token_record),
+         true <- Token.is_valid?(token_record),
          {:ok, user} <- User.get(token_record.user_id) do
       case User.update(user, %{"email" => token_record.email, "unverified_email" => nil},
              changeset: &User.email_only_changeset/2

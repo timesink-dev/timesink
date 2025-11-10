@@ -29,7 +29,7 @@ defmodule Timesink.Account.Mail do
 
       #{url}
 
-      This link will expire in 15 minutes.
+      This link will expire in 48 hours.
 
       If you didn't request this change, you can safely ignore this email.
 
