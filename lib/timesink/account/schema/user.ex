@@ -17,7 +17,7 @@ defmodule Timesink.Account.User do
           first_name: String.t(),
           last_name: String.t(),
           roles: list(String.t()),
-          unverified_email: String.t(),
+          unverified_email: String.t() | nil,
           profile: Account.Profile.t()
         }
 
