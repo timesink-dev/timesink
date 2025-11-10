@@ -423,7 +423,7 @@ defmodule Timesink.Account do
       end
     else
       {:error, :not_found} -> {:error, :invalid_or_expired}
-      true -> {:error, :invalid_or_expired}
+      false -> {:error, :invalid_or_expired}
       _ -> {:error, :invalid_or_expired}
     end
   end
