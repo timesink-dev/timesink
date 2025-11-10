@@ -5,10 +5,14 @@ defmodule TimesinkWeb.ErrorHTMLTest do
   import Phoenix.Template
 
   test "renders 404.html" do
-    assert render_to_string(TimesinkWeb.ErrorHTML, "404", "html", []) == "Not Found"
+    html = render_to_string(TimesinkWeb.ErrorHTML, "404", "html", [])
+    assert html =~ "Error 404"
+    assert html =~ "Uh oh, the Projector Broke"
   end
 
   test "renders 500.html" do
-    assert render_to_string(TimesinkWeb.ErrorHTML, "500", "html", []) == "Internal Server Error"
+    html = render_to_string(TimesinkWeb.ErrorHTML, "500", "html", [])
+    assert html =~ "Error 500"
+    assert html =~ "Technical Difficulties"
   end
 end
