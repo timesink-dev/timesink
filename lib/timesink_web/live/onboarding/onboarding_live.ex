@@ -57,6 +57,8 @@ defmodule TimesinkWeb.OnboardingLive do
       |> assign(:steps, @steps)
       # Start at the first *kept* step
       |> assign(:step, hd(@step_order))
+      # Track initial page load to enforce step reset on refresh
+      |> assign(:initial_load, true)
 
     {:ok, socket, layout: {TimesinkWeb.Layouts, :empty}}
   end
@@ -77,9 +79,14 @@ defmodule TimesinkWeb.OnboardingLive do
     invite_token = socket.assigns.invite_token
 
     # Only validate token now; do NOT gate on "missing email"
-    with true <- Token.is_valid?(invite_token),
-         step <- get_step_from_params(params) do
-      {:noreply, assign(socket, step: step)}
+    with true <- Token.is_valid?(invite_token) do
+      # On initial page load (including refresh), always start at location step
+      if socket.assigns.initial_load do
+        {:noreply, socket |> assign(initial_load: false, step: :location)}
+      else
+        step = get_step_from_params(params)
+        {:noreply, assign(socket, step: step)}
+      end
     else
       false ->
         {:noreply,
@@ -134,8 +141,10 @@ defmodule TimesinkWeb.OnboardingLive do
       {:ok, user} ->
         token = CoreAuth.generate_token(user)
 
-        # sign them up to the newsletter
-        Timesink.Newsletter.Resend.subscribe(user.email)
+        # Enqueue newsletter subscription job (non-blocking)
+        %{"email" => user.email}
+        |> Timesink.Newsletter.Workers.SubscribeWorker.new()
+        |> Oban.insert()
 
         {:noreply, push_navigate(socket, to: ~p"/auth/complete_onboarding?token=#{token}")}
 
