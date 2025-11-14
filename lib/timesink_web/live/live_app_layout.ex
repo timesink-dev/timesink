@@ -24,19 +24,17 @@ defmodule TimesinkWeb.LiveAppLayout do
           </div>
           
     <!-- Column 2: Navigation Links -->
-          <div class="space-y-2.5 text-sm md:mx-auto md:text-left">
-            <p class="font-semibold text-base mb-2">eXplOre</p>
-            <a href="/now-playing" class="hover:underline hover:text-white transition">
-              Now Playing
-            </a>
-            <br />
-            <a href="/upcoming" class="hover:underline hover:text-white transition">upcoming</a>
-            <br />
-            <a href="/archives" class="hover:underline hover:text-white transition">Archives</a>
-            <br />
-            <a href="/blog" class="hover:underline hover:text-white transition">Blog</a>
-            <br />
-            <a href="/info" class="hover:underline hover:text-white transition">About</a>
+          <div class="space-y-2 text-md md:mx-auto md:text-left">
+            <p class="font-semibold text-lg mb-2">eXplOre</p>
+            <div class="flex flex-col gap-y-2">
+              <a href="/now-playing" class="hover:underline hover:text-white transition">
+                Now Playing
+              </a>
+              <a href="/upcoming" class="hover:underline hover:text-white transition">upcoming</a>
+              <a href="/archives" class="hover:underline hover:text-white transition">Archives</a>
+              <a href="/blog" class="hover:underline hover:text-white transition">Blog</a>
+              <a href="/info" class="hover:underline hover:text-white transition">About</a>
+            </div>
             <br />
           </div>
           
@@ -45,7 +43,7 @@ defmodule TimesinkWeb.LiveAppLayout do
             
     <!-- Participation Section -->
             <div class="space-y-2 md:mx-auto">
-              <p class="font-semibold text-base mb-2.5">Make your mark</p>
+              <p class="font-semibold text-lg mb-4">Make your mark</p>
               <div class="flex flex-col space-y-4">
                 <a href="/submit" class="hover:underline hover:text-white transition">
                   <.button color="primary">Submit your film</.button>
@@ -58,7 +56,7 @@ defmodule TimesinkWeb.LiveAppLayout do
             
     <!-- Connect Section -->
             <div class="space-y-2 md:mx-auto">
-              <p class="font-semibold text-base mb-2">Connect</p>
+              <p class="font-semibold text-lg mb-2">Connect</p>
               <div class="flex space-x-4">
                 <a
                   href="https://instagram.com/timesink_"
