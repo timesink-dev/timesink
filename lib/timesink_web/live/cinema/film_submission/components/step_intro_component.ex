@@ -26,8 +26,14 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
             </p>
             <p>If it moves us we'll follow up with next steps.</p>
           </div>
-          
-    <!-- Payment methods -->
+          <.button
+            color="primary"
+            class="w-full lg:w-1/2 py-3 text-lg mt-8 mb-4"
+            phx-click={JS.push("go_to_step", value: %{step: "next"})}
+          >
+            Begin submission
+          </.button>
+          <!-- Payment methods -->
           <div class="mt-8 space-y-2">
             <div class="flex items-center gap-2.5 text-xs text-gray-400">
               <span class="font-medium">We accept:</span>
@@ -69,15 +75,6 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
               Bitcoin because cinema deserves to be powered by permissionless money.
             </p>
           </div>
-
-          <.button
-            color="primary"
-            class="w-full lg:w-1/2 py-3 text-lg mt-8 mb-4"
-            phx-click={JS.push("go_to_step", value: %{step: "next"})}
-          >
-            Begin submission
-          </.button>
-
           <%= if @data.user do %>
             <div class="mt-8">
               <p class="text-sm text-green-300 bg-green-900/30 p-3 rounded border border-green-600">
