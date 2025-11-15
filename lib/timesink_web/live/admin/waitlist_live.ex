@@ -6,12 +6,7 @@ defmodule TimesinkWeb.Admin.WaitlistLive do
       update_changeset: &Timesink.Waitlist.Applicant.changeset/3,
       create_changeset: &Timesink.Waitlist.Applicant.changeset/3
     ],
-    layout: {TimesinkWeb.Layouts, :admin},
-    pubsub: [
-      name: Timesink.PubSub,
-      topic: "applicants",
-      event_prefix: "applicant_"
-    ]
+    layout: {TimesinkWeb.Layouts, :admin}
 
   @impl Backpex.LiveResource
   def singular_name, do: "Applicant"

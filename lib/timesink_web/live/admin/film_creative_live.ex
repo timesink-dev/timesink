@@ -6,12 +6,7 @@ defmodule TimesinkWeb.Admin.FilmCreativeLive do
       update_changeset: &Timesink.Cinema.FilmCreative.changeset/3,
       create_changeset: &Timesink.Cinema.FilmCreative.changeset/3
     ],
-    layout: {TimesinkWeb.Layouts, :admin},
-    pubsub: [
-      name: Timesink.PubSub,
-      topic: "film_creatives",
-      event_prefix: "film_creative_"
-    ]
+    layout: {TimesinkWeb.Layouts, :admin}
 
   @impl Backpex.LiveResource
   def singular_name, do: "Film Creative"

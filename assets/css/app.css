@@ -5,6 +5,8 @@
 /* This file is for your main application CSS */
 
 
+@source "../../deps/backpex/**/*.*ex";
+@source "../../deps/backpex/assets/js/**/*.*js";
 
 @keyframes slide-in {
   0% {

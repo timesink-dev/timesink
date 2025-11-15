@@ -31,6 +31,8 @@ config :timesink, TimesinkWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :timesink, Timesink.Mailer, adapter: Swoosh.Adapters.Local
 
+config :backpex, :pubsub_server, Timesink.PubSub
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",

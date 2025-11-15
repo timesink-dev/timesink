@@ -6,12 +6,7 @@ defmodule TimesinkWeb.Admin.UserLive do
       update_changeset: &Timesink.Account.User.changeset/3,
       create_changeset: &Timesink.Account.User.changeset/3
     ],
-    layout: {TimesinkWeb.Layouts, :admin},
-    pubsub: [
-      name: Timesink.PubSub,
-      topic: "users",
-      event_prefix: "user_"
-    ]
+    layout: {TimesinkWeb.Layouts, :admin}
 
   @impl Backpex.LiveResource
   def singular_name, do: "Member"

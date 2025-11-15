@@ -103,12 +103,12 @@ defmodule TimesinkWeb.Account.PersonalFilmSubmissionsLive do
     """
   end
 
-  def handle_info({"film_submission_updated", submission}, socket) do
+  def handle_info({"backpex:updated", submission}, socket) do
     update_submission_if_owned(submission, socket)
   end
 
-  def handle_info({"backpex:film_submission_updated", submission}, socket) do
-    update_submission_if_owned(submission, socket)
+  def handle_info(_msg, socket) do
+    {:noreply, socket}
   end
 
   defp update_submission_if_owned(submission, socket) do

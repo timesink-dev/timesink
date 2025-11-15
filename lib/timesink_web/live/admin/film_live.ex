@@ -6,12 +6,7 @@ defmodule TimesinkWeb.Admin.FilmLive do
       update_changeset: &Timesink.Cinema.Film.changeset/3,
       create_changeset: &Timesink.Cinema.Film.changeset/3
     ],
-    layout: {TimesinkWeb.Layouts, :admin},
-    pubsub: [
-      name: Timesink.PubSub,
-      topic: "films",
-      event_prefix: "film_"
-    ]
+    layout: {TimesinkWeb.Layouts, :admin}
 
   @impl Backpex.LiveResource
   def singular_name, do: "Film"
