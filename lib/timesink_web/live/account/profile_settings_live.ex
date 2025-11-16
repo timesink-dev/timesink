@@ -72,7 +72,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
           >
             <.inputs_for :let={pf} field={@account_form[:profile]}>
               <div class="grid grid-cols-1 md:grid-cols-[auto,1fr] items-start gap-4 md:gap-6">
-                <div class="relative mx-auto md:mx-0">
+                <div class="relative mx-auto">
                   <form
                     phx-change="upload_avatar"
                     phx-auto-recover="ignore"
@@ -101,7 +101,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                         <% end %>
                       <% end %>
 
-                      <span class="absolute -bottom-1 -right-1 inline-flex items-center rounded-full bg-emerald-600/90 text-xs text-white px-2 py-0.5">
+                      <span class="absolute -bottom-1 -right-1 items-center rounded-full bg-emerald-600/90 text-xs text-white px-2 py-0.5">
                         You
                       </span>
                       

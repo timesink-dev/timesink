@@ -89,10 +89,10 @@ defmodule TimesinkWeb.CoreComponents do
               <button
                 phx-click={JS.exec("data-cancel", to: "##{@id}")}
                 type="button"
-                class="rounded-full p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 focus:outline-none focus:ring-2 focus:ring-neon-blue-lightest/60"
+                class="cursor-pointer rounded-full p-2 text-zinc-400 hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-neon-blue-lightest/60"
                 aria-label={gettext("close")}
               >
-                <.icon name="hero-x-mark-solid" class="h-5 w-5" />
+                <.icon name="hero-x-mark" class="h-5 w-5" />
               </button>
             </div>
 
@@ -280,7 +280,7 @@ defmodule TimesinkWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-md px-4 py-2 cursor-pointer disabled:cursor-not-allowed",
+        "disabled:opacity-60 disabled:cursor-not-allowed phx-submit-loading:opacity-60 phx-submit-loading:cursor-wait rounded-md px-4 py-2 cursor-pointer",
         @color_classes,
         @class,
         @classes
@@ -411,7 +411,7 @@ defmodule TimesinkWeb.CoreComponents do
           @input_class,
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
           @errors != [] && "border-rose-400 focus:border-rose-400",
-          "bg-dark-theater-primary"
+          "bg-dark-theater-primary placeholder:text-white/40"
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
@@ -437,7 +437,7 @@ defmodule TimesinkWeb.CoreComponents do
             @errors == [] && "border-zinc-300 focus:border-zinc-400",
             @errors != [] && "border-rose-400 focus:border-rose-400",
             @addon_icon_right != [] && "pr-10",
-            "rounded-md bg-dark-theater-primary"
+            "rounded-md bg-dark-theater-primary placeholder:text-gray-400"
           ]}
           {@rest}
         />

@@ -211,6 +211,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                       Save
                     </span>
                     <span class="hidden phx-submit-loading:inline-flex items-center gap-2">
+                      Saving…
                       <svg
                         class="w-4 h-4 animate-spin"
                         viewBox="0 0 24 24"
@@ -227,7 +228,6 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                         />
                         <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" />
                       </svg>
-                      Saving…
                     </span>
                   </.button>
                 </div>

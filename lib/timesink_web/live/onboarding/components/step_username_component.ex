@@ -50,7 +50,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
                 placeholder="Claim your unique handle"
               >
                 <:addon_icon_right :if={username_valid?(@form, @error)}>
-                  <.icon name="hero-check-circle-mini" class="h-5 w-5 text-green-500" />
+                  <.icon name="hero-check-circle" class="h-5 w-5 text-green-500" />
                 </:addon_icon_right>
               </.input>
             </div>

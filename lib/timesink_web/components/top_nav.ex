@@ -214,10 +214,10 @@ defmodule TimesinkWeb.TopNav do
         phx-click={show_hamburger()}
         aria-label="Open menu"
         aria-controls="hamburger-content"
-        class="inline-flex items-center justify-center h-12 w-12 rounded-xl border border-zinc-700             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+        class="cursor-pointer inline-flex items-center justify-center h-12 w-12 rounded-xl border border-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
             focus-visible:ring-zinc-400 focus-visible:ring-offset-black "
       >
-        <.icon name="hero-bars-3" class="h-7 w-7" />
+        <.icon name="hero-bars-3" class="h-6 w-6" />
         <span class="sr-only">Open menu</span>
       </button>
     </div>
@@ -242,10 +242,10 @@ defmodule TimesinkWeb.TopNav do
                 Menu Du Jour
               </p>
             </div>
-            <button class="navbar-close" phx-click={hide_hamburger()}>
+            <.button class="navbar-close" color="none" phx-click={hide_hamburger()}>
               <span class="sr-only">Close menu</span>
-              <.icon name="hero-x-mark-mini" class="h-6 w-6" />
-            </button>
+              <.icon name="hero-x-mark" class="h-6 w-6" />
+            </.button>
           </div>
 
           <ul class="flex flex-col justify-start items-start gap-y-4 pt-2.5">

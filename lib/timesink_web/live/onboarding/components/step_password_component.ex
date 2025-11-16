@@ -93,12 +93,8 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
             <div class="mt-4 sm:mt-6">
               <.button
                 color="primary"
-                classes={[
-                  "w-full py-3 text-base sm:text-lg inline-flex items-center justify-center gap-2",
-                  (@loading? && "opacity-80 cursor-not-allowed") || ""
-                ]}
+                class="w-full py-3 text-base sm:text-lg inline-flex items-center justify-center gap-2"
                 disabled={@loading?}
-                phx-disable-with=" "
               >
                 <%= if @loading? do %>
                   <span>Completing</span>

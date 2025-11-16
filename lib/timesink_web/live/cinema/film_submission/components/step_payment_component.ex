@@ -46,7 +46,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
               phx-value-method="card"
               phx-target={@myself}
               class={[
-                "px-4 py-2 rounded font-semibold border transition",
+                "cursor-pointer px-4 py-2 rounded font-semibold border transition",
                 @method == "card" && "bg-white text-black border-white shadow",
                 @method != "card" && "bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-700"
               ]}
@@ -59,7 +59,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
               phx-value-method="bitcoin"
               phx-target={@myself}
               class={[
-                "px-4 py-2 rounded font-semibold border transition flex items-center gap-2",
+                "cursor-pointer px-4 py-2 rounded font-semibold border transition flex items-center gap-2",
                 @method == "bitcoin" && "bg-orange-500 text-white border-orange-400 shadow",
                 @method != "bitcoin" &&
                   "bg-backroom-black  border-orange-400 text-orange-400 hover:text-orange-300 hover:border-orange-300"
@@ -84,19 +84,18 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
                 >
                   <div id="payment-element" />
 
-                  <button
+                  <.button
                     id="stripe-submit"
                     type="submit"
-                    disabled
                     aria-busy="false"
-                    class="mt-6 bg-white text-black font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition
+                    class="phx-submit-loading:opacity-60 mt-6 bg-white text-black font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition
            inline-flex items-center justify-center gap-2"
                   >
                     <span>Pay &amp; Submit</span>
                     <!-- keep width stable even when not spinning -->
                     <span class="inline-flex items-center justify-center w-4 h-4" aria-hidden="true">
                     </span>
-                  </button>
+                  </.button>
 
                   <p id="card-errors" class="mt-3 text-sm text-red-400"></p>
                 </form>
@@ -134,14 +133,15 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
                   </p>
                 </div>
               <% else %>
-                <button
+                <.button
                   type="button"
+                  color="none"
                   phx-click="create_btcpay_invoice"
                   phx-target={@myself}
                   disabled={@btcpay_loading}
                   aria-busy={to_string(@btcpay_loading)}
-                  class={[
-                    "w-full border border-orange-500 text-orange-400 font-semibold px-6 py-3 rounded-md shadow transition",
+                  classes={[
+                    "w-full border bg-orange-500 border-orange-500 text-white font-semibold px-6 py-3 rounded-md shadow transition",
                     "flex items-center justify-center gap-2",
                     if(@btcpay_loading, do: "opacity-90 cursor-wait", else: "hover:bg-orange-500/10")
                   ]}
@@ -168,7 +168,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
                       </svg>
                     <% end %>
                   </span>
-                </button>
+                </.button>
               <% end %>
             </div>
           <% end %>

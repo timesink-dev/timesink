@@ -9,11 +9,15 @@
 /* This file is for your main application CSS */
 
 
-@source "../../deps/backpex/**/*.*ex";
-@source "../../deps/backpex/assets/js/**/*.*js";
-@source "../js/**/*.js";
+/* Tell Tailwind where to look for class names */
+@source "../js/**/*.{js,ts}";
 @source "../../lib/timesink_web.ex";
 @source "../../lib/timesink_web/**/*.*ex";
+
+/* Backpex sources */
+@source "../../deps/backpex/**/*.*ex";
+@source "../../deps/backpex/assets/js/**/*.*js";
+
 
 @plugin "../js/heroicons.tailwind.plugin.js";
 
