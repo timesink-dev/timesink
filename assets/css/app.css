@@ -1,8 +1,5 @@
 @import "tailwindcss";
 
-/* Import custom fonts */
-@import "../../priv/static/fonts/ano/ano.css";
-@import "../../priv/static/fonts/gangster_grotesk/gangster-grotesk.css";
 
 /* your plugins / custom stuff */
 
@@ -59,18 +56,7 @@
   --font-gangster: "Gangster Grotesk", sans-serif;
 }
 
-/* Generate custom font utility classes */
-@utility font-brand {
-  font-family: var(--font-brand);
-}
 
-@utility font-brand-italic {
-  font-family: var(--font-brand-italic);
-}
-
-@utility font-gangster {
-  font-family: var(--font-gangster);
-}
 
 @keyframes slide-in {
   0% {
