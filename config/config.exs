@@ -31,6 +31,8 @@ config :timesink, TimesinkWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :timesink, Timesink.Mailer, adapter: Swoosh.Adapters.Local
 
+config :backpex, :pubsub_server, Timesink.PubSub
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
@@ -41,12 +43,10 @@ config :esbuild,
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
-# Configure tailwind (the version is required)
 config :tailwind,
-  version: "3.4.3",
+  version: "4.1.17",
   timesink: [
     args: ~w(
-      --config=tailwind.config.js
       --input=css/app.css
       --output=../priv/static/assets/app.css
     ),

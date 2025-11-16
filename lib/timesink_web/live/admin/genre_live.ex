@@ -6,12 +6,7 @@ defmodule TimesinkWeb.Admin.GenreLive do
       update_changeset: &Timesink.Cinema.Genre.changeset/3,
       create_changeset: &Timesink.Cinema.Genre.changeset/3
     ],
-    layout: {TimesinkWeb.Layouts, :admin},
-    pubsub: [
-      name: Timesink.PubSub,
-      topic: "genres",
-      event_prefix: "genre_"
-    ]
+    layout: {TimesinkWeb.Layouts, :admin}
 
   @impl Backpex.LiveResource
   def singular_name, do: "Genre"
