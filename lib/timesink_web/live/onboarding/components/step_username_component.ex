@@ -64,7 +64,7 @@ defmodule TimesinkWeb.Onboarding.StepUsernameComponent do
 
             <%= if input_value(@form, :username) != "" && @error do %>
               <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light mt-2">
-                <.icon name="hero-exclamation-circle-mini" class="h-5 w-5 sm:h-6 sm:w-6" />
+                <.icon name="hero-exclamation-circle" class="h-5 w-5 sm:h-6 sm:w-6" />
                 <p class="text-xs sm:text-sm mt-1 sm:mt-2">{@error}</p>
               </span>
             <% end %>

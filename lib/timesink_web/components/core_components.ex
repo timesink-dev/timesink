@@ -148,7 +148,7 @@ defmodule TimesinkWeb.CoreComponents do
     >
       <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6">
         <.icon :if={@kind == :info} name="hero-information-circle-mini" class="h-4 w-4" />
-        <.icon :if={@kind == :error} name="hero-exclamation-circle-mini" class="h-4 w-4" /> {@title}
+        <.icon :if={@kind == :error} name="hero-exclamation-circle" class="h-4 w-4" /> {@title}
       </p>
       <p class="mt-2 text-sm leading-5">{msg}</p>
       <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>
@@ -475,7 +475,7 @@ defmodule TimesinkWeb.CoreComponents do
   def error(assigns) do
     ~H"""
     <p class={["mt-1 flex gap-3 text-sm leading-6 text-neon-red-light", @class]}>
-      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
+      <.icon name="hero-exclamation-circle" class="mt-0.5 h-5 w-5 flex-none" />
       {render_slot(@inner_block)}
     </p>
     """

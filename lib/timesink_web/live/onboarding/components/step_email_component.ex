@@ -68,7 +68,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
 
           <%= if input_value(@form, :email) !== "" && @error do %>
             <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light">
-              <.icon name="hero-exclamation-circle-mini" class="h-6 w-6" />
+              <.icon name="hero-exclamation-circle" class="h-6 w-6" />
               <p class="text-md mt-2">
                 {@error}
               </p>
