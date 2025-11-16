@@ -133,16 +133,14 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
                   </p>
                 </div>
               <% else %>
-                <.button
+                <button
                   type="button"
-                  color="none"
                   phx-click="create_btcpay_invoice"
                   phx-target={@myself}
                   disabled={@btcpay_loading}
                   aria-busy={to_string(@btcpay_loading)}
-                  classes={[
-                    "w-full border bg-orange-500 border-orange-500 text-white font-semibold px-6 py-3 rounded-md shadow transition",
-                    "flex items-center justify-center gap-2",
+                  class={[
+                    "cursor-pointer w-full border border-orange-500 text-orange-400 font-semibold px-6 py-3 rounded-md shadow transition flex items-center justify-center gap-2",
                     if(@btcpay_loading, do: "opacity-90 cursor-wait", else: "hover:bg-orange-500/10")
                   ]}
                 >
@@ -168,7 +166,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
                       </svg>
                     <% end %>
                   </span>
-                </.button>
+                </button>
               <% end %>
             </div>
           <% end %>
