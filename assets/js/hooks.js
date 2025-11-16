@@ -731,10 +731,10 @@ Hooks.ChatAutoScroll =  {
     btn.className = [
       "inline-flex", "items-center", "gap-2",
       "rounded-full", "border", "border-white/10",
-      "bg-white/[0.06]", "backdrop-blur",
+      "bg-white/6", "backdrop-blur",
       "px-4", "py-2",
       "text-xs", "font-medium", "text-gray-100",
-      "shadow-lg", "hover:bg-white/[0.10]",
+      "shadow-lg", "hover:bg-white/10",
       "transition-all", "duration-200",
       "animate-in", "slide-in-from-bottom-2"
     ].join(" ");

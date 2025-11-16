@@ -10,9 +10,7 @@ defmodule TimesinkWeb.Admin.FilmSubmissionLive do
     ],
     layout: {TimesinkWeb.Layouts, :admin},
     pubsub: [
-      name: Timesink.PubSub,
-      topic: "film_submissions",
-      event_prefix: "film_submission_"
+      topic: "film_submissions"
     ]
 
   @impl Backpex.LiveResource

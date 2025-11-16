@@ -38,7 +38,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
             placeholder="Enter your email"
           >
             <:addon_icon_right :if={email_valid?(@form, @error)}>
-              <.icon name="hero-check-circle-mini" class="h-5 w-5 text-green-500" />
+              <.icon name="hero-check-circle" class="h-5 w-5 text-green-500" />
             </:addon_icon_right>
           </.input>
 
@@ -68,7 +68,7 @@ defmodule TimesinkWeb.Onboarding.StepEmailComponent do
 
           <%= if input_value(@form, :email) !== "" && @error do %>
             <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light">
-              <.icon name="hero-exclamation-circle-mini" class="h-6 w-6" />
+              <.icon name="hero-exclamation-circle" class="h-6 w-6" />
               <p class="text-md mt-2">
                 {@error}
               </p>

@@ -48,7 +48,7 @@ defmodule TimesinkWeb.Onboarding.StepLocationComponent do
               phx-change="search"
               phx-target={@myself}
               placeholder="Start typing your city (e.g., Lyon, France)"
-              class="w-full p-3 rounded text-white border-none bg-dark-theater-primary focus:outline-none focus:ring-2 focus:ring-neon-blue-lightest text-sm sm:text-base"
+              class="placeholder:text-gray-400 w-full p-3 rounded text-white border-none bg-dark-theater-primary focus:outline-none focus:ring-2 focus:ring-neon-blue-lightest text-sm sm:text-base"
               autocomplete="off"
             />
           </div>
