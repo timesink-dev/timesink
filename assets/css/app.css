@@ -1,11 +1,6 @@
 @import "tailwindcss";
 
 
-/* your plugins / custom stuff */
-
-@plugin "daisyui";
-
-
 /* This file is for your main application CSS */
 
 
@@ -20,6 +15,7 @@
 
 
 @plugin "../js/heroicons.tailwind.plugin.js";
+@plugin "daisyui";
 
 
 @variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
@@ -28,8 +24,6 @@
 
 
 @theme {
-  /* Colors → give you bg-*, text-*, border-* utilities with these names */
-
   --color-obsidian: #0B1215;
   --color-mystery-white: #F5F7F9;
   --color-backroom-black: #0C0C0C;
