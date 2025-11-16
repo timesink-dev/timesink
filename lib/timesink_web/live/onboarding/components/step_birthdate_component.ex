@@ -79,7 +79,7 @@ defmodule TimesinkWeb.Onboarding.StepBirthdateComponent do
 
           <%= if @error do %>
             <p class="text-neon-red-light text-xs sm:text-sm mt-2">
-              <.icon name="hero-exclamation-circle-mini" class="h-4 w-4 sm:h-5 sm:w-5 inline" />
+              <.icon name="hero-exclamation-circle" class="h-4 w-4 sm:h-5 sm:w-5 inline" />
               {@error}
             </p>
           <% end %>

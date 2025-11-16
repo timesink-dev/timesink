@@ -40,7 +40,7 @@ defmodule TimesinkWeb.Onboarding.StepVerifyEmailComponent do
           </div>
           <%= if @verification_error do %>
             <span class="flex flex-col text-center items-center justify-center gap-x-1 text-neon-red-light my-2">
-              <.icon name="hero-exclamation-circle-mini" class="h-6 w-6" />
+              <.icon name="hero-exclamation-circle" class="h-6 w-6" />
               <p class="text-md mt-2">
                 {@verification_error}
               </p>
