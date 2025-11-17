@@ -6,9 +6,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
   require Logger
 
-  # ───────────────────────────────────────────────────────────
-  # Mount
-  # ───────────────────────────────────────────────────────────
   def mount(%{"theater_slug" => theater_slug}, _session, socket) do
     with {:ok, theater} <- Theater.get_by(%{slug: theater_slug}),
          {:ok, showcase} <- Showcase.get_by(%{status: :active}),
@@ -79,12 +76,13 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     end
   end
 
-  # ───────────────────────────────────────────────────────────
-  # Render
-  # ───────────────────────────────────────────────────────────
   def render(assigns) do
     ~H"""
-    <div id="theater" class="max-w-7xl md:max-w-4xl mx-auto px-4 md:px-6 mt-16 text-gray-100">
+    <div
+      id="theater"
+      phx-hook="TheaterBodyScroll"
+      class="max-w-7xl md:max-w-4xl mx-auto px-4 md:px-6 mt-16 text-gray-100"
+    >
       <!-- Header -->
       <div class="border-b border-white/10 pb-4 mb-10">
         <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
@@ -241,14 +239,18 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         </div>
         
     <!-- Right: Desktop side panel -->
-        <aside class={[
-          "md:sticky md:top-20 md:self-start border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02]",
-          "md:block md:transform-gpu transition-all duration-200",
-          if(@chat_open,
-            do: "opacity-100 md:w-96 md:translate-x-0",
-            else: "opacity-0 md:w-0 md:translate-x-4 pointer-events-none"
-          )
-        ]}>
+        <aside class={
+          [
+            # <--- THIS FIXES IT
+            "hidden md:block",
+            "md:sticky md:top-20 md:self-start border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02]",
+            "md:transform-gpu transition-all duration-200",
+            if(@chat_open,
+              do: "opacity-100 md:w-96 md:translate-x-0",
+              else: "opacity-0 md:w-0 md:translate-x-4 pointer-events-none"
+            )
+          ]
+        }>
           <!-- Tabs -->
           <div class="flex items-center justify-between bg-white/[0.03] px-4 py-3 border-b border-white/10">
             <div class="flex gap-6 text-sm">
@@ -420,7 +422,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           </div>
 
           <div id="mobile-chat-panel" class="h-[50vh] flex flex-col relative">
-            <!-- host for jump button -->
             <div id="mobile-chat-body" class="flex-1 overflow-y-auto overscroll-contain">
               <div class={@active_panel_tab == :chat || "hidden"}>
                 <%= if not @has_messages? do %>
@@ -453,6 +454,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                       </li>
                     <% end %>
                   </ul>
+
+                  <%= if map_size(@typing_users) > 0 do %>
+                    <div class="px-4 py-2 text-xs text-zinc-400 border-t border-white/5">
+                      {typing_line(@typing_users, @presence)}
+                    </div>
+                  <% end %>
                 <% end %>
               </div>
               

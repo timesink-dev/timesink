@@ -804,7 +804,34 @@ Hooks.ChatAutoScroll = {
   }
 };
 
+Hooks.TheaterBodyScroll = {
+  mounted() {
+    this.prevRootOverflow = null;
+    this.prevBodyOverflow = null;
 
+    this.handleEvent("toggle_body_scroll", ({ prevent }) => {
+      // Only lock scroll on mobile (< md)
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      if (!isMobile) return;
+
+      const root = document.documentElement;
+      const body = document.body;
+
+      if (prevent) {
+        console.log({prevent})
+        // save previous styles to restore later
+        this.prevRootOverflow = root.style.overflow;
+        this.prevBodyOverflow = body.style.overflow;
+
+        root.style.overflow = "hidden";
+        body.style.overflow = "hidden";
+      } else {
+        root.style.overflow = this.prevRootOverflow || "";
+        body.style.overflow = this.prevBodyOverflow || "";
+      }
+    });
+  }
+};
 
 
 export default Hooks;
