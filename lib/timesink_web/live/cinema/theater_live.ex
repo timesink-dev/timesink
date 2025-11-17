@@ -6,9 +6,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
   require Logger
 
-  # ───────────────────────────────────────────────────────────
-  # Mount
-  # ───────────────────────────────────────────────────────────
   def mount(%{"theater_slug" => theater_slug}, _session, socket) do
     with {:ok, theater} <- Theater.get_by(%{slug: theater_slug}),
          {:ok, showcase} <- Showcase.get_by(%{status: :active}),
@@ -71,19 +68,21 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:countdown, nil)
        |> assign(:pulse_seconds_only?, false)
        # UI state
-       |> assign(:chat_open, true)
-       |> assign(:active_panel_tab, :chat)}
+       |> assign(:chat_open, false)
+       |> assign(:active_panel_tab, :chat)
+       |> assign(:has_messages?, length(recent_msgs) > 0)}
     else
       _ -> {:redirect, socket |> put_flash(:error, "Not found") |> redirect(to: "/")}
     end
   end
 
-  # ───────────────────────────────────────────────────────────
-  # Render
-  # ───────────────────────────────────────────────────────────
   def render(assigns) do
     ~H"""
-    <div id="theater" class="max-w-7xl md:max-w-4xl mx-auto px-4 md:px-6 mt-16 text-gray-100">
+    <div
+      id="theater"
+      phx-hook="TheaterBodyScroll"
+      class="max-w-7xl md:max-w-4xl mx-auto px-4 md:px-6 mt-16 text-gray-100"
+    >
       <!-- Header -->
       <div class="border-b border-white/10 pb-4 mb-10">
         <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
@@ -97,7 +96,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           phx-click="toggle_chat"
           class={[
             @chat_open && "invisible md:visible",
-            "text-sm px-4 py-2 rounded-lg border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-gray-300 hover:text-white transition"
+            "cursor-pointer text-sm px-4 py-2 rounded-lg border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-gray-300 hover:text-white transition"
           ]}
           aria-haspopup="dialog"
           aria-expanded="false"
@@ -242,9 +241,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <!-- Right: Desktop side panel -->
         <aside class={
           [
+            # <--- THIS FIXES IT
+            "hidden md:block",
             "md:sticky md:top-20 md:self-start border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02]",
-            "md:block md:transform-gpu transition-all duration-200",
-            # keep it anchored on the right and slide in
+            "md:transform-gpu transition-all duration-200",
             if(@chat_open,
               do: "opacity-100 md:w-96 md:translate-x-0",
               else: "opacity-0 md:w-0 md:translate-x-4 pointer-events-none"
@@ -278,38 +278,43 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               </button>
             </div>
           </div>
-          
-    <!-- Body (scroll-limited like before) -->
-          <div class="bg-white/[0.01]">
-            <!-- Chat Tab Content -->
+          <div id="chat-panel-desktop" class="bg-white/[0.01] relative">
+            <!-- This is where the jump button will be absolutely positioned -->
+
             <div class={@active_panel_tab == :chat || "hidden"}>
               <!-- Scrollable chat body (fixed height) -->
-              <div
-                id="chat-body-desktop"
-                data-scroll-container="#chat-body-desktop"
-                class="max-h-[40vh] overflow-y-auto relative"
-              >
-                <!-- STREAMED LIST (desktop only) -->
-                <ul
-                  id="chat-list"
-                  phx-update="stream"
-                  phx-hook="ChatAutoScroll"
-                  data-scroll-container="#chat-body-desktop"
-                  data-overlay="fixed"
-                  class="divide-y divide-white/5"
-                >
-                  <%= for {dom_id, msg} <- @streams.messages do %>
-                    <li id={dom_id} class="px-4 py-3">
-                      <div class="flex items-center justify-between">
-                        <span class="font-medium text-zinc-300 text-sm">
-                          {(msg.user && "@" <> msg.user.username) || "Member"}
-                        </span>
-                        <span class="text-xs text-zinc-400">{chat_time(msg.inserted_at)}</span>
-                      </div>
-                      <p class="text-gray-100 text-sm mt-1">{msg.content}</p>
-                    </li>
-                  <% end %>
-                </ul>
+              <div id="chat-body-desktop" class="max-h-[40vh] overflow-y-auto relative">
+                <%= if not @has_messages? do %>
+                  <!-- Empty state placeholder -->
+                  <div class="flex items-center justify-center h-full min-h-[200px] px-4 py-8">
+                    <div class="text-center">
+                      <div class="text-zinc-400 text-sm mb-2">No messages yet</div>
+                      <div class="text-zinc-500 text-xs">Be the first to start the conversation!</div>
+                    </div>
+                  </div>
+                <% else %>
+                  <!-- STREAMED LIST (desktop only) -->
+                  <ul
+                    id="chat-list"
+                    phx-update="stream"
+                    phx-hook="ChatAutoScroll"
+                    data-scroll="#chat-body-desktop"
+                    data-host="#chat-panel-desktop"
+                    class="divide-y divide-white/5"
+                  >
+                    <%= for {dom_id, msg} <- @streams.messages do %>
+                      <li id={dom_id} class="px-4 py-3">
+                        <div class="flex items-center justify-between">
+                          <span class="font-medium text-zinc-300 text-sm">
+                            {(msg.user && "@" <> msg.user.username) || "Member"}
+                          </span>
+                          <span class="text-xs text-zinc-400">{chat_time(msg.inserted_at)}</span>
+                        </div>
+                        <p class="text-gray-100 text-sm mt-1">{msg.content}</p>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
                 
     <!-- TYPING -->
                 <%= if map_size(@typing_users) > 0 do %>
@@ -332,7 +337,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
                     autocomplete="off"
                   />
-                  <button class="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/[0.06] text-gray-200 hover:bg-white/[0.10] transition">
+                  <button class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/[0.06] text-gray-200 hover:bg-white/[0.10] transition">
                     Send
                   </button>
                 </div>
@@ -416,34 +421,46 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             <button class="text-gray-300" phx-click="toggle_chat" aria-label="Close">✕</button>
           </div>
 
-          <div class="h-[50vh] flex flex-col">
-            <div class="flex-1 overflow-y-auto overscroll-contain">
-              <!-- Mobile Chat Tab Content -->
-              <div
-                id="mobile-chat-scroll"
-                data-scroll-container="#mobile-chat-scroll"
-                class={@active_panel_tab == :chat || "hidden"}
-              >
-                <!-- Mobile chat list with streaming -->
-                <ul
-                  id="mobile-chat-list"
-                  phx-update="stream"
-                  phx-hook="ChatAutoScroll"
-                  data-scroll-container="#mobile-chat-scroll"
-                  class="divide-y divide-white/5 text-sm"
-                >
-                  <%= for {dom_id, msg} <- @streams.messages do %>
-                    <li id={"m-#{dom_id}"} class="px-4 py-3">
-                      <div class="flex items-center justify-between">
-                        <span class="font-medium text-zinc-300">
-                          {(msg.user && msg.user.username) || "Member"}
-                        </span>
-                        <span class="text-xs text-zinc-400">{chat_time(msg.inserted_at)}</span>
-                      </div>
-                      <p class="text-gray-100 text-sm mt-1">{msg.content}</p>
-                    </li>
+          <div id="mobile-chat-panel" class="h-[50vh] flex flex-col relative">
+            <div id="mobile-chat-body" class="flex-1 overflow-y-auto overscroll-contain">
+              <div class={@active_panel_tab == :chat || "hidden"}>
+                <%= if not @has_messages? do %>
+                  <!-- Empty state placeholder -->
+                  <div class="flex items-center justify-center h-full min-h-[300px] px-4 py-8">
+                    <div class="text-center">
+                      <div class="text-zinc-400 text-sm mb-2">No messages yet</div>
+                      <div class="text-zinc-500 text-xs">Be the first to start the conversation!</div>
+                    </div>
+                  </div>
+                <% else %>
+                  <!-- Mobile chat list with streaming -->
+                  <ul
+                    id="mobile-chat-list"
+                    phx-update="stream"
+                    phx-hook="ChatAutoScroll"
+                    data-scroll="#mobile-chat-body"
+                    data-host="#mobile-chat-panel"
+                    class="divide-y divide-white/5 text-sm"
+                  >
+                    <%= for {dom_id, msg} <- @streams.messages do %>
+                      <li id={"m-#{dom_id}"} class="px-4 py-3">
+                        <div class="flex items-center justify-between">
+                          <span class="font-medium text-zinc-300">
+                            {(msg.user && msg.user.username) || "Member"}
+                          </span>
+                          <span class="text-xs text-zinc-400">{chat_time(msg.inserted_at)}</span>
+                        </div>
+                        <p class="text-gray-100 text-sm mt-1">{msg.content}</p>
+                      </li>
+                    <% end %>
+                  </ul>
+
+                  <%= if map_size(@typing_users) > 0 do %>
+                    <div class="px-4 py-2 text-xs text-zinc-400 border-t border-white/5">
+                      {typing_line(@typing_users, @presence)}
+                    </div>
                   <% end %>
-                </ul>
+                <% end %>
               </div>
               
     <!-- Mobile Live Audience Tab Content -->
@@ -494,7 +511,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
                     autocomplete="off"
                   />
-                  <button class="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/[0.06] text-gray-200 hover:bg-white/[0.10] transition">
+                  <button class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/[0.06] text-gray-200 hover:bg-white/[0.10] transition">
                     Send
                   </button>
                 </div>
@@ -542,7 +559,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   end
 
   def handle_info({:new_message, msg}, socket) do
-    {:noreply, stream_insert(socket, :messages, msg)}
+    {:noreply,
+     socket
+     |> stream_insert(:messages, msg)
+     |> assign(:has_messages?, true)}
   end
 
   def handle_info({:typing, %{user_id: uid}}, socket) do
@@ -560,7 +580,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   # Events
   # ───────────────────────────────────────────────────────────
   def handle_event("toggle_chat", _params, socket) do
-    {:noreply, update(socket, :chat_open, fn v -> not v end)}
+    new_state = not socket.assigns.chat_open
+
+    {:noreply,
+     socket
+     |> assign(:chat_open, new_state)
+     |> push_event("toggle_body_scroll", %{prevent: new_state})}
   end
 
   def handle_event("switch_tab", %{"to" => to}, socket) do
@@ -618,7 +643,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         {:noreply,
          socket
          |> assign(:chat_input, "")
-         |> stream_insert(:messages, msg)}
+         |> stream_insert(:messages, msg)
+         |> assign(:has_messages?, true)}
     end
   end
 
