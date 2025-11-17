@@ -68,7 +68,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:countdown, nil)
        |> assign(:pulse_seconds_only?, false)
        # UI state
-       |> assign(:chat_open, true)
+       |> assign(:chat_open, false)
        |> assign(:active_panel_tab, :chat)
        |> assign(:has_messages?, length(recent_msgs) > 0)}
     else
