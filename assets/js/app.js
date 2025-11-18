@@ -19,6 +19,8 @@
 import "phoenix_html";
 import '@mux/mux-player';
 import '@mux/mux-uploader';
+import Toast from "../../deps/toast/assets/js/toast.js"
+
 // Establish Phoenix Socket and LiveView configuration.
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
@@ -33,7 +35,7 @@ let csrfToken = document
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken },
-  hooks: { ...Hooks, ...BackpexHooks },
+  hooks: { ...Hooks, ...BackpexHooks, Toast },
 });
 
 // Show progress bar on live navigation and form submits

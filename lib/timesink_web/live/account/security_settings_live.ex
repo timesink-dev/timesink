@@ -149,7 +149,7 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
            dirty: false,
            can_submit: false
          )
-         |> put_flash(:info, "Password updated")}
+         |> put_flash(:success, "Password updated")}
 
       {:error, cs} ->
         cs = Map.put(cs, :action, :insert)

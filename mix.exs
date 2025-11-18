@@ -75,7 +75,8 @@ defmodule Timesink.MixProject do
       {:bandit, "~> 1.6"},
       {:timex, "~> 3.7"},
       {:tesla, "~> 1.11"},
-      {:mox, "~> 1.2", only: :test}
+      {:mox, "~> 1.2", only: :test},
+      {:toast, "~> 0.2.0"}
     ]
   end
 

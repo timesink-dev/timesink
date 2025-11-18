@@ -104,7 +104,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                       <span class="absolute -bottom-1 -right-1 items-center rounded-full bg-emerald-600/90 text-xs text-white px-2 py-0.5">
                         You
                       </span>
-                      
+
     <!-- Subtle loading overlay while processing -->
                       <div
                         :if={@avatar_processing}
@@ -139,7 +139,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                     {@avatar_error}
                   </p>
                 </div>
-                
+
     <!-- Username column -->
                 <div class="w-full mt-4 md:mt-0">
                   <label class="block text-sm font-medium text-zinc-300 mb-2">Username</label>
@@ -159,11 +159,11 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                   <.input type="hidden" field={pf[:id]} value={@user.profile.id} />
                 </div>
               </div>
-              
+
     <!-- Location (Onboarding-style) -->
               <div class="mt-1">
                 <label class="block text-sm font-medium text-zinc-300 mb-2">Location</label>
-                
+
     <!-- Visible query box mirrors onboarding -->
                 <input
                   type="text"
@@ -175,7 +175,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                   class="w-full rounded-xl bg-dark-theater-primary text-mystery-white placeholder:zinc-400 outline-none ring-0 focus:ring-2 focus:ring-neon-blue-lightest px-4 py-3"
                   autocomplete="off"
                 />
-                
+
     <!-- Dropdown results -->
                 <ul
                   :if={@loc_results != []}
@@ -195,7 +195,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                     {result.label}
                   </li>
                 </ul>
-                
+
     <!-- Hidden nested fields posted with the form -->
                 <.inputs_for :let={locf} field={pf[:location]}>
                   <.input
@@ -236,7 +236,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                   This helps us plan screenings and build our community.
                 </p>
               </div>
-              
+
     <!-- Bio -->
               <div>
                 <label class="block text-sm font-medium text-zinc-300 mb-2">Bio</label>
@@ -249,7 +249,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                 />
               </div>
             </.inputs_for>
-            
+
     <!-- Account fields -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -447,7 +447,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
               socket
               |> assign(user: user_with_pending_email)
               |> put_flash(
-                :info,
+                :success,
                 "Profile updated. We've sent a verification link to #{current_user.email}."
               )
 
@@ -469,7 +469,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         else
           socket
           |> assign(user: updated_user)
-          |> put_flash(:info, "Profile updated successfully")
+          |> put_flash(:success, "Profile updated successfully")
         end
 
       {:noreply,
@@ -546,7 +546,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         {:noreply,
          socket
          |> assign(user: user, avatar_processing: false, avatar_error: nil)
-         |> put_flash(:info, "Avatar updated!")}
+         |> put_flash(:success, "Avatar updated!")}
 
       {:attach_error, reason} ->
         {:noreply,

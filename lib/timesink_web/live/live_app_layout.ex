@@ -9,20 +9,30 @@ defmodule TimesinkWeb.LiveAppLayout do
     <TopNav.top_nav current_user={@current_user} class="h-[30px] mx-4" />
     <main>
       <div class="min-h-[calc(100vh-60px)]">
-        <.flash_group flash={@flash} /> {@inner_content}
+        <Toast.toast_group
+          flash={@flash}
+          position="bottom-center"
+          theme="dark"
+          rich_colors={false}
+          max_toasts={4}
+            animation_duration={400}
+            duration={3000}
+
+        />
+        {@inner_content}
       </div>
     </main>
     <footer class="bg-backroom-black text-mystery-white px-12 md:px-0 font-brand py-20 mt-24">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row justify-between gap-12 gap-x-24">
-          
+
     <!-- Column 1: Branding and Contact -->
           <div class="space-y-2.5 md:mx-auto md:text-left">
             <p class="text-xl sm:text-2xl font-semibold">TimeSink Presents</p>
             <p class="text-sm opacity-70">Real time. Real audiences. Real cinema.</p>
             <p class="font-gangster font-light text-xs sm:text-sm">hello@timesinkpresents.com</p>
           </div>
-          
+
     <!-- Column 2: Navigation Links -->
           <div class="space-y-2 text-md md:mx-auto md:text-left">
             <p class="font-semibold text-lg mb-2">eXplOre</p>
@@ -37,10 +47,10 @@ defmodule TimesinkWeb.LiveAppLayout do
             </div>
             <br />
           </div>
-          
+
     <!-- Column 3: Participate + Social -->
           <div class="space-y-8 md:space-y-6 text-sm md:mx-auto">
-            
+
     <!-- Participation Section -->
             <div class="space-y-2 md:mx-auto">
               <p class="font-semibold text-lg mb-4">Make your mark</p>
@@ -53,7 +63,7 @@ defmodule TimesinkWeb.LiveAppLayout do
                 </a>
               </div>
             </div>
-            
+
     <!-- Connect Section -->
             <div class="space-y-2 md:mx-auto">
               <p class="font-semibold text-lg mb-2">Connect</p>
@@ -79,7 +89,7 @@ defmodule TimesinkWeb.LiveAppLayout do
             </p>
           </div>
         </div>
-        
+
     <!-- Newsletter Signup -->
         <.live_component module={NewsletterLive} id="newsletter-footer" />
       </div>

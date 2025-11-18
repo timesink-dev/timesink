@@ -148,7 +148,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                       </span>
                     <% end %>
                   </div>
-                  
+
     <!-- Clickable overlay (keeps input interactive without layout shift) -->
                   <.live_file_input
                     upload={@uploads.welcome_avatar}
@@ -167,7 +167,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
               >
                 {@welcome_avatar_error}
               </p>
-              
+
     <!-- Bio -->
               <div>
                 <label class="mb-2 block text-sm font-medium text-zinc-300 text-left">Bio</label>
@@ -182,7 +182,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                   Don't worry you can edit these details anytime in your profile settings.
                 </p>
               </div>
-              
+
     <!-- Actions: full-width on mobile, right-aligned on md+ -->
               <:actions>
                 <div class="flex flex-col md:flex-row justify-end gap-3 pt-1 md:pt-2">
@@ -338,7 +338,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
          socket
          |> assign(show_welcome_modal: false, welcome_bio: "")
          |> assign(current_user: updated_user)
-         |> put_flash(:info, "Profile updated — welcome to the show!")}
+         |> put_flash(:success, "Profile updated — welcome to the show!")}
 
       {:error, _cs} ->
         {:noreply, put_flash(socket, :error, "Could not save your profile. Please try again.")}

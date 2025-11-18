@@ -1,21 +1,26 @@
+/* This file is for the main application CSS */
+
+
 @import "tailwindcss";
+@import "../../deps/toast/assets/css/toast.css";
 
 
-/* This file is for your main application CSS */
+@plugin "../js/heroicons.tailwind.plugin.js";
 
+@plugin "daisyui" {
+  exclude: toast;
+  logs: false;
+}
 
 /* Tell Tailwind where to look for class names */
 @source "../js/**/*.{js,ts}";
 @source "../../lib/timesink_web.ex";
 @source "../../lib/timesink_web/**/*.*ex";
 
+
 /* Backpex sources */
 @source "../../deps/backpex/**/*.*ex";
 @source "../../deps/backpex/assets/js/**/*.*js";
-
-
-@plugin "../js/heroicons.tailwind.plugin.js";
-@plugin "daisyui";
 
 
 @variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
@@ -53,6 +58,48 @@
   --font-brand-italic: "Ano Regular Wide Italic", sans-serif;
   --font-gangster: "Gangster Grotesk", sans-serif;
 }
+
+
+/* Animation for slide-in-right */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+/* Animation for slide-in-from-top */
+@keyframes slide-in-from-top {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Animation for slide-in-from-bottom */
+@keyframes slide-in-from-bottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 
 
 

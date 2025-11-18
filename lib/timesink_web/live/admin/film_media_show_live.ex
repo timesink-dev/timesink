@@ -279,7 +279,7 @@ defmodule TimesinkWeb.Admin.FilmMediaShowLive do
       {:noreply,
        socket
        |> assign(film: load_film(film.id))
-       |> put_flash(:info, "Poster removed successfully.")}
+       |> put_flash(:success, "Poster removed successfully.")}
     else
       nil ->
         {:noreply, put_flash(socket, :error, "No poster found to remove.")}
