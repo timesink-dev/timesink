@@ -13,13 +13,28 @@
 
 
 # Storage
+
+# export TIMESINK_AWS_REGION="us-east-1"
+
+
+# export TIMESINK_S3_HOST="https://s3.us-east-1.amazonaws.com"
+# export TIMESINK_S3_ACCESS_KEY_ID="dflkwlkwerlwe"
+# export TIMESINK_S3_ACCESS_KEY_SECRET="sdfdskkj33"
+# export TIMESINK_S3_BUCKET="timesink-remote"
+# export TIMESINK_S3_PREFIX="blobs"
+
+# export TIMESINK_STAGING_S3_HOST="https://s3.us-east-1.amazonaws.com"
+# export TIMESINK_STAGING_S3_ACCESS_KEY_ID="dflkwlkwerlwe"
+# export TIMESINK_STAGING_S3_ACCESS_KEY_SECRET="sdfdskkj33"
+# export TIMESINK_STAGING_S3_BUCKET="timesink-staging"
+# export TIMESINK_STAGING_S3_PREFIX="blobs"
 #
 # S3 (MinIO, S3-compatible)
-# export TIMESINK_S3_HOST="http://localhost:9000"
-# export TIMESINK_S3_ACCESS_KEY_ID="minioadmin"
-# export TIMESINK_S3_ACCESS_KEY_SECRET="minioadmin"
-# export TIMESINK_S3_BUCKET="timesink"
-# export TIMESINK_S3_PREFIX="blobs"
+# export TIMESINK_DEV_S3_HOST="http://localhost:9000"
+# export TIMESINK_DEV_S3_ACCESS_KEY_ID="minioadmin"
+# export TIMESINK_DEV_S3_ACCESS_KEY_SECRET="minioadmin"
+# export TIMESINK_DEV_S3_BUCKET="timesink"
+# export TIMESINK_DEV_S3_PREFIX="blobs"
 #
 # S3 (tests-specific; customize if needed)
 # export TIMESINK_TEST_S3_HOST="http://localhost:9000"
@@ -65,3 +80,8 @@
 # export TIMESINK_PROD_URL=
 # export TIMESINK_DEV_URL=
 # export TIMESINK_STAGING_URL=
+
+# Blog
+# export TIMESINK_GHOST_CONTENT_API_KEY=
+# export TIMESINK_TEST_GHOST_PUBLISHING_WEBHOOK_KEY=
+# export TIMESINK_GHOST_PUBLISHING_WEBHOOK_KEY=

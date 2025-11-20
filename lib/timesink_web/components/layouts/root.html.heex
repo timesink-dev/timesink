@@ -4,7 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title suffix=" · TimeSink Presents">
+    <meta
+      name="description"
+      content="We bring great filmmakers — of all levels — to the stage. And we don’t waste your time discovering them. Real audiences. Real-time reactions. Conversations and moments that last. No noise — pure signal."
+    />
+    <.live_title suffix=" · Real audiences. Real time. Real cinema.">
       {assigns[:page_title] || "TimeSink Presents"}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/fonts/ano/ano.css"} />
@@ -15,8 +19,6 @@
     />
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
-    </script>
-    <script src="https://js.stripe.com/v3/">
     </script>
   </head>
   <body class="text-mystery-white font-gangster antialiased">

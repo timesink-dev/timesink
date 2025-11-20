@@ -8,7 +8,6 @@ defmodule TimesinkWeb.Account.MeLive do
   import TimesinkWeb.Account.MePageItem
 
   @max_invites 2
-  @base_url Application.compile_env(:timesink, :base_url)
   @copy_reset_ms 2000
 
   def mount(_params, _session, socket) do
@@ -219,6 +218,8 @@ defmodule TimesinkWeb.Account.MeLive do
   end
 
   defp list_invites(user_id) do
+    base_url = base_url()
+
     from(t in Token,
       where: t.user_id == ^user_id and t.kind == :invite,
       order_by: [desc: t.inserted_at]
@@ -227,9 +228,13 @@ defmodule TimesinkWeb.Account.MeLive do
     |> Enum.map(fn t ->
       %{
         id: t.id,
-        url: "#{@base_url}/invite/#{t.secret || t.token}",
+        url: "#{base_url}/invite/#{t.secret || t.token}",
         status: (t.status || :valid) |> to_string()
       }
     end)
+  end
+
+  defp base_url do
+    Application.fetch_env!(:timesink, :base_url)
   end
 end

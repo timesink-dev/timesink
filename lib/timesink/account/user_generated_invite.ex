@@ -5,8 +5,6 @@ defmodule Timesink.UserGeneratedInvite do
   alias Timesink.Repo
   alias Timesink.Token
 
-  @base_url Application.compile_env(:timesink, :base_url)
-
   # Each user gets 2 invites
   @max_invites 2
 
@@ -19,11 +17,16 @@ defmodule Timesink.UserGeneratedInvite do
       )
 
     if active_invites < @max_invites do
+      base_url = base_url()
       token = Ecto.UUID.generate()
       Repo.insert!(%Token{kind: :invite, secret: token, status: :valid, user_id: user_id})
-      {:ok, "#{@base_url}/invite/#{token}"}
+      {:ok, "#{base_url}/invite/#{token}"}
     else
       {:error, "You've used all your invite tickets!"}
     end
+  end
+
+  defp base_url do
+    Application.fetch_env!(:timesink, :base_url)
   end
 end

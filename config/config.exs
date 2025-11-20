@@ -87,7 +87,7 @@ config :timesink, Oban,
        # Runs every 1 minute for dev env
        #  {"*/1 * * * *", Timesink.Workers.Waitlist.ScheduleInviteJob}
        # Clean up expired email verification tokens and clear unverified_email fields
-       {"@daily", Timesink.Workers.Account.CleanupExpiredEmailVerificationJob}
+       {"@hourly", Timesink.Workers.Account.CleanupExpiredEmailVerificationJob}
      ]}
   ],
   queues: [mailer: 10, waitlist: 10, account: 10]

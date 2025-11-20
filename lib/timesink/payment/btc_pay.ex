@@ -23,8 +23,6 @@ defmodule Timesink.Payment.BtcPay do
 
   """
 
-  @http Application.compile_env!(:timesink, :http_client)
-
   def create_invoice(%{amount: amount, currency: currency, metadata: metadata}) do
     config = btc_pay_config()
 
@@ -46,7 +44,7 @@ defmodule Timesink.Payment.BtcPay do
 
     req = Finch.build(:post, url, headers, body)
 
-    case @http.request(req) do
+    case http_client().request(req) do
       {:ok, %Finch.Response{status: 200, body: body}} ->
         Jason.decode(body)
 
@@ -59,4 +57,8 @@ defmodule Timesink.Payment.BtcPay do
   end
 
   defp btc_pay_config, do: Application.fetch_env!(:timesink, :btc_pay) |> Enum.into(%{})
+
+  defp http_client do
+    Application.get_env(:timesink, :http_client, Finch)
+  end
 end

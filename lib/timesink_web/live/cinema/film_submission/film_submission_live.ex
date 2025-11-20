@@ -76,6 +76,8 @@ defmodule TimesinkWeb.FilmSubmissionLive do
       id="film-submission"
       class="relative h-screen px-6 md:px-12 py-16 md:py-24 flex flex-col justify-between"
     >
+      <script defer async src="https://js.stripe.com/v3/">
+      </script>
       <div class="flex flex-col-reverse md:flex-row items-center gap-6">
         <div class="w-full">
           <div class="min-h-[calc(100vh-200px)] max-h-[calc(100vh-200px)] overflow-auto">
@@ -350,9 +352,11 @@ defmodule TimesinkWeb.FilmSubmissionLive do
         %Phoenix.Socket.Broadcast{event: "film_submission_completed", payload: submission},
         socket
       ) do
+    IO.inspect(socket.assigns, label: "SOCKET ASSIGNS FILM SUBMISSION")
+
     Mail.send_film_submission_completion_notification(
-      socket.assigns.applicant.contact_email,
-      socket.assigns.applicant.contact_name,
+      submission.contact_email,
+      submission.contact_name,
       submission
     )
 
