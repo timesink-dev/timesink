@@ -93,7 +93,6 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
               </div>
             </div>
           </div>
-
           <!-- Terms & Privacy acceptance -->
           <div class="mt-4 sm:mt-5 space-y-2">
             <label class="flex items-start gap-3 text-xs sm:text-[0.8rem] text-gray-300">
