@@ -111,11 +111,13 @@ jobs:
         env:
           MIX_ENV: staging
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        run: flyctl deploy \
-          --build-arg MIX_ENV=staging \
-          --config fly.staging.toml \
-          --app timesink-staging \
-          --remote-only
+        run: |
+          flyctl deploy \
+            --build-arg MIX_ENV=staging \
+            --config fly.staging.toml \
+            --app timesink-staging \
+            --remote-only
+
 
   deploy_prod:
     if: github.ref == 'refs/heads/production'
@@ -137,11 +139,13 @@ jobs:
         env:
           MIX_ENV: prod
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        run: flyctl deploy \
-          --build-arg MIX_ENV=prod \
-          --config fly.prod.toml \
-          --app timesink-prod \
-          --remote-only
+        run: |
+          flyctl deploy \
+            --build-arg MIX_ENV=prod \
+            --config fly.prod.toml \
+            --app timesink-prod \
+            --remote-only
+
 
 
 
