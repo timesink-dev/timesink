@@ -48,7 +48,7 @@ defmodule TimesinkWeb.Components.Hero do
             </p>
 
             <a href="/join" class="block">
-              <.button class="mt-5 justify-center px-6 py-2 md:py-2.5 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition">
+              <.button class="mt-5 justify-center px-6 py-3 font-medium bg-neon-blue-lightest text-backroom-black hover:bg-mystery-white hover:text-black transition">
                 Get free early access
               </.button>
             </a>
