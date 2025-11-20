@@ -9,7 +9,7 @@ defmodule Timesink.Repo.Migrations.CreateExhibitionCommentTable do
       # polymorphic link to the thing being commented on for this flavor
       add :assoc_id, references(:exhibition, type: :uuid, on_delete: :delete_all), null: false
 
-      # author (same pattern as your blog_post_comment)
+      # author
       add :user_id, references(:user, type: :uuid, on_delete: :delete_all), null: false
 
       # 1-level threading (optional)
