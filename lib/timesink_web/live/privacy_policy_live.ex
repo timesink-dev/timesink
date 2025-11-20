@@ -48,7 +48,9 @@ defmodule TimesinkWeb.PrivacyPageLive do
             <li>Messages you send in chat, comments, or feedback forms.</li>
           </ul>
 
-          <h3 class="font-semibold text-sm sm:text-base pt-3">2.2 Information collected automatically</h3>
+          <h3 class="font-semibold text-sm sm:text-base pt-3">
+            2.2 Information collected automatically
+          </h3>
           <ul class="list-disc list-inside space-y-1">
             <li>IP address and rough location derived from it.</li>
             <li>Device type, browser, and operating system.</li>
@@ -143,7 +145,9 @@ defmodule TimesinkWeb.PrivacyPageLive do
               Playback and presence logs: kept for a limited operational window to monitor
               performance and security.
             </li>
-            <li>Film submission data: kept while your film is programmed or hosted, or until you request removal.</li>
+            <li>
+              Film submission data: kept while your film is programmed or hosted, or until you request removal.
+            </li>
           </ul>
         </section>
 
@@ -162,8 +166,7 @@ defmodule TimesinkWeb.PrivacyPageLive do
             <li>Withdraw consent where processing is based on consent.</li>
           </ul>
           <p>
-            To exercise your rights, contact us at
-            <span class="font-gangster">hello@timesinkpresents.com</span>.
+            To exercise your rights, contact us at <span class="font-gangster">hello@timesinkpresents.com</span>.
             We will respond within a reasonable time and within any deadlines required by law.
           </p>
         </section>

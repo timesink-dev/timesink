@@ -220,7 +220,7 @@ defmodule Timesink.Account.Profile do
           [birthdate: "That seems a bit early. We’re flattered, though."]
 
         too_young?(date) ->
-          [birthdate: "Sorry! You'll have to wait a few years to be able to join the platform."]
+          [birthdate: "Sorry! Only those 18+ can join the theaters."]
 
         true ->
           []

@@ -113,8 +113,7 @@ defmodule TimesinkWeb.TermsPageLive do
             store full credit card numbers on our own servers.
           </p>
           <p>
-            Except where <strong>required by applicable law</strong>, all payments are
-            <strong>non-refundable</strong>. At our sole discretion, we may offer alternative
+            Except where <strong>required by applicable law</strong>, all payments are <strong>non-refundable</strong>. At our sole discretion, we may offer alternative
             access (for example, rescheduling a screening) if a show is materially disrupted
             by technical issues.
           </p>
@@ -189,8 +188,7 @@ defmodule TimesinkWeb.TermsPageLive do
         <section class="space-y-3">
           <h2 class="text-lg sm:text-xl font-semibold">11. Governing Law</h2>
           <p>
-            These Terms are governed by and construed in accordance with the laws of the
-            <strong>State of New York, USA</strong>, without regard to its conflict-of-law
+            These Terms are governed by and construed in accordance with the laws of the <strong>State of New York, USA</strong>, without regard to its conflict-of-law
             principles.
           </p>
           <p>

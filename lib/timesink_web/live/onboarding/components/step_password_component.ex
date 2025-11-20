@@ -6,8 +6,13 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
     data = assigns[:data] || %{}
     password = Map.get(data, "password", "")
 
-    # Create a changeset for password validation
-    changeset = password_changeset(%{"password" => password, "password_confirmation" => ""})
+    # Create a changeset for password + terms validation
+    changeset =
+      password_changeset(%{
+        "password" => password,
+        "password_confirmation" => "",
+        "accept_terms" => "false"
+      })
 
     {:ok,
      socket
@@ -89,6 +94,34 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
             </div>
           </div>
 
+    <!-- Terms & Privacy acceptance -->
+          <div class="mt-4 sm:mt-5 space-y-2">
+            <label class="flex items-start gap-3 text-xs sm:text-[0.8rem] text-gray-300">
+              <.input type="checkbox" field={@form[:accept_terms]} required class="mt-0.5 sm:mt-1" />
+              <span>
+                I’ve read and agree to the
+                <a
+                  href="/terms"
+                  target="_blank"
+                  class="underline underline-offset-2 hover:text-white transition"
+                >
+                  Terms of Service
+                </a>
+                and
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  class="underline underline-offset-2 hover:text-white transition"
+                >
+                  Privacy Policy
+                </a>
+                <span class="block text-[0.7rem] sm:text-xs text-gray-400 mt-1">
+                  Short version: we don’t sell your data, and we expect you not to pirate films.
+                </span>
+              </span>
+            </label>
+          </div>
+
           <:actions>
             <div class="mt-4 sm:mt-6">
               <.button
@@ -165,10 +198,8 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
     changeset = password_changeset(password_params)
 
     if changeset.valid? do
-      # Only send the password field to user_data (not password_confirmation)
       password = get_change(changeset, :password)
 
-      # Merge password into user_data and complete onboarding
       user_create_params =
         socket.assigns.data
         |> Map.put("password", password)
@@ -185,16 +216,19 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
     {:noreply, socket}
   end
 
-  # Private helper to create password changeset with confirmation validation
+  # Private helper to create password changeset with confirmation + terms validation
   defp password_changeset(params) do
-    types = %{password: :string, password_confirmation: :string}
+    types = %{password: :string, password_confirmation: :string, accept_terms: :boolean}
 
     {%{}, types}
-    |> cast(params, [:password, :password_confirmation])
+    |> cast(params, [:password, :password_confirmation, :accept_terms])
     |> validate_required([:password, :password_confirmation])
     |> validate_length(:password, min: 8, message: "Password must be at least 8 characters")
     |> validate_confirmation(:password,
       message: "Password confirmation does not match"
+    )
+    |> validate_acceptance(:accept_terms,
+      message: "You must agree to the Terms and Privacy Policy to continue"
     )
   end
 end

@@ -22,8 +22,8 @@ defmodule TimesinkWeb.LiveAppLayout do
             <p class="text-sm opacity-70">Real time. Real audiences. Real cinema.</p>
             <p class="font-gangster font-light text-xs sm:text-sm">hello@timesinkpresents.com</p>
           </div>
-
-          <!-- Column 2: Navigation Links -->
+          
+    <!-- Column 2: Navigation Links -->
           <div class="space-y-2 text-md md:mx-auto md:text-left">
             <p class="font-semibold text-lg mb-2">eXplOre</p>
             <div class="flex flex-col gap-y-2">
@@ -45,8 +45,8 @@ defmodule TimesinkWeb.LiveAppLayout do
             </div>
             <br />
           </div>
-
-          <!-- Column 3: Participate + Social -->
+          
+    <!-- Column 3: Participate + Social -->
           <div class="space-y-8 md:space-y-6 text-sm md:mx-auto">
             <!-- Participation Section -->
             <div class="space-y-2 md:mx-auto">
@@ -60,8 +60,8 @@ defmodule TimesinkWeb.LiveAppLayout do
                 </a>
               </div>
             </div>
-
-            <!-- Connect Section -->
+            
+    <!-- Connect Section -->
             <div class="space-y-2 md:mx-auto">
               <p class="font-semibold text-lg mb-2">Connect</p>
               <div class="flex space-x-4">
@@ -83,14 +83,14 @@ defmodule TimesinkWeb.LiveAppLayout do
             </div>
           </div>
         </div>
-
-        <!-- Newsletter Signup -->
+        
+    <!-- Newsletter Signup -->
         <.live_component module={NewsletterLive} id="newsletter-footer" />
-
-        <!-- Legal Bar: Terms, Privacy, Copyright -->
+        
+    <!-- Legal Bar: Terms, Privacy, Copyright -->
         <div class="mt-10 border-t border-zinc-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-[0.8rem] opacity-70">
           <p>
-            &copy; <%= DateTime.utc_now().year %> TimeSink Presents. All rights reserved.
+            &copy; {DateTime.utc_now().year} TimeSink Presents. All rights reserved.
           </p>
           <div class="flex items-center gap-4">
             <a href="/terms" class="hover:underline hover:text-white transition">
