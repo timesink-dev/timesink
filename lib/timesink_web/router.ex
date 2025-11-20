@@ -125,6 +125,8 @@ defmodule TimesinkWeb.Router do
       layout: {TimesinkWeb.LiveAppLayout, :app} do
       live "/", HomepageLive
       live "/info", InfoPageLive
+      live "/terms", TermsPageLive
+      live "/privacy", PrivacyPageLive
       live "/submit", FilmSubmissionLive
       live "/archives", Cinema.ArchivesLive
       live "/upcoming", Cinema.UpcomingLive

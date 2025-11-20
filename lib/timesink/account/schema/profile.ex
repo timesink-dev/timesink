@@ -256,6 +256,6 @@ defmodule Timesink.Account.Profile do
     end
   end
 
-  defp too_young?(date), do: Date.diff(Date.utc_today(), date) < 16 * 365
+  defp too_young?(date), do: Date.diff(Date.utc_today(), date) < 18 * 365
   defp too_old_to_believe?(date), do: Date.diff(Date.utc_today(), date) > 110 * 365
 end
