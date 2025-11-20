@@ -34,7 +34,7 @@ defmodule TimesinkWeb.InfoPageLive do
         <div>
           <h2 class="text-white font-semibold text-lg">What kind of films do you show?</h2>
           <p class="mt-1">
-            Short films, features, documentaries, comedies, hybrids, experiments—anything with a strong voice and vision. Format doesn't matter. iPhone or cinema camera, we don't care. If it's compelling and well-made, it's in. The only rule: no boring, no pandering.
+            Short films, features, documentaries, comedies, animation, experiments...anything with a strong voice and vision. Format doesn't matter. iPhone or cinema camera, we don't care. If it's compelling and well-made, it's in. The only rule: no boring, no pandering.
           </p>
         </div>
 
@@ -50,7 +50,7 @@ defmodule TimesinkWeb.InfoPageLive do
             Can I join immediately?
           </h2>
           <p class="mt-1">
-            Yes we are currently rolling out our early access phase. Sign up and you're in. Once you create an account, you'll have immediate access to our virtual theaters and upcoming screenings. But this won't last forever.
+            Yes we are currently rolling out our free early access phase. Sign up and you're in. Once you create an account, you'll have immediate access to our virtual theaters and upcoming screenings. But this won't last forever.
           </p>
           <p class="mt-3">
             <span class="font-semibold"> Ready to join? </span>
@@ -61,7 +61,7 @@ defmodule TimesinkWeb.InfoPageLive do
         <div>
           <h2 class="text-white font-semibold text-lg">What happens if my film gets selected?</h2>
           <p class="mt-1">
-            Your film gets a proper screening with a live audience, instead of being buried in a content library. You'll receive full creator credit, a public profile page, and exposure to engaged viewers who actually care. We're building toward filmmaker rewards including revenue sharing and direct support, because cinema should support its creators.
+            Your film gets a proper screening with a live audience, instead of being buried in a content library. You'll receive full creator credit, a public profile page (we're also building towards something like IMDB), and exposure to engaged viewers who actually care. We're building toward filmmaker rewards including revenue sharing and direct support, because cinema should support its creators.
           </p>
         </div>
 
@@ -92,7 +92,7 @@ defmodule TimesinkWeb.InfoPageLive do
         <div>
           <h2 class="text-white font-semibold text-lg">Do you host in-person events?</h2>
           <p class="mt-1">
-            Not yet, but it's in the plans. Pop-up screenings, midnight premieres, underground cinema nights—bringing the TimeSink experience into physical spaces with audiences who care. Stay tuned.
+            Not yet, but it's in the plans. Pop-up screenings, midnight premieres, cinema nights bringing the TimeSink experience into physical spaces with audiences who care. Stay tuned.
           </p>
         </div>
 
@@ -122,7 +122,7 @@ defmodule TimesinkWeb.InfoPageLive do
         <div>
           <h2 class="text-white font-semibold text-lg">What's the vision?</h2>
           <p class="mt-1">
-            We're building a culture around cinema, not just another streaming catalog. TimeSink is for people who want discovery, community, and films that matter. If that resonates then welcome... we're glad you've made it here.
+            We're building a culture around cinema, not just another streaming catalog. TimeSink is for people who want discovery, community, and films that matter. If that resonates then welcome...we're glad you've made it here.
           </p>
         </div>
       </div>
