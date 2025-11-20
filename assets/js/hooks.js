@@ -593,7 +593,7 @@ Hooks.CopyBus = {
 - When user clicks the button or scrolls back to bottom, resume autoscroll 
 */
 Hooks.ChatAutoScroll = {
-  STICKY_THRESHOLD: 64, // a bit tighter than 64 for mobile
+  STICKY_THRESHOLD: 64, // px from bottom is "at bottom"
 
   mounted() {
     // ── find scroll + host elements from data attributes ──

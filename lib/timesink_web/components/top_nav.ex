@@ -197,7 +197,7 @@ defmodule TimesinkWeb.TopNav do
             </li>
             <li>
               <a href="/join">
-                <.button color="none">Get early access</.button>
+                <.button color="none">Get free early access</.button>
               </a>
             </li>
           <% end %>
@@ -293,7 +293,7 @@ defmodule TimesinkWeb.TopNav do
                 </a>
                 <a href="/join">
                   <.button color="tertiary" class="w-full md:w-1/2">
-                    Get early access
+                    Get free early access
                   </.button>
                 </a>
               <% end %>
