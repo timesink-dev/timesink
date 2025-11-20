@@ -94,7 +94,7 @@ defmodule TimesinkWeb.Onboarding.StepPasswordComponent do
             </div>
           </div>
 
-    <!-- Terms & Privacy acceptance -->
+          <!-- Terms & Privacy acceptance -->
           <div class="mt-4 sm:mt-5 space-y-2">
             <label class="flex items-start gap-3 text-xs sm:text-[0.8rem] text-gray-300">
               <.input type="checkbox" field={@form[:accept_terms]} required class="mt-0.5 sm:mt-1" />
