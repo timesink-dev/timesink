@@ -8,8 +8,7 @@ defmodule TimesinkWeb.Plugs.CaptureRawBody do
   import Plug.Conn
 
   @webhook_paths [
-    "/api/webhooks/btc-pay.server",
-    ~r|^/api/webhooks/ghost\.io/.*|
+    "/api/webhooks/btc-pay.server"
   ]
 
   def init(opts), do: opts

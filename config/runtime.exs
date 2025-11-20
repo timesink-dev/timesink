@@ -236,12 +236,6 @@ if env == :staging do
     webhook_url:
       System.get_env("TIMESINK_STAGING_BTC_PAY_WEBHOOK_URL") ||
         "https://staging.timesinkpresents.com/api/webhooks/btc-pay.server"
-
-  # Ghost (staging)
-  config :timesink, :ghost_publishing,
-    webhook_key: System.get_env("TIMESINK_STAGING_GHOST_PUBLISHING_WEBHOOK_KEY"),
-    content_api_key:
-      System.get_env("TIMESINK_STAGING_GHOST_CONTENT_API_KEY", "staging-content-api-key")
 end
 
 # ─────────────────────────────────────────────────────────────
@@ -284,9 +278,4 @@ if env == :prod do
     store_id: System.fetch_env!("TIMESINK_BTC_PAY_STORE_ID"),
     webhook_secret: System.fetch_env!("TIMESINK_BTC_PAY_WEBHOOK_SECRET"),
     webhook_url: System.fetch_env!("TIMESINK_BTC_PAY_WEBHOOK_URL")
-
-  # Ghost (prod)
-  config :timesink, :ghost_publishing,
-    webhook_key: System.fetch_env!("TIMESINK_GHOST_PUBLISHING_WEBHOOK_KEY"),
-    content_api_key: System.fetch_env!("TIMESINK_GHOST_CONTENT_API_KEY")
 end
