@@ -31,8 +31,8 @@ WORKDIR /app
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-# set build ENV
-ENV MIX_ENV="staging"
+ARG MIX_ENV=prod
+ENV MIX_ENV=${MIX_ENV}
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
