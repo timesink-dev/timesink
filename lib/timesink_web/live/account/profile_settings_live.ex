@@ -469,7 +469,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         else
           socket
           |> assign(user: updated_user)
-          |> put_flash(:info, "Profile updated successfully")
+          |> put_flash(:success, "Profile updated successfully")
         end
 
       {:noreply,
@@ -546,7 +546,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         {:noreply,
          socket
          |> assign(user: user, avatar_processing: false, avatar_error: nil)
-         |> put_flash(:info, "Avatar updated!")}
+         |> put_flash(:success, "Avatar updated!")}
 
       {:attach_error, reason} ->
         {:noreply,

@@ -116,8 +116,7 @@ defmodule TimesinkWeb.CoreComponents do
   """
   attr :id, :string, doc: "the optional id of flash container"
   attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
-  attr :title, :string, default: nil
-  attr :kind, :atom, values: [:info, :error], doc: "used for styling and flash lookup"
+  attr :kind, :atom, values: [:info, :error, :success], doc: "used for styling and flash lookup"
   attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash container"
 
   slot :inner_block, doc: "the optional inner block that renders the flash message"
@@ -134,25 +133,39 @@ defmodule TimesinkWeb.CoreComponents do
       role="alert"
       class={
         [
-          "fixed bottom-4 right-4 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 transform transition-transform duration-300 ease-in-out",
-          # Initial state for slide-in animation
-          "translate-y-full opacity-0",
-          # Animation class for slide-in effect
-          "animate-slide-in",
-          @kind == :info && "bg-green-500 text-backroom-black",
-          @kind == :error &&
-            "bg-backroom-black border-[1px] border-neon-red-primary text-neon-red-primary"
+          "fixed bottom-4 right-4 w-96 z-50 rounded-2xl p-4 shadow-xl ring-1",
+          "backdrop-blur-md transition-all duration-300 ease-out animate-slide-in",
+          # Base toast surface
+          "bg-zinc-950/90 text-zinc-50 ring-white/10",
+          # Kind-specific tint + border/left accent vibes
+          @kind == :success && "border border-emerald-400/20 ring-emerald-400/20",
+          @kind == :info && "border border-sky-400/20 ring-sky-400/20"
         ]
       }
       {@rest}
     >
-      <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6">
-        <.icon :if={@kind == :info} name="hero-information-circle-mini" class="h-4 w-4" />
-        <.icon :if={@kind == :error} name="hero-exclamation-circle" class="h-4 w-4" /> {@title}
-      </p>
-      <p class="mt-2 text-sm leading-5">{msg}</p>
-      <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>
-        <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-100 group-hover:opacity-70" />
+      <div class="flex items-start gap-3 pr-8">
+        <div class="mt-0.5 shrink-0">
+          <.icon :if={@kind == :success} name="hero-check-circle" class="h-5 w-5 text-emerald-300" />
+          <.icon :if={@kind == :info} name="hero-information-circle" class="h-5 w-5 text-sky-300" />
+          <.icon
+            :if={@kind == :error}
+            name="hero-exclamation-circle"
+            class="h-5 w-5 text-neon-red-light"
+          />
+        </div>
+
+        <p class="text-sm leading-5 text-zinc-100/90">
+          {msg}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="group absolute top-2 right-2 p-2 rounded-xl hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-white/20"
+        aria-label={gettext("close")}
+      >
+        <.icon name="hero-x-mark-solid" class="h-4 w-4 opacity-80 group-hover:opacity-100" />
       </button>
     </div>
     """
@@ -172,6 +185,7 @@ defmodule TimesinkWeb.CoreComponents do
     ~H"""
     <div id={@id}>
       <.flash kind={:info} title={gettext("Success!")} flash={@flash} />
+      <.flash kind={:success} title={gettext("Success!")} flash={@flash} />
       <.flash kind={:error} title={gettext("Error!")} flash={@flash} />
       <.flash
         id="client-error"
