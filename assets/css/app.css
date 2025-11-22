@@ -58,11 +58,11 @@
 
 @keyframes slide-in {
   0% {
-    transform: translateX(100%); /* Start from the right of the screen */
+    transform: translateY(100%); /* Start from the bottom of the screen */
     opacity: 0; /* Start hidden */
   }
   100% {
-    transform: translateX(0); /* End in place */
+    transform: translateY(0); /* End in place */
     opacity: 1; /* Fully visible */
   }
 }

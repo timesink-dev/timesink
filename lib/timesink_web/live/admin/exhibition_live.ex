@@ -235,7 +235,7 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
       {:noreply,
        socket
        |> assign(:showcases_active_and_upcoming, refresh_showcases())
-       |> put_flash(:info, "Exhibition scheduled.")}
+       |> put_flash(:success, "Exhibition scheduled.")}
     else
       {:error, _changeset} ->
         {:noreply, put_flash(socket, :error, "Failed to schedule exhibiton.")}
@@ -249,7 +249,7 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
       {:noreply,
        socket
        |> assign(:showcases_active_and_upcoming, refresh_showcases())
-       |> put_flash(:info, "Exhibition removed.")}
+       |> put_flash(:success, "Exhibition removed.")}
     else
       nil ->
         {:noreply, put_flash(socket, :error, "Exhibition not found.")}
