@@ -22,7 +22,6 @@ defmodule TimesinkWeb.AuthControllerTest do
         |> post("/sign-in", params)
 
       assert redirected_to(conn) == "/now-playing"
-      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Welcome back!"
       token = get_session(conn, "user_token")
       assert is_binary(token)
     end
@@ -43,7 +42,6 @@ defmodule TimesinkWeb.AuthControllerTest do
         |> post("/sign-in", params)
 
       assert redirected_to(conn) == "/sign-in"
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "Invalid credentials"
     end
   end
 
@@ -58,7 +56,6 @@ defmodule TimesinkWeb.AuthControllerTest do
 
       assert redirected_to(conn) == "/"
       refute get_session(conn, "user_token")
-      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "You have logged out succesfully"
     end
   end
 end

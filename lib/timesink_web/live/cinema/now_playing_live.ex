@@ -338,7 +338,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
          socket
          |> assign(show_welcome_modal: false, welcome_bio: "")
          |> assign(current_user: updated_user)
-         |> put_flash(:info, "Profile updated — welcome to the show!")}
+         |> put_flash(:success, "Profile updated — welcome to the show!")}
 
       {:error, _cs} ->
         {:noreply, put_flash(socket, :error, "Could not save your profile. Please try again.")}

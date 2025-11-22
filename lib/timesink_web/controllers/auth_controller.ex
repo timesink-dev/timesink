@@ -20,7 +20,7 @@ defmodule TimesinkWeb.AuthController do
   def sign_out(conn, _params) do
     conn
     |> Auth.log_out_user()
-    |> put_flash(:info, "You have logged out succesfully.")
+    |> put_flash(:success, "You have logged out succesfully.")
   end
 
   @spec complete_onboarding(Plug.Conn.t(), map()) :: Plug.Conn.t()
@@ -40,7 +40,7 @@ defmodule TimesinkWeb.AuthController do
     case Timesink.Account.verify_email_change_token(token) do
       {:ok, _updated_user} ->
         conn
-        |> put_flash(:info, "Email address verified successfully!")
+        |> put_flash(:success, "Email address verified successfully!")
         |> redirect(to: ~p"/me/profile")
 
       {:error, :invalid_or_expired} ->

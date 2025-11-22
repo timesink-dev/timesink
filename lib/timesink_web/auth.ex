@@ -44,7 +44,7 @@ defmodule TimesinkWeb.Auth do
     |> renew_session()
     |> put_token_in_session(token)
     |> maybe_write_remember_me_cookie(token, params)
-    |> put_flash(:info, "Welcome back!")
+    |> put_flash(:success, "Welcome back!")
     |> redirect(to: user_return_to || signed_in_path(conn))
   end
 
