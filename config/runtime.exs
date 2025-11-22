@@ -1,33 +1,30 @@
 import Config
 
-# config/runtime.exs is executed for all environments, including
-# during releases. It is executed after compilation and before the
-# system starts, so it is typically used to load production configuration
-# and secrets from environment variables or elsewhere. Do not define
-# any compile-time configuration in here, as it won't be applied.
-# The block below contains prod specific runtime configuration.
-
-# ## Using releases
-#
-# If you use `mix release`, you need to explicitly enable the server
-# by passing the PHX_SERVER=true when you start it:
-#
-#     PHX_SERVER=true bin/timesink start
-#
-# Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
-# script that automatically sets the env var above.
-
 env = config_env()
 
-# ─────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
+fetch_env! = fn key ->
+  System.get_env(key) ||
+    raise """
+    environment variable #{key} is missing.
+    """
+end
+
+get_port = fn ->
+  String.to_integer(System.get_env("PORT") || "4000")
+end
+
+# -----------------------------------------------------------------------------
 # Common (all environments)
-# ─────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 if System.get_env("PHX_SERVER") do
   config :timesink, TimesinkWeb.Endpoint, server: true
 end
 
-# Repo (shared with per-env socket options)
+# Repo
 database_url =
   System.get_env("DATABASE_URL") ||
     raise """
@@ -48,52 +45,87 @@ config :timesink, :http_client, Timesink.HTTP.FinchClient
 # Base URL per env (used by your app logic)
 base_url =
   case env do
-    :dev -> System.get_env("TIMESINK_DEV_URL") || "http://localhost:4000"
-    :test -> "http://localhost:4001"
-    :staging -> System.get_env("TIMESINK_STAGING_URL") || "https://staging.timesinkpresents.com"
-    :prod -> System.get_env("TIMESINK_PROD_URL") || "https://timesinkpresents.com"
+    :dev ->
+      System.get_env("TIMESINK_DEV_URL") || "http://localhost:4000"
+
+    :test ->
+      "http://localhost:4001"
+
+    :staging ->
+      System.get_env("TIMESINK_STAGING_URL") || "https://staging.timesinkpresents.com"
+
+    :prod ->
+      System.get_env("TIMESINK_PROD_URL") || "https://timesinkpresents.com"
   end
 
 config :timesink, base_url: base_url
 
-# HERE Maps (single key works across envs; override via env var if needed)
+# HERE Maps
 config :timesink, :here_maps_api_key, System.get_env("TIMESINK_HERE_MAPS_API_KEY")
 
-# ─────────────────────────────────────────────────────────────
-# Shared for :staging and :prod
-# ─────────────────────────────────────────────────────────────
-if env in [:staging, :prod] do
-  secret_key_base =
-    System.get_env("SECRET_KEY_BASE") ||
-      raise "environment variable SECRET_KEY_BASE is missing. Run: mix phx.gen.secret"
+# DNS cluster query only relevant on Fly, safe to set for all envs
+config :timesink, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
-  host = System.get_env("PHX_HOST") || "example.com"
-  port = String.to_integer(System.get_env("PORT") || "4000")
+# -----------------------------------------------------------------------------
+# Endpoint
+# -----------------------------------------------------------------------------
+case env do
+  :dev ->
+    # Dev endpoint stays in config/dev.exs usually.
+    # Nothing required here unless you want runtime overrides.
+    :ok
 
-  config :timesink, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+  :test ->
+    # Test endpoint also generally in config/test.exs.
+    :ok
 
-  # Endpoint (Bandit)
-  config :timesink, TimesinkWeb.Endpoint,
-    url: [host: host, port: 443, scheme: "https"],
-    check_origin: [
-      "https://timesink-staging.fly.dev",
-      "https://staging.timesinkpresents.com",
-      "https://timesinkpresents.com",
-      "https://blog.timesinkpresents.com"
-    ],
-    http: [
-      ip: {0, 0, 0, 0, 0, 0, 0, 0},
-      port: port
-    ],
-    secret_key_base: secret_key_base
+  :staging ->
+    secret_key_base = fetch_env!.("SECRET_KEY_BASE")
+    port = get_port.()
 
-  # ExAws region (real AWS in non-dev/test)
-  config :ex_aws, region: System.fetch_env!("TIMESINK_AWS_REGION")
+    # IMPORTANT: staging host is explicit; does not depend on prod secrets.
+    host = System.get_env("PHX_HOST") || "staging.timesinkpresents.com"
+
+    config :timesink, TimesinkWeb.Endpoint,
+      url: [host: host, port: 443, scheme: "https"],
+      check_origin: [
+        "https://staging.timesinkpresents.com",
+        "https://timesink-staging.fly.dev"
+      ],
+      http: [
+        ip: {0, 0, 0, 0, 0, 0, 0, 0},
+        port: port
+      ],
+      secret_key_base: secret_key_base
+
+    # ExAws region (real AWS in staging)
+    config :ex_aws, region: fetch_env!.("TIMESINK_AWS_REGION")
+
+  :prod ->
+    secret_key_base = fetch_env!.("SECRET_KEY_BASE")
+    port = get_port.()
+
+    host = System.get_env("PHX_HOST") || "timesinkpresents.com"
+
+    config :timesink, TimesinkWeb.Endpoint,
+      url: [host: host, port: 443, scheme: "https"],
+      check_origin: [
+        "https://timesinkpresents.com",
+        "https://blog.timesinkpresents.com"
+      ],
+      http: [
+        ip: {0, 0, 0, 0, 0, 0, 0, 0},
+        port: port
+      ],
+      secret_key_base: secret_key_base
+
+    # ExAws region (real AWS in prod)
+    config :ex_aws, region: fetch_env!.("TIMESINK_AWS_REGION")
 end
 
-# ─────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # :dev
-# ─────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 if env == :dev do
   # ExAws creds + region (MinIO ignores region, ExAws needs a value)
   config :ex_aws,
@@ -145,14 +177,15 @@ if env == :dev do
   config :stripity_stripe,
     api_key: System.get_env("TIMESINK_TEST_STRIPE_SECRET_KEY")
 
+  # Resend (dev)
   config :timesink, :resend,
     api_key: System.get_env("TIMESINK_RESEND_API_KEY", "dev-api-key"),
     audience_id: System.get_env("TIMESINK_RESEND_AUDIENCE_ID", "dev-audience-id")
 end
 
-# ─────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # :test
-# ─────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 if env == :test do
   # Point ExAws S3 at test MinIO instance
   System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000")
@@ -187,16 +220,16 @@ if env == :test do
         "http://localhost:4000/api/btc_pay/webhook"
 end
 
-# ─────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # :staging
-# ─────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 if env == :staging do
   # Mailer
-  config :timesink, Timesink.Mailer, api_key: System.fetch_env!("TIMESINK_STAGING_RESEND_API_KEY")
+  config :timesink, Timesink.Mailer, api_key: fetch_env!.("TIMESINK_STAGING_RESEND_API_KEY")
 
   config :timesink, :resend,
-    api_key: System.fetch_env!("TIMESINK_STAGING_RESEND_API_KEY"),
-    audience_id: System.fetch_env!("TIMESINK_STAGING_RESEND_AUDIENCE_ID")
+    api_key: fetch_env!.("TIMESINK_STAGING_RESEND_API_KEY"),
+    audience_id: fetch_env!.("TIMESINK_STAGING_RESEND_AUDIENCE_ID")
 
   # Stripe (staging)
   config :timesink, :stripe,
@@ -209,17 +242,17 @@ if env == :staging do
 
   # S3 (staging)
   config :timesink, Timesink.Storage.S3,
-    host: System.fetch_env!("TIMESINK_STAGING_S3_HOST"),
-    access_key_id: System.fetch_env!("TIMESINK_STAGING_S3_ACCESS_KEY_ID"),
-    access_key_secret: System.fetch_env!("TIMESINK_STAGING_S3_ACCESS_KEY_SECRET"),
-    bucket: System.fetch_env!("TIMESINK_STAGING_S3_BUCKET"),
-    prefix: System.fetch_env!("TIMESINK_STAGING_S3_PREFIX")
+    host: fetch_env!.("TIMESINK_STAGING_S3_HOST"),
+    access_key_id: fetch_env!.("TIMESINK_STAGING_S3_ACCESS_KEY_ID"),
+    access_key_secret: fetch_env!.("TIMESINK_STAGING_S3_ACCESS_KEY_SECRET"),
+    bucket: fetch_env!.("TIMESINK_STAGING_S3_BUCKET"),
+    prefix: fetch_env!.("TIMESINK_STAGING_S3_PREFIX")
 
   # Mux (staging)
   config :timesink, Timesink.Storage.Mux,
-    webhook_key: System.fetch_env!("TIMESINK_STAGING_MUX_WEBHOOK_KEY"),
-    access_key_id: System.fetch_env!("TIMESINK_STAGING_MUX_ACCESS_KEY_ID"),
-    access_key_secret: System.fetch_env!("TIMESINK_STAGING_MUX_ACCESS_KEY_SECRET")
+    webhook_key: fetch_env!.("TIMESINK_STAGING_MUX_WEBHOOK_KEY"),
+    access_key_id: fetch_env!.("TIMESINK_STAGING_MUX_ACCESS_KEY_ID"),
+    access_key_secret: fetch_env!.("TIMESINK_STAGING_MUX_ACCESS_KEY_SECRET")
 
   # BTC Pay (staging)
   config :timesink, :btc_pay,
@@ -238,44 +271,44 @@ if env == :staging do
         "https://staging.timesinkpresents.com/api/webhooks/btc-pay.server"
 end
 
-# ─────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # :prod
-# ─────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 if env == :prod do
   # Mailer
-  config :timesink, Timesink.Mailer, api_key: System.fetch_env!("TIMESINK_RESEND_API_KEY")
+  config :timesink, Timesink.Mailer, api_key: fetch_env!.("TIMESINK_RESEND_API_KEY")
 
   config :timesink, :resend,
-    api_key: System.fetch_env!("TIMESINK_RESEND_API_KEY"),
-    audience_id: System.fetch_env!("TIMESINK_RESEND_AUDIENCE_ID")
+    api_key: fetch_env!.("TIMESINK_RESEND_API_KEY"),
+    audience_id: fetch_env!.("TIMESINK_RESEND_AUDIENCE_ID")
 
-  # S3 (prod) — require all secret envs explicitly
+  # S3 (prod)
   config :timesink, Timesink.Storage.S3,
-    host: System.fetch_env!("TIMESINK_S3_HOST"),
-    access_key_id: System.fetch_env!("TIMESINK_S3_ACCESS_KEY_ID"),
-    access_key_secret: System.fetch_env!("TIMESINK_S3_ACCESS_KEY_SECRET"),
-    bucket: System.fetch_env!("TIMESINK_S3_BUCKET"),
-    prefix: System.fetch_env!("TIMESINK_S3_PREFIX")
+    host: fetch_env!.("TIMESINK_S3_HOST"),
+    access_key_id: fetch_env!.("TIMESINK_S3_ACCESS_KEY_ID"),
+    access_key_secret: fetch_env!.("TIMESINK_S3_ACCESS_KEY_SECRET"),
+    bucket: fetch_env!.("TIMESINK_S3_BUCKET"),
+    prefix: fetch_env!.("TIMESINK_S3_PREFIX")
 
   # Mux (prod)
   config :timesink, Timesink.Storage.Mux,
-    webhook_key: System.fetch_env!("TIMESINK_MUX_WEBHOOK_KEY"),
-    access_key_id: System.fetch_env!("TIMESINK_MUX_ACCESS_KEY_ID"),
-    access_key_secret: System.fetch_env!("TIMESINK_MUX_ACCESS_KEY_SECRET")
+    webhook_key: fetch_env!.("TIMESINK_MUX_WEBHOOK_KEY"),
+    access_key_id: fetch_env!.("TIMESINK_MUX_ACCESS_KEY_ID"),
+    access_key_secret: fetch_env!.("TIMESINK_MUX_ACCESS_KEY_SECRET")
 
   # Stripe (prod)
   config :timesink, :stripe,
-    secret_key: System.fetch_env!("TIMESINK_STRIPE_SECRET_KEY"),
-    publishable_key: System.fetch_env!("TIMESINK_STRIPE_PUBLISHABLE_KEY")
+    secret_key: fetch_env!.("TIMESINK_STRIPE_SECRET_KEY"),
+    publishable_key: fetch_env!.("TIMESINK_STRIPE_PUBLISHABLE_KEY")
 
   config :stripity_stripe,
-    api_key: System.fetch_env!("TIMESINK_STRIPE_SECRET_KEY")
+    api_key: fetch_env!.("TIMESINK_STRIPE_SECRET_KEY")
 
-  # BTC Pay (prod) — require explicit envs or set your prod defaults
+  # BTC Pay (prod)
   config :timesink, :btc_pay,
-    api_key: System.fetch_env!("TIMESINK_BTC_PAY_API_KEY"),
-    url: System.fetch_env!("TIMESINK_BTC_PAY_API_URL"),
-    store_id: System.fetch_env!("TIMESINK_BTC_PAY_STORE_ID"),
-    webhook_secret: System.fetch_env!("TIMESINK_BTC_PAY_WEBHOOK_SECRET"),
-    webhook_url: System.fetch_env!("TIMESINK_BTC_PAY_WEBHOOK_URL")
+    api_key: fetch_env!.("TIMESINK_BTC_PAY_API_KEY"),
+    url: fetch_env!.("TIMESINK_BTC_PAY_API_URL"),
+    store_id: fetch_env!.("TIMESINK_BTC_PAY_STORE_ID"),
+    webhook_secret: fetch_env!.("TIMESINK_BTC_PAY_WEBHOOK_SECRET"),
+    webhook_url: fetch_env!.("TIMESINK_BTC_PAY_WEBHOOK_URL")
 end
