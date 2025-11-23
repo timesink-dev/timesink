@@ -422,7 +422,9 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
     username = user_params["username"] |> to_string() |> String.trim_leading("@")
     current_user = socket.assigns.user
     new_email = user_params["email"] |> to_string() |> String.trim() |> String.downcase()
-    email_change_request? = current_user.email != new_email
+    # Only treat as email change if it's different from both current email AND unverified_email
+    email_change_request? =
+      new_email != current_user.email and new_email != current_user.unverified_email
 
     updated_params =
       user_params
