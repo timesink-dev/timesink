@@ -136,10 +136,7 @@ defmodule TimesinkWeb.CoreComponents do
           "fixed bottom-4 right-4 w-96 z-50 rounded-2xl p-4 shadow-xl ring-1",
           "backdrop-blur-md transition-all duration-300 ease-out animate-slide-in",
           # Base toast surface
-          "bg-zinc-950/90 text-zinc-50 ring-white/10",
-          # Kind-specific tint + border/left accent vibes
-          @kind == :success && "border border-emerald-400/20 ring-emerald-400/20",
-          @kind == :info && "border border-sky-400/20 ring-sky-400/20"
+          "bg-zinc-950/90 text-zinc-50 ring-white/10"
         ]
       }
       {@rest}
