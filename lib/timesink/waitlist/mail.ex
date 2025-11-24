@@ -75,6 +75,9 @@ defmodule Timesink.Waitlist.Mail do
     * A home for filmmakers to share work and viewers to share reactions
     * A virtual arthouse cinema built for lingering, not scrolling
 
+    We’ve also opened a Substack where we’ll publish featured editorials, film notes, and behind-the-scenes posts. A place to extend the conversation and give context to the films we bring onto the platform.
+    You can find it here: https://timesinkpresents.substack.com/
+
     TimeSink is small right now. This is intentional.
     It’s personal, handmade, and growing slowly, like all meaningful communities do.
 
