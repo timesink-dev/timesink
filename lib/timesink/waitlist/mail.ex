@@ -42,14 +42,14 @@ defmodule Timesink.Waitlist.Mail do
   end
 
   def send_platform_greeting(to_email, first_name) do
-    subject = "Welcome to TimeSink — you’re here at the beginning"
+    subject = "Welcome to TimeSink. You've made it here at the beginning."
 
     body = """
     Hi #{first_name},
 
     Welcome to TimeSink. I’m genuinely glad you’re here.
 
-    This platform started years ago in the mid-to-late 2010's, when I was an ambitious young filmmaker living in New York City, doing what so many of us do: chasing the sparks of ideas, trying to bridge that impossible distance between the desire to create and the moment something finally takes shape.
+    This platform started years ago in the mid-to-late 2010's, when I was an ambitious young filmmaker living in New York City, chasing the sparks of ideas, trying to bridge that impossible distance between the desire to create and the moment something finally takes shape.
 
     I spent countless nights at Anthology Film Archives, watching films that rattled me awake. I’d leave the theater buzzing. Wanting to talk, to debate, to stay in that feeling. But the moment the doors opened, the energy dissipated onto the street. Everyone walked off into the night, and the conversation evaporated with them.
 
@@ -61,7 +61,7 @@ defmodule Timesink.Waitlist.Mail do
 
     A place for the afterglow.
     A place where cinema doesn’t end when the credits roll.
-    A place where the buzzing, fragile, electric thing that happens inside a theater can actually live a little longer — through conversation, through community, through other people who felt something too.
+    A place where the buzzing, fragile, electric thing that happens inside a theater can actually live a little longer through conversation, through community, through other people who felt something too.
 
     You’re joining us very early.
     There are no showcases yet.
@@ -91,7 +91,7 @@ defmodule Timesink.Waitlist.Mail do
     Aaron
     Founder, TimeSink
 
-    P.S. If you ever want to share thoughts, ideas, or just say hi, hit reply — I read everything.
+    P.S. If you ever want to share thoughts, ideas, or just say hi, hit reply. I'll read everything.
     """
 
     send_mail(to_email, subject, body)
