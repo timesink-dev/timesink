@@ -141,6 +141,8 @@ defmodule TimesinkWeb.OnboardingLive do
       {:ok, user} ->
         token = CoreAuth.generate_token(user)
 
+        Waitlist.Mail.send_platform_greeting(user.email, user.first_name)
+
         # Enqueue newsletter subscription job (non-blocking)
         %{"email" => user.email}
         |> Timesink.Newsletter.Workers.SubscribeWorker.new()
