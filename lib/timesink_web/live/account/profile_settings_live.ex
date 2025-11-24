@@ -30,6 +30,8 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         dirty: false,
         # ← avatar upload ready but not persisted yet
         avatar_ready: false,
+        # ← showing upload progress
+        avatar_processing: false,
         # ← error message to show near control
         avatar_error: nil
       )
@@ -73,7 +75,11 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
             <.inputs_for :let={pf} field={@account_form[:profile]}>
               <div class="grid grid-cols-1 md:grid-cols-[auto,1fr] items-start gap-4 md:gap-6">
                 <div class="relative mx-auto">
-                  <form phx-change="upload_avatar" phx-auto-recover="ignore" class="cursor-pointer">
+                  <form
+                    phx-change="upload_avatar"
+                    phx-auto-recover="ignore"
+                    class={[@avatar_processing && "pointer-events-none opacity-60", "cursor-pointer"]}
+                  >
                     <label class="cursor-pointer block">
                       <!-- Avatar image or initials -->
                       <%= if @uploads.avatar.entries != [] do %>
@@ -100,6 +106,33 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                       <span class="absolute -bottom-1 -right-1 items-center rounded-full bg-emerald-600/90 text-xs text-white px-2 py-0.5">
                         You
                       </span>
+                      
+    <!-- Subtle loading overlay while processing -->
+                      <div
+                        :if={@avatar_processing}
+                        class="absolute inset-0 rounded-full bg-black/40 grid place-items-center"
+                      >
+                        <svg
+                          class="animate-spin h-5 w-5 text-white"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          />
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4A4 4 0 008 12H4z"
+                          />
+                        </svg>
+                      </div>
 
                       <.live_file_input upload={@uploads.avatar} class="hidden" />
                     </label>
@@ -285,13 +318,13 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                 type="submit"
                 disabled={!@dirty}
                 aria-disabled={!@dirty}
-                class="w-full md:w-auto px-6 py-3 bg-neon-blue-lightest text-backroom-black
+                class="w-full md:w-2/3 px-6 py-3 bg-neon-blue-lightest text-backroom-black
           hover:opacity-90 focus:ring-2 focus:ring-neon-blue-lightest focus:outline-none transition
           disabled:opacity-40 disabled:cursor-not-allowed phx-submit-loading:opacity-60 phx-submit-loading:cursor-wait"
-                phx-disable-with="Updating…"
+                phx-disable-with="Updating profile…"
               >
                 <span class="inline-flex items-center gap-2 phx-submit-loading:hidden">
-                  Save changes
+                  Update profile
                 </span>
                 <span class="hidden phx-submit-loading:inline-flex items-center gap-2">
                   <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -488,7 +521,8 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
          account_form: to_form(User.changeset(updated_user_with_flash.assigns.user)),
          selected_location: to_location_map(final_user.profile.location),
          dirty: false,
-         avatar_ready: false
+         avatar_ready: false,
+         avatar_processing: false
        )}
     else
       {:error, cs} ->
@@ -498,11 +532,20 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
 
   # Fire once when client finished sending the file
   # Don't persist yet - wait for save button
+  # Fire during upload progress - show spinner while uploading
   def handle_avatar_progress(:avatar, entry, socket) do
     if entry.done? do
-      {:noreply, assign(socket, avatar_ready: true, avatar_error: nil, dirty: true)}
+      # Upload complete - hide spinner, mark ready for save
+      {:noreply,
+       assign(socket,
+         avatar_processing: false,
+         avatar_ready: true,
+         avatar_error: nil,
+         dirty: true
+       )}
     else
-      {:noreply, socket}
+      # Upload in progress - show spinner
+      {:noreply, assign(socket, avatar_processing: true, avatar_error: nil)}
     end
   end
 
@@ -576,7 +619,7 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
           avatar_url: new_url
         })
 
-        {reloaded_user, :success, "Avatar updated."}
+        {reloaded_user, :success, ""}
 
       {:attach_error, reason} ->
         {user, :error, "Failed to update avatar: #{friendly_err(reason)}"}
