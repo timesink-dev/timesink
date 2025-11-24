@@ -77,7 +77,7 @@ defmodule TimesinkWeb.Account.SecuritySettingsLive do
                 disabled={!@can_submit}
                 aria-disabled={!@can_submit}
                 phx-disable-with="Updating…"
-                class="w-full md:w-auto px-6 py-3 bg-neon-blue-lightest text-backroom-black
+                class="w-full md:w-3/4 px-6 py-3 bg-neon-blue-lightest text-backroom-black
                         hover:opacity-90 focus:ring-2 focus:ring-neon-blue-lightest transition
                         disabled:opacity-40 disabled:cursor-not-allowed phx-submit-loading:opacity-60 phx-submit-loading:cursor-wait"
               >

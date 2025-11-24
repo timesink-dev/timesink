@@ -28,7 +28,9 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         loc_results: [],
         selected_location: selected_location,
         dirty: false,
-        # ← server-side processing state
+        # ← avatar upload ready but not persisted yet
+        avatar_ready: false,
+        # ← showing upload progress
         avatar_processing: false,
         # ← error message to show near control
         avatar_error: nil
@@ -316,13 +318,13 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
                 type="submit"
                 disabled={!@dirty}
                 aria-disabled={!@dirty}
-                class="w-full md:w-auto px-6 py-3 bg-neon-blue-lightest text-backroom-black
+                class="w-full md:w-2/3 px-6 py-3 bg-neon-blue-lightest text-backroom-black
           hover:opacity-90 focus:ring-2 focus:ring-neon-blue-lightest focus:outline-none transition
           disabled:opacity-40 disabled:cursor-not-allowed phx-submit-loading:opacity-60 phx-submit-loading:cursor-wait"
-                phx-disable-with="Updating…"
+                phx-disable-with="Updating profile…"
               >
                 <span class="inline-flex items-center gap-2 phx-submit-loading:hidden">
-                  Save changes
+                  Update profile
                 </span>
                 <span class="hidden phx-submit-loading:inline-flex items-center gap-2">
                   <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -415,14 +417,20 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
         socket.assigns.selected_location
       )
 
-    {:noreply, assign(socket, account_form: to_form(cs), dirty: cs.changes != %{} or loc_dirty?)}
+    {:noreply,
+     assign(socket,
+       account_form: to_form(cs),
+       dirty: cs.changes != %{} or loc_dirty? or socket.assigns.avatar_ready
+     )}
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
     username = user_params["username"] |> to_string() |> String.trim_leading("@")
     current_user = socket.assigns.user
     new_email = user_params["email"] |> to_string() |> String.trim() |> String.downcase()
-    email_change_request? = current_user.email != new_email
+    # Only treat as email change if it's different from both current email AND unverified_email
+    email_change_request? =
+      new_email != current_user.email and new_email != current_user.unverified_email
 
     updated_params =
       user_params
@@ -433,51 +441,88 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
 
     # First update other fields (username, name, profile)
     with {:ok, updated_user} <- User.update(current_user, updated_params) do
+      # Process avatar upload if ready
+      {final_user, avatar_flash_type, avatar_flash_msg} =
+        if socket.assigns.avatar_ready do
+          process_pending_avatar(socket, updated_user)
+        else
+          {updated_user, nil, nil}
+        end
+
       # If email changed, initiate email change verification flow
       updated_user_with_flash =
         if email_change_request? do
           case Timesink.Account.initiate_email_change(
-                 updated_user,
+                 final_user,
                  new_email,
                  fn token ->
                    url(~p"/auth/verify-email/#{token}")
                  end
                ) do
             {:ok, user_with_pending_email} ->
+              msg =
+                build_flash_message(
+                  "Profile updated. We've sent a verification link to #{current_user.email}.",
+                  avatar_flash_msg
+                )
+
               socket
               |> assign(user: user_with_pending_email)
-              |> put_flash(
-                :info,
-                "Profile updated. We've sent a verification link to #{current_user.email}."
-              )
+              |> put_flash(:info, msg)
 
             {:error, :email_already_in_use} ->
+              msg =
+                build_flash_message(
+                  "That email address is already in use by another account.",
+                  avatar_flash_msg
+                )
+
               socket
-              |> assign(user: updated_user)
-              |> put_flash(:error, "That email address is already in use by another account.")
+              |> assign(user: final_user)
+              |> put_flash(:error, msg)
 
             {:error, %Ecto.Changeset{} = cs} ->
+              msg = build_flash_message("Failed to update email address.", avatar_flash_msg)
+
               socket
               |> assign(account_form: to_form(cs))
-              |> put_flash(:error, "Failed to update email address.")
+              |> put_flash(:error, msg)
 
             {:error, _reason} ->
+              msg =
+                build_flash_message(
+                  "Failed to send verification email. Please try again.",
+                  avatar_flash_msg
+                )
+
               socket
-              |> assign(user: updated_user)
-              |> put_flash(:error, "Failed to send verification email. Please try again.")
+              |> assign(user: final_user)
+              |> put_flash(:error, msg)
           end
         else
+          # Determine success message based on avatar upload result
+          {flash_type, flash_msg} =
+            case avatar_flash_type do
+              :error ->
+                {:error, avatar_flash_msg}
+
+              _ ->
+                {:success, build_flash_message("Profile updated successfully", avatar_flash_msg)}
+            end
+
           socket
-          |> assign(user: updated_user)
-          |> put_flash(:success, "Profile updated successfully")
+          |> assign(user: final_user)
+          |> put_flash(flash_type, flash_msg)
         end
 
       {:noreply,
        updated_user_with_flash
        |> assign(
          account_form: to_form(User.changeset(updated_user_with_flash.assigns.user)),
-         selected_location: to_location_map(updated_user.profile.location),
-         dirty: false
+         selected_location: to_location_map(final_user.profile.location),
+         dirty: false,
+         avatar_ready: false,
+         avatar_processing: false
        )}
     else
       {:error, cs} ->
@@ -486,77 +531,21 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
   end
 
   # Fire once when client finished sending the file
+  # Don't persist yet - wait for save button
+  # Fire during upload progress - show spinner while uploading
   def handle_avatar_progress(:avatar, entry, socket) do
     if entry.done? do
-      send(self(), {:process_avatar_upload, entry.ref})
-      {:noreply, assign(socket, avatar_processing: true, avatar_error: nil)}
+      # Upload complete - hide spinner, mark ready for save
+      {:noreply,
+       assign(socket,
+         avatar_processing: false,
+         avatar_ready: true,
+         avatar_error: nil,
+         dirty: true
+       )}
     else
-      {:noreply, socket}
-    end
-  end
-
-  def handle_info({:process_avatar_upload, _entry_ref}, socket) do
-    outcomes =
-      consume_uploaded_entries(socket, :avatar, fn %{path: path}, entry ->
-        plug = %Plug.Upload{
-          path: path,
-          filename: entry.client_name,
-          content_type: entry.client_type
-        }
-
-        case Timesink.Account.Profile.attach_avatar(socket.assigns.user.profile, plug,
-               user_id: socket.assigns.user.id
-             ) do
-          {:ok, _att} -> {:ok, :attached}
-          {:error, reason} -> {:ok, {:attach_error, reason}}
-        end
-      end)
-
-    # Pick first result if multiple (we only allow 1 anyway)
-    outcome =
-      Enum.find_value(outcomes, fn
-        {:attach_error, _} = err -> err
-        :attached -> :attached
-        _ -> nil
-      end) || :noop
-
-    case outcome do
-      :attached ->
-        # Reload fresh user with avatar + blob
-        user =
-          Repo.get!(Timesink.Account.User, socket.assigns.user.id)
-          |> Repo.preload(profile: [avatar: [:blob]])
-
-        new_url = Profile.avatar_url(user.profile.avatar)
-
-        send_update(
-          TimesinkWeb.NavAvatarLive,
-          id: "nav-avatar-#{user.id}",
-          avatar_url: new_url
-        )
-
-        UserCache.put(%{
-          id: user.id,
-          username: user.username,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          avatar_url: new_url
-        })
-
-        {:noreply,
-         socket
-         |> assign(user: user, avatar_processing: false, avatar_error: nil)
-         |> put_flash(:success, "Avatar updated!")}
-
-      {:attach_error, reason} ->
-        {:noreply,
-         socket
-         |> assign(avatar_processing: false, avatar_error: friendly_err(reason))
-         |> put_flash(:error, "Failed to update avatar.")}
-
-      :noop ->
-        # Nothing was consumed (race/cancel). Just stop the spinner.
-        {:noreply, assign(socket, avatar_processing: false)}
+      # Upload in progress - show spinner
+      {:noreply, assign(socket, avatar_processing: true, avatar_error: nil)}
     end
   end
 
@@ -579,6 +568,72 @@ defmodule TimesinkWeb.Account.ProfileSettingsLive do
   # Ignore updates for other users (good hygiene if you happen to be subscribed widely)
   def handle_info({:avatar_updated, _other_id, _url}, socket) do
     {:noreply, socket}
+  end
+
+  # Process pending avatar upload during save
+  defp process_pending_avatar(socket, user) do
+    outcomes =
+      consume_uploaded_entries(socket, :avatar, fn %{path: path}, entry ->
+        plug = %Plug.Upload{
+          path: path,
+          filename: entry.client_name,
+          content_type: entry.client_type
+        }
+
+        case Timesink.Account.Profile.attach_avatar(user.profile, plug, user_id: user.id) do
+          {:ok, _att} -> {:ok, :attached}
+          {:error, reason} -> {:ok, {:attach_error, reason}}
+        end
+      end)
+
+    # Pick first result (we only allow 1 entry anyway)
+    outcome =
+      Enum.find_value(outcomes, fn
+        {:attach_error, _} = err -> err
+        :attached -> :attached
+        _ -> nil
+      end) || :noop
+
+    case outcome do
+      :attached ->
+        # Reload user with fresh avatar + blob
+        reloaded_user =
+          Repo.get!(Timesink.Account.User, user.id)
+          |> Repo.preload(profile: [avatar: [:blob]])
+
+        new_url = Profile.avatar_url(reloaded_user.profile.avatar)
+
+        # Update nav avatar component
+        send_update(
+          TimesinkWeb.NavAvatarLive,
+          id: "nav-avatar-#{user.id}",
+          avatar_url: new_url
+        )
+
+        # Update user cache
+        UserCache.put(%{
+          id: user.id,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          avatar_url: new_url
+        })
+
+        {reloaded_user, :success, ""}
+
+      {:attach_error, reason} ->
+        {user, :error, "Failed to update avatar: #{friendly_err(reason)}"}
+
+      :noop ->
+        {user, nil, nil}
+    end
+  end
+
+  # Build combined flash message with optional avatar message
+  defp build_flash_message(main_msg, nil), do: main_msg
+
+  defp build_flash_message(main_msg, avatar_msg) do
+    "#{main_msg} #{avatar_msg}"
   end
 
   # If the nested location is empty (user didn't pick from dropdown), fall back to previous selection
