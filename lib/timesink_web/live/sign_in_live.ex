@@ -62,7 +62,7 @@ defmodule TimesinkWeb.SignInLive do
         <div class="text-center mt-6 text-sm text-dark-theater-lightest">
           Not a member?
           <.link navigate={~p"/join"} class="text-brand hover:underline">
-            Join the Waitlist
+            Join
           </.link>
         </div>
       </div>
