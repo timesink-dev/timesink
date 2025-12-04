@@ -29,7 +29,7 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
                 <% end %>
               <% :intermission -> %>
                 <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
-                  <p>Intermission</p>
+                  <p>Intermission{format_next_showing(@playback_state)}</p>
                   <p>{part}</p>
                 <% end %>
               <% :upcoming -> %>
@@ -121,4 +121,11 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
 
   defp playback_phase(%{phase: phase}) when not is_nil(phase), do: phase
   defp playback_phase(_), do: :unknown
+
+  defp format_next_showing(%{countdown: countdown}) when is_integer(countdown) do
+    minutes = div(countdown, 60)
+    " -- Next Showing In #{minutes} Minutes"
+  end
+
+  defp format_next_showing(_), do: ""
 end
