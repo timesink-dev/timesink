@@ -4,6 +4,10 @@ defmodule Timesink.Cinema.Showcase do
   use Timesink.Schema
   import Ecto.Changeset
   import Ecto.Query
+  require Logger
+
+  # Make SwissSchema functions overridable so we can add cache reload logic
+  defoverridable create: 1, create: 2, update: 2, update: 3
 
   @type status :: :upcoming | :active | :archived
   @statuses [:upcoming, :active, :archived]
@@ -103,5 +107,52 @@ defmodule Timesink.Cinema.Showcase do
       %{showcase | exhibitions: sorted_exhibitions}
     end)
     |> Enum.sort_by(fn s -> s.start_at || s.inserted_at end, {:desc, Date})
+  end
+
+  @doc """
+  Custom create that reloads theater cache when a new showcase is created as active.
+  Overrides SwissSchema's create to add cache invalidation logic.
+  """
+  def create(params, opts \\ []) do
+    result = super(params, opts)
+
+    case result do
+      {:ok, showcase} ->
+        # Reload theater cache if created as active
+        if showcase.status == :active do
+          Logger.info("Showcase #{showcase.id} created as active, reloading theater cache")
+          Timesink.Cinema.TheaterScheduler.reload()
+        end
+
+        result
+
+      error ->
+        error
+    end
+  end
+
+  @doc """
+  Custom update that reloads theater cache when showcase becomes active.
+  Overrides SwissSchema's update to add cache invalidation logic.
+  """
+  def update(showcase, params, opts \\ []) do
+    old_status = showcase.status
+
+    # Call the original SwissSchema update using super
+    result = super(showcase, params, opts)
+
+    case result do
+      {:ok, updated_showcase} ->
+        # Reload theater cache if status changed to active
+        if old_status != :active and updated_showcase.status == :active do
+          Logger.info("Showcase #{updated_showcase.id} became active, reloading theater cache")
+          Timesink.Cinema.TheaterScheduler.reload()
+        end
+
+        result
+
+      error ->
+        error
+    end
   end
 end
