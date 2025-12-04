@@ -127,6 +127,11 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
   defp playback_phase(%{phase: phase}) when not is_nil(phase), do: phase
   defp playback_phase(_), do: :unknown
 
+  defp format_next_showing(%{countdown: countdown}, _timezone)
+       when is_integer(countdown) and countdown < 60 do
+    " • Next Showing In Less Than A Minute • "
+  end
+
   defp format_next_showing(%{countdown: countdown}, timezone) when is_integer(countdown) do
     next_showing_time =
       DateTime.utc_now()

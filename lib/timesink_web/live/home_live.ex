@@ -101,7 +101,7 @@ defmodule TimesinkWeb.HomepageLive do
               </p>
             <% end %> --%>
           </div>
-
+          
     <!-- 3 column highlights -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5 transition hover:border-white/20 hover:bg-white/[0.04]">
@@ -160,7 +160,7 @@ defmodule TimesinkWeb.HomepageLive do
               </p>
             </div>
           </div>
-
+          
     <!-- slim schedule teaser -->
           <div class="mt-10 rounded-2xl border border-white/10 bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-5">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -182,7 +182,7 @@ defmodule TimesinkWeb.HomepageLive do
             <div class="mt-4 flex flex-wrap gap-2 text-sm">
               No events yet...
             </div>
-
+            
     <!-- pills-style schedule items (demo preview) -->
             <%!-- <div class="mt-4 flex flex-wrap gap-2">
               <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs md:text-sm">

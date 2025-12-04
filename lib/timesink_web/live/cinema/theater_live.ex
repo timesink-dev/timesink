@@ -660,10 +660,20 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     minutes = rem(total, 3_600) |> div(60)
     seconds = rem(total, 60)
 
-    Enum.filter(
-      [{:days, days}, {:hours, hours}, {:minutes, minutes}, {:seconds, seconds}],
-      fn {_k, v} -> v > 0 end
-    )
+    all_parts = [{:days, days}, {:hours, hours}, {:minutes, minutes}, {:seconds, seconds}]
+
+    # Filter out zero values, but keep seconds if minutes are shown (for proper time format)
+    filtered = Enum.filter(all_parts, fn {_k, v} -> v > 0 end)
+
+    # If we have minutes but no seconds in the filtered list, add seconds back
+    has_minutes? = Enum.any?(filtered, fn {k, _} -> k == :minutes end)
+    has_seconds? = Enum.any?(filtered, fn {k, _} -> k == :seconds end)
+
+    if has_minutes? and not has_seconds? do
+      filtered ++ [{:seconds, 0}]
+    else
+      filtered
+    end
   end
 
   defp join_names([]), do: ""
