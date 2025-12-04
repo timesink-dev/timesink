@@ -14,12 +14,16 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
     # Common welcome modal setup - applies regardless of showcase state
     show_welcome_modal = params["welcome"] == "1" and needs_avatar?(current_user)
 
+    # Capture timezone from browser (defaults to UTC if not provided)
+    timezone = get_connect_params(socket)["timezone"] || "Etc/UTC"
+
     socket =
       socket
       |> assign(
         show_welcome_modal: show_welcome_modal,
         welcome_bio: "",
-        welcome_avatar_error: nil
+        welcome_avatar_error: nil,
+        timezone: timezone
       )
       |> allow_upload(:welcome_avatar,
         accept: ~w(.jpg .jpeg .png .webp .heic),
@@ -87,6 +91,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
             exhibitions={@exhibitions}
             presence={@presence}
             playback_states={@playback_states}
+            timezone={@timezone}
           />
         <% @upcoming_showcase -> %>
           <div class="text-center text-white my-32 px-6 max-w-xl mx-auto h-[100vh] flex flex-col items-center justify-center">
