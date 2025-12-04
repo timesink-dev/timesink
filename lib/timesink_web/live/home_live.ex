@@ -7,6 +7,9 @@ defmodule TimesinkWeb.HomepageLive do
   import TimesinkWeb.Components.{Hero, NoShowcase}
 
   def mount(_params, _session, socket) do
+    # Capture timezone from browser (defaults to UTC if not provided)
+    timezone = get_connect_params(socket)["timezone"] || "Etc/UTC"
+
     with showcase when not is_nil(showcase) <- Cinema.get_active_showcase_with_exhibitions() do
       exhibitions =
         (showcase.exhibitions || [])
@@ -22,7 +25,8 @@ defmodule TimesinkWeb.HomepageLive do
           playback_states: playback_states,
           presence: %{},
           upcoming_showcase: nil,
-          no_showcase: false
+          no_showcase: false,
+          timezone: timezone
         )
 
       if connected?(socket), do: send(self(), :connected)
@@ -38,7 +42,8 @@ defmodule TimesinkWeb.HomepageLive do
                playback_states: %{},
                presence: %{},
                upcoming_showcase: upcoming,
-               no_showcase: false
+               no_showcase: false,
+               timezone: timezone
              )}
 
           nil ->
@@ -49,7 +54,8 @@ defmodule TimesinkWeb.HomepageLive do
                playback_states: %{},
                presence: %{},
                upcoming_showcase: nil,
-               no_showcase: true
+               no_showcase: true,
+               timezone: timezone
              )}
         end
     end
@@ -95,7 +101,7 @@ defmodule TimesinkWeb.HomepageLive do
               </p>
             <% end %> --%>
           </div>
-          
+
     <!-- 3 column highlights -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5 transition hover:border-white/20 hover:bg-white/[0.04]">
@@ -154,7 +160,7 @@ defmodule TimesinkWeb.HomepageLive do
               </p>
             </div>
           </div>
-          
+
     <!-- slim schedule teaser -->
           <div class="mt-10 rounded-2xl border border-white/10 bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-5">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -176,7 +182,7 @@ defmodule TimesinkWeb.HomepageLive do
             <div class="mt-4 flex flex-wrap gap-2 text-sm">
               No events yet...
             </div>
-            
+
     <!-- pills-style schedule items (demo preview) -->
             <%!-- <div class="mt-4 flex flex-wrap gap-2">
               <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs md:text-sm">
@@ -208,6 +214,7 @@ defmodule TimesinkWeb.HomepageLive do
             exhibitions={@exhibitions}
             presence={@presence}
             playback_states={@playback_states}
+            timezone={@timezone}
           />
         <% @upcoming_showcase -> %>
           <div class="text-center text-white my-32 px-6 max-w-xl mx-auto h-[100vh] flex flex-col items-center justify-center">

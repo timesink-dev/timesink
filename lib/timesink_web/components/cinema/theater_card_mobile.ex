@@ -7,6 +7,7 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
   attr :exhibition, Exhibition, required: true
   attr :live_viewer_count, :integer, required: true
   attr :playback_state, :map, required: true
+  attr :timezone, :string, required: true
 
   def theater_card_mobile(assigns) do
     ~H"""
@@ -29,7 +30,7 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
                 <% end %>
               <% :intermission -> %>
                 <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
-                  <p>Intermission{format_next_showing(@playback_state)}</p>
+                  <p>Intermission{format_next_showing(@playback_state, @timezone)}</p>
                   <p>{part}</p>
                 <% end %>
               <% :upcoming -> %>
@@ -122,10 +123,15 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
   defp playback_phase(%{phase: phase}) when not is_nil(phase), do: phase
   defp playback_phase(_), do: :unknown
 
-  defp format_next_showing(%{countdown: countdown}) when is_integer(countdown) do
-    minutes = div(countdown, 60)
-    " -- Next Showing In #{minutes} Minutes"
+  defp format_next_showing(%{countdown: countdown}, timezone) when is_integer(countdown) do
+    next_showing_time =
+      DateTime.utc_now()
+      |> DateTime.add(countdown, :second)
+      |> DateTime.shift_zone!(timezone)
+
+    time_string = Calendar.strftime(next_showing_time, "%I:%M %p")
+    " -- Next Showing At #{time_string}"
   end
 
-  defp format_next_showing(_), do: ""
+  defp format_next_showing(_, _), do: ""
 end
