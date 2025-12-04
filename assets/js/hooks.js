@@ -833,5 +833,28 @@ Hooks.TheaterBodyScroll = {
   }
 };
 
+Hooks.MarqueeTicker = {
+  mounted() {
+    this.setTickerSpeed();
+  },
+
+  updated() {
+    this.setTickerSpeed();
+  },
+
+  setTickerSpeed() {
+    const marquee = this.el;
+    const contentWidth = marquee.scrollWidth;
+
+    // Set a consistent speed: 80 pixels per second
+    // This means larger content takes proportionally longer
+    const pixelsPerSecond = 80;
+    const duration = contentWidth / pixelsPerSecond;
+
+    // Apply the duration to the animation
+    marquee.style.animationDuration = `${duration}s`;
+  }
+};
+
 
 export default Hooks;

@@ -75,6 +75,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                     @presence
                   )
                 }
+                timezone={@timezone}
               />
             <% else %>
               {nil}
@@ -96,6 +97,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                     @presence
                   )
                 }
+                timezone={@timezone}
               />
             <% end %>
           </div>

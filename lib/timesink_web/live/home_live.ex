@@ -7,6 +7,9 @@ defmodule TimesinkWeb.HomepageLive do
   import TimesinkWeb.Components.{Hero, NoShowcase}
 
   def mount(_params, _session, socket) do
+    # Capture timezone from browser (defaults to UTC if not provided)
+    timezone = get_connect_params(socket)["timezone"] || "Etc/UTC"
+
     with showcase when not is_nil(showcase) <- Cinema.get_active_showcase_with_exhibitions() do
       exhibitions =
         (showcase.exhibitions || [])
@@ -22,7 +25,8 @@ defmodule TimesinkWeb.HomepageLive do
           playback_states: playback_states,
           presence: %{},
           upcoming_showcase: nil,
-          no_showcase: false
+          no_showcase: false,
+          timezone: timezone
         )
 
       if connected?(socket), do: send(self(), :connected)
@@ -38,7 +42,8 @@ defmodule TimesinkWeb.HomepageLive do
                playback_states: %{},
                presence: %{},
                upcoming_showcase: upcoming,
-               no_showcase: false
+               no_showcase: false,
+               timezone: timezone
              )}
 
           nil ->
@@ -49,7 +54,8 @@ defmodule TimesinkWeb.HomepageLive do
                playback_states: %{},
                presence: %{},
                upcoming_showcase: nil,
-               no_showcase: true
+               no_showcase: true,
+               timezone: timezone
              )}
         end
     end
@@ -208,6 +214,7 @@ defmodule TimesinkWeb.HomepageLive do
             exhibitions={@exhibitions}
             presence={@presence}
             playback_states={@playback_states}
+            timezone={@timezone}
           />
         <% @upcoming_showcase -> %>
           <div class="text-center text-white my-32 px-6 max-w-xl mx-auto h-[100vh] flex flex-col items-center justify-center">

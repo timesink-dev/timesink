@@ -8,6 +8,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
   attr :exhibition, Exhibition, required: true
   attr :live_viewer_count, :integer, required: true
   attr :playback_state, :map, required: true
+  attr :timezone, :string, required: true
 
   def theater_card(assigns) do
     ~H"""
@@ -21,7 +22,11 @@ defmodule TimesinkWeb.Components.TheaterCard do
           {@exhibition.theater.description}
         </p>
         <div class="wrapper w-64 px-2 py-1 mb-6 overflow-hidden">
-          <div class="marquee text-neon-red-lightest text-sm uppercase">
+          <div
+            id={"marquee-#{@exhibition.theater_id}"}
+            class="marquee text-neon-red-lightest text-sm uppercase"
+            phx-hook="MarqueeTicker"
+          >
             <%= case playback_phase(@playback_state) do %>
               <% :playing -> %>
                 <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
@@ -30,7 +35,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
                 <% end %>
               <% :intermission -> %>
                 <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
-                  <p>Intermission</p>
+                  <p class="mr-2">• Intermission{format_next_showing(@playback_state, @timezone)}</p>
                   <p>{part}</p>
                 <% end %>
               <% :upcoming -> %>
@@ -116,4 +121,22 @@ defmodule TimesinkWeb.Components.TheaterCard do
 
   defp playback_phase(%{phase: phase}) when not is_nil(phase), do: phase
   defp playback_phase(_), do: :unknown
+
+  defp format_next_showing(%{countdown: countdown}, _timezone)
+       when is_integer(countdown) and countdown < 60 do
+    " • Next Showing In Less Than A Minute • "
+  end
+
+  defp format_next_showing(%{countdown: countdown}, timezone) when is_integer(countdown) do
+    next_showing_time =
+      DateTime.utc_now()
+      |> DateTime.add(countdown, :second)
+      |> DateTime.shift_zone!(timezone)
+
+    time_string = Calendar.strftime(next_showing_time, "%I:%M %p")
+    minutes = div(countdown, 60)
+    " • Next Showing In #{minutes} Min At #{time_string} • "
+  end
+
+  defp format_next_showing(_, _), do: ""
 end
