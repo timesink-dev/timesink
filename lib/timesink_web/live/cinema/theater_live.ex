@@ -191,11 +191,11 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 <% end %>
               </div>
 
-              <div class="pt-6">
+              <%!-- <div class="pt-6">
                 <.button color="tertiary" class="hover:cursor-not-allowed" disabled>
                   More info
                 </.button>
-              </div>
+              </div> --%>
             </div>
           <% else %>
             <!-- Waiting/Countdown (unchanged) -->
@@ -258,7 +258,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 phx-click="switch_tab"
                 phx-value-to="chat"
                 class={[
-                  "pb-2",
+                  "pb-2 cursor-pointer",
                   @active_panel_tab == :chat && "text-white border-b-2 border-white",
                   @active_panel_tab != :chat && "text-gray-400 hover:text-gray-200"
                 ]}
@@ -269,7 +269,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 phx-click="switch_tab"
                 phx-value-to="online"
                 class={[
-                  "pb-2",
+                  "pb-2 cursor-pointer",
                   @active_panel_tab == :online && "text-white border-b-2 border-white",
                   @active_panel_tab != :online && "text-gray-400 hover:text-gray-200"
                 ]}
@@ -399,7 +399,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 phx-click="switch_tab"
                 phx-value-to="chat"
                 class={[
-                  "pb-2",
+                  "pb-2 cursor-pointer",
                   @active_panel_tab == :chat && "text-white border-b-2 border-white",
                   @active_panel_tab != :chat && "text-gray-400 hover:text-gray-200"
                 ]}
@@ -410,7 +410,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 phx-click="switch_tab"
                 phx-value-to="online"
                 class={[
-                  "pb-2",
+                  "pb-2 cursor-pointer",
                   @active_panel_tab == :online && "text-white border-b-2 border-white",
                   @active_panel_tab != :online && "text-gray-400 hover:text-gray-200"
                 ]}
