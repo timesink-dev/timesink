@@ -21,7 +21,11 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
           {@exhibition.theater.description}
         </p>
         <div class="wrapper w-72 px-2 py-2 mb-2 overflow-hidden text-center">
-          <div class="marquee text-neon-red-lightest text-sm uppercase">
+          <div
+            id={"marquee-mobile-#{@exhibition.theater_id}"}
+            class="marquee text-neon-red-lightest text-sm uppercase"
+            phx-hook="MarqueeTicker"
+          >
             <%= case playback_phase(@playback_state) do %>
               <% :playing -> %>
                 <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
@@ -30,7 +34,7 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
                 <% end %>
               <% :intermission -> %>
                 <%= for part <- repeated_film_title_parts(@exhibition.film.title) do %>
-                  <p>Intermission{format_next_showing(@playback_state, @timezone)}</p>
+                  <p>• Intermission{format_next_showing(@playback_state, @timezone)}</p>
                   <p>{part}</p>
                 <% end %>
               <% :upcoming -> %>
@@ -130,7 +134,8 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
       |> DateTime.shift_zone!(timezone)
 
     time_string = Calendar.strftime(next_showing_time, "%I:%M %p")
-    " -- Next Showing At #{time_string}"
+    minutes = div(countdown, 60)
+    " • Next Showing In #{minutes} Min At #{time_string} • "
   end
 
   defp format_next_showing(_, _), do: ""
