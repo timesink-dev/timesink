@@ -4,13 +4,24 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
+
     <meta
       name="description"
       content="We bring great filmmakers — of all levels — to the stage. And we don’t waste your time discovering them. Real audiences. Real-time reactions. Conversations and moments that last. No noise — pure signal."
     />
+
     <.live_title suffix=" · Real audiences. Real time. Real cinema.">
       {assigns[:page_title] || "TimeSink Presents"}
     </.live_title>
+    
+<!-- ✅ FAVICONS -->
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="TimeSink" />
+    <link rel="manifest" href="/site.webmanifest" />
+
     <link phx-track-static rel="stylesheet" href={~p"/fonts/ano/ano.css"} />
     <link
       phx-track-static
@@ -18,9 +29,12 @@
       href={~p"/fonts/gangster_grotesk/gangster-grotesk.css"}
     />
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    
+<!-- JS -->
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
+
   <body class="text-mystery-white font-gangster antialiased">
     {@inner_content}
   </body>

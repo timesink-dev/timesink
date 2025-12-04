@@ -49,7 +49,7 @@ defmodule TimesinkWeb.TopNav do
               phx-click={open_dd("#films-dropdown")}
               aria-haspopup="menu"
               aria-expanded="false"
-              class="inline-flex items-end gap-1 font-medium text-mystery-white hover:underline focus:outline-none"
+              class="cursor-pointer inline-flex items-end gap-1 font-medium text-mystery-white hover:underline focus:outline-none"
             >
               <span>Cinema</span>
             </button>
@@ -145,7 +145,7 @@ defmodule TimesinkWeb.TopNav do
 
               <div
                 id="account-menu"
-                class="dd hidden absolute right-0 mt-2 w-56 rounded-md bg-dark-theater-primary  text-mystery-white shadow-lg z-50 overflow-hidden"
+                class="dd hidden absolute right-0 mt-1 w-56 rounded-md bg-dark-theater-primary  text-mystery-white shadow-lg z-50 overflow-hidden"
                 phx-click-away={close_dd("#account-menu")}
                 phx-window-keydown={close_dd("#account-menu")}
                 phx-key="escape"
