@@ -75,6 +75,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                     @presence
                   )
                 }
+                timezone={@timezone}
               />
             <% else %>
               {nil}
@@ -85,7 +86,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
 
       <div class="block lg:hidden px-4 space-y-6 max-w-screen-lg mx-auto">
         <div id="embla-main" phx-hook="EmblaMain" class="overflow-hidden">
-          <div class="flex gap-4 px-4">
+          <div class="flex gap-4 px-2">
             <%= for {exhibition, _index} <- Enum.with_index(@exhibitions) do %>
               <.theater_card_mobile
                 exhibition={exhibition}
@@ -96,6 +97,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                     @presence
                   )
                 }
+                timezone={@timezone}
               />
             <% end %>
           </div>
