@@ -95,7 +95,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
               </p>
               <.link navigate={"/now-playing/#{@exhibition.theater.slug}"}>
                 <.button class="cursor-pointer">
-                  Enter theater →
+                  Go to Theater →
                 </.button>
               </.link>
             </div>
