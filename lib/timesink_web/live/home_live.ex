@@ -187,8 +187,15 @@ defmodule TimesinkWeb.HomepageLive do
                   Live showings every 15 minutes
                 </div>
                 <button
-                  phx-click={show_modal("schedule-modal")}
-                  class="cursor-pointer rounded-full border border-white/15 px-4.5 py-2 hover:bg-white/[0.06] hover:border-white/25 transition-all"
+                  phx-click={@showcase && show_modal("schedule-modal")}
+                  disabled={!@showcase}
+                  class={[
+                    "rounded-full border border-white/15 px-4.5 py-2 transition-all",
+                    if(@showcase,
+                      do: "cursor-pointer hover:bg-white/[0.06] hover:border-white/25",
+                      else: "cursor-not-allowed opacity-50"
+                    )
+                  ]}
                 >
                   View schedule
                 </button>
