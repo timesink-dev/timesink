@@ -22,7 +22,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="bg-backroom-black py-16 px-6 max-w-7xl mx-auto mt-12">
+    <div class="bg-backroom-black py-2 px-6 max-w-7xl mx-auto mt-4 md:mt-12">
       <%!-- <div class="mb-32 md:mb-72 max-w-3xl mx-auto text-center px-4">
         <h2 class="text-xl tracking-tight text-mystery-white font-gangter uppercase">
           Featured Showcase

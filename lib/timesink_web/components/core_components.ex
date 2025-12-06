@@ -89,7 +89,7 @@ defmodule TimesinkWeb.CoreComponents do
               <button
                 phx-click={JS.exec("data-cancel", to: "##{@id}")}
                 type="button"
-                class="cursor-pointer rounded-full p-2 text-zinc-400 hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-neon-blue-lightest/60"
+                class="cursor-pointer rounded-full p-2 text-zinc-400 hover:text-zinc-200 focus:outline-none"
                 aria-label={gettext("close")}
               >
                 <.icon name="hero-x-mark" class="h-5 w-5" />
