@@ -53,7 +53,7 @@ defmodule TimesinkWeb.Components.NoShowcase do
               <.icon name="hero-play" class="h-4 w-4 text-neon-blue-lightest" />
             </div>
             <div class="order-1 sm:order-2 text-sm text-zinc-300 mb-3 sm:mb-0">
-              Live showtimes every 30 minutes
+              Live showtimes every 15 minutes
             </div>
           </div>
 

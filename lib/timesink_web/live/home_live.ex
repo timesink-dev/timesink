@@ -116,7 +116,7 @@ defmodule TimesinkWeb.HomepageLive do
           
     <!-- 3 column highlights -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5 transition hover:border-white/20 hover:bg-white/[0.04]">
+            <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5">
               <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.06]">
                 <!-- film icon -->
                 <svg
@@ -134,7 +134,7 @@ defmodule TimesinkWeb.HomepageLive do
               </p>
             </div>
 
-            <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5 transition hover:border-white/20 hover:bg-white/[0.04]">
+            <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5">
               <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.06]">
                 <!-- chat icon -->
                 <svg
@@ -154,7 +154,7 @@ defmodule TimesinkWeb.HomepageLive do
               </p>
             </div>
 
-            <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5 transition hover:border-white/20 hover:bg-white/[0.04]">
+            <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5">
               <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.06]">
                 <!-- globe icon -->
                 <svg
@@ -184,11 +184,11 @@ defmodule TimesinkWeb.HomepageLive do
                 <div class="inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-3 py-1">
                   <div class="h-2 w-2 rounded-full animate-pulse bg-current text-neon-red-light">
                   </div>
-                  Live showings every 30 minutes
+                  Live showings every 15 minutes
                 </div>
                 <button
                   phx-click={show_modal("schedule-modal")}
-                  class="cursor-pointer rounded-full border border-white/15 px-3 py-1 hover:bg-white/[0.06] hover:border-white/25 transition-all"
+                  class="cursor-pointer rounded-full border border-white/15 px-4.5 py-2 hover:bg-white/[0.06] hover:border-white/25 transition-all"
                 >
                   View schedule
                 </button>

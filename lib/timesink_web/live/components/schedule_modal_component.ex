@@ -11,7 +11,7 @@ defmodule TimesinkWeb.ScheduleModalComponent do
   def render(assigns) do
     ~H"""
     <div>
-      <.modal id="schedule-modal" show={false}>
+      <.modal id="schedule-modal">
         <div class="space-y-6">
           <!-- Header -->
           <div class="border-b border-white/10 pb-6">
@@ -26,12 +26,17 @@ defmodule TimesinkWeb.ScheduleModalComponent do
                     {format_date_range(@showcase.start_at, @showcase.end_at, @timezone)}
                   </span>
                 </div>
-                <h2 id="schedule-modal-title" class="text-2xl font-semibold text-white">
-                  {@showcase.title}
-                </h2>
-                <p class="mt-2 text-sm text-zinc-400 leading-relaxed">
-                  {@showcase.description}
-                </p>
+                <div class="mt-4.5">
+                  <h3 class="text-sm font-medium text-white uppercase tracking-wider mb-1">
+                    Showcase
+                  </h3>
+                  <h2 id="schedule-modal-title" class="text-xl font-semibold text-white">
+                    {@showcase.title}
+                  </h2>
+                  <p class="mt-2 text-sm text-zinc-400 leading-relaxed">
+                    {@showcase.description}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -52,7 +57,7 @@ defmodule TimesinkWeb.ScheduleModalComponent do
               <div class="flex-1">
                 <h3 class="text-sm font-medium text-white">Continuous Screenings</h3>
                 <p class="mt-1 text-xs text-zinc-400 leading-relaxed">
-                  Films play in rotation across all theaters. Each screening begins every 30 minutes during the showcase period.
+                  Films play in rotation across all theaters. Each screening begins every 15 minutes during the showcase period.
                 </p>
               </div>
             </div>
@@ -133,10 +138,10 @@ defmodule TimesinkWeb.ScheduleModalComponent do
                         </div>
 
                         <.link
-                          navigate={"/cinema/theater/#{exhibition.theater_id}"}
-                          class="text-xs text-neon-blue-lightest hover:text-neon-blue-light transition-colors"
+                          navigate={"/now-playing/#{exhibition.theater.slug}"}
+                          class="text-xs text-neon-blue-lightest hover:text-zinc-300 transition-colors"
                         >
-                          View Theater →
+                          Go to Theater →
                         </.link>
                       </div>
                     </div>
