@@ -3,7 +3,7 @@ defmodule TimesinkWeb.HomepageLive do
 
   alias TimesinkWeb.Presence
   alias Timesink.Cinema
-  alias TimesinkWeb.{TheaterShowcaseComponent, PubSubTopics}
+  alias TimesinkWeb.{TheaterShowcaseComponent, PubSubTopics, ScheduleModalComponent}
   import TimesinkWeb.Components.{Hero, NoShowcase}
 
   def mount(_params, _session, socket) do
@@ -64,6 +64,18 @@ defmodule TimesinkWeb.HomepageLive do
   def render(assigns) do
     ~H"""
     <div id="homepage">
+      <%= if @showcase do %>
+        <.live_component
+          module={ScheduleModalComponent}
+          id="schedule-modal-component"
+          showcase={@showcase}
+          exhibitions={@exhibitions}
+          playback_states={@playback_states}
+          presence={@presence}
+          timezone={@timezone}
+        />
+      <% end %>
+
       <div
         id="hero"
         class="h-screen relative w-full bg-backroom-black text-white flex items-center justify-center"
@@ -174,7 +186,10 @@ defmodule TimesinkWeb.HomepageLive do
                   </div>
                   Live showings every 30 minutes
                 </div>
-                <button class="rounded-full border border-white/15 px-3 py-1 hover:bg-white/[0.06] hover:cursor-not-allowed">
+                <button
+                  phx-click={show_modal("schedule-modal")}
+                  class="cursor-pointer rounded-full border border-white/15 px-3 py-1 hover:bg-white/[0.06] hover:border-white/25 transition-all"
+                >
                   View schedule
                 </button>
               </div>
@@ -217,7 +232,7 @@ defmodule TimesinkWeb.HomepageLive do
             timezone={@timezone}
           />
         <% @upcoming_showcase -> %>
-          <div class="text-center text-white my-32 px-6 max-w-xl mx-auto h-[100vh] flex flex-col items-center justify-center">
+          <div class="text-center text-white my-32 px-6 max-w-xl mx-auto h-screen flex flex-col items-center justify-center">
             <.icon name="hero-clock" class="h-16 w-16 mb-6 text-neon-blue-lightest" />
             <h1 class="text-4xl font-bold mb-4">Upcoming Showcase</h1>
             <h2 class="text-2xl font-semibold text-neon-blue-lightest mb-2">
