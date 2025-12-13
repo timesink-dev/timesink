@@ -10,11 +10,8 @@ defmodule TimesinkWeb.HomepageLive do
     # Capture timezone from browser (defaults to UTC if not provided)
     timezone = get_connect_params(socket)["timezone"] || "Etc/UTC"
 
-    with showcase when not is_nil(showcase) <- Cinema.get_active_showcase_with_exhibitions() do
-      exhibitions =
-        (showcase.exhibitions || [])
-        |> Cinema.preload_exhibitions()
-        |> Enum.sort_by(& &1.theater.name, :asc)
+    with showcase when not is_nil(showcase) <- Timesink.Cinema.ShowcaseCache.get_active_showcase() do
+      exhibitions = showcase.exhibitions || []
 
       playback_states = Timesink.Cinema.compute_initial_playback_states(exhibitions, showcase)
 
