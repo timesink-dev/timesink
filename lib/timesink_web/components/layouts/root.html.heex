@@ -37,5 +37,29 @@
 
   <body class="text-mystery-white font-gangster antialiased">
     {@inner_content}
+    <script>
+      // Back/Forward Cache (bfcache) Optimization
+      //
+      // Browsers cache pages when navigating away to enable instant back/forward navigation.
+      // However, open WebSocket connections (used by LiveView) can prevent this caching.
+      //
+      // This script:
+      // 1. Disconnects LiveSocket when page is hidden (pagehide) - signals browser it's safe to cache
+      // 2. Reconnects LiveSocket when page is restored (pageshow) - restores live functionality
+      // 3. Only runs if event.persisted=true (meaning page was restored from bfcache)
+      //
+      // Result: Instant back/forward navigation + maintained LiveView functionality
+      window.addEventListener('pagehide', (event) => {
+        if (event.persisted && window.liveSocket) {
+          window.liveSocket.disconnect();
+        }
+      });
+
+      window.addEventListener('pageshow', (event) => {
+        if (event.persisted && window.liveSocket) {
+          window.liveSocket.connect();
+        }
+      });
+    </script>
   </body>
 </html>

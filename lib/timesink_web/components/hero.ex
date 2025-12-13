@@ -15,10 +15,15 @@ defmodule TimesinkWeb.Components.Hero do
         <!-- LEFT: poster (flush-left). On md+ we nudge it left & slightly scale for a nicer crop -->
         <div class="relative h-[50vh] md:h-full">
           <img
-            src="/images/timesink_hero.webp"
+            src="/images/timesink_hero_1400w.jpg"
+            srcset="/images/timesink_hero_768w.jpg 768w,
+                    /images/timesink_hero_1024w.jpg 1024w,
+                    /images/timesink_hero_1400w.jpg 1400w,
+                    /images/timesink_hero_2000w.jpg 2000w"
+            sizes="(max-width: 768px) 100vw, 71vw"
             alt="TimeSink Presents — night marquee"
-            width="2880"
-            height="1620"
+            width="1400"
+            height="1180"
             class="
               absolute inset-0 h-full w-full object-cover object-[center_45%]
               md:transform-gpu  md:translate-x-[-2%]
@@ -26,6 +31,7 @@ defmodule TimesinkWeb.Components.Hero do
                xl:translate-x-[-4%]
             "
             loading="eager"
+            fetchpriority="high"
             decoding="async"
           />
         </div>
