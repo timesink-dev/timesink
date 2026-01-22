@@ -16,14 +16,14 @@ defmodule TimesinkWeb.Plugs.EnsureCanonicalUrl do
   def call(conn, _opts) do
     canonical_host = "timesinkpresents.com"
 
-    # Skip redirects for local development
-    if conn.host in ["localhost", "127.0.0.1"] do
+    # Skip redirects for local development and staging
+    if conn.host in ["localhost", "127.0.0.1", "staging.timesinkpresents.com"] do
       conn
     else
       needs_redirect? =
         conn.scheme != :https or
-        conn.host != canonical_host or
-        has_trailing_slash?(conn)
+          conn.host != canonical_host or
+          has_trailing_slash?(conn)
 
       if needs_redirect? do
         redirect_to_canonical(conn, canonical_host)
