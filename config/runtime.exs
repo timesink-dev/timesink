@@ -111,7 +111,7 @@ case env do
       url: [host: host, port: 443, scheme: "https"],
       check_origin: [
         "https://timesinkpresents.com",
-        "https://blog.timesinkpresents.com"
+        "https://www.timesinkpresents.com"
       ],
       http: [
         ip: {0, 0, 0, 0, 0, 0, 0, 0},
