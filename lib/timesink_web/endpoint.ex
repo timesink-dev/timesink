@@ -1,5 +1,6 @@
 defmodule TimesinkWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :timesink
+  alias TimesinkWeb.Plugs
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -8,7 +9,8 @@ defmodule TimesinkWeb.Endpoint do
     store: :cookie,
     key: "_timesink_key",
     signing_salt: "xfGNS3d0",
-    same_site: "Lax"
+    same_site: "Lax",
+    domain: ".timesinkpresents.com"
   ]
 
   socket "/live", Phoenix.LiveView.Socket,
@@ -50,6 +52,7 @@ defmodule TimesinkWeb.Endpoint do
 
   plug Plug.MethodOverride
   plug Plug.Head
+  plug Plugs.CanonicalHost
   plug Plug.Session, @session_options
   plug TimesinkWeb.Router
 end
