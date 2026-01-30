@@ -62,6 +62,8 @@ config :timesink, TimesinkWeb.Endpoint,
     ]
   ]
 
+config :timesink, :session_cookie_key, "_timesink_dev_key"
+
 # Enable dev routes for dashboard and mailbox
 config :timesink, dev_routes: true
 

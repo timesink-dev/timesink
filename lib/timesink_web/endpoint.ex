@@ -2,7 +2,7 @@ defmodule TimesinkWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :timesink
   alias TimesinkWeb.Plugs
 
-  @session_key Application.get_env(:timesink, :session_cookie_key, "_timesink_key")
+  @session_key Application.compile_env(:timesink, :session_cookie_key)
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.

@@ -24,9 +24,6 @@ if System.get_env("PHX_SERVER") do
   config :timesink, TimesinkWeb.Endpoint, server: true
 end
 
-# Session cookie key (set per Fly app via secrets)
-config :timesink, :session_cookie_key, System.get_env("SESSION_COOKIE_KEY") || "_timesink_key"
-
 # Repo
 database_url =
   System.get_env("DATABASE_URL") ||
