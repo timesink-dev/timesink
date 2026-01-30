@@ -2,12 +2,14 @@ defmodule TimesinkWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :timesink
   alias TimesinkWeb.Plugs
 
+  @session_key Application.compile_env(:timesink, :session_cookie_key)
+
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_timesink_key",
+    key: @session_key,
     signing_salt: "xfGNS3d0",
     same_site: "Lax",
     domain: ".timesinkpresents.com"
@@ -55,4 +57,14 @@ defmodule TimesinkWeb.Endpoint do
   plug Plugs.CanonicalHost
   plug Plug.Session, @session_options
   plug TimesinkWeb.Router
+
+  defp session_options do
+    [
+      store: :cookie,
+      key: System.get_env("SESSION_COOKIE_KEY") || "_timesink_key",
+      signing_salt: "xfGNS3d0",
+      same_site: "Lax",
+      domain: ".timesinkpresents.com"
+    ]
+  end
 end

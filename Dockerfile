@@ -18,6 +18,9 @@ ARG DEBIAN_VERSION=bullseye-20241223-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
+# ─────────────────────────────
+# Builder stage
+# ─────────────────────────────
 FROM ${BUILDER_IMAGE} as builder
 
 # install build dependencies
@@ -31,12 +34,14 @@ WORKDIR /app
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-# set build ENV
-ENV MIX_ENV="staging"
+# Accept MIX_ENV from build args; default to staging for safety.
+# This will be overridden by --build-arg MIX_ENV=... in staging/prod deploys.
+ARG MIX_ENV=staging
+ENV MIX_ENV=${MIX_ENV}
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
-RUN mix deps.get --only $MIX_ENV
+RUN mix deps.get --only ${MIX_ENV}
 RUN mkdir config
 
 # copy compile-time config files before we compile dependencies
@@ -46,9 +51,7 @@ COPY config/config.exs config/${MIX_ENV}.exs config/
 RUN mix deps.compile
 
 COPY priv priv
-
 COPY lib lib
-
 COPY assets assets
 
 RUN apt-get update -y && \
@@ -58,7 +61,6 @@ RUN apt-get update -y && \
     npm install --prefix ./assets && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
 # compile assets
 RUN mix assets.deploy
 
@@ -67,12 +69,14 @@ RUN mix compile
 
 # Changes to config/runtime.exs don't require recompiling the code
 COPY config/runtime.exs config/
-
 COPY rel rel
+
+# Build the release for the current MIX_ENV
 RUN mix release
 
-# start a new build stage so that the final image will only contain
-# the compiled release and other runtime necessities
+# ─────────────────────────────
+# Runtime stage
+# ─────────────────────────────
 FROM ${RUNNER_IMAGE}
 
 RUN apt-get update -y && \
@@ -89,10 +93,12 @@ ENV LC_ALL en_US.UTF-8
 WORKDIR "/app"
 RUN chown nobody /app
 
-# set runner ENV
-ENV MIX_ENV="staging"
+# Accept MIX_ENV here as well (same build arg, same default)
+ARG MIX_ENV=staging
+ENV MIX_ENV=${MIX_ENV}
 
 # Only copy the final release from the build stage
+# This now uses the correct build path based on MIX_ENV (staging/prod)
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/timesink ./
 
 USER nobody

@@ -1,6 +1,6 @@
 import Config
 
-# Configure your database
+# Configure test database
 #
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
@@ -14,11 +14,16 @@ config :timesink, Timesink.Repo,
   pool_size: System.schedulers_online() * 2
 
 # We don't run a server during test. If one is required,
-# you can enable the server option below.
+# we can enable the server option below.
 config :timesink, TimesinkWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "e9gSkUYsRSUjPc1MQg5VHjnsEN0oIwBBAMXnLFAI/Qr0DHMwXCxhhLkrmeWPr7rT",
   server: false
+
+config :timesink, :session_cookie_key, "_timesink_dev_key"
+
+# no need to redirect to apex/canonical url
+config :timesink, :canonical_host_redirect, false
 
 # In test we don't send emails
 config :timesink, Timesink.Mailer, adapter: Swoosh.Adapters.Test

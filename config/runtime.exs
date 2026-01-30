@@ -39,7 +39,7 @@ config :timesink, Timesink.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   socket_options: maybe_ipv6
 
-# Default HTTP client adapter used by your code
+# Default HTTP client adapter
 config :timesink, :http_client, Timesink.HTTP.FinchClient
 
 # Base URL per env (used by your app logic)
