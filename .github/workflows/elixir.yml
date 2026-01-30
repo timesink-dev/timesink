@@ -62,7 +62,6 @@ jobs:
       TIMESINK_S3_ACCESS_KEY_SECRET: minioadmin
       AUTH_TOKEN_SALT: "test_salt"
 
-
     steps:
       - uses: actions/checkout@v4
       - uses: asdf-vm/actions/setup@v3
@@ -91,13 +90,31 @@ jobs:
       - run: mix do ecto.create + ecto.migrate + run priv/repo/seeds.exs
       - run: mix test
 
-  deploy_staging:
-    if: github.ref == 'refs/heads/staging'
+  deploy:
+    # Only deploy from staging or production branches.
+    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/production'
     runs-on: ubuntu-latest
     needs: [lint, analyze, test]
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set deploy target
+        id: vars
+        shell: bash
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
+            echo "mix_env=staging" >> "$GITHUB_OUTPUT"
+            echo "fly_app=timesink-staging" >> "$GITHUB_OUTPUT"
+            echo "fly_config=fly.staging.toml" >> "$GITHUB_OUTPUT"
+          elif [ "${GITHUB_REF_NAME}" = "production" ]; then
+            echo "mix_env=prod" >> "$GITHUB_OUTPUT"
+            echo "fly_app=timesink-prod" >> "$GITHUB_OUTPUT"
+            echo "fly_config=fly.prod.toml" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unsupported branch for deploy: ${GITHUB_REF_NAME}"
+            exit 1
+          fi
 
       - uses: erlef/setup-beam@v1
         with:
@@ -107,46 +124,15 @@ jobs:
       - name: Set up Fly.io
         uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Deploy to Fly.io (staging) 🚀
+      - name: Deploy to Fly.io 🚀
         env:
-          MIX_ENV: staging
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
           flyctl deploy \
-            --build-arg MIX_ENV=staging \
-            --config fly.staging.toml \
-            --app timesink-staging \
+            --build-arg MIX_ENV=${{ steps.vars.outputs.mix_env }} \
+            --config ${{ steps.vars.outputs.fly_config }} \
+            --app ${{ steps.vars.outputs.fly_app }} \
             --remote-only
-
-
-  deploy_prod:
-    if: github.ref == 'refs/heads/production'
-    runs-on: ubuntu-latest
-    needs: [lint, analyze, test]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: erlef/setup-beam@v1
-        with:
-          otp-version: ${{ env.OTP_VERSION }}
-          elixir-version: ${{ env.ELIXIR_VERSION }}
-
-      - name: Set up Fly.io
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: Deploy to Fly.io (production) 🚀
-        env:
-          MIX_ENV: prod
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        run: |
-          flyctl deploy \
-            --build-arg MIX_ENV=prod \
-            --config fly.prod.toml \
-            --app timesink-prod \
-            --remote-only
-
-
 
 
 
