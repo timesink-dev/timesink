@@ -20,6 +20,8 @@ config :timesink, TimesinkWeb.Endpoint,
   secret_key_base: "e9gSkUYsRSUjPc1MQg5VHjnsEN0oIwBBAMXnLFAI/Qr0DHMwXCxhhLkrmeWPr7rT",
   server: false
 
+config :timesink, :session_cookie_key, "_timesink_dev_key"
+
 # no need to redirect to apex/canonical url
 config :timesink, :canonical_host_redirect, false
 
