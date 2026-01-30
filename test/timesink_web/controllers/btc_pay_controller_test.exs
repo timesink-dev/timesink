@@ -8,8 +8,6 @@ defmodule TimesinkWeb.BtcPayControllerTest do
                     "BTC_PAY_WEBHOOK_SECRET_TEST"
                   )
 
-  @valid_sig "validsig123"
-
   test "handles InvoiceSettled and creates FilmSubmission when a current user submits", %{
     conn: conn
   } do
