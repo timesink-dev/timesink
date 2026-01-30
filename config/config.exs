@@ -96,6 +96,8 @@ config :timesink, :finch, Timesink.Finch
 
 config :timesink, :http_client, Timesink.HTTP.FinchClient
 
+config :timesink, :session_cookie_key, System.get_env("SESSION_COOKIE_KEY") || "_timesink_key"
+
 config :timesink, :here_maps_api_key, System.get_env("TIMESINK_HERE_MAPS_API_KEY")
 
 config :tesla, adapter: {Tesla.Adapter.Finch, name: Timesink.Finch}

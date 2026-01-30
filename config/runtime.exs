@@ -24,6 +24,9 @@ if System.get_env("PHX_SERVER") do
   config :timesink, TimesinkWeb.Endpoint, server: true
 end
 
+# Session cookie key (set per Fly app via secrets)
+config :timesink, :session_cookie_key, System.get_env("SESSION_COOKIE_KEY") || "_timesink_key"
+
 # Repo
 database_url =
   System.get_env("DATABASE_URL") ||
@@ -39,7 +42,7 @@ config :timesink, Timesink.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   socket_options: maybe_ipv6
 
-# Default HTTP client adapter used by your code
+# Default HTTP client adapter
 config :timesink, :http_client, Timesink.HTTP.FinchClient
 
 # Base URL per env (used by your app logic)
