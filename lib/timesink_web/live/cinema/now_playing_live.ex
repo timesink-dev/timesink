@@ -94,22 +94,79 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
             timezone={@timezone}
           />
         <% @upcoming_showcase -> %>
-          <div class="text-center text-white my-32 px-6 max-w-xl mx-auto h-[100vh] flex flex-col items-center justify-center">
-            <.icon name="hero-clock" class="h-16 w-16 mb-6 text-neon-blue-lightest" />
-            <h1 class="text-4xl font-bold mb-4">Upcoming Showcase</h1>
-            <h2 class="text-2xl font-semibold text-neon-blue-lightest mb-2">
-              {@upcoming_showcase.title}
-            </h2>
-            <p class="text-gray-400 mb-4">
-              {@upcoming_showcase.description}
-            </p>
-            <p class="text-gray-500 text-sm">
-              Starts
-              <span class="font-medium">
-                {Calendar.strftime(@upcoming_showcase.start_at, "%A, %B %d at %H:%M")}
-              </span>
-            </p>
-          </div>
+          <section class="relative isolate min-h-[calc(100vh-5rem)]">
+            <!-- Background image -->
+            <img
+              src={~p"/images/upcoming_showcase.webp"}
+              alt="Upcoming showcase"
+              class="absolute inset-0 h-full w-full object-cover"
+            />
+            
+    <!-- Overlays (readability + mood) -->
+            <div class="absolute inset-0 bg-gradient-to-b from-backroom-black/20 via-backroom-black/70 to-backroom-black">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-r from-backroom-black/90 via-backroom-black/55 to-transparent">
+            </div>
+            
+    <!-- Content -->
+            <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <!-- breathing room under sticky nav -->
+              <div class="pt-28 md:pt-36"></div>
+
+              <div class="max-w-2xl">
+                <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1">
+                  <span class="h-2 w-2 rounded-full bg-neon-red-light animate-pulse"></span>
+                  <span class="text-xs uppercase tracking-wider text-zinc-200">
+                    Upcoming showcase
+                  </span>
+                </div>
+
+                <h1 class="mt-5 text-4xl md:text-5xl tracking-tight text-mystery-white">
+                  {@upcoming_showcase.title}
+                </h1>
+
+                <p class="mt-4 text-base md:text-lg text-zinc-200/80">
+                  {@upcoming_showcase.description}
+                </p>
+
+                <div class="mt-6 flex flex-wrap items-center gap-3">
+                  <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">
+                    <p class="text-xs uppercase tracking-wider text-zinc-400">Starts</p>
+                    <p class="text-sm md:text-base font-medium text-white">
+                      {Calendar.strftime(@upcoming_showcase.start_at, "%A, %B %d · %H:%M")}
+                      <span class="text-zinc-400 font-normal"> (CET/Paris)</span>
+                    </p>
+                  </div>
+
+                  <div class="hidden sm:block h-6 w-px bg-white/10"></div>
+
+                  <p class="text-sm text-zinc-400">
+                    TimeSink opens its doors. No easing in. No settling down.
+                  </p>
+                </div>
+
+                <div class="mt-8 flex flex-col sm:flex-row gap-3">
+                  <a
+                    href={~p"/"}
+                    class="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/[0.06] px-5 py-2.5 text-sm text-white transition hover:bg-white/[0.10] hover:border-white/25"
+                  >
+                    Back to homepage
+                  </a>
+
+                  <button
+                    type="button"
+                    phx-click={show_modal("newsletter-modal")}
+                    class="inline-flex items-center justify-center rounded-full bg-white text-backroom-black px-4.5 py-2 text-sm font-medium transition hover:opacity-90 cursor-pointer"
+                  >
+                    Get notified
+                  </button>
+                </div>
+              </div>
+              
+    <!-- optional: subtle bottom fade to page background -->
+              <div class="h-16 md:h-24"></div>
+            </div>
+          </section>
         <% @no_showcase -> %>
           <.no_showcase class="mt-16" />
       <% end %>
@@ -241,6 +298,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
           </div>
         </.modal>
       <% end %>
+      <.live_component module={TimesinkWeb.NewsletterModalComponent} id="newsletter-modal-component" />
     </div>
     """
   end
