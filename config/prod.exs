@@ -7,6 +7,8 @@ import Config
 # before starting your production server.
 config :timesink, TimesinkWeb.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 
+config :timesink, :session_cookie_key, "_timesink_key"
+
 # Configures adapter for the mailer
 config :timesink, Timesink.Mailer, adapter: Resend.Swoosh.Adapter
 
