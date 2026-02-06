@@ -4,13 +4,21 @@ defmodule TimesinkWeb.NewsletterLive do
 
   @impl true
   def mount(socket) do
-    {:ok, assign(socket, status: :idle, error: nil)}
+    {:ok, assign(socket, status: :idle, error: nil, variant: :page)}
+  end
+
+  @impl true
+  def update(assigns, socket) do
+    {:ok, assign(socket, assigns)}
   end
 
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="max-w-3xl mx-auto mt-16 border-t border-mystery-white/10 pt-10">
+    <div class={[
+      "max-w-3xl mx-auto",
+      if(@variant == :modal, do: "", else: "mt-16 border-t border-mystery-white/10 pt-10")
+    ]}>
       <p class="text-lg font-semibold mb-2 text-center">
         Get screening updates & Cinematic transmissions from our newsletter
       </p>

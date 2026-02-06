@@ -42,6 +42,10 @@ config :timesink, Timesink.Repo,
 # Default HTTP client adapter
 config :timesink, :http_client, Timesink.HTTP.FinchClient
 
+if config_env() == :prod do
+  config :timesink, TimesinkWeb.Endpoint, session_options: [domain: ".timesinkpresents.com"]
+end
+
 # Base URL per env (used by your app logic)
 base_url =
   case env do
