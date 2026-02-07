@@ -4,6 +4,8 @@ config :timesink, TimesinkWeb.Endpoint, cache_static_manifest: "priv/static/cach
 
 config :timesink, :session_cookie_key, "_timesink_staging_key"
 
+config :timesink, TimesinkWeb.Endpoint, session_options: []
+
 config :timesink, Timesink.Mailer, adapter: Resend.Swoosh.Adapter
 
 config :swoosh,

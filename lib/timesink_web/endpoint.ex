@@ -2,19 +2,27 @@ defmodule TimesinkWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :timesink
   alias TimesinkWeb.Plugs
 
+  @session_key Application.compile_env(:timesink, :session_cookie_key)
+
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
+  @base_session_options [
+    store: :cookie,
+    key: @session_key,
+    signing_salt: "xfGNS3d0",
+    same_site: "Lax"
+  ]
+
   @session_options Keyword.merge(
-                     [
-                       store: :cookie,
-                       key: Application.compile_env(:timesink, :session_cookie_key),
-                       signing_salt: "xfGNS3d0",
-                       same_site: "Lax"
-                     ],
-                     Application.compile_env(:timesink, TimesinkWeb.Endpoint)[:session_options] ||
-                       []
+                     @base_session_options,
+                     Application.get_env(:timesink, __MODULE__, [])
+                     |> Keyword.get(:session_options, [])
                    )
+
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [session: @session_options]],
+    longpoll: [connect_info: [session: @session_options]]
 
   socket "/live", Phoenix.LiveView.Socket,
     websocket: [connect_info: [session: @session_options]],
