@@ -147,10 +147,10 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
 
                 <div class="mt-8 flex flex-col sm:flex-row gap-3">
                   <a
-                    href={~p"/"}
+                    href={~p"/upcoming"}
                     class="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/[0.06] px-5 py-2.5 text-sm text-white transition hover:bg-white/[0.10] hover:border-white/25"
                   >
-                    Back to homepage
+                    View all upcoming showcases
                   </a>
 
                   <button
