@@ -108,8 +108,12 @@ defmodule TimesinkWeb.HomepageLive do
           
     <!-- 3 column highlights -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-              <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.06]">
+            <button
+              type="button"
+              phx-click={show_modal("lineup-info-modal")}
+              class="group rounded-2xl border border-white/10 bg-white/2 p-5 text-left transition hover:border-white/20 hover:bg-white/3 cursor-pointer"
+            >
+              <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/6">
                 <!-- film icon -->
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -120,14 +124,22 @@ defmodule TimesinkWeb.HomepageLive do
                   <path d="M4 4h4v4H4V4Zm6 0h4v4h-4V4Zm6 0h4v4h-4V4ZM4 10h16v10H4V10Zm0 6h4v4H4v-4Zm12 0h4v4h-4v-4Z" />
                 </svg>
               </div>
-              <h3 class="text-lg font-medium">Hand-picked lineup</h3>
-              <p class="mt-1 text-sm text-zinc-400">
-                Spotlight on retrospectives, festival favorites, hidden gems, and filmmaker premieres.
-              </p>
-            </div>
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-lg font-medium">Hand-picked lineup</h3>
+                  <p class="mt-1 text-sm text-zinc-400">
+                    Spotlight on retrospectives, festival favorites, hidden gems, and filmmaker premieres.
+                  </p>
+                </div>
+              </div>
+            </button>
 
-            <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-              <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.06]">
+            <button
+              type="button"
+              phx-click={show_modal("live-info-modal")}
+              class="group rounded-2xl border border-white/10 bg-white/2 p-5 text-left transition hover:border-white/20 hover:bg-white/3 cursor-pointer"
+            >
+              <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/6">
                 <!-- chat icon -->
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -138,16 +150,22 @@ defmodule TimesinkWeb.HomepageLive do
                   <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z" />
                 </svg>
               </div>
-              <h3 class="text-lg font-medium">
-                Live for every showing
-              </h3>
-              <p class="mt-1 text-sm text-zinc-400">
-                Live chats to engage with real people, not noisy comment walls.
-              </p>
-            </div>
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-lg font-medium">Live for every showing</h3>
+                  <p class="mt-1 text-sm text-zinc-400">
+                    Live chats to engage with real people, not noisy comment walls.
+                  </p>
+                </div>
+              </div>
+            </button>
 
-            <div class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-              <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.06]">
+            <button
+              type="button"
+              phx-click={show_modal("community-info-modal")}
+              class="group rounded-2xl border border-white/10 bg-white/2 p-5 text-left transition hover:border-white/20 hover:bg-white/3 cursor-pointer"
+            >
+              <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/6">
                 <!-- globe icon -->
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -155,32 +173,36 @@ defmodule TimesinkWeb.HomepageLive do
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
-                  <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.93 6h-3.26a14.6 14.6 0 0 0-2.01-4.2A8.03 8.03 0 0 1 18.93 8ZM12 4.06c.9 1.17 1.67 2.67 2.2 3.94H9.8c.53-1.27 1.3-2.77 2.2-3.94ZM5.07 8h3.26c.34-1.02.8-2.07 1.34-3.02A8.03 8.03 0 0 0 5.07 8Zm0 8a8.03 8.03 0 0 1 4.6 3.02A14.6 14.6 0 0 1 8.33 16H5.07Zm4.73 0h4.4c-.53 1.27-1.3 2.77-2.2 3.94-.9-1.17-1.67-2.67-2.2-3.94Zm8.13 0h-3.26c-.34 1.02-.8 2.07-1.34 3.02A8.03 8.03 0 0 0 17.93 16Zm-1.6-6c.27.96.45 2 .5 3.05H7.17c.05-1.05.23-2.09.5-3.05h8.66Z" />
+                  <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.93 6h-3.26a14.6 14.6 0 0 0-2.01-4.2A8.03 8.03 0 0 1 18.93 8ZM12 4.06c.9 1.17 1.67 2.67 2.2 3.94H9.8c.53-1.27 1.3-2.77 2.2-3.94ZM5.07 8h3.26c.34-1.02.8-2.07 1.34-3.02A8.03 8.03 0 0 0 5.07 8Zm0 8a8.03 8.03 0 0 1 4.6 3.02A14.6 14.6 0 0 1 8.33 16H5.07Zm4.73 0h4.4c-.53 1.27-1.3 2.77-2.2 3.94-.9-1.17-1.67 2.67-2.2-3.94Zm8.13 0h-3.26c-.34 1.02-.8 2.07-1.34 3.02A8.03 8.03 0 0 0 17.93 16Zm-1.6-6c.27.96.45 2 .5 3.05H7.17c.05-1.05.23-2.09.5-3.05h8.66Z" />
                 </svg>
               </div>
-              <h3 class="text-lg font-medium">Global community</h3>
-              <p class="mt-1 text-sm text-zinc-400">
-                Join a network of viewers from everywhere. Discover, discuss, connect, repeat.
-              </p>
-            </div>
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-lg font-medium">Global community</h3>
+                  <p class="mt-1 text-sm text-zinc-400">
+                    Join a network of viewers from everywhere. Discover, discuss, connect, repeat.
+                  </p>
+                </div>
+              </div>
+            </button>
           </div>
           
     <!-- slim schedule teaser -->
-          <div class="mt-10 rounded-2xl border border-white/10 bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-5">
+          <div class="mt-10 rounded-2xl border border-white/10 bg-linear-to-r from-white/3 to-white/1 p-5">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <p class="text-sm uppercase tracking-wider text-zinc-400">This Week</p>
                 <h4 class="mt-1 text-lg font-medium">Upcoming screenings &amp; special events</h4>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <div class="inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-3 py-1">
-                  <div class="h-2 w-2 rounded-full animate-pulse bg-current text-neon-red-light">
+                <div class="inline-flex items-center gap-2 rounded-full bg-white/6 px-3 py-1">
+                  <div class="h-2 w-2 shrink-0 rounded-full bg-neon-red-light animate-pulse ring-1 ring-neon-red-light/40">
                   </div>
                   Live showings every 15 minutes
                 </div>
                 <button
                   phx-click={show_modal("schedule-modal")}
-                  class="rounded-full border border-white/15 px-4.5 py-2 transition-all cursor-pointer hover:bg-white/[0.06] hover:border-white/25"
+                  class="rounded-full border border-white/15 px-4.5 py-2 transition-all cursor-pointer hover:bg-white/6 hover:border-white/25"
                 >
                   View schedule
                 </button>
@@ -226,7 +248,7 @@ defmodule TimesinkWeb.HomepageLive do
         <% @upcoming_showcase -> %>
           <section class="relative isolate">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 md:py-12">
-              <div class="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
+              <div class="overflow-hidden rounded-3xl border border-white/10 bg-white/2 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
                 <div class="grid grid-cols-1 md:grid-cols-5">
                   <!-- Image side -->
                   <div class="relative md:col-span-3 min-h-[260px] md:min-h-[340px]">
@@ -237,13 +259,13 @@ defmodule TimesinkWeb.HomepageLive do
                     />
                     
     <!-- Overlays for readability -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-backroom-black/90 via-backroom-black/55 to-transparent">
+                    <div class="absolute inset-0 bg-linear-to-r from-backroom-black/90 via-backroom-black/55 to-transparent">
                     </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-backroom-black/70 via-transparent to-backroom-black/20">
+                    <div class="absolute inset-0 bg-linear-to-t from-backroom-black/70 via-transparent to-backroom-black/20">
                     </div>
 
                     <div class="relative p-6 md:p-8">
-                      <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1">
+                      <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/6 px-3 py-1">
                         <span class="h-2 w-2 rounded-full bg-neon-red-light animate-pulse"></span>
                         <span class="text-xs uppercase tracking-wider text-zinc-200">
                           Upcoming showcase
@@ -277,7 +299,7 @@ defmodule TimesinkWeb.HomepageLive do
                       <button
                         type="button"
                         phx-click={show_modal("showcase-info-modal")}
-                        class="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/[0.06] px-4.5 py-2 text-sm text-white transition hover:bg-white/[0.10] hover:border-white/25 cursor-pointer"
+                        class="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/6 px-4.5 py-2 text-sm text-white transition hover:bg-white/10 hover:border-white/25 cursor-pointer"
                       >
                         Learn more
                       </button>
@@ -322,6 +344,12 @@ defmodule TimesinkWeb.HomepageLive do
       />
 
       <.live_component module={TimesinkWeb.NewsletterModalComponent} id="newsletter-modal-component" />
+      <.live_component module={TimesinkWeb.LineupInfoModalComponent} id="lineup-info-modal-component" />
+      <.live_component module={TimesinkWeb.LiveInfoModalComponent} id="live-info-modal-component" />
+      <.live_component
+        module={TimesinkWeb.CommunityInfoModalComponent}
+        id="community-info-modal-component"
+      />
     </div>
     """
   end
