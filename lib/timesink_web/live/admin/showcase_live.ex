@@ -27,11 +27,11 @@ defmodule TimesinkWeb.Admin.ShowcaseLive do
       },
       start_at: %{
         module: Backpex.Fields.DateTime,
-        label: "Start Date and Time"
+        label: "Start Date and Time (UTC)"
       },
       end_at: %{
         module: Backpex.Fields.DateTime,
-        label: "End Date and Time"
+        label: "End Date and Time (UTC)"
       },
       status: %{
         module: Backpex.Fields.Select,

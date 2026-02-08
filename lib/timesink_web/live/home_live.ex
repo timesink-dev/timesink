@@ -287,8 +287,10 @@ defmodule TimesinkWeb.HomepageLive do
                     <p class="text-xs uppercase tracking-wider text-zinc-400">Starts</p>
 
                     <p class="mt-2 text-lg md:text-xl font-medium text-white">
-                      {Calendar.strftime(@upcoming_showcase.start_at, "%A, %B %d · %H:%M")}
-                      <span class="text-zinc-400 text-sm font-normal"> (CET/Paris)</span>
+                      {format_datetime_in_timezone(@upcoming_showcase.start_at, @timezone)}
+                      <span class="text-zinc-400 text-sm font-normal">
+                        ({extract_city_from_timezone(@timezone)})
+                      </span>
                     </p>
 
                     <p class="mt-3 text-sm text-zinc-400">
@@ -392,5 +394,28 @@ defmodule TimesinkWeb.HomepageLive do
   def handle_info(%{event: "presence_diff", topic: topic}, socket) do
     updated = Presence.list(topic)
     {:noreply, update(socket, :presence, &Map.put(&1, topic, updated))}
+  end
+
+  # ───────────────────────────────────────────────────────────
+  # Timezone Helpers
+  # ───────────────────────────────────────────────────────────
+
+  defp format_datetime_in_timezone(nil, _timezone), do: "TBA"
+
+  defp format_datetime_in_timezone(naive_dt, timezone) do
+    naive_dt
+    |> DateTime.from_naive!("Etc/UTC")
+    |> Timex.Timezone.convert(timezone)
+    |> Timex.format!("%A, %B %d · %H:%M", :strftime)
+  end
+
+  defp extract_city_from_timezone("Etc/UTC"), do: "UTC"
+
+  defp extract_city_from_timezone(timezone) do
+    # Extract city from IANA timezone like "America/New_York" -> "New York"
+    timezone
+    |> String.split("/")
+    |> List.last()
+    |> String.replace("_", " ")
   end
 end

@@ -132,7 +132,7 @@ defmodule Timesink.Cinema.Showcase do
   end
 
   @doc """
-  Custom update that reloads theater cache when showcase becomes active.
+  Custom update that reloads theater cache when showcase becomes active or when an active showcase is updated.
   Overrides SwissSchema's update to add cache invalidation logic.
   """
   def update(showcase, params, opts \\ []) do
@@ -143,9 +143,18 @@ defmodule Timesink.Cinema.Showcase do
 
     case result do
       {:ok, updated_showcase} ->
-        # Reload theater cache if status changed to active
-        if old_status != :active and updated_showcase.status == :active do
-          Logger.info("Showcase #{updated_showcase.id} became active, reloading theater cache")
+        # Reload theater cache if:
+        # 1. Status changed to active, OR
+        # 2. Already active showcase was updated (e.g., start_at changed)
+        should_reload =
+          (old_status != :active and updated_showcase.status == :active) or
+            updated_showcase.status == :active
+
+        if should_reload do
+          Logger.info(
+            "Showcase #{updated_showcase.id} updated (status=#{updated_showcase.status}), reloading theater cache"
+          )
+
           Timesink.Cinema.TheaterScheduler.reload()
         end
 

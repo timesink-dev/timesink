@@ -179,6 +179,11 @@ defmodule Timesink.Cinema do
   @doc """
   Fetch the upcoming showcase that starts soonest after now.
   Returns nil if none found.
+
+  Note: This filters by both status=:upcoming AND start_at > now.
+  If a showcase has status=:upcoming but its start_at has passed,
+  it won't be returned. Ensure showcase statuses are updated properly
+  (e.g., upcoming -> active -> archived) to avoid the "no showcase" message.
   """
   def get_upcoming_showcase do
     Showcase
