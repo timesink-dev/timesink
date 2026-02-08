@@ -136,7 +136,9 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
               <div class="text-xs md:text-sm text-mystery-white uppercase tracking-wider flex flex-wrap gap-x-3 md:gap-x-4 gap-y-2">
                 <%= for genre <- @film.genres do %>
-                  <span>{genre.name}</span>
+                  <span class="inline-block bg-dark-theater-primary rounded-full px-2 py-1 mr-2 text-xs">
+                    {genre.name}
+                  </span>
                 <% end %>
                 <span>•</span>
                 <span>{@film.duration} min</span>

@@ -44,9 +44,9 @@ defmodule TimesinkWeb.ScheduleModalComponent do
               </div>
               
     <!-- Continuous Screening Info -->
-              <div class="rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.03] to-white/[0.01] p-4">
+              <div class="rounded-xl border border-white/10 bg-linear-to-br from-white/3 to-white/1 p-4">
                 <div class="flex items-start gap-3">
-                  <div class="flex-shrink-0 mt-0.5">
+                  <div class="shrink-0 mt-0.5">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-5 w-5 text-neon-blue-lightest"
@@ -75,81 +75,76 @@ defmodule TimesinkWeb.ScheduleModalComponent do
 
                 <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
                   <%= for exhibition <- @exhibitions do %>
-                    <div class="group rounded-xl border border-white/10 bg-gradient-to-r from-white/[0.02] to-transparent hover:border-white/20 hover:from-white/[0.04] transition-all">
-                      <div class="flex gap-4 p-4">
-                        <!-- Poster -->
-                        <div class="flex-shrink-0">
-                          <img
-                            src={Film.poster_url(exhibition.film.poster)}
-                            alt={exhibition.film.title}
-                            class="w-16 h-24 object-cover rounded-lg ring-1 ring-white/10"
-                          />
-                        </div>
-                        
+                    <div class="group rounded-xl border border-white/10 bg-linear-to-r from-white/2 to-transparent hover:border-white/20 hover:from-white/4 transition-all">
+                      <.link navigate={"/now-playing/#{exhibition.theater.slug}"}>
+                        <div class="flex gap-4 p-4">
+                          <!-- Poster -->
+                          <div class="shrink-0">
+                            <img
+                              src={Film.poster_url(exhibition.film.poster)}
+                              alt={exhibition.film.title}
+                              class="w-16 h-24 object-cover rounded-lg ring-1 ring-white/10"
+                            />
+                          </div>
+                          
     <!-- Film Info -->
-                        <div class="flex-1 min-w-0">
-                          <div class="flex items-start justify-between gap-3">
-                            <div class="flex-1 min-w-0">
-                              <h4 class="text-base font-medium text-white truncate">
-                                {exhibition.film.title}
-                              </h4>
-                              <div class="flex items-center gap-2 mt-1 text-xs text-zinc-400">
-                                <span>{exhibition.theater.name}</span>
-                                <span class="text-zinc-600">•</span>
-                                <span>{exhibition.film.duration} min</span>
-                                <%= if exhibition.film.year do %>
+                          <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-3">
+                              <div class="flex-1 min-w-0">
+                                <h4 class="text-base font-medium text-white truncate">
+                                  {exhibition.film.title}
+                                </h4>
+                                <div class="flex items-center gap-2 mt-1 text-xs text-zinc-400">
+                                  <span>{exhibition.theater.name}</span>
                                   <span class="text-zinc-600">•</span>
-                                  <span>{exhibition.film.year}</span>
+                                  <span>{exhibition.film.duration} min</span>
+                                  <%= if exhibition.film.year do %>
+                                    <span class="text-zinc-600">•</span>
+                                    <span>{exhibition.film.year}</span>
+                                  <% end %>
+                                </div>
+                              </div>
+                              
+    <!-- Live Status Badge -->
+                              <div class="shrink-0">
+                                <%= case get_playback_phase(exhibition.theater_id, @playback_states) do %>
+                                  <% :playing -> %>
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 border border-red-500/20 px-2.5 py-1 text-xs font-medium text-red-400">
+                                      <div class="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse">
+                                      </div>
+                                      Playing
+                                    </span>
+                                  <% :intermission -> %>
+                                    <span class="inline-flex items-center rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 text-xs font-medium text-amber-400">
+                                      Intermission
+                                    </span>
+                                  <% :upcoming -> %>
+                                    <span class="inline-flex items-center rounded-full bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 text-xs font-medium text-blue-400">
+                                      Starting Soon
+                                    </span>
+                                  <% _ -> %>
+                                    <span class="inline-flex items-center rounded-full bg-zinc-500/10 border border-zinc-500/20 px-2.5 py-1 text-xs font-medium text-zinc-400">
+                                      Scheduled
+                                    </span>
                                 <% end %>
                               </div>
                             </div>
                             
-    <!-- Live Status Badge -->
-                            <div class="flex-shrink-0">
-                              <%= case get_playback_phase(exhibition.theater_id, @playback_states) do %>
-                                <% :playing -> %>
-                                  <span class="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 border border-red-500/20 px-2.5 py-1 text-xs font-medium text-red-400">
-                                    <div class="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse">
-                                    </div>
-                                    Playing
-                                  </span>
-                                <% :intermission -> %>
-                                  <span class="inline-flex items-center rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 text-xs font-medium text-amber-400">
-                                    Intermission
-                                  </span>
-                                <% :upcoming -> %>
-                                  <span class="inline-flex items-center rounded-full bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 text-xs font-medium text-blue-400">
-                                    Starting Soon
-                                  </span>
-                                <% _ -> %>
-                                  <span class="inline-flex items-center rounded-full bg-zinc-500/10 border border-zinc-500/20 px-2.5 py-1 text-xs font-medium text-zinc-400">
-                                    Scheduled
-                                  </span>
-                              <% end %>
-                            </div>
-                          </div>
-                          
     <!-- Viewer Count -->
-                          <div class="flex items-center gap-4 mt-3">
-                            <div class="flex items-center gap-1.5 text-xs text-zinc-500">
-                              <.icon name="hero-user-group" class="h-4 w-4" />
-                              <span>
-                                {live_viewer_count(exhibition.theater_id, @presence)}
-                                {if live_viewer_count(exhibition.theater_id, @presence) == 1,
-                                  do: "viewer",
-                                  else: "viewers"}
-                              </span>
+                            <div class="flex items-center gap-4 mt-3">
+                              <div class="flex items-center gap-1.5 text-xs text-zinc-500">
+                                <.icon name="hero-user-group" class="h-4 w-4" />
+                                <span>
+                                  {live_viewer_count(exhibition.theater_id, @presence)}
+                                  {if live_viewer_count(exhibition.theater_id, @presence) == 1,
+                                    do: "viewer",
+                                    else: "viewers"}
+                                </span>
+                              </div>
                             </div>
-
-                            <.link
-                              navigate={"/now-playing/#{exhibition.theater.slug}"}
-                              class="text-xs text-neon-blue-lightest hover:text-zinc-300 transition-colors"
-                            >
-                              Go to Theater →
-                            </.link>
                           </div>
                         </div>
-                      </div>
+                      </.link>
                     </div>
                   <% end %>
                 </div>
@@ -194,7 +189,7 @@ defmodule TimesinkWeb.ScheduleModalComponent do
                 </div>
               </div>
 
-              <div class="rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.03] to-white/[0.01] p-4">
+              <div class="rounded-xl border border-white/10 bg-linear-to-br from-white/3 to-white/[0.01] p-4">
                 <p class="text-sm text-zinc-400">
                   The lineup will appear here once the doors open. Come back closer to start time.
                 </p>
@@ -216,7 +211,7 @@ defmodule TimesinkWeb.ScheduleModalComponent do
                 </p>
               </div>
 
-              <div class="rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.03] to-white/[0.01] p-4">
+              <div class="rounded-xl border border-white/10 bg-linear-to-br from-white/3 to-white/1 p-4">
                 <p class="text-sm text-zinc-400">
                   Want a heads-up when the next showcase is announced?
                 </p>

@@ -232,6 +232,9 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
              "showcase_id" => showcase_id,
              "theater_id" => theater_id
            }) do
+      # Reload theater cache after creating exhibition
+      Timesink.Cinema.TheaterScheduler.reload()
+
       {:noreply,
        socket
        |> assign(:showcases_active_and_upcoming, refresh_showcases())
@@ -246,6 +249,9 @@ defmodule TimesinkWeb.Admin.ExhibitionsLive do
     with %Timesink.Cinema.Exhibition{} = exhibition <-
            Timesink.Repo.get(Timesink.Cinema.Exhibition, id),
          {:ok, _exhibition} <- Timesink.Repo.delete(exhibition) do
+      # Reload theater cache after removing exhibition
+      Timesink.Cinema.TheaterScheduler.reload()
+
       {:noreply,
        socket
        |> assign(:showcases_active_and_upcoming, refresh_showcases())

@@ -27,11 +27,11 @@ defmodule TimesinkWeb.Admin.ShowcaseLive do
       },
       start_at: %{
         module: Backpex.Fields.DateTime,
-        label: "Start Date and Time"
+        label: "Start Date and Time (UTC)"
       },
       end_at: %{
         module: Backpex.Fields.DateTime,
-        label: "End Date and Time"
+        label: "End Date and Time (UTC)"
       },
       status: %{
         module: Backpex.Fields.Select,
@@ -42,5 +42,21 @@ defmodule TimesinkWeb.Admin.ShowcaseLive do
           end)
       }
     ]
+  end
+
+  @impl Backpex.LiveResource
+  def on_item_created(socket, item) do
+    require Logger
+    Logger.info("Showcase #{item.id} created via Backpex, reloading theater cache")
+    Timesink.Cinema.TheaterScheduler.reload()
+    socket
+  end
+
+  @impl Backpex.LiveResource
+  def on_item_updated(socket, item) do
+    require Logger
+    Logger.info("Showcase #{item.id} updated via Backpex, reloading theater cache")
+    Timesink.Cinema.TheaterScheduler.reload()
+    socket
   end
 end

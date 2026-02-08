@@ -64,7 +64,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
             phx-hook="HoverPlay"
           />
 
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 space-y-2 z-10">
+          <div class="absolute inset-0 bg-linear-to-t from-black/80 to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 space-y-2 z-10">
             <h3 class="text-2xl font-bold">{film.title}</h3>
             <div class="text-sm text-white/70">
               <span>{film.year} &nbsp; •</span>
@@ -81,7 +81,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
                 </ul>
               <% end %>
             </div>
-            <p class="text-xs text-white/60 line-clamp-3 w-80">{film.synopsis}</p>
+            <p class="text-xs text-white/60 line-clamp-3 w-120">{film.synopsis}</p>
 
             <%= if Enum.any?(film.directors) do %>
               <div class="text-xs text-white/50">

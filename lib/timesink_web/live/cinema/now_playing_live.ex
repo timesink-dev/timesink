@@ -133,8 +133,10 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                   <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">
                     <p class="text-xs uppercase tracking-wider text-zinc-400">Starts</p>
                     <p class="text-sm md:text-base font-medium text-white">
-                      {Calendar.strftime(@upcoming_showcase.start_at, "%A, %B %d · %H:%M")}
-                      <span class="text-zinc-400 font-normal"> (CET/Paris)</span>
+                      {format_datetime_in_timezone(@upcoming_showcase.start_at, @timezone)}
+                      <span class="text-zinc-400 font-normal">
+                        ({extract_city_from_timezone(@timezone)})
+                      </span>
                     </p>
                   </div>
 
@@ -449,4 +451,27 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
   end
 
   defp needs_avatar?(_), do: true
+
+  # ───────────────────────────────────────────────────────────
+  # Timezone Helpers
+  # ───────────────────────────────────────────────────────────
+
+  defp format_datetime_in_timezone(nil, _timezone), do: "TBA"
+
+  defp format_datetime_in_timezone(naive_dt, timezone) do
+    naive_dt
+    |> DateTime.from_naive!("Etc/UTC")
+    |> Timex.Timezone.convert(timezone)
+    |> Timex.format!("%A, %B %d · %H:%M", :strftime)
+  end
+
+  defp extract_city_from_timezone("Etc/UTC"), do: "UTC"
+
+  defp extract_city_from_timezone(timezone) do
+    # Extract city from IANA timezone like "America/New_York" -> "New York"
+    timezone
+    |> String.split("/")
+    |> List.last()
+    |> String.replace("_", " ")
+  end
 end
