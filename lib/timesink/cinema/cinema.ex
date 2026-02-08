@@ -168,7 +168,7 @@ defmodule Timesink.Cinema do
   end
 
   def get_film_duration_seconds(%{duration: minutes}) when is_integer(minutes),
-    do: minutes
+    do: minutes * 60
 
   # default fallback
   def get_film_duration_seconds(_film) do

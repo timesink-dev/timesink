@@ -85,7 +85,9 @@ defmodule Timesink.Cinema.TheaterScheduler do
 
   def current_offset_for(theater, showcase, film_duration_secs) do
     with %NaiveDateTime{} = _naive <- showcase.start_at do
-      interval = theater.playback_interval_minutes * 60
+      # Fixed intermission duration regardless of film length
+      intermission_duration = theater.playback_interval_minutes * 60
+      cycle_duration = film_duration_secs + intermission_duration
       now = DateTime.utc_now()
 
       adjusted_anchor =
@@ -99,14 +101,14 @@ defmodule Timesink.Cinema.TheaterScheduler do
 
         _ ->
           seconds_since_anchor = DateTime.diff(now, adjusted_anchor)
-          cycles_elapsed = div(seconds_since_anchor, interval)
-          cycle_start = DateTime.add(adjusted_anchor, cycles_elapsed * interval)
+          cycles_elapsed = div(seconds_since_anchor, cycle_duration)
+          cycle_start = DateTime.add(adjusted_anchor, cycles_elapsed * cycle_duration)
           offset = DateTime.diff(now, cycle_start)
 
           cond do
             offset < film_duration_secs -> {:playing, offset}
-            offset < interval -> {:intermission, interval - offset}
-            true -> {:intermission, interval}
+            offset < cycle_duration -> {:intermission, cycle_duration - offset}
+            true -> {:intermission, intermission_duration}
           end
       end
     else
