@@ -114,7 +114,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                 src={Timesink.Cinema.Film.poster_url(exhibition.film.poster)}
                 alt={exhibition.film.title}
                 data-thumb-index={index}
-                class="object-cover rounded-md w-28 h-28 transition-all duration-300 cursor-pointer"
+                class="aspect-square object-cover rounded-md w-28 h-28 transition-all duration-300 cursor-pointer"
               />
             <% end %>
           </div>

@@ -6,12 +6,30 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
   require Logger
 
-  def mount(%{"theater_slug" => theater_slug}, _session, socket) do
+  def mount(_params, _session, socket) do
+    {:ok, socket}
+  end
+
+  def handle_params(%{"theater_slug" => theater_slug}, _uri, socket) do
     with {:ok, theater} <- Theater.get_by(%{slug: theater_slug}),
          {:ok, showcase} <- Showcase.get_by(%{status: :active}),
          {:ok, exhibition} <-
            Exhibition.get_by(%{theater_id: theater.id, showcase_id: showcase.id}),
          {:ok, film} <- Film.get(exhibition.film_id) do
+      # Clean up previous theater subscriptions if this is a theater change
+      if old_theater = socket.assigns[:theater] do
+        if old_theater.id != theater.id do
+          Phoenix.PubSub.unsubscribe(Timesink.PubSub, PubSubTopics.chat_topic(old_theater.id))
+
+          Phoenix.PubSub.unsubscribe(
+            Timesink.PubSub,
+            PubSubTopics.scheduler_topic(old_theater.id)
+          )
+
+          Phoenix.PubSub.unsubscribe(Timesink.PubSub, PubSubTopics.presence_topic(old_theater.id))
+        end
+      end
+
       exhibition = Repo.preload(exhibition, [:showcase, :theater])
 
       film =
@@ -52,10 +70,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         "Loaded #{length(recent_msgs)} existing comments for exhibition #{exhibition.id}. Comment IDs: #{Enum.map(recent_msgs, & &1.id) |> Enum.join(", ")}"
       )
 
-      {:ok,
+      {:noreply,
        socket
        # efficient diffs
-       |> stream(:messages, recent_msgs)
+       |> stream(:messages, recent_msgs, reset: true)
        |> assign(:chat_input, "")
        |> assign(:typing_users, %{})
        |> assign(:theater, theater)
@@ -72,7 +90,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:active_panel_tab, :chat)
        |> assign(:has_messages?, length(recent_msgs) > 0)}
     else
-      _ -> {:redirect, socket |> put_flash(:error, "Not found") |> redirect(to: "/")}
+      _ -> {:noreply, socket |> put_flash(:error, "Not found") |> redirect(to: "/")}
     end
   end
 
@@ -336,10 +354,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     placeholder="Type a message…"
                     phx-change="chat:typing"
                     phx-debounce="100"
-                    class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
+                    class="w-full bg-white/4 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
                     autocomplete="off"
                   />
-                  <button class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/[0.06] text-gray-200 hover:bg-white/[0.10] transition">
+                  <button class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/6 text-gray-200 hover:bg-white/[0.10] transition">
                     Send
                   </button>
                 </div>
@@ -356,7 +374,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   <%= for {_user_id, %{metas: [meta | _]}} <- @presence do %>
                     <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-white/[0.02] hover:bg-white/[0.04] transition">
                       <div class="flex items-center gap-3">
-                        <div class="h-7 w-7 rounded-full bg-white/[0.08] text-gray-100 flex items-center justify-center text-[11px] font-semibold">
+                        <div class="h-7 w-7 rounded-full bg-white/8 text-gray-100 flex items-center justify-center text-[11px] font-semibold">
                           {meta.username |> String.first() |> String.upcase()}
                         </div>
                         <span class="text-sm text-gray-100">{meta.username}</span>
@@ -510,7 +528,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     placeholder="Type a message…"
                     phx-change="chat:typing"
                     phx-debounce="100"
-                    class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
+                    class="w-full bg-white/4 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
                     autocomplete="off"
                   />
                   <button class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/[0.06] text-gray-200 hover:bg-white/[0.10] transition">
