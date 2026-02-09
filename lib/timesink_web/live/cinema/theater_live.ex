@@ -6,12 +6,26 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
   require Logger
 
-  def mount(%{"theater_slug" => theater_slug}, _session, socket) do
+  def mount(_params, _session, socket) do
+    {:ok, socket}
+  end
+
+  def handle_params(%{"theater_slug" => theater_slug}, _uri, socket) do
     with {:ok, theater} <- Theater.get_by(%{slug: theater_slug}),
          {:ok, showcase} <- Showcase.get_by(%{status: :active}),
          {:ok, exhibition} <-
            Exhibition.get_by(%{theater_id: theater.id, showcase_id: showcase.id}),
          {:ok, film} <- Film.get(exhibition.film_id) do
+
+      # Clean up previous theater subscriptions if this is a theater change
+      if old_theater = socket.assigns[:theater] do
+        if old_theater.id != theater.id do
+          Phoenix.PubSub.unsubscribe(Timesink.PubSub, PubSubTopics.chat_topic(old_theater.id))
+          Phoenix.PubSub.unsubscribe(Timesink.PubSub, PubSubTopics.scheduler_topic(old_theater.id))
+          Phoenix.PubSub.unsubscribe(Timesink.PubSub, PubSubTopics.presence_topic(old_theater.id))
+        end
+      end
+
       exhibition = Repo.preload(exhibition, [:showcase, :theater])
 
       film =
@@ -52,10 +66,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         "Loaded #{length(recent_msgs)} existing comments for exhibition #{exhibition.id}. Comment IDs: #{Enum.map(recent_msgs, & &1.id) |> Enum.join(", ")}"
       )
 
-      {:ok,
+      {:noreply,
        socket
        # efficient diffs
-       |> stream(:messages, recent_msgs)
+       |> stream(:messages, recent_msgs, reset: true)
        |> assign(:chat_input, "")
        |> assign(:typing_users, %{})
        |> assign(:theater, theater)
@@ -72,7 +86,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:active_panel_tab, :chat)
        |> assign(:has_messages?, length(recent_msgs) > 0)}
     else
-      _ -> {:redirect, socket |> put_flash(:error, "Not found") |> redirect(to: "/")}
+      _ -> {:noreply, socket |> put_flash(:error, "Not found") |> redirect(to: "/")}
     end
   end
 
@@ -88,7 +102,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
         <p class="text-zinc-400 mt-2 text-sm">{@theater.description}</p>
       </div>
-      
+
     <!-- Toolbar -->
       <div class="flex justify-between items-center mb-4">
         <div></div>
@@ -104,7 +118,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           {if @chat_open, do: "Hide Chat", else: "Show Chat"}
         </button>
       </div>
-      
+
     <!-- Main layout (mobile-first: stacked) -->
       <div class="flex flex-col md:flex-row md:gap-6 md:items-start">
         <!-- Left: Player + Film Info -->
@@ -126,7 +140,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 start-time={@offset}
               />
             </div>
-            
+
     <!-- Film Info -->
             <div id="film-info" class="w-full mt-6 md:mt-8 border-t border-gray-800 pt-6 space-y-4">
               <div class="text-2xl font-semibold tracking-wide text-mystery-white">
@@ -239,7 +253,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             </div>
           <% end %>
         </div>
-        
+
     <!-- Right: Desktop side panel -->
         <aside class={
           [
@@ -317,7 +331,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     <% end %>
                   </ul>
                 <% end %>
-                
+
     <!-- TYPING -->
                 <%= if map_size(@typing_users) > 0 do %>
                   <div class="px-4 py-2 text-xs text-zinc-400 border-t border-white/5">
@@ -325,7 +339,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   </div>
                 <% end %>
               </div>
-              
+
     <!-- INPUT (outside scroll area) -->
               <form phx-submit="chat:send" class="p-3 border-t border-white/10">
                 <div class="flex items-center gap-2">
@@ -345,7 +359,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 </div>
               </form>
             </div>
-            
+
     <!-- Live Audience Tab Content -->
             <div class={[
               "max-h-[65vh] overflow-y-auto p-3",
@@ -381,7 +395,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           </div>
         </aside>
       </div>
-      
+
     <!-- Mobile chat drawer -->
       <div class={[
         "md:hidden fixed inset-0 z-50 flex items-end transition-opacity duration-200",
@@ -389,7 +403,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       ]}>
         <!-- backdrop -->
         <div class="absolute inset-0 bg-black/70" phx-click="toggle_chat" aria-hidden="true"></div>
-        
+
     <!-- sheet -->
         <div class={[
           "relative w-full rounded-t-2xl border-t border-white/10 bg-backroom-black transition-transform duration-300 ease-out",
@@ -464,7 +478,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   <% end %>
                 <% end %>
               </div>
-              
+
     <!-- Mobile Live Audience Tab Content -->
               <div class={[
                 "p-3",
@@ -510,7 +524,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     placeholder="Type a message…"
                     phx-change="chat:typing"
                     phx-debounce="100"
-                    class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
+                    class="w-full bg-white/4 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
                     autocomplete="off"
                   />
                   <button class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/[0.06] text-gray-200 hover:bg-white/[0.10] transition">
