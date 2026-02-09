@@ -16,12 +16,16 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
          {:ok, exhibition} <-
            Exhibition.get_by(%{theater_id: theater.id, showcase_id: showcase.id}),
          {:ok, film} <- Film.get(exhibition.film_id) do
-
       # Clean up previous theater subscriptions if this is a theater change
       if old_theater = socket.assigns[:theater] do
         if old_theater.id != theater.id do
           Phoenix.PubSub.unsubscribe(Timesink.PubSub, PubSubTopics.chat_topic(old_theater.id))
-          Phoenix.PubSub.unsubscribe(Timesink.PubSub, PubSubTopics.scheduler_topic(old_theater.id))
+
+          Phoenix.PubSub.unsubscribe(
+            Timesink.PubSub,
+            PubSubTopics.scheduler_topic(old_theater.id)
+          )
+
           Phoenix.PubSub.unsubscribe(Timesink.PubSub, PubSubTopics.presence_topic(old_theater.id))
         end
       end
