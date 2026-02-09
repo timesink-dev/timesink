@@ -354,10 +354,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     placeholder="Type a message…"
                     phx-change="chat:typing"
                     phx-debounce="100"
-                    class="w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
+                    class="w-full bg-white/4 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
                     autocomplete="off"
                   />
-                  <button class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/[0.06] text-gray-200 hover:bg-white/[0.10] transition">
+                  <button class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/6 text-gray-200 hover:bg-white/[0.10] transition">
                     Send
                   </button>
                 </div>
@@ -374,7 +374,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   <%= for {_user_id, %{metas: [meta | _]}} <- @presence do %>
                     <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-white/[0.02] hover:bg-white/[0.04] transition">
                       <div class="flex items-center gap-3">
-                        <div class="h-7 w-7 rounded-full bg-white/[0.08] text-gray-100 flex items-center justify-center text-[11px] font-semibold">
+                        <div class="h-7 w-7 rounded-full bg-white/8 text-gray-100 flex items-center justify-center text-[11px] font-semibold">
                           {meta.username |> String.first() |> String.upcase()}
                         </div>
                         <span class="text-sm text-gray-100">{meta.username}</span>
