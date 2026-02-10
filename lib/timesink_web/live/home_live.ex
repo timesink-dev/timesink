@@ -202,7 +202,7 @@ defmodule TimesinkWeb.HomepageLive do
                 </div>
                 <button
                   phx-click={show_modal("schedule-modal")}
-                  class="rounded-full border border-white/15 px-4.5 py-2 transition-all cursor-pointer hover:bg-white/6 hover:border-white/25"
+                  class="rounded border border-white/15 px-4.5 py-2 transition-all cursor-pointer hover:bg-white/6 hover:border-white/25"
                 >
                   View schedule
                 </button>
@@ -301,7 +301,7 @@ defmodule TimesinkWeb.HomepageLive do
                       <button
                         type="button"
                         phx-click={show_modal("showcase-info-modal")}
-                        class="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/6 px-4.5 py-2 text-sm text-white transition hover:bg-white/10 hover:border-white/25 cursor-pointer"
+                        class="inline-flex items-center justify-center rounded border border-white/15 bg-white/6 px-4.5 py-2 text-sm text-white transition hover:bg-white/10 hover:border-white/25 cursor-pointer"
                       >
                         Learn more
                       </button>
@@ -309,7 +309,7 @@ defmodule TimesinkWeb.HomepageLive do
                       <button
                         type="button"
                         phx-click={show_modal("newsletter-modal")}
-                        class="inline-flex items-center justify-center rounded-full bg-white text-backroom-black px-4.5 py-2 text-sm font-medium transition hover:opacity-90 cursor-pointer"
+                        class="inline-flex items-center justify-center rounded bg-white text-backroom-black px-4.5 py-2 text-sm font-medium transition hover:opacity-90 cursor-pointer"
                       >
                         Get notified
                       </button>

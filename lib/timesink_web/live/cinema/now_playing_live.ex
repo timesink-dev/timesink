@@ -121,7 +121,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                   </span>
                 </div>
 
-                <h1 class="mt-5 text-4xl md:text-5xl tracking-tight text-mystery-white">
+                <h1 class="mt-5 text-4xl md:text-2xl tracking-tight text-mystery-white">
                   {@upcoming_showcase.title}
                 </h1>
 
@@ -141,16 +141,12 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                   </div>
 
                   <div class="hidden sm:block h-6 w-px bg-white/10"></div>
-
-                  <p class="text-sm text-zinc-400">
-                    TimeSink opens its doors. No easing in. No settling down.
-                  </p>
                 </div>
 
                 <div class="mt-8 flex flex-col sm:flex-row gap-3">
                   <a
                     href={~p"/upcoming"}
-                    class="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/[0.06] px-5 py-2.5 text-sm text-white transition hover:bg-white/[0.10] hover:border-white/25"
+                    class="inline-flex items-center justify-center rounded border border-white/15 bg-white/6 px-5 py-2.5 text-sm text-white transition hover:bg-white/10 hover:border-white/25"
                   >
                     View all upcoming showcases
                   </a>
@@ -158,7 +154,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                   <button
                     type="button"
                     phx-click={show_modal("newsletter-modal")}
-                    class="inline-flex items-center justify-center rounded-full bg-white text-backroom-black px-4.5 py-2 text-sm font-medium transition hover:opacity-90 cursor-pointer"
+                    class="inline-flex items-center justify-center rounded bg-white text-backroom-black px-4.5 py-2 text-sm font-medium transition hover:opacity-90 cursor-pointer"
                   >
                     Get notified
                   </button>
