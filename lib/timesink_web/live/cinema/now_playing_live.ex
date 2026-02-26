@@ -125,7 +125,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
                   {@upcoming_showcase.title}
                 </h1>
 
-                <p class="mt-4 text-base md:text-lg text-zinc-200/80">
+                <p class="mt-4 text-base md:text-md text-zinc-200/80">
                   {@upcoming_showcase.description}
                 </p>
 

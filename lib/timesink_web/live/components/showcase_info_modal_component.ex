@@ -26,20 +26,32 @@ defmodule TimesinkWeb.ShowcaseInfoModalComponent do
               or a magazine edition. It has a loose theme and a point of view.
             </p>
 
-            <div class="rounded-xl border border-white/10 bg-white/3 p-4">
-              <p class="text-white font-medium mb-2">How it works:</p>
+            <div class="rounded-xl border border-white/10 bg-white/3 p-5">
+              <p class="text-white font-medium mb-4">How it works:</p>
 
-              <ul class="space-y-2 text-zinc-300">
-                <li class="flex gap-2 items-start">
+              <ul class="space-y-3.5 text-zinc-300">
+                <li class="flex gap-3 items-start">
+                  <div class="shrink-0 w-5 h-5 mt-0.5 text-blue-400">
+                    <.icon name="hero-film" class="w-5 h-5" />
+                  </div>
                   <span>Each theater gets a fresh film for the volume.</span>
                 </li>
-                <li class="flex gap-2 items-start">
+                <li class="flex gap-3 items-start">
+                  <div class="shrink-0 w-5 h-5 mt-0.5 text-purple-400">
+                    <.icon name="hero-clock" class="w-5 h-5" />
+                  </div>
                   <span>Films screen on a periodic schedule. You watch together, in sync.</span>
                 </li>
-                <li class="flex gap-2 items-start">
+                <li class="flex gap-3 items-start">
+                  <div class="shrink-0 w-5 h-5 mt-0.5 text-emerald-400">
+                    <.icon name="hero-user-group" class="w-5 h-5" />
+                  </div>
                   <span>Sometimes we invite a guest curator to program a theater.</span>
                 </li>
-                <li class="flex gap-2 items-start">
+                <li class="flex gap-3 items-start">
+                  <div class="shrink-0 w-5 h-5 mt-0.5 text-amber-400">
+                    <.icon name="hero-chat-bubble-left-right" class="w-5 h-5" />
+                  </div>
                   <span>Live chat is part of the show, not an afterthought.</span>
                 </li>
               </ul>
