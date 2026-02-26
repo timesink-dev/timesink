@@ -272,7 +272,7 @@ defmodule TimesinkWeb.HomepageLive do
                         </span>
                       </div>
 
-                      <h2 class="mt-4 text-3xl md:text-4xl font-semibold tracking-tight text-white">
+                      <h2 class="mt-4 text-2xl md:text-xl font-semibold tracking-tight text-white">
                         {@upcoming_showcase.title}
                       </h2>
 
