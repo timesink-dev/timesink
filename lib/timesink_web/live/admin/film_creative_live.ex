@@ -8,6 +8,8 @@ defmodule TimesinkWeb.Admin.FilmCreativeLive do
     ],
     layout: {TimesinkWeb.Layouts, :admin}
 
+  import Ecto.Query, only: [dynamic: 2, select_merge: 3]
+
   @impl Backpex.LiveResource
   def singular_name, do: "Film Creative"
 
@@ -27,9 +29,16 @@ defmodule TimesinkWeb.Admin.FilmCreativeLive do
       creative: %{
         module: Backpex.Fields.BelongsTo,
         label: "Creative",
-        display_field: :last_name,
+        display_field: :full_name,
         searchable: false,
-        live_resource: TimesinkWeb.Admin.UserLive
+        live_resource: TimesinkWeb.Admin.CreativeLive,
+        select: dynamic([creative: c], fragment("concat(?, ' ', ?)", c.first_name, c.last_name)),
+        options_query: fn query, _assigns ->
+          query
+          |> select_merge([c], %{
+            full_name: fragment("concat(?, ' ', ?)", c.first_name, c.last_name)
+          })
+        end
       },
       role: %{
         module: Backpex.Fields.Select,
@@ -52,11 +61,8 @@ defmodule TimesinkWeb.Admin.FilmCreativeLive do
 
           %{live_action: :edit} = assigns ->
             current_role = Map.get(assigns.form.data, :role)
-            is_current_cast_or_crew = current_role in [:cast, :crew]
-
             changed_role = Map.get(assigns.changeset.changes, :role)
-
-            is_current_cast_or_crew || changed_role in [:cast, :crew]
+            current_role in [:cast, :crew] || changed_role in [:cast, :crew]
 
           _assigns ->
             true

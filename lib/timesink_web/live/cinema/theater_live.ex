@@ -1,6 +1,7 @@
 defmodule TimesinkWeb.Cinema.TheaterLive do
   use TimesinkWeb, :live_view
-  alias Timesink.Cinema.{Theater, Exhibition, Showcase, Film, Creative}
+  alias Timesink.Cinema.{Theater, Exhibition, Showcase, Film}
+  alias TimesinkWeb.Components.FilmInfo
   alias TimesinkWeb.PubSubTopics
   alias Timesink.Repo
 
@@ -128,6 +129,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         <!-- Left: Player + Film Info -->
         <div class="min-w-0 md:flex-1 transition-all duration-300">
           <% playback_id = Film.get_mux_playback_id(@film.video) %>
+
           <%= if @phase == :playing and playback_id do %>
             <div id="simulated-live-player" data-offset={@offset} phx-hook="SimulatedLivePlayback">
               <mux-player
@@ -144,85 +146,11 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 start-time={@offset}
               />
             </div>
-            
-    <!-- Film Info -->
-            <div id="film-info" class="w-full mt-6 md:mt-8 border-t border-gray-800 pt-6 space-y-4">
-              <div class="text-2xl font-semibold tracking-wide text-mystery-white">
-                {@film.title}
-                <span class="text-gray-400 text-base ml-2">({@film.year})</span>
-              </div>
-
-              <div class="text-xs md:text-sm text-mystery-white uppercase tracking-wider flex flex-wrap gap-x-3 md:gap-x-4 gap-y-2">
-                <%= for genre <- @film.genres do %>
-                  <span class="inline-block bg-dark-theater-primary rounded-full px-2 py-1 mr-2 text-xs">
-                    {genre.name}
-                  </span>
-                <% end %>
-                <span>•</span>
-                <span>{@film.duration} min</span>
-                <span>•</span>
-                <span>{String.upcase(to_string(@film.format))}</span>
-                <span>•</span>
-                <span>{@film.aspect_ratio} aspect</span>
-                <%= if @film.color do %>
-                  <span>•</span>
-                  <span class="capitalize">{String.replace(to_string(@film.color), "_", " ")}</span>
-                <% end %>
-              </div>
-
-              <div class="text-base text-gray-300 leading-relaxed font-light max-w-prose">
-                {@film.synopsis}
-              </div>
-
-              <div class="text-sm text-gray-400 font-light space-y-2 pt-4 border-t border-gray-900 mt-6">
-                <%= if Enum.any?(@film.directors) do %>
-                  <div>
-                    <span class="text-gray-500 uppercase tracking-wider">Director:</span>
-                    <span class="text-gray-300">{join_names(@film.directors)}</span>
-                  </div>
-                <% end %>
-                <%= if Enum.any?(@film.writers) do %>
-                  <div>
-                    <span class="text-gray-500 uppercase tracking-wider">Writer:</span>
-                    <span class="text-gray-300">{join_names(@film.producers)}</span>
-                  </div>
-                <% end %>
-                <%= if Enum.any?(@film.producers) do %>
-                  <div>
-                    <span class="text-gray-500 uppercase tracking-wider">Producer:</span>
-                    <span class="text-gray-300">{join_names(@film.producers)}</span>
-                  </div>
-                <% end %>
-                <%= if Enum.any?(@film.cast) do %>
-                  <div>
-                    <span class="text-gray-500 uppercase tracking-wider">Cast:</span>
-                    <ul class="text-gray-300 list-disc list-inside">
-                      {join_names_with_roles(@film.cast)}
-                    </ul>
-                  </div>
-                <% end %>
-                <%= if Enum.any?(@film.crew) do %>
-                  <div>
-                    <span class="text-gray-500 uppercase tracking-wider">Crew:</span>
-                    <ul class="text-gray-300 list-disc list-inside">
-                      {join_names_with_roles(@film.crew)}
-                    </ul>
-                  </div>
-                <% end %>
-              </div>
-
-              <%!-- <div class="pt-6">
-                <.button color="tertiary" class="hover:cursor-not-allowed" disabled>
-                  More info
-                </.button>
-              </div> --%>
-            </div>
           <% else %>
-            <!-- Waiting/Countdown (unchanged) -->
-            <div class="text-center text-gray-400 text-xl py-8">
+            <div class="text-center text-gray-400 text-xl py-8 border border-white/10 rounded-xl bg-white/2 min-h-60 flex items-center justify-center">
               <%= if is_nil(@countdown) do %>
                 <div class="flex flex-col items-center justify-center gap-2 text-gray-400">
-                  <h3 class="font-semibold">Loading schedule...</h3>
+                  <h3 class="font-semibold">Finding your seat...</h3>
                   <div class="h-4 w-4 border-2 border-t-transparent border-gray-400 rounded-full animate-spin" />
                 </div>
               <% else %>
@@ -237,13 +165,14 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                         Waiting for playback...
                     <% end %>
                   </h3>
+
                   <div class="flex justify-center gap-x-4 mt-2 text-center">
                     <%= for {label, value} <- breakdown_time(@countdown) do %>
                       <div class="flex flex-col items-center mx-2">
                         <span class={
-                          "text-3xl font-bold" <>
-                          (if label == :seconds and @pulse_seconds_only?, do: " pulse-second text-neon-red-lightest", else: "")
-                        }>
+                  "text-3xl font-bold" <>
+                  if(label == :seconds and @pulse_seconds_only?, do: " pulse-second text-neon-red-lightest", else: "")
+                }>
                           {String.pad_leading(to_string(value), 2, "0")}
                         </span>
                         <span class="text-xs uppercase text-gray-400 tracking-wider">
@@ -256,6 +185,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               <% end %>
             </div>
           <% end %>
+
+          <FilmInfo.film_info film={@film} />
         </div>
         
     <!-- Right: Desktop side panel -->
@@ -694,25 +625,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     else
       filtered
     end
-  end
-
-  defp join_names([]), do: ""
-
-  defp join_names(creatives),
-    do: creatives |> Enum.map(fn %{creative: c} -> Creative.full_name(c) end) |> Enum.join(", ")
-
-  defp join_names_with_roles([]), do: ""
-
-  defp join_names_with_roles(creatives) do
-    creatives
-    |> Enum.map(fn %{creative: c, subrole: r} ->
-      case r do
-        nil -> Creative.full_name(c)
-        "" -> Creative.full_name(c)
-        _ -> "#{Creative.full_name(c)} (#{r})"
-      end
-    end)
-    |> Enum.join(", ")
   end
 
   defp chat_time(%NaiveDateTime{} = ndt), do: chat_time(DateTime.from_naive!(ndt, "Etc/UTC"))
