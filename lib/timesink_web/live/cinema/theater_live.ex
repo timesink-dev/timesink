@@ -184,7 +184,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 <%= if Enum.any?(@film.writers) do %>
                   <div>
                     <span class="text-gray-500 uppercase tracking-wider">Writer:</span>
-                    <span class="text-gray-300">{join_names(@film.producers)}</span>
+                    <span class="text-gray-300">{join_names(@film.writers)}</span>
                   </div>
                 <% end %>
                 <%= if Enum.any?(@film.producers) do %>
