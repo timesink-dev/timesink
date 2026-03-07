@@ -150,7 +150,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             <div class="text-center text-gray-400 text-xl py-8 border border-white/10 rounded-xl bg-white/2 min-h-60 flex items-center justify-center">
               <%= if is_nil(@countdown) do %>
                 <div class="flex flex-col items-center justify-center gap-2 text-gray-400">
-                  <h3 class="font-semibold">Loading schedule...</h3>
+                  <h3 class="font-semibold">Finding your seat...</h3>
                   <div class="h-4 w-4 border-2 border-t-transparent border-gray-400 rounded-full animate-spin" />
                 </div>
               <% else %>
