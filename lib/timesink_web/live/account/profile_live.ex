@@ -4,6 +4,7 @@ defmodule TimesinkWeb.Account.ProfileLive do
   import Ecto.Query
   alias Timesink.{Repo}
   alias Timesink.Account.{User, Profile}
+  alias Timesink.Cinema.FilmCreative
 
   # /u/@username -> param arrives like "@aaron"
   def mount(%{"profile_username" => raw}, _session, socket) do
@@ -17,22 +18,23 @@ defmodule TimesinkWeb.Account.ProfileLive do
       from(u in User,
         where: fragment("LOWER(?) = LOWER(?)", u.username, ^username),
         join: p in assoc(u, :profile),
-        preload: [profile: [avatar: [:blob]], creative: []],
+        preload: [profile: [avatar: [:blob]]],
         limit: 1
       )
       |> Repo.one()
 
+    user = if user, do: Repo.preload(user, :creative), else: nil
+
     case user do
       %User{} = user ->
-        # is_me? = match?(%{id: ^user.id}, socket.assigns[:current_user])
+        films = if user.creative, do: load_films(user.creative.id), else: []
 
         {:ok,
          socket
          |> assign(
            user: user,
-           profile: user.profile
-
-           #  is_me?: is_me?
+           profile: user.profile,
+           creative_films: films
          )}
 
       nil ->
@@ -96,16 +98,16 @@ defmodule TimesinkWeb.Account.ProfileLive do
                 </span>
                 <span
                   :if={@user.creative}
-                  class="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-emerald-400 text-xs font-medium"
+                  class="inline-flex items-center gap-1 rounded-full bg-neon-blue-light border border-neon-blue-primary px-1.5 py-0.5 text-backroom-black text-xs font-medium"
                 >
-                  <.icon name="hero-film" class="h-3 w-3" /> TimeSink Creative
+                  <.icon name="hero-star" class="h-3 w-3" /> TimeSink Creator
                 </span>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+
     <!-- Body -->
       <div class="mx-auto max-w-5xl mt-5 grid grid-cols-1 md:grid-cols-[1.2fr,2fr] gap-5">
         <section class="rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800">
@@ -148,6 +150,32 @@ defmodule TimesinkWeb.Account.ProfileLive do
           </div>
         </section>
       </div>
+
+      <%= if @user.creative && @creative_films != [] do %>
+        <div class="mx-auto max-w-5xl mt-5">
+          <section class="rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800">
+            <div class="px-5 md:px-6 py-3 border-b border-zinc-800 flex items-center gap-2">
+              <.icon name="hero-film" class="h-4 w-4 text-zinc-400" />
+              <h2 class="text-base font-medium text-mystery-white">Filmography</h2>
+            </div>
+            <div class="divide-y divide-zinc-800/60">
+              <%= for {film, role, subrole} <- @creative_films do %>
+                <div class="px-5 md:px-6 py-4 flex items-center justify-between gap-4">
+                  <div>
+                    <p class="text-sm font-medium text-mystery-white">{film.title}</p>
+                    <p class="text-xs text-zinc-500 mt-0.5">
+                      {film.year} · <span class="capitalize">{role}</span>
+                      <%= if subrole && subrole != "" do %>
+                        ({subrole})
+                      <% end %>
+                    </p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </section>
+        </div>
+      <% end %>
     </section>
     """
   end
@@ -206,4 +234,14 @@ defmodule TimesinkWeb.Account.ProfileLive do
   defp h1_size(), do: "text-lg md:text-xl"
   defp card_pad_x(), do: "px-5 md:px-6"
   defp card_pad_y(), do: "py-4"
+
+  defp load_films(creative_id) do
+    from(fc in FilmCreative,
+      where: fc.creative_id == ^creative_id,
+      join: f in assoc(fc, :film),
+      order_by: [desc: f.year],
+      select: {f, fc.role, fc.subrole}
+    )
+    |> Repo.all()
+  end
 end

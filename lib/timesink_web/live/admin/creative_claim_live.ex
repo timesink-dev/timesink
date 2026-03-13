@@ -4,11 +4,19 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
       schema: Timesink.Cinema.CreativeClaim,
       repo: Timesink.Repo,
       update_changeset: &Timesink.Cinema.CreativeClaim.changeset/3,
-      create_changeset: &Timesink.Cinema.CreativeClaim.changeset/3
+      create_changeset: &Timesink.Cinema.CreativeClaim.changeset/3,
+      item_query: &__MODULE__.item_query/3
     ],
     layout: {TimesinkWeb.Layouts, :admin}
 
+  import Ecto.Query, only: [dynamic: 2, join: 5, as: 1]
   alias Timesink.Cinema.CreativeClaims
+
+  def item_query(query, _live_action, _assigns) do
+    query
+    |> join(:left, [claim], c in assoc(claim, :creative), as: :creative)
+    |> join(:left, [claim], u in assoc(claim, :user), as: :member)
+  end
 
   @impl Backpex.LiveResource
   def singular_name, do: "Creative Claim"
@@ -19,6 +27,7 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
   @impl Backpex.LiveResource
   def can?(_assigns, :index, _item), do: true
   def can?(_assigns, :show, _item), do: true
+  def can?(_assigns, :edit, _item), do: true
 
   @impl Backpex.LiveResource
   def can?(_assigns, _action, _item), do: false
@@ -41,28 +50,66 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
   @impl Backpex.LiveResource
   def fields do
     [
-      status: %{
+      creative_name: %{
         module: Backpex.Fields.Text,
+        label: "Creative",
+        except: [:new],
+        readonly: true,
+        select: dynamic([creative: c], fragment("concat(?, ' ', ?)", c.first_name, c.last_name))
+      },
+      member_name: %{
+        module: Backpex.Fields.Text,
+        label: "Member",
+        except: [:new],
+        readonly: true,
+        select: dynamic([member: u], fragment("concat(?, ' ', ?)", u.first_name, u.last_name))
+      },
+      status: %{
+        module: Backpex.Fields.Select,
         label: "Status",
-        except: [:edit, :new]
+        options: fn _assigns ->
+          [
+            {"Pending", :pending},
+            {"Approved", :approved},
+            {"Rejected", :rejected}
+          ]
+        end
       },
       creative_id: %{
         module: Backpex.Fields.Text,
         label: "Creative ID",
-        except: [:edit, :new]
+        readonly: true
       },
       user_id: %{
         module: Backpex.Fields.Text,
         label: "Member ID",
-        except: [:edit, :new]
+        readonly: true
       },
       message: %{
         module: Backpex.Fields.Textarea,
         label: "Message",
-        except: [:edit, :new]
+        readonly: true
       }
     ]
   end
+
+  @impl Backpex.LiveResource
+  def on_item_updated(socket, %Timesink.Cinema.CreativeClaim{} = claim) do
+    claim = Timesink.Repo.preload(claim, [:user, :creative])
+    maybe_handle_status_change(claim)
+    {socket, :ok}
+  end
+
+  defp maybe_handle_status_change(%{status: :approved} = claim) do
+    Timesink.Cinema.Creative.update(claim.creative, %{user_id: claim.user_id})
+    Timesink.Cinema.Mail.send_creative_claim_approved(claim.user, claim.creative)
+  end
+
+  defp maybe_handle_status_change(%{status: :rejected} = claim) do
+    Timesink.Cinema.Mail.send_creative_claim_rejected(claim.user, claim.creative)
+  end
+
+  defp maybe_handle_status_change(_), do: :noop
 end
 
 defmodule TimesinkWeb.Admin.CreativeClaimLive.ApproveAction do

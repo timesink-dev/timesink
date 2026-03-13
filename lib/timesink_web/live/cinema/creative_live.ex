@@ -79,7 +79,7 @@ defmodule TimesinkWeb.Cinema.CreativeLive do
               </span>
             <% end %>
           </div>
-          
+
     <!-- Claim CTA -->
           <%= if is_nil(@creative.user_id) && @current_user && !@already_claimed? && @claim_status != :submitted do %>
             <div class="mt-6 border-t border-zinc-800 pt-5">
@@ -107,7 +107,7 @@ defmodule TimesinkWeb.Cinema.CreativeLive do
                     <.button type="submit" color="primary" class="text-sm">
                       Submit claim
                     </.button>
-                    <.button phx-click="close_claim" type="button" class="text-sm">
+                    <.button phx-click="close_claim" type="button" color="secondary" class="text-sm">
                       Cancel
                     </.button>
                   </div>
@@ -124,7 +124,7 @@ defmodule TimesinkWeb.Cinema.CreativeLive do
             </div>
           <% end %>
         </div>
-        
+
     <!-- Filmography -->
         <div class="mt-5 rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800">
           <div class="px-6 py-3 border-b border-zinc-800">

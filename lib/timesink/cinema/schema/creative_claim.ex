@@ -27,12 +27,15 @@ defmodule Timesink.Cinema.CreativeClaim do
     field :status, Ecto.Enum, values: @statuses, default: :pending
     field :message, :string
 
+    field :creative_name, :string, virtual: true
+    field :member_name, :string, virtual: true
+
     timestamps(type: :utc_datetime)
   end
 
   def changeset(claim, params, _metadata \\ []) do
     claim
-    |> cast(params, [:user_id, :creative_id, :message])
+    |> cast(params, [:user_id, :creative_id, :message, :status])
     |> validate_required([:user_id, :creative_id])
     |> assoc_constraint(:user)
     |> assoc_constraint(:creative)
