@@ -9,7 +9,7 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
     ],
     layout: {TimesinkWeb.Layouts, :admin}
 
-  import Ecto.Query, only: [dynamic: 2, join: 5, as: 1]
+  import Ecto.Query, only: [dynamic: 2, join: 5]
   alias Timesink.Cinema.CreativeClaims
 
   def item_query(query, _live_action, _assigns) do
@@ -27,7 +27,8 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
   @impl Backpex.LiveResource
   def can?(_assigns, :index, _item), do: true
   def can?(_assigns, :show, _item), do: true
-  def can?(_assigns, :edit, _item), do: true
+  def can?(_assigns, :approve, _item), do: true
+  def can?(_assigns, :reject, _item), do: true
 
   @impl Backpex.LiveResource
   def can?(_assigns, _action, _item), do: false
@@ -38,11 +39,11 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
       [
         approve: %{
           module: TimesinkWeb.Admin.CreativeClaimLive.ApproveAction,
-          only: [:row]
+          only: [:row, :index, :show]
         },
         reject: %{
           module: TimesinkWeb.Admin.CreativeClaimLive.RejectAction,
-          only: [:row]
+          only: [:row, :index, :show]
         }
       ]
   end
@@ -74,6 +75,7 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
       status: %{
         module: Backpex.Fields.Select,
         label: "Status",
+        except: [:edit, :new],
         options: fn _assigns ->
           [
             {"Pending", :pending},
@@ -101,22 +103,9 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
   end
 
   @impl Backpex.LiveResource
-  def on_item_updated(socket, %Timesink.Cinema.CreativeClaim{} = claim) do
-    claim = Timesink.Repo.preload(claim, [:user, :creative])
-    maybe_handle_status_change(claim)
+  def on_item_updated(socket, %Timesink.Cinema.CreativeClaim{}) do
     {socket, :ok}
   end
-
-  defp maybe_handle_status_change(%{status: :approved} = claim) do
-    Timesink.Cinema.Creative.update(claim.creative, %{user_id: claim.user_id})
-    Timesink.Cinema.Mail.send_creative_claim_approved(claim.user, claim.creative)
-  end
-
-  defp maybe_handle_status_change(%{status: :rejected} = claim) do
-    Timesink.Cinema.Mail.send_creative_claim_rejected(claim.user, claim.creative)
-  end
-
-  defp maybe_handle_status_change(_), do: :noop
 end
 
 defmodule TimesinkWeb.Admin.CreativeClaimLive.ApproveAction do
