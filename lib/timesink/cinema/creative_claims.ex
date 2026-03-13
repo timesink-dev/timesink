@@ -38,7 +38,13 @@ defmodule Timesink.Cinema.CreativeClaims do
     claim = Repo.preload(claim, [:user, :creative])
 
     Repo.transaction(fn ->
-      with {:ok, _creative} <- Creative.update(claim.creative, %{user_id: claim.user_id}),
+      fresh_creative = Repo.get!(Creative, claim.creative_id)
+
+      if fresh_creative.user_id != nil do
+        Repo.rollback(:creative_already_claimed)
+      end
+
+      with {:ok, _creative} <- Creative.update(fresh_creative, %{user_id: claim.user_id}),
            {:ok, approved_claim} <- CreativeClaim.update(claim, %{status: :approved}) do
         # Reject all other pending claims for this creative
         from(c in CreativeClaim,

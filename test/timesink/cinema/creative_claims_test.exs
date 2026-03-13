@@ -89,6 +89,18 @@ defmodule Timesink.Cinema.CreativeClaimsTest do
       assert Repo.get!(CreativeClaim, claim3.id).status == :rejected
     end
 
+    test "returns error if creative is already linked to another user" do
+      user1 = insert(:user)
+      user2 = insert(:user)
+      creative = insert(:creative)
+
+      {:ok, claim1} = CreativeClaims.submit_claim(user1, creative.id)
+      {:ok, claim2} = CreativeClaims.submit_claim(user2, creative.id)
+
+      assert {:ok, _} = CreativeClaims.approve_claim(claim1)
+      assert {:error, :creative_already_claimed} = CreativeClaims.approve_claim(claim2)
+    end
+
     test "links creative to user so user has_one :creative association" do
       user = insert(:user)
       creative = insert(:creative)

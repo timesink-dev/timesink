@@ -148,6 +148,9 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive.ApproveAction do
       {:ok, _claim} ->
         socket |> put_flash(:info, "Claim approved.") |> ok()
 
+      {:error, :creative_already_claimed} ->
+        socket |> put_flash(:error, "This creative is already linked to another account.") |> ok()
+
       {:error, _reason} ->
         socket |> put_flash(:error, "Could not approve claim.") |> ok()
     end
