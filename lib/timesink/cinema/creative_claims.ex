@@ -64,7 +64,7 @@ defmodule Timesink.Cinema.CreativeClaims do
     claim = Repo.preload(claim, [:user, :creative])
 
     with {:ok, rejected_claim} <-
-           CreativeClaim.update(claim, CreativeClaim.status_changeset(claim, :rejected)) do
+           CreativeClaim.update(claim, %{status: :rejected}) do
       Mail.send_creative_claim_rejected(claim.user, claim.creative)
       {:ok, rejected_claim}
     end
