@@ -26,7 +26,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             Access opens in carefully curated waves.
           </p>
         </div>
-        
+
     <!-- Success State -->
         <div
           :if={@sent?}
@@ -42,7 +42,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             <a href="/">Return home</a>
           </.button>
         </div>
-        
+
     <!-- Waitlist Form -->
         <.simple_form
           :if={!@sent?}
@@ -87,7 +87,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
           </:actions>
         </.simple_form>
       </div>
-      
+
     <!-- Status Block Outside Card -->
       <div
         :if={!@sent?}
@@ -120,29 +120,29 @@ defmodule TimesinkWeb.WaitlistFormComponent do
       send(self(), :applicant_joined)
       {:noreply, socket}
     else
-    case Timesink.Waitlist.join(applicant_params) do
-      {:ok, _applicant} ->
-        send(self(), :applicant_joined)
-        {:noreply, socket}
+      case Timesink.Waitlist.join(applicant_params) do
+        {:ok, _applicant} ->
+          send(self(), :applicant_joined)
+          {:noreply, socket}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        error_message =
-          changeset
-          |> Ecto.Changeset.traverse_errors(&translate_error/1)
-          |> Map.get(:email)
-          |> Enum.at(0, "There was an error. Please try again.")
+        {:error, %Ecto.Changeset{} = changeset} ->
+          error_message =
+            changeset
+            |> Ecto.Changeset.traverse_errors(&translate_error/1)
+            |> Map.get(:email)
+            |> Enum.at(0, "There was an error. Please try again.")
 
-        socket =
-          socket
-          |> assign(:email, applicant_params["email"])
-          |> assign(:form, to_form(%{changeset | action: :insert}))
-          |> put_flash!(
-            :error,
-            error_message
-          )
+          socket =
+            socket
+            |> assign(:email, applicant_params["email"])
+            |> assign(:form, to_form(%{changeset | action: :insert}))
+            |> put_flash!(
+              :error,
+              error_message
+            )
 
-        {:noreply, socket}
-    end
+          {:noreply, socket}
+      end
     end
   end
 end
