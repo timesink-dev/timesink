@@ -29,6 +29,7 @@ defmodule Timesink.Cinema.CreativeClaim do
 
     field :creative_name, :string, virtual: true
     field :member_name, :string, virtual: true
+    field :username, :string, virtual: true
 
     timestamps(type: :utc_datetime)
   end

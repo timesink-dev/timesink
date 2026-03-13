@@ -64,6 +64,13 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
         readonly: true,
         select: dynamic([member: u], fragment("concat(?, ' ', ?)", u.first_name, u.last_name))
       },
+      username: %{
+        module: Backpex.Fields.Text,
+        label: "Username",
+        except: [:new],
+        readonly: true,
+        select: dynamic([member: u], u.username)
+      },
       status: %{
         module: Backpex.Fields.Select,
         label: "Status",
