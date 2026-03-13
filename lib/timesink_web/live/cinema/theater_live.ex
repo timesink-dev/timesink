@@ -107,7 +107,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
         <p class="text-zinc-400 mt-2 text-sm">{@theater.description}</p>
       </div>
-
+      
     <!-- Toolbar -->
       <div class="flex justify-between items-center mb-4">
         <div></div>
@@ -123,7 +123,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           {if @chat_open, do: "Hide Chat", else: "Show Chat"}
         </button>
       </div>
-
+      
     <!-- Main layout (mobile-first: stacked) -->
       <div class="flex flex-col md:flex-row md:gap-6 md:items-start">
         <!-- Left: Player + Film Info -->
@@ -188,7 +188,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
           <FilmInfo.film_info film={@film} />
         </div>
-
+        
     <!-- Right: Desktop side panel -->
         <aside class={
           [
@@ -266,7 +266,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     <% end %>
                   </ul>
                 <% end %>
-
+                
     <!-- TYPING -->
                 <%= if map_size(@typing_users) > 0 do %>
                   <div class="px-4 py-2 text-xs text-zinc-400 border-t border-white/5">
@@ -274,7 +274,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   </div>
                 <% end %>
               </div>
-
+              
     <!-- INPUT (outside scroll area) -->
               <form phx-submit="chat:send" class="p-3 border-t border-white/10">
                 <div class="flex items-center gap-2">
@@ -294,7 +294,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 </div>
               </form>
             </div>
-
+            
     <!-- Live Audience Tab Content -->
             <div class={[
               "max-h-[65vh] overflow-y-auto p-3",
@@ -330,7 +330,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           </div>
         </aside>
       </div>
-
+      
     <!-- Mobile chat drawer -->
       <div class={[
         "md:hidden fixed inset-0 z-50 flex items-end transition-opacity duration-200",
@@ -338,7 +338,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       ]}>
         <!-- backdrop -->
         <div class="absolute inset-0 bg-black/70" phx-click="toggle_chat" aria-hidden="true"></div>
-
+        
     <!-- sheet -->
         <div class={[
           "relative w-full rounded-t-2xl border-t border-white/10 bg-backroom-black transition-transform duration-300 ease-out",
@@ -413,7 +413,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   <% end %>
                 <% end %>
               </div>
-
+              
     <!-- Mobile Live Audience Tab Content -->
               <div class={[
                 "p-3",
