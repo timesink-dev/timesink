@@ -58,6 +58,55 @@ defmodule Timesink.Cinema.Mail do
     end
   end
 
+  def send_creative_claim_notification(user, creative) do
+    subject = "Creative claim submitted: #{creative.first_name} #{creative.last_name}"
+
+    body = """
+    A TimeSink member has submitted a claim for a creative profile.
+
+    Member: #{user.first_name} #{user.last_name} (#{user.email})
+    Creative: #{creative.first_name} #{creative.last_name}
+
+    Review and approve or reject this claim in the admin panel:
+    #{base_url()}/admin/creative-claims
+    """
+
+    send_mail("hello@timesinkpresents.com", subject, body)
+  end
+
+  def send_creative_claim_approved(user, creative) do
+    subject = "Your TimeSink Creative profile has been verified"
+
+    body = """
+    Hi #{user.first_name},
+
+    Great news — your claim for the creative profile "#{creative.first_name} #{creative.last_name}" has been approved.
+
+    Your TimeSink profile now reflects your status as a verified creative. Your name will appear as a link in film credits where your work is listed.
+
+    See you in the theater,
+    The TimeSink Team
+    """
+
+    send_mail(user.email, subject, body)
+  end
+
+  def send_creative_claim_rejected(user, creative) do
+    subject = "Update on your TimeSink Creative claim"
+
+    body = """
+    Hi #{user.first_name},
+
+    Thank you for submitting a claim for the creative profile "#{creative.first_name} #{creative.last_name}."
+
+    After review, we were unable to verify this claim at this time. If you believe this is a mistake or have additional information to share, please reply to this email.
+
+    The TimeSink Team
+    """
+
+    send_mail(user.email, subject, body)
+  end
+
   defp base_url do
     Application.fetch_env!(:timesink, :base_url)
   end

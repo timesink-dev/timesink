@@ -48,35 +48,39 @@ defmodule TimesinkWeb.Components.FilmInfo do
         <%= if Enum.any?(@film.directors) do %>
           <div>
             <span class="text-gray-500 uppercase tracking-wider">Director:</span>
-            <span class="text-gray-300">{join_names(@film.directors)}</span>
+            <span class="text-gray-300"><.creative_names film_creatives={@film.directors} /></span>
           </div>
         <% end %>
 
         <%= if Enum.any?(@film.writers) do %>
           <div>
             <span class="text-gray-500 uppercase tracking-wider">Writer:</span>
-            <span class="text-gray-300">{join_names(@film.writers)}</span>
+            <span class="text-gray-300"><.creative_names film_creatives={@film.writers} /></span>
           </div>
         <% end %>
 
         <%= if Enum.any?(@film.producers) do %>
           <div>
             <span class="text-gray-500 uppercase tracking-wider">Producer:</span>
-            <span class="text-gray-300">{join_names(@film.producers)}</span>
+            <span class="text-gray-300"><.creative_names film_creatives={@film.producers} /></span>
           </div>
         <% end %>
 
         <%= if Enum.any?(@film.cast) do %>
           <div>
             <span class="text-gray-500 uppercase tracking-wider">Cast:</span>
-            <div class="text-gray-300">{join_names_with_roles(@film.cast)}</div>
+            <div class="text-gray-300">
+              <.creative_names film_creatives={@film.cast} with_roles />
+            </div>
           </div>
         <% end %>
 
         <%= if Enum.any?(@film.crew) do %>
           <div>
             <span class="text-gray-500 uppercase tracking-wider">Crew:</span>
-            <div class="text-gray-300">{join_names_with_roles(@film.crew)}</div>
+            <div class="text-gray-300">
+              <.creative_names film_creatives={@film.crew} with_roles />
+            </div>
           </div>
         <% end %>
       </div>
@@ -84,25 +88,36 @@ defmodule TimesinkWeb.Components.FilmInfo do
     """
   end
 
-  defp join_names([]), do: ""
+  attr :film_creatives, :list, required: true
+  attr :with_roles, :boolean, default: false
 
-  defp join_names(creatives) do
-    creatives
-    |> Enum.map(fn %{creative: c} -> Creative.full_name(c) end)
-    |> Enum.join(", ")
+  defp creative_names(assigns) do
+    ~H"""
+    <%= for {fc, idx} <- Enum.with_index(@film_creatives) do %>
+      {if idx > 0, do: ", "}
+      <%= if fc.creative.user do %>
+        <.link
+          navigate={"/@#{fc.creative.user.username}"}
+          class="hover:text-mystery-white transition-colors"
+        >
+          {creative_label(fc, @with_roles)}
+        </.link>
+      <% else %>
+        <.link
+          navigate={"/creatives/#{fc.creative.id}"}
+          class="hover:text-mystery-white transition-colors"
+        >
+          {creative_label(fc, @with_roles)}
+        </.link>
+      <% end %>
+    <% end %>
+    """
   end
 
-  defp join_names_with_roles([]), do: ""
-
-  defp join_names_with_roles(creatives) do
-    creatives
-    |> Enum.map(fn %{creative: c, subrole: r} ->
-      case r do
-        nil -> Creative.full_name(c)
-        "" -> Creative.full_name(c)
-        _ -> "#{Creative.full_name(c)} (#{r})"
-      end
-    end)
-    |> Enum.join(", ")
+  defp creative_label(%{creative: c, subrole: r}, _with_roles = true) do
+    name = Creative.full_name(c)
+    if r && r != "", do: "#{name} (#{r})", else: name
   end
+
+  defp creative_label(%{creative: c}, _with_roles), do: Creative.full_name(c)
 end

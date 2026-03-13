@@ -38,11 +38,11 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           {:video, [:blob]},
           {:poster, [:blob]},
           :genres,
-          directors: [:creative],
-          cast: [:creative],
-          writers: [:creative],
-          producers: [:creative],
-          crew: [:creative]
+          directors: [creative: [:user]],
+          cast: [creative: [:user]],
+          writers: [creative: [:user]],
+          producers: [creative: [:user]],
+          crew: [creative: [:user]]
         ])
 
       if connected?(socket) do
@@ -115,7 +115,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           phx-click="toggle_chat"
           class={[
             @chat_open && "invisible md:visible",
-            "cursor-pointer text-sm px-4 py-2 rounded-lg border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-gray-300 hover:text-white transition"
+            "cursor-pointer text-sm px-4 py-2 rounded-lg border border-white/10 bg-white/2 hover:bg-white/6 text-gray-300 hover:text-white transition"
           ]}
           aria-haspopup="dialog"
           aria-expanded="false"

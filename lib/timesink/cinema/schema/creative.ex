@@ -9,14 +9,14 @@ defmodule Timesink.Cinema.Creative do
           first_name: :string,
           last_name: :string,
           full_name: :string,
-          profile: Timesink.Account.Profile.t()
+          user: Timesink.Account.User.t() | nil
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
   schema "creative" do
-    belongs_to :profile, Timesink.Account.Profile
+    belongs_to :user, Timesink.Account.User
 
     field :first_name, :string
     field :last_name, :string
@@ -27,7 +27,7 @@ defmodule Timesink.Cinema.Creative do
 
   def changeset(creative, params, _metadata \\ []) do
     creative
-    |> cast(params, [:first_name, :last_name])
+    |> cast(params, [:first_name, :last_name, :user_id])
     |> validate_required([:first_name, :last_name])
     |> validate_length(:first_name, min: 2)
     |> validate_length(:last_name, min: 2)

@@ -104,6 +104,7 @@ defmodule TimesinkWeb.Router do
       live_resources "/members", Admin.UserLive
       live_resources "/film-submissions", Admin.FilmSubmissionLive
       live_resources "/creatives", Admin.CreativeLive
+      live_resources "/creative-claims", Admin.CreativeClaimLive
       live_resources "/film_creatives", Admin.FilmCreativeLive
     end
   end
@@ -135,6 +136,7 @@ defmodule TimesinkWeb.Router do
       live "/archives", Cinema.ArchivesLive
       live "/upcoming", Cinema.UpcomingLive
       live "/now-playing", Cinema.NowPlayingLive
+      live "/creatives/:id", Cinema.CreativeLive
       live "/@:profile_username", Account.ProfileLive
     end
   end

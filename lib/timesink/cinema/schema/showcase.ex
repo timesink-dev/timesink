@@ -59,11 +59,11 @@ defmodule Timesink.Cinema.Showcase do
               {:poster, [:blob]},
               # {:video, [:blob]}, # optional if not needed in archives
               :genres,
-              directors: [:creative],
-              writers: [:creative],
-              producers: [:creative],
-              cast: [:creative],
-              crew: [:creative]
+              directors: [creative: [:user]],
+              writers: [creative: [:user]],
+              producers: [creative: [:user]],
+              cast: [creative: [:user]],
+              crew: [creative: [:user]]
             ]
           ]
         ]
@@ -89,11 +89,11 @@ defmodule Timesink.Cinema.Showcase do
             film: [
               {:poster, [:blob]},
               :genres,
-              directors: [:creative],
-              writers: [:creative],
-              producers: [:creative],
-              cast: [:creative],
-              crew: [:creative]
+              directors: [creative: [:user]],
+              writers: [creative: [:user]],
+              producers: [creative: [:user]],
+              cast: [creative: [:user]],
+              crew: [creative: [:user]]
             ]
           ]
         ]

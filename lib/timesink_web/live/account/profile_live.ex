@@ -4,6 +4,7 @@ defmodule TimesinkWeb.Account.ProfileLive do
   import Ecto.Query
   alias Timesink.{Repo}
   alias Timesink.Account.{User, Profile}
+  alias Timesink.Cinema.FilmCreative
 
   # /u/@username -> param arrives like "@aaron"
   def mount(%{"profile_username" => raw}, _session, socket) do
@@ -17,23 +18,23 @@ defmodule TimesinkWeb.Account.ProfileLive do
       from(u in User,
         where: fragment("LOWER(?) = LOWER(?)", u.username, ^username),
         join: p in assoc(u, :profile),
-        # ← no :location here
         preload: [profile: [avatar: [:blob]]],
         limit: 1
       )
       |> Repo.one()
 
+    user = if user, do: Repo.preload(user, :creative), else: nil
+
     case user do
       %User{} = user ->
-        # is_me? = match?(%{id: ^user.id}, socket.assigns[:current_user])
+        films = if user.creative, do: load_films(user.creative.id), else: []
 
         {:ok,
          socket
          |> assign(
            user: user,
-           profile: user.profile
-
-           #  is_me?: is_me?
+           profile: user.profile,
+           creative_films: films
          )}
 
       nil ->
@@ -95,6 +96,22 @@ defmodule TimesinkWeb.Account.ProfileLive do
                 >
                   <.icon name="hero-map-pin" class="h-3.5 w-3.5" /> {location_label(@profile)}
                 </span>
+                <span :if={@user.creative} class="inline-flex gap-x-1 font-medium">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-neon-blue-lightest shrink-0"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <span class="text-sm font-medium text-neon-blue-lightest">TimeSink Creator</span>
+                </span>
               </div>
             </div>
           </div>
@@ -143,6 +160,32 @@ defmodule TimesinkWeb.Account.ProfileLive do
           </div>
         </section>
       </div>
+
+      <%= if @user.creative && @creative_films != [] do %>
+        <div class="mx-auto max-w-5xl mt-5">
+          <section class="rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800">
+            <div class="px-5 md:px-6 py-3 border-b border-zinc-800 flex items-center gap-2">
+              <.icon name="hero-film" class="h-4 w-4 text-zinc-400" />
+              <h2 class="text-base font-medium text-mystery-white">Filmography</h2>
+            </div>
+            <div class="divide-y divide-zinc-800/60">
+              <%= for {film, role, subrole} <- @creative_films do %>
+                <div class="px-5 md:px-6 py-4 flex items-center justify-between gap-4">
+                  <div>
+                    <p class="text-sm font-medium text-mystery-white">{film.title}</p>
+                    <p class="text-xs text-zinc-500 mt-0.5">
+                      {film.year} · <span class="capitalize">{role}</span>
+                      <%= if subrole && subrole != "" do %>
+                        ({subrole})
+                      <% end %>
+                    </p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </section>
+        </div>
+      <% end %>
     </section>
     """
   end
@@ -201,4 +244,14 @@ defmodule TimesinkWeb.Account.ProfileLive do
   defp h1_size(), do: "text-lg md:text-xl"
   defp card_pad_x(), do: "px-5 md:px-6"
   defp card_pad_y(), do: "py-4"
+
+  defp load_films(creative_id) do
+    from(fc in FilmCreative,
+      where: fc.creative_id == ^creative_id,
+      join: f in assoc(fc, :film),
+      order_by: [desc: f.year],
+      select: {f, fc.role, fc.subrole}
+    )
+    |> Repo.all()
+  end
 end
