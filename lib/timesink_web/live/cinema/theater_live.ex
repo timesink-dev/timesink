@@ -38,11 +38,11 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           {:video, [:blob]},
           {:poster, [:blob]},
           :genres,
-          directors: [:creative],
-          cast: [:creative],
-          writers: [:creative],
-          producers: [:creative],
-          crew: [:creative]
+          directors: [creative: [:user]],
+          cast: [creative: [:user]],
+          writers: [creative: [:user]],
+          producers: [creative: [:user]],
+          crew: [creative: [:user]]
         ])
 
       if connected?(socket) do

@@ -17,8 +17,7 @@ defmodule TimesinkWeb.Account.ProfileLive do
       from(u in User,
         where: fragment("LOWER(?) = LOWER(?)", u.username, ^username),
         join: p in assoc(u, :profile),
-        # ← no :location here
-        preload: [profile: [avatar: [:blob]]],
+        preload: [profile: [avatar: [:blob]], creative: []],
         limit: 1
       )
       |> Repo.one()
@@ -94,6 +93,12 @@ defmodule TimesinkWeb.Account.ProfileLive do
                   class="inline-flex items-center gap-1 rounded-full bg-zinc-800/70 px-2.5 py-0.5 text-zinc-300 ring-1 ring-zinc-700 text-xs"
                 >
                   <.icon name="hero-map-pin" class="h-3.5 w-3.5" /> {location_label(@profile)}
+                </span>
+                <span
+                  :if={@user.creative}
+                  class="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-emerald-400 text-xs font-medium"
+                >
+                  <.icon name="hero-film" class="h-3 w-3" /> TimeSink Creative
                 </span>
               </div>
             </div>

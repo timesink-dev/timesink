@@ -123,8 +123,8 @@ defmodule Timesink.Cinema do
         video: [:blob],
         poster: [:blob],
         trailer: [:blob],
-        directors: [:creative],
-        cast: [:creative]
+        directors: [creative: [:user]],
+        cast: [creative: [:user]]
       ]
     ])
   end
