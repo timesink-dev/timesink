@@ -16,6 +16,7 @@ defmodule TimesinkWeb.Admin.WaitlistLive do
 
   @impl Backpex.LiveResource
   def can?(_assigns, :index, _item), do: true
+  def can?(_assigns, :delete, _item), do: true
 
   @impl Backpex.LiveResource
   def can?(_assigns, _action, _item), do: false

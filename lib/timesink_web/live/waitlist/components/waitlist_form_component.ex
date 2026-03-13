@@ -52,6 +52,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
           phx-target={@myself}
           class="mt-8 mb-4 w-full md:flex md:justify-center gap-x-4 h-full md:items-end animate-fade-in"
         >
+          <input type="text" name="website" autocomplete="off" tabindex="-1" class="hidden" />
           <div class="w-full flex flex-col gap-y-2">
             <div class="flex gap-x-2">
               <.input
@@ -113,7 +114,12 @@ defmodule TimesinkWeb.WaitlistFormComponent do
     """
   end
 
-  def handle_event("save", %{"applicant" => applicant_params}, socket) do
+  def handle_event("save", %{"applicant" => applicant_params} = params, socket) do
+    # Honeypot drop (treat as success to avoid tipping off bots)
+    if Map.get(params, "website", "") != "" do
+      send(self(), :applicant_joined)
+      {:noreply, socket}
+    else
     case Timesink.Waitlist.join(applicant_params) do
       {:ok, _applicant} ->
         send(self(), :applicant_joined)
@@ -136,6 +142,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
           )
 
         {:noreply, socket}
+    end
     end
   end
 end
