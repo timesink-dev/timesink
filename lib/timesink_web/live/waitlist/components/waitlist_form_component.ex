@@ -26,7 +26,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             Access opens in carefully curated waves.
           </p>
         </div>
-
+        
     <!-- Success State -->
         <div
           :if={@sent?}
@@ -42,7 +42,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
             <a href="/">Return home</a>
           </.button>
         </div>
-
+        
     <!-- Waitlist Form -->
         <.simple_form
           :if={!@sent?}
@@ -87,7 +87,7 @@ defmodule TimesinkWeb.WaitlistFormComponent do
           </:actions>
         </.simple_form>
       </div>
-
+      
     <!-- Status Block Outside Card -->
       <div
         :if={!@sent?}
