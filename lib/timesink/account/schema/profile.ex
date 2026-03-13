@@ -39,8 +39,6 @@ defmodule Timesink.Account.Profile do
 
     embeds_one :location, Account.Location
 
-    has_one :creative, Timesink.Cinema.Creative
-
     timestamps(type: :utc_datetime)
   end
 

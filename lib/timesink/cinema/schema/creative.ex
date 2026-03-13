@@ -9,14 +9,14 @@ defmodule Timesink.Cinema.Creative do
           first_name: :string,
           last_name: :string,
           full_name: :string,
-          profile: Timesink.Account.Profile.t()
+          user: Timesink.Account.User.t() | nil
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
   schema "creative" do
-    belongs_to :profile, Timesink.Account.Profile
+    belongs_to :user, Timesink.Account.User
 
     field :first_name, :string
     field :last_name, :string
