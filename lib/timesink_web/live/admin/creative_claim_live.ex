@@ -25,15 +25,17 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
 
   @impl Backpex.LiveResource
   def item_actions(default_actions) do
-    default_actions
-    |> Map.put(:approve, %{
-      module: TimesinkWeb.Admin.CreativeClaimLive.ApproveAction,
-      only: [:pending]
-    })
-    |> Map.put(:reject, %{
-      module: TimesinkWeb.Admin.CreativeClaimLive.RejectAction,
-      only: [:pending]
-    })
+    default_actions ++
+      [
+        approve: %{
+          module: TimesinkWeb.Admin.CreativeClaimLive.ApproveAction,
+          only: [:row]
+        },
+        reject: %{
+          module: TimesinkWeb.Admin.CreativeClaimLive.RejectAction,
+          only: [:row]
+        }
+      ]
   end
 
   @impl Backpex.LiveResource
@@ -64,35 +66,69 @@ defmodule TimesinkWeb.Admin.CreativeClaimLive do
 end
 
 defmodule TimesinkWeb.Admin.CreativeClaimLive.ApproveAction do
-  use Backpex.ItemAction
+  use BackpexWeb, :item_action
 
   alias Timesink.Cinema.CreativeClaims
 
   @impl Backpex.ItemAction
-  def label(_assigns), do: "Approve"
+  def icon(assigns, _item) do
+    ~H"""
+    <Backpex.HTML.CoreComponents.icon
+      name="hero-check"
+      class="h-5 w-5 cursor-pointer transition duration-75 hover:scale-110 hover:text-emerald-500"
+    />
+    """
+  end
 
   @impl Backpex.ItemAction
-  def handle(_socket, item, _params) do
+  def label(_assigns, _item), do: "Approve"
+
+  @impl Backpex.ItemAction
+  def confirm(_assigns),
+    do:
+      "Are you sure you want to approve this claim? This will link the creative to the member's account."
+
+  @impl Backpex.ItemAction
+  def handle(socket, [item | _], _params) do
     case CreativeClaims.approve_claim(item) do
-      {:ok, _claim} -> {:ok, "Claim approved."}
-      {:error, _reason} -> {:error, "Could not approve claim."}
+      {:ok, _claim} ->
+        socket |> put_flash(:info, "Claim approved.") |> ok()
+
+      {:error, _reason} ->
+        socket |> put_flash(:error, "Could not approve claim.") |> ok()
     end
   end
 end
 
 defmodule TimesinkWeb.Admin.CreativeClaimLive.RejectAction do
-  use Backpex.ItemAction
+  use BackpexWeb, :item_action
 
   alias Timesink.Cinema.CreativeClaims
 
   @impl Backpex.ItemAction
-  def label(_assigns), do: "Reject"
+  def icon(assigns, _item) do
+    ~H"""
+    <Backpex.HTML.CoreComponents.icon
+      name="hero-x-mark"
+      class="h-5 w-5 cursor-pointer transition duration-75 hover:scale-110 hover:text-red-500"
+    />
+    """
+  end
 
   @impl Backpex.ItemAction
-  def handle(_socket, item, _params) do
+  def label(_assigns, _item), do: "Reject"
+
+  @impl Backpex.ItemAction
+  def confirm(_assigns), do: "Are you sure you want to reject this claim?"
+
+  @impl Backpex.ItemAction
+  def handle(socket, [item | _], _params) do
     case CreativeClaims.reject_claim(item) do
-      {:ok, _claim} -> {:ok, "Claim rejected."}
-      {:error, _reason} -> {:error, "Could not reject claim."}
+      {:ok, _claim} ->
+        socket |> put_flash(:info, "Claim rejected.") |> ok()
+
+      {:error, _reason} ->
+        socket |> put_flash(:error, "Could not reject claim.") |> ok()
     end
   end
 end
