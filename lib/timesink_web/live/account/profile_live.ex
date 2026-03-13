@@ -107,7 +107,7 @@ defmodule TimesinkWeb.Account.ProfileLive do
           </div>
         </div>
       </div>
-
+      
     <!-- Body -->
       <div class="mx-auto max-w-5xl mt-5 grid grid-cols-1 md:grid-cols-[1.2fr,2fr] gap-5">
         <section class="rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800">
