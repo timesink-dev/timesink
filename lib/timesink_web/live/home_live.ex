@@ -77,8 +77,104 @@ defmodule TimesinkWeb.HomepageLive do
         phx-hook="ScrollObserver"
       />
 
+      <%= cond do %>
+        <% @showcase -> %>
+          <.live_component
+            id="theater-showcase"
+            module={TheaterShowcaseComponent}
+            showcase={@showcase}
+            exhibitions={@exhibitions}
+            presence={@presence}
+            playback_states={@playback_states}
+            timezone={@timezone}
+          />
+        <% @upcoming_showcase -> %>
+          <section class="relative isolate">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+              <div class="overflow-hidden rounded-3xl border border-white/10 bg-white/2 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
+                <div class="grid grid-cols-1 md:grid-cols-5">
+                  <!-- Image side -->
+                  <div class="relative md:col-span-3 min-h-[260px] md:min-h-[340px]">
+                    <img
+                      src={~p"/images/upcoming_showcase.webp"}
+                      alt="Upcoming showcase"
+                      class="absolute inset-0 h-full w-full object-cover"
+                    />
+                    
+    <!-- Overlays for readability -->
+                    <div class="absolute inset-0 bg-linear-to-r from-backroom-black/90 via-backroom-black/55 to-transparent">
+                    </div>
+                    <div class="absolute inset-0 bg-linear-to-t from-backroom-black/70 via-transparent to-backroom-black/20">
+                    </div>
+
+                    <div class="relative p-6 md:p-8">
+                      <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/6 px-3 py-1">
+                        <span class="h-2 w-2 rounded-full bg-neon-red-light animate-pulse"></span>
+                        <span class="text-xs uppercase tracking-wider text-zinc-200">
+                          Upcoming showcase
+                        </span>
+                      </div>
+
+                      <h2 class="mt-4 text-2xl md:text-xl font-semibold tracking-tight text-white">
+                        {@upcoming_showcase.title}
+                      </h2>
+
+                      <p class="mt-3 max-w-xl text-sm md:text-base text-zinc-200/80">
+                        {@upcoming_showcase.description}
+                      </p>
+                    </div>
+                  </div>
+                  
+    <!-- Details side -->
+                  <div class="md:col-span-2 p-6 md:p-8 bg-backroom-black/60">
+                    <p class="text-xs uppercase tracking-wider text-zinc-400">Starts</p>
+
+                    <p class="mt-2 text-lg md:text-xl font-medium text-white">
+                      {format_datetime_in_timezone(@upcoming_showcase.start_at, @timezone)}
+                      <span class="text-zinc-400 text-sm font-normal">
+                        ({extract_city_from_timezone(@timezone)})
+                      </span>
+                    </p>
+
+                    <p class="mt-3 text-sm text-zinc-400">
+                      TimeSink opens its doors. No easing in. No settling down.
+                    </p>
+
+                    <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                      <button
+                        type="button"
+                        phx-click={show_modal("showcase-info-modal")}
+                        class="inline-flex items-center justify-center rounded border border-white/15 bg-white/6 px-4.5 py-2 text-sm text-white transition hover:bg-white/10 hover:border-white/25 cursor-pointer"
+                      >
+                        Learn more
+                      </button>
+
+                      <button
+                        type="button"
+                        phx-click={show_modal("newsletter-modal")}
+                        class="inline-flex items-center justify-center rounded bg-white text-backroom-black px-4.5 py-2 text-sm font-medium transition hover:opacity-90 cursor-pointer"
+                      >
+                        Get notified
+                      </button>
+                    </div>
+
+                    <div class="mt-6 border-t border-white/10 pt-5">
+                      <p class="text-xs uppercase tracking-wider text-zinc-400">What to expect</p>
+                      <p class="mt-2 text-sm text-zinc-400">
+                        A curated drop. Live chat in every room. A night where everything begins.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        <% @no_showcase -> %>
+          <.no_showcase />
+      <% end %>
+
       <div id="bridge" class="relative isolate">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-32">
           <!-- value proposition -->
           <div class="text-center mb-10">
             <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">
@@ -234,101 +330,6 @@ defmodule TimesinkWeb.HomepageLive do
         </div>
       </div>
 
-      <%= cond do %>
-        <% @showcase -> %>
-          <.live_component
-            id="theater-showcase"
-            module={TheaterShowcaseComponent}
-            showcase={@showcase}
-            exhibitions={@exhibitions}
-            presence={@presence}
-            playback_states={@playback_states}
-            timezone={@timezone}
-          />
-        <% @upcoming_showcase -> %>
-          <section class="relative isolate">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 md:py-12">
-              <div class="overflow-hidden rounded-3xl border border-white/10 bg-white/2 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
-                <div class="grid grid-cols-1 md:grid-cols-5">
-                  <!-- Image side -->
-                  <div class="relative md:col-span-3 min-h-[260px] md:min-h-[340px]">
-                    <img
-                      src={~p"/images/upcoming_showcase.webp"}
-                      alt="Upcoming showcase"
-                      class="absolute inset-0 h-full w-full object-cover"
-                    />
-                    
-    <!-- Overlays for readability -->
-                    <div class="absolute inset-0 bg-linear-to-r from-backroom-black/90 via-backroom-black/55 to-transparent">
-                    </div>
-                    <div class="absolute inset-0 bg-linear-to-t from-backroom-black/70 via-transparent to-backroom-black/20">
-                    </div>
-
-                    <div class="relative p-6 md:p-8">
-                      <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/6 px-3 py-1">
-                        <span class="h-2 w-2 rounded-full bg-neon-red-light animate-pulse"></span>
-                        <span class="text-xs uppercase tracking-wider text-zinc-200">
-                          Upcoming showcase
-                        </span>
-                      </div>
-
-                      <h2 class="mt-4 text-2xl md:text-xl font-semibold tracking-tight text-white">
-                        {@upcoming_showcase.title}
-                      </h2>
-
-                      <p class="mt-3 max-w-xl text-sm md:text-base text-zinc-200/80">
-                        {@upcoming_showcase.description}
-                      </p>
-                    </div>
-                  </div>
-                  
-    <!-- Details side -->
-                  <div class="md:col-span-2 p-6 md:p-8 bg-backroom-black/60">
-                    <p class="text-xs uppercase tracking-wider text-zinc-400">Starts</p>
-
-                    <p class="mt-2 text-lg md:text-xl font-medium text-white">
-                      {format_datetime_in_timezone(@upcoming_showcase.start_at, @timezone)}
-                      <span class="text-zinc-400 text-sm font-normal">
-                        ({extract_city_from_timezone(@timezone)})
-                      </span>
-                    </p>
-
-                    <p class="mt-3 text-sm text-zinc-400">
-                      TimeSink opens its doors. No easing in. No settling down.
-                    </p>
-
-                    <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                      <button
-                        type="button"
-                        phx-click={show_modal("showcase-info-modal")}
-                        class="inline-flex items-center justify-center rounded border border-white/15 bg-white/6 px-4.5 py-2 text-sm text-white transition hover:bg-white/10 hover:border-white/25 cursor-pointer"
-                      >
-                        Learn more
-                      </button>
-
-                      <button
-                        type="button"
-                        phx-click={show_modal("newsletter-modal")}
-                        class="inline-flex items-center justify-center rounded bg-white text-backroom-black px-4.5 py-2 text-sm font-medium transition hover:opacity-90 cursor-pointer"
-                      >
-                        Get notified
-                      </button>
-                    </div>
-
-                    <div class="mt-6 border-t border-white/10 pt-5">
-                      <p class="text-xs uppercase tracking-wider text-zinc-400">What to expect</p>
-                      <p class="mt-2 text-sm text-zinc-400">
-                        A curated drop. Live chat in every room. A night where everything begins.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        <% @no_showcase -> %>
-          <.no_showcase />
-      <% end %>
       <.live_component
         module={ScheduleModalComponent}
         id="schedule-modal-component"
