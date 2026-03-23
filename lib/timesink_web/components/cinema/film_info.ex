@@ -128,7 +128,11 @@ defmodule TimesinkWeb.Components.FilmInfo do
     <div class="px-1">
       <div class="flex items-center gap-3 mb-5">
         <div class="h-10 w-10 rounded-full overflow-hidden ring-1 ring-zinc-700 shrink-0">
-          <img src="/images/timesink_hero.webp" alt="TimeSink" class="h-full w-full object-cover object-center" />
+          <img
+            src="/images/timesink_hero.webp"
+            alt="TimeSink"
+            class="h-full w-full object-cover object-center"
+          />
         </div>
         <div>
           <p class="text-sm font-medium text-mystery-white">TimeSink Presents</p>
