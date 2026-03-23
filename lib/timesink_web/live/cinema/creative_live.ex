@@ -41,8 +41,8 @@ defmodule TimesinkWeb.Cinema.CreativeLive do
     ~H"""
     <section class="px-4 md:px-6 py-16">
       <div class="max-w-3xl mx-auto text-center">
-        <h1 class="text-xl md:text-2xl font-semibold text-mystery-white">Creative not found</h1>
-        <p class="mt-3 text-zinc-400">We couldn't find that creative profile.</p>
+        <h1 class="text-xl md:text-2xl font-semibold text-mystery-white">Profile not found</h1>
+        <p class="mt-3 text-zinc-400">We couldn't find that filmmaker profile.</p>
         <.link navigate={~p"/"} class="inline-block mt-6 text-neon-blue-lightest hover:opacity-80">
           Back to home
         </.link>
@@ -79,50 +79,6 @@ defmodule TimesinkWeb.Cinema.CreativeLive do
               </span>
             <% end %>
           </div>
-          
-    <!-- Claim CTA -->
-          <%= if is_nil(@creative.user_id) && @current_user && !@already_claimed? && @claim_status != :submitted do %>
-            <div class="mt-6 border-t border-zinc-800 pt-5">
-              <%= if !@claim_open? do %>
-                <p class="text-sm text-zinc-400 mb-3">Are you this creative?</p>
-                <.button phx-click="open_claim" color="primary" class="text-sm">
-                  Claim this profile
-                </.button>
-              <% else %>
-                <p class="text-sm text-zinc-300 mb-3 font-medium">
-                  Submit a claim for
-                  <span class="text-mystery-white">{Creative.full_name(@creative)}</span>
-                </p>
-                <p class="text-xs text-zinc-500 mb-4">
-                  Tell us briefly why this is you — a film you directed, your role, or any context that helps us verify.
-                </p>
-                <form phx-submit="submit_claim" class="space-y-3">
-                  <textarea
-                    name="message"
-                    rows="3"
-                    placeholder="e.g. I directed Bitter Rivals (2019), listed above."
-                    class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-mystery-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-neon-blue-lightest resize-none"
-                  >{@claim_message}</textarea>
-                  <div class="flex gap-3">
-                    <.button type="submit" color="primary" class="text-sm">
-                      Submit claim
-                    </.button>
-                    <.button phx-click="close_claim" type="button" color="secondary" class="text-sm">
-                      Cancel
-                    </.button>
-                  </div>
-                </form>
-              <% end %>
-            </div>
-          <% end %>
-
-          <%= if @claim_status == :submitted do %>
-            <div class="mt-6 border-t border-zinc-800 pt-5">
-              <p class="text-sm text-emerald-400">
-                Your claim has been submitted. We'll review it and get back to you by email.
-              </p>
-            </div>
-          <% end %>
         </div>
         
     <!-- Filmography -->
@@ -152,6 +108,57 @@ defmodule TimesinkWeb.Cinema.CreativeLive do
             <% end %>
           </div>
         </div>
+        
+    <!-- Claim CTA -->
+        <%= if is_nil(@creative.user_id) && @current_user && !@already_claimed? && @claim_status != :submitted do %>
+          <div class="mt-4">
+            <%= if !@claim_open? do %>
+              <div class="flex items-center gap-3 px-1">
+                <p class="text-sm text-gray-400 font-medium">Is this you?</p>
+                <button
+                  phx-click="open_claim"
+                  class="text-xs text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2 cursor-pointer"
+                >
+                  Claim this profile
+                </button>
+              </div>
+            <% else %>
+              <div class="rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800 px-6 py-5">
+                <p class="text-sm text-zinc-300 mb-1 font-medium">
+                  Claim profile for
+                  <span class="text-mystery-white">{Creative.full_name(@creative)}</span>
+                </p>
+                <p class="text-xs text-zinc-500 mb-4">
+                  Tell us briefly why this is you — a film you directed, your role, or any context that helps us verify.
+                </p>
+                <form phx-submit="submit_claim" class="space-y-3">
+                  <textarea
+                    name="message"
+                    rows="3"
+                    placeholder="e.g. I directed Bitter Rivals (2019), listed above."
+                    class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-mystery-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-neon-blue-lightest resize-none"
+                  >{@claim_message}</textarea>
+                  <div class="flex gap-3">
+                    <.button type="submit" color="primary" class="text-sm">
+                      Submit claim
+                    </.button>
+                    <.button phx-click="close_claim" type="button" color="secondary" class="text-sm">
+                      Cancel
+                    </.button>
+                  </div>
+                </form>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%= if @claim_status == :submitted do %>
+          <div class="mt-4 px-1">
+            <p class="text-xs text-emerald-500">
+              Claim submitted — we'll review it and get back to you by email.
+            </p>
+          </div>
+        <% end %>
       </div>
     </section>
     """
