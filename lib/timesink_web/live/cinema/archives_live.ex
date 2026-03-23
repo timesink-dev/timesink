@@ -180,45 +180,47 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
                 <!-- Poster grid (square, hover effect, non-interactive) -->
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                   <%= for ex <- group.exhibitions do %>
-                    <article
-                      class="group relative rounded-2xl overflow-hidden border border-zinc-800 bg-[#0C0C0C]
-             transition-all duration-300 cursor-default select-none
+                    <.link navigate={"/films/#{ex.film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(ex.film.title)}"}>
+                      <article
+                        class="group relative rounded-2xl overflow-hidden border border-zinc-800 bg-[#0C0C0C]
+             transition-all duration-300 cursor-pointer select-none
              hover:border-dark-theater-primary/50"
-                      aria-label={ex.film.title}
-                    >
-                      <div class="relative aspect-square w-full overflow-hidden">
-                        <img
-                          src={Timesink.Cinema.Film.poster_url(ex.film.poster)}
-                          alt={ex.film.title}
-                          loading="lazy"
-                          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                        />
-                        <!-- subtle glow on hover -->
-                        <div class="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition
+                        aria-label={ex.film.title}
+                      >
+                        <div class="relative aspect-square w-full overflow-hidden">
+                          <img
+                            src={Timesink.Cinema.Film.poster_url(ex.film.poster)}
+                            alt={ex.film.title}
+                            loading="lazy"
+                            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                          />
+                          <!-- subtle glow on hover -->
+                          <div class="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition
                     bg-[radial-gradient(60%_50%_at_50%_50%,rgba(0,224,255,0.10),transparent)]">
-                        </div>
-                        
+                          </div>
+                          
     <!-- theater pill -->
-                        <div class="absolute left-2 top-2 rounded-full bg-black/70 backdrop-blur px-2 py-1
+                          <div class="absolute left-2 top-2 rounded-full bg-black/70 backdrop-blur px-2 py-1
                     text-[10px] font-medium text-zinc-200 border border-zinc-700">
-                          {ex.theater.name}
+                            {ex.theater.name}
+                          </div>
                         </div>
-                      </div>
 
-                      <div class="p-3">
-                        <h4 class="line-clamp-1 text-sm font-semibold text-zinc-100">
-                          {ex.film.title}
-                        </h4>
-                        <div class="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
-                          <span>{ex.film.year}</span>
-                          <span class="opacity-40">•</span>
-                          <span class="line-clamp-1">Dir: {join_names(ex.film.directors)}</span>
+                        <div class="p-3">
+                          <h4 class="line-clamp-1 text-sm font-semibold text-zinc-100">
+                            {ex.film.title}
+                          </h4>
+                          <div class="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
+                            <span>{ex.film.year}</span>
+                            <span class="opacity-40">•</span>
+                            <span class="line-clamp-1">Dir: {join_names(ex.film.directors)}</span>
+                          </div>
+                          <p class="mt-1 line-clamp-1 text-[11px] text-zinc-500">
+                            Cast: {join_names(ex.film.cast)}
+                          </p>
                         </div>
-                        <p class="mt-1 line-clamp-1 text-[11px] text-zinc-500">
-                          Cast: {join_names(ex.film.cast)}
-                        </p>
-                      </div>
-                    </article>
+                      </article>
+                    </.link>
                   <% end %>
                 </div>
               </div>

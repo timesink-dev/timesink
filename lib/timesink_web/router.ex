@@ -137,6 +137,8 @@ defmodule TimesinkWeb.Router do
       live "/upcoming", Cinema.UpcomingLive
       live "/now-playing", Cinema.NowPlayingLive
       live "/creatives/:id", Cinema.CreativeLive
+      live "/films/:id", Cinema.FilmLive
+      live "/films/:id/:title_slug", Cinema.FilmLive
       live "/@:profile_username", Account.ProfileLive
     end
   end
