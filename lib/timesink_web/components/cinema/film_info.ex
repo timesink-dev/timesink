@@ -126,10 +126,16 @@ defmodule TimesinkWeb.Components.FilmInfo do
   def film_review(%{film: %{review: review}} = assigns) when is_binary(review) and review != "" do
     ~H"""
     <div class="px-1">
-      <p class="text-xs uppercase tracking-wider text-zinc-500 mb-4">
-        A word from TimeSink Presents...
-      </p>
-      <div class="prose prose-invert prose-sm max-w-none text-zinc-300 leading-relaxed">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="h-10 w-10 rounded-full overflow-hidden ring-1 ring-zinc-700 shrink-0">
+          <img src="/images/timesink_hero.webp" alt="TimeSink" class="h-full w-full object-cover object-center" />
+        </div>
+        <div>
+          <p class="text-sm font-medium text-mystery-white">TimeSink Presents</p>
+          <p class="text-xs text-zinc-500">A word on this film</p>
+        </div>
+      </div>
+      <div class="border-t border-zinc-800 pt-5 prose prose-invert prose-base max-w-none text-zinc-300 leading-relaxed prose-p:mt-4 prose-p:first-of-type:text-base prose-p:first-of-type:text-zinc-200">
         {Phoenix.HTML.raw(@film.review)}
       </div>
     </div>

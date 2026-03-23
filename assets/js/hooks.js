@@ -1,5 +1,44 @@
 import EmblaCarousel from 'embla-carousel'
+import Trix from 'trix'
 
+// ── Trix custom heading levels ──────────────────────────────────────────────
+// Register h2 and h3 as custom block attributes (Trix only ships with h1)
+Trix.config.blockAttributes.heading2 = {
+  tagName: "h2",
+  terminal: true,
+  breakOnReturn: true,
+  group: false
+}
+
+Trix.config.blockAttributes.heading3 = {
+  tagName: "h3",
+  terminal: true,
+  breakOnReturn: true,
+  group: false
+}
+
+// Replace the default single H1 button with H1 / H2 / H3 buttons
+document.addEventListener("trix-initialize", (event) => {
+  const toolbar = event.target.toolbarElement
+  const h1Btn = toolbar.querySelector('[data-trix-attribute="heading1"]')
+  if (!h1Btn) return
+
+  h1Btn.textContent = "H1"
+  h1Btn.dataset.trixAttribute = "heading1"
+
+  const h2Btn = h1Btn.cloneNode(true)
+  h2Btn.textContent = "H2"
+  h2Btn.dataset.trixAttribute = "heading2"
+  h2Btn.classList.remove("trix-active")
+
+  const h3Btn = h1Btn.cloneNode(true)
+  h3Btn.textContent = "H3"
+  h3Btn.dataset.trixAttribute = "heading3"
+  h3Btn.classList.remove("trix-active")
+
+  h1Btn.after(h3Btn)
+  h1Btn.after(h2Btn)
+})
 
 const Hooks = {};
 
