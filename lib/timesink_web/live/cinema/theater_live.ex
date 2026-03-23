@@ -187,6 +187,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           <% end %>
 
           <FilmInfo.film_info film={@film} />
+
+          <div class="mt-12">
+            <FilmInfo.film_review film={@film} />
+          </div>
         </div>
         
     <!-- Right: Desktop side panel -->

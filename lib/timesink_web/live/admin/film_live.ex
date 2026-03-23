@@ -29,6 +29,10 @@ defmodule TimesinkWeb.Admin.FilmLive do
         module: Backpex.Fields.Textarea,
         label: "Synopsis"
       },
+      review: %{
+        module: TimesinkWeb.Admin.Fields.RichText,
+        label: "Review"
+      },
       duration: %{
         module: Backpex.Fields.Number,
         label: "Duration (min)"

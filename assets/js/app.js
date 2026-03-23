@@ -17,6 +17,7 @@
 
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html";
+import "trix";
 import '@mux/mux-player';
 import '@mux/mux-uploader';
 // Establish Phoenix Socket and LiveView configuration.

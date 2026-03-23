@@ -9,6 +9,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
   attr :live_viewer_count, :integer, required: true
   attr :playback_state, :map, required: true
   attr :timezone, :string, required: true
+  attr :current_user, :map, default: nil
 
   def theater_card(assigns) do
     ~H"""
@@ -93,11 +94,15 @@ defmodule TimesinkWeb.Components.TheaterCard do
               <p class="text-white/40 text-md">
                 <.icon name="hero-user-group" class="h-6 w-6" /> {@live_viewer_count}
               </p>
-              <.link href={"/now-playing/#{@exhibition.theater.slug}"}>
-                <.button class="cursor-pointer">
-                  Go to Theater →
-                </.button>
-              </.link>
+              <%= if @current_user do %>
+                <.link href={"/now-playing/#{@exhibition.theater.slug}"}>
+                  <.button class="cursor-pointer">Go to Theater →</.button>
+                </.link>
+              <% else %>
+                <.link navigate={"/films/#{@exhibition.film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(@exhibition.film.title)}?from=theater"}>
+                  <.button class="cursor-pointer">Enter Theater →</.button>
+                </.link>
+              <% end %>
             </div>
           </div>
         </div>

@@ -36,6 +36,7 @@ defmodule Timesink.Cinema.Film do
     field :aspect_ratio, :string
     field :format, Ecto.Enum, values: @formats
     field :synopsis, :string
+    field :review, :string
 
     has_one :video, {"film_attachment", Timesink.Storage.Attachment},
       foreign_key: :assoc_id,
@@ -64,7 +65,7 @@ defmodule Timesink.Cinema.Film do
           Ecto.Changeset.t()
   def changeset(film, params, _metadata \\ []) do
     film
-    |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis])
+    |> cast(params, [:title, :year, :duration, :color, :aspect_ratio, :format, :synopsis, :review])
     |> validate_required([:title, :year, :duration, :color, :format, :aspect_ratio])
     |> validate_length(:title, min: 1)
   end

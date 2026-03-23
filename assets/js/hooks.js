@@ -857,4 +857,24 @@ Hooks.MarqueeTicker = {
 };
 
 
+// Trix rich text editor — Trix natively syncs to the hidden input via the `input` attribute.
+// This hook just notifies LiveView of changes so form validation stays reactive.
+Hooks.TrixEditor = {
+  mounted() {
+    this.hiddenInput = document.getElementById(this.el.dataset.inputId);
+    if (!this.hiddenInput) return;
+
+    this.handleChange = () => {
+      this.hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+
+    this.el.addEventListener("trix-change", this.handleChange);
+  },
+  destroyed() {
+    if (this.el && this.handleChange) {
+      this.el.removeEventListener("trix-change", this.handleChange);
+    }
+  }
+};
+
 export default Hooks;

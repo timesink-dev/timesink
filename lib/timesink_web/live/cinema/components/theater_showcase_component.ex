@@ -17,7 +17,8 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:selected_theater_id, selected_theater_id)}
+     |> assign(:selected_theater_id, selected_theater_id)
+     |> assign_new(:current_user, fn -> nil end)}
   end
 
   def render(assigns) do
@@ -76,6 +77,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                   )
                 }
                 timezone={@timezone}
+                current_user={@current_user}
               />
             <% else %>
               {nil}
@@ -98,6 +100,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
                   )
                 }
                 timezone={@timezone}
+                current_user={@current_user}
               />
             <% end %>
           </div>

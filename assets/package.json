@@ -3,7 +3,8 @@
     "@mux/mux-player": "^3.4.0",
     "@mux/mux-uploader": "^1.2.0",
     "daisyui": "^5.5.5",
-    "embla-carousel": "^8.6.0"
+    "embla-carousel": "^8.6.0",
+    "trix": "^2.1.17"
   },
   "devDependencies": {
     "tailwindcss": "^4.1.17"

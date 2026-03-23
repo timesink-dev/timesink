@@ -120,4 +120,21 @@ defmodule TimesinkWeb.Components.FilmInfo do
   end
 
   defp creative_label(%{creative: c}, _with_roles), do: Creative.full_name(c)
+
+  attr :film, Film, required: true
+
+  def film_review(%{film: %{review: review}} = assigns) when is_binary(review) and review != "" do
+    ~H"""
+    <div class="px-1">
+      <p class="text-xs uppercase tracking-wider text-zinc-500 mb-4">
+        A word from TimeSink Presents...
+      </p>
+      <div class="prose prose-invert prose-sm max-w-none text-zinc-300 leading-relaxed">
+        {Phoenix.HTML.raw(@film.review)}
+      </div>
+    </div>
+    """
+  end
+
+  def film_review(assigns), do: ~H""
 end
