@@ -165,11 +165,11 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
                                 </span>
                               </div>
                               <svg
-                                class="h-3.5 w-3.5 text-zinc-500 group-hover/row:text-zinc-300 transition-colors flex-shrink-0"
+                                class="h-3.5 w-3.5 text-zinc-500 group-hover/row:text-zinc-300 transition-colors shrink-0"
                                 viewBox="0 0 16 16"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
+                                stroke-width="1"
                               >
                                 <path
                                   stroke-linecap="round"
