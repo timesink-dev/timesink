@@ -73,23 +73,20 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
             <!-- Search -->
             <div class="md:col-span-1">
               <form phx-change="search">
-                <div id="archives-search-wrapper" phx-update="ignore">
-                  <div class="relative">
-                    <input
-                      id="archives-search"
-                      name="q"
-                      value=""
-                      placeholder="Search title, director, cast…"
-                      phx-debounce="250"
-                      phx-hook="SearchFocus"
-                      autocomplete="off"
-                      class="h-12 w-full rounded-2xl border border-zinc-800 bg-[#0C0C0C] text-zinc-100 placeholder-zinc-500
-                   focus:outline-none focus:ring-1 focus:ring-neon-blue-light focus:border-neon-blue-light
-                   px-4 pr-10"
-                    />
-                    <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500">
-                      ⌘K
-                    </div>
+                <div class="relative">
+                  <input
+                    id="archives-search"
+                    name="q"
+                    placeholder="Search title, director, cast…"
+                    phx-debounce="250"
+                    phx-hook="SearchFocus"
+                    autocomplete="off"
+                    class="h-12 w-full rounded-2xl border border-zinc-800 bg-[#0C0C0C] text-zinc-100 placeholder-zinc-500
+                 focus:outline-none focus:ring-1 focus:ring-neon-blue-light focus:border-neon-blue-light
+                 px-4 pr-10"
+                  />
+                  <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500">
+                    ⌘K
                   </div>
                 </div>
               </form>
