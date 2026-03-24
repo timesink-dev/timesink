@@ -37,22 +37,25 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
        selected_month: "all",
        selected_theater: "all",
        months: months,
-       theaters: theaters
+       theaters: theaters,
+       creative_results: [],
+       film_results: []
      )
      |> assign_grouped()}
   end
 
   # ---------- EVENTS ----------
   def handle_event("search", %{"q" => q}, socket) do
-    {:noreply, socket |> assign(q: q) |> assign_grouped()}
+    {:noreply, socket |> assign(q: q) |> assign_grouped() |> assign_search_results()}
   end
 
   def handle_event("filter-month", %{"month" => m}, socket) do
-    {:noreply, socket |> assign(selected_month: m) |> assign_grouped()}
+    {:noreply, socket |> assign(selected_month: m) |> assign_grouped() |> assign_search_results()}
   end
 
   def handle_event("filter-theater", %{"theater" => th}, socket) do
-    {:noreply, socket |> assign(selected_theater: th) |> assign_grouped()}
+    {:noreply,
+     socket |> assign(selected_theater: th) |> assign_grouped() |> assign_search_results()}
   end
 
   # live countdown tick
@@ -74,33 +77,136 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
           </div>
           
     <!-- Controls -->
-          <div
-            id="upcoming-controls"
-            phx-update="ignore"
-            class="mt-6 md:mt-8 grid grid-cols-1 md:grid-cols-3 gap-3"
-          >
+          <div id="upcoming-controls" class="mt-6 md:mt-8 grid grid-cols-1 md:grid-cols-3 gap-3">
             <!-- Search -->
             <div class="md:col-span-1">
               <form phx-change="search">
-                <div class="relative">
-                  <input
-                    name="q"
-                    value={@q}
-                    placeholder="Search title, director, cast…"
-                    phx-debounce="250"
-                    class="h-12 w-full rounded-2xl border border-zinc-800 bg-backroom-black text-zinc-100 placeholder-zinc-500
-                           focus:outline-none focus:ring-1 focus:ring-neon-blue-light focus:border-neon-blue-light
-                           px-4 pr-10"
-                  />
-                  <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500">
-                    ⌘K
+                <div id="upcoming-search-wrapper" phx-update="ignore">
+                  <div class="relative">
+                    <input
+                      id="upcoming-search"
+                      name="q"
+                      value=""
+                      placeholder="Search title, director, cast…"
+                      phx-debounce="250"
+                      phx-hook="SearchFocus"
+                      autocomplete="off"
+                      class="h-12 w-full rounded-2xl border border-zinc-800 bg-backroom-black text-zinc-100 placeholder-zinc-500
+                             focus:outline-none focus:ring-1 focus:ring-neon-blue-light focus:border-neon-blue-light
+                             px-4 pr-10"
+                    />
+                    <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500">
+                      ⌘K
+                    </div>
                   </div>
                 </div>
               </form>
+              <!-- Search results panel -->
+              <%= if @q != "" do %>
+                <div class="mt-2 rounded-xl border border-zinc-800 bg-[#0C0C0C] overflow-hidden">
+                  <%= if Enum.empty?(@film_results) and Enum.empty?(@creative_results) do %>
+                    <p class="px-4 py-3 text-xs text-zinc-500">No results found.</p>
+                  <% else %>
+                    <%= if not Enum.empty?(@film_results) do %>
+                      <p class="px-4 pt-3 pb-1 text-[10px] uppercase tracking-widest text-zinc-600">
+                        Films
+                      </p>
+                      <ul class="divide-y divide-zinc-800/60">
+                        <%= for film <- @film_results do %>
+                          <li class="group/row relative px-4 py-2.5 hover:bg-zinc-800/30 transition-colors">
+                            <.link
+                              navigate={"/films/#{film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(film.title)}"}
+                              class="absolute inset-0"
+                              aria-hidden="true"
+                            >
+                              <span />
+                            </.link>
+                            <div class="relative pointer-events-none flex items-center justify-between">
+                              <div>
+                                <span class="text-sm text-zinc-100">{film.title}</span>
+                                <span class="ml-2 text-[11px] text-zinc-500">{film.year}</span>
+                                <%= if film.directors != "" do %>
+                                  <p class="text-[11px] text-zinc-600 mt-0.5">
+                                    Dir: {film.directors}
+                                  </p>
+                                <% end %>
+                              </div>
+                              <svg
+                                class="h-3.5 w-3.5 text-zinc-500 group-hover/row:text-zinc-300 transition-colors flex-shrink-0"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M3 8h10M9 4l4 4-4 4"
+                                />
+                              </svg>
+                            </div>
+                          </li>
+                        <% end %>
+                      </ul>
+                    <% end %>
+                    <%= if not Enum.empty?(@creative_results) do %>
+                      <p class="px-4 pt-3 pb-1 text-[10px] uppercase tracking-widest text-zinc-600">
+                        Filmmakers
+                      </p>
+                      <ul class="divide-y divide-zinc-800/60">
+                        <%= for c <- @creative_results do %>
+                          <li class="group/row relative px-4 py-3 hover:bg-zinc-800/30 transition-colors">
+                            <.link
+                              navigate={creative_link(c)}
+                              class="absolute inset-0"
+                              aria-hidden="true"
+                            >
+                              <span />
+                            </.link>
+                            <div class="relative pointer-events-none flex items-center justify-between mb-1">
+                              <div class="flex items-baseline gap-2">
+                                <span class="text-sm font-medium text-zinc-100">
+                                  {c.first_name} {c.last_name}
+                                </span>
+                                <span class="text-[10px] text-zinc-500 capitalize">
+                                  {c.primary_role}
+                                </span>
+                              </div>
+                              <svg
+                                class="h-3.5 w-3.5 text-zinc-500 group-hover/row:text-zinc-300 transition-colors shrink-0"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M3 8h10M9 4l4 4-4 4"
+                                />
+                              </svg>
+                            </div>
+                            <div class="relative flex flex-wrap gap-1 mt-1">
+                              <%= for film <- c.films do %>
+                                <.link
+                                  navigate={"/films/#{film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(film.title)}"}
+                                  class="text-[11px] text-zinc-400 hover:text-zinc-200 transition-colors bg-zinc-800/60 rounded px-2 py-0.5 pointer-events-auto"
+                                >
+                                  {film.title} <span class="text-zinc-600">({film.year})</span>
+                                </.link>
+                              <% end %>
+                            </div>
+                          </li>
+                        <% end %>
+                      </ul>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
             </div>
             
     <!-- Month -->
-            <div>
+            <div id="upcoming-month-filter" phx-update="ignore">
               <form phx-change="filter-month">
                 <div class="relative">
                   <select
@@ -132,7 +238,7 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
             </div>
             
     <!-- Theater -->
-            <div>
+            <div id="upcoming-theater-filter" phx-update="ignore">
               <form phx-change="filter-theater">
                 <div class="relative">
                   <select
@@ -175,7 +281,7 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
         <%= for {month_tag, groups} <- @grouped do %>
           <section id={"m-#{month_tag}"} class="scroll-mt-24 mt-16 md:mt-20">
             <div class="sticky top-0 z-10 -mx-6 md:-mx-8
-              bg-gradient-to-r from-white/[0.08] to-white/[0.08]">
+              bg-linear-to-r from-white/8 to-white/8">
               <div class="px-6 md:px-8 py-4 flex items-center justify-between">
                 <h2 class="text-sm tracking-widest uppercase text-mystery-white">{month_tag}</h2>
               </div>
@@ -202,55 +308,57 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
     <!-- Poster grid (square, hover alive, not clickable) -->
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                   <%= for ex <- group.exhibitions do %>
-                    <article
-                      class="group relative rounded-2xl overflow-hidden border border-zinc-800 bg-[#0C0C0C]
-                             transition-all duration-300 cursor-default select-none
+                    <.link navigate={"/films/#{ex.film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(ex.film.title)}"}>
+                      <article
+                        class="group relative rounded-2xl overflow-hidden border border-zinc-800 bg-[#0C0C0C]
+                             transition-all duration-300 cursor-pointer select-none
                              hover:border-dark-theater-primary/50"
-                      aria-label={ex.film.title}
-                    >
-                      <div class="relative aspect-square w-full overflow-hidden">
-                        <img
-                          src={Timesink.Cinema.Film.poster_url(ex.film.poster)}
-                          alt={ex.film.title}
-                          loading="lazy"
-                          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                        />
-                        
+                        aria-label={ex.film.title}
+                      >
+                        <div class="relative aspect-square w-full overflow-hidden">
+                          <img
+                            src={Timesink.Cinema.Film.poster_url(ex.film.poster)}
+                            alt={ex.film.title}
+                            loading="lazy"
+                            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                          />
+                          
     <!-- cinema ribbon: "Premieres" -->
-                        <div class="absolute left-2 top-2 rounded
-            bg-neon-blue-lightest text-backroom-black
+                          <div class="absolute left-2 top-2
+            bg-backroom-black text-mystery-white
             px-2 py-1 text-[10px] font-semibold
-            ring-neon-blue-lightest shadow-sm">
-                          Premieres {format_short_date(group.start_at)}
-                        </div>
-                        
-    <!-- subtle glow -->
-                        <div class="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition
-                                    bg-[radial-gradient(60%_50%_at_50%_50%,rgba(0,224,255,0.10),transparent)]">
-                        </div>
-                      </div>
-
-                      <div class="p-3">
-                        <h4 class="line-clamp-1 text-sm font-semibold text-zinc-100">
-                          {ex.film.title}
-                        </h4>
-                        <div class="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
-                          <span>{ex.film.year}</span>
-                          <span class="opacity-40">•</span>
-                          <span class="line-clamp-1">Dir: {join_names(ex.film.directors)}</span>
-                        </div>
-                        <p class="mt-1 line-clamp-1 text-[11px] text-zinc-500">
-                          Cast: {join_names(ex.film.cast)}
-                        </p>
-                        
-    <!-- countdown -->
-                        <%= if group.start_at do %>
-                          <div class="mt-2 text-[11px] font-medium text-zinc-300">
-                            Starts in {format_countdown(@now, group.start_at)}
+            border-gray-400 border rounded shadow-sm">
+                            Premieres {format_short_date(group.start_at)}
                           </div>
-                        <% end %>
-                      </div>
-                    </article>
+                          
+    <!-- subtle glow -->
+                          <div class="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition
+                                    bg-[radial-gradient(60%_50%_at_50%_50%,rgba(0,224,255,0.10),transparent)]">
+                          </div>
+                        </div>
+
+                        <div class="p-3">
+                          <h4 class="line-clamp-1 text-sm font-semibold text-zinc-100">
+                            {ex.film.title}
+                          </h4>
+                          <div class="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
+                            <span>{ex.film.year}</span>
+                            <span class="opacity-40">•</span>
+                            <span class="line-clamp-1">Dir: {join_names(ex.film.directors)}</span>
+                          </div>
+                          <p class="mt-1 line-clamp-1 text-[11px] text-zinc-500">
+                            Cast: {join_names(ex.film.cast)}
+                          </p>
+                          
+    <!-- countdown -->
+                          <%= if group.start_at do %>
+                            <div class="mt-2 text-[11px] font-medium text-zinc-300">
+                              Starts in {format_countdown(@now, group.start_at)}
+                            </div>
+                          <% end %>
+                        </div>
+                      </article>
+                    </.link>
                   <% end %>
                 </div>
               </div>
@@ -400,4 +508,86 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
   defp normalize_datetime(nil), do: ~U[1970-01-01 00:00:00Z]
   defp normalize_datetime(%NaiveDateTime{} = ndt), do: DateTime.from_naive!(ndt, "Etc/UTC")
   defp normalize_datetime(%DateTime{} = dt), do: dt
+
+  # ---------- SEARCH RESULTS ----------
+  defp assign_search_results(socket) do
+    q = socket.assigns.q
+    grouped = socket.assigns.grouped
+
+    if q == "" do
+      assign(socket, creative_results: [], film_results: [])
+    else
+      needle = String.downcase(q)
+
+      all_films =
+        grouped
+        |> Enum.flat_map(fn {_tag, groups} ->
+          Enum.flat_map(groups, fn group -> group.exhibitions end)
+        end)
+        |> Enum.map(fn ex -> ex.film end)
+        |> Enum.uniq_by(& &1.id)
+
+      all_pairs =
+        Enum.flat_map(all_films, fn film ->
+          film |> all_film_creatives() |> Enum.map(fn fc -> {fc, film} end)
+        end)
+
+      film_results =
+        all_films
+        |> Enum.filter(fn film ->
+          String.contains?(String.downcase(film.title || ""), needle)
+        end)
+        |> Enum.sort_by(& &1.title)
+        |> Enum.map(fn film ->
+          %{
+            id: film.id,
+            title: film.title,
+            year: film.year,
+            directors: join_names(film.directors)
+          }
+        end)
+
+      creative_results =
+        all_pairs
+        |> Enum.filter(fn {fc, _} ->
+          name = String.downcase("#{fc.creative.first_name} #{fc.creative.last_name}")
+          String.contains?(name, needle)
+        end)
+        |> Enum.group_by(fn {fc, _} -> fc.creative.id end)
+        |> Enum.map(fn {_cid, pairs} ->
+          {fc, _} = hd(pairs)
+
+          films =
+            pairs
+            |> Enum.map(fn {_, film} -> %{id: film.id, title: film.title, year: film.year} end)
+            |> Enum.uniq_by(& &1.id)
+            |> Enum.sort_by(& &1.title)
+
+          %{
+            id: fc.creative.id,
+            first_name: fc.creative.first_name,
+            last_name: fc.creative.last_name,
+            user: fc.creative.user,
+            primary_role: fc.role,
+            films: films
+          }
+        end)
+        |> Enum.sort_by(fn c -> "#{c.last_name} #{c.first_name}" end)
+
+      assign(socket, creative_results: creative_results, film_results: film_results)
+    end
+  end
+
+  defp all_film_creatives(film) do
+    (film.directors || []) ++
+      (film.writers || []) ++
+      (film.producers || []) ++
+      (film.cast || []) ++
+      (film.crew || [])
+  end
+
+  defp creative_link(%{user: %{username: username}}) when not is_nil(username),
+    do: "/@#{username}"
+
+  defp creative_link(%{id: id}), do: "/creatives/#{id}"
 end
