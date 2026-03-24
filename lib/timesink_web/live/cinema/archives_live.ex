@@ -363,16 +363,23 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
         {
           year,
           Enum.map(scs, fn sc ->
+            visible_exhibitions =
+              if th == "all",
+                do: sc.exhibitions,
+                else: Enum.filter(sc.exhibitions, fn ex -> ex.theater.name == th end)
+
             %{
               id: sc.id,
               title: sc.title,
               start_at: sc.start_at,
               end_at: sc.end_at,
-              exhibitions: sc.exhibitions
+              exhibitions: visible_exhibitions
             }
           end)
+          |> Enum.reject(fn g -> Enum.empty?(g.exhibitions) end)
         }
       end)
+      |> Enum.reject(fn {_year, groups} -> Enum.empty?(groups) end)
 
     assign(socket, grouped: grouped)
   end
@@ -415,7 +422,9 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
   end
 
   defp extract_showcase_year(%{end_at: %DateTime{year: y}}), do: y
+  defp extract_showcase_year(%{end_at: %NaiveDateTime{year: y}}), do: y
   defp extract_showcase_year(%{start_at: %DateTime{year: y}}), do: y
+  defp extract_showcase_year(%{start_at: %NaiveDateTime{year: y}}), do: y
   defp extract_showcase_year(_), do: 1970
 
   # Kept for future use if you add links back
@@ -428,20 +437,16 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
   # end
 
   defp format_showcase_dates(nil, nil), do: ""
-
-  defp format_showcase_dates(start_at, nil),
-    do: "Started on " <> Calendar.strftime(start_at, "%B %d, %Y")
-
-  defp format_showcase_dates(nil, end_at),
-    do: "Ended on " <> Calendar.strftime(end_at, "%B %d, %Y")
+  defp format_showcase_dates(start_at, nil), do: format_dmy(start_at)
+  defp format_showcase_dates(nil, end_at), do: format_dmy(end_at)
 
   defp format_showcase_dates(start_at, end_at) do
-    if Calendar.strftime(start_at, "%B") == Calendar.strftime(end_at, "%B") do
-      Calendar.strftime(start_at, "%B %-d") <> "–" <> Calendar.strftime(end_at, "%-d, %Y")
-    else
-      Calendar.strftime(start_at, "%B %-d") <> " – " <> Calendar.strftime(end_at, "%B %-d, %Y")
-    end
+    format_dmy(start_at) <> " – " <> format_dmy(end_at)
   end
+
+  defp format_dmy(nil), do: "TBD"
+  defp format_dmy(%NaiveDateTime{} = ndt), do: Calendar.strftime(ndt, "%d.%m.%y")
+  defp format_dmy(%DateTime{} = dt), do: Calendar.strftime(dt, "%d.%m.%y")
 
   defp normalize_datetime(nil), do: ~U[1970-01-01 00:00:00Z]
   defp normalize_datetime(%NaiveDateTime{} = ndt), do: DateTime.from_naive!(ndt, "Etc/UTC")

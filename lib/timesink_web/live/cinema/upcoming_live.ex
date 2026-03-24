@@ -299,7 +299,7 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
                       Premieres {format_premiere_date(group.start_at)}
                       <%= if group.end_at do %>
                         <span class="opacity-40">•</span>
-                        Runs until {Calendar.strftime(group.end_at, "%B %-d, %Y")}
+                        Runs until {Calendar.strftime(group.end_at, "%d.%m.%y")}
                       <% end %>
                     </p>
                   </div>
@@ -396,16 +396,23 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
         {
           tag,
           Enum.map(scs, fn sc ->
+            visible_exhibitions =
+              if th == "all",
+                do: sc.exhibitions,
+                else: Enum.filter(sc.exhibitions, fn ex -> ex.theater.name == th end)
+
             %{
               id: sc.id,
               title: sc.title,
               start_at: sc.start_at,
               end_at: sc.end_at,
-              exhibitions: sc.exhibitions
+              exhibitions: visible_exhibitions
             }
           end)
+          |> Enum.reject(fn g -> Enum.empty?(g.exhibitions) end)
         }
       end)
+      |> Enum.reject(fn {_tag, groups} -> Enum.empty?(groups) end)
 
     assign(socket, grouped: grouped)
   end
@@ -470,20 +477,12 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
   end
 
   defp format_premiere_date(nil), do: "TBD"
-
-  defp format_premiere_date(%NaiveDateTime{} = ndt),
-    do: ndt |> DateTime.from_naive!("Etc/UTC") |> Calendar.strftime("%B %-d, %Y")
-
-  defp format_premiere_date(%DateTime{} = dt),
-    do: Calendar.strftime(dt, "%B %-d, %Y")
+  defp format_premiere_date(%NaiveDateTime{} = ndt), do: Calendar.strftime(ndt, "%d.%m.%y")
+  defp format_premiere_date(%DateTime{} = dt), do: Calendar.strftime(dt, "%d.%m.%y")
 
   defp format_short_date(nil), do: "TBD"
-
-  defp format_short_date(%NaiveDateTime{} = ndt),
-    do: ndt |> DateTime.from_naive!("Etc/UTC") |> Calendar.strftime("%b %-d")
-
-  defp format_short_date(%DateTime{} = dt),
-    do: Calendar.strftime(dt, "%b %-d")
+  defp format_short_date(%NaiveDateTime{} = ndt), do: Calendar.strftime(ndt, "%d.%m.%y")
+  defp format_short_date(%DateTime{} = dt), do: Calendar.strftime(dt, "%d.%m.%y")
 
   # Countdown like "2d 04:12:09" (floors at zero)
   defp format_countdown(_now, nil), do: "TBD"
