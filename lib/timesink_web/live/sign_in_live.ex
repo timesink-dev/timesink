@@ -1,11 +1,12 @@
 defmodule TimesinkWeb.SignInLive do
   use TimesinkWeb, :live_view
 
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     email = Phoenix.Flash.get(socket.assigns.flash, :email)
-    form = to_form(%{"email" => email}, as: "user")
+    return_to = Map.get(params, "return_to")
+    form = to_form(%{"email" => email, "return_to" => return_to}, as: "user")
 
-    {:ok, assign(socket, form: form, trigger_submit: false),
+    {:ok, assign(socket, form: form, trigger_submit: false, return_to: return_to),
      layout: {TimesinkWeb.Layouts, :empty}}
   end
 
@@ -29,6 +30,9 @@ defmodule TimesinkWeb.SignInLive do
           action={~p"/sign-in"}
           class="space-y-5"
         >
+          <%= if @return_to do %>
+            <input type="hidden" name="user[return_to]" value={@return_to} />
+          <% end %>
           <.input
             field={@form[:email]}
             type="email"

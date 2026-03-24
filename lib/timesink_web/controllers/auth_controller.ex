@@ -4,10 +4,14 @@ defmodule TimesinkWeb.AuthController do
   alias TimesinkWeb.Auth
 
   @spec sign_in(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def sign_in(conn, %{"user" => %{"email" => email, "password" => password}} = _params) do
+  def sign_in(
+        conn,
+        %{"user" => %{"email" => email, "password" => password} = user_params} = _params
+      ) do
     with {:ok, user} <-
            Auth.authenticate_user(%{email: email, password: password}) do
       conn
+      |> maybe_put_return_to(user_params)
       |> Auth.log_in_user(user)
     else
       {:error, :invalid_credentials} ->
@@ -16,6 +20,14 @@ defmodule TimesinkWeb.AuthController do
         |> redirect(to: ~p"/sign-in")
     end
   end
+
+  defp maybe_put_return_to(conn, %{"return_to" => return_to})
+       when is_binary(return_to) and return_to != "" do
+    import Plug.Conn, only: [put_session: 3]
+    put_session(conn, :user_return_to, return_to)
+  end
+
+  defp maybe_put_return_to(conn, _), do: conn
 
   def sign_out(conn, _params) do
     conn
