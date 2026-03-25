@@ -916,4 +916,21 @@ Hooks.TrixEditor = {
   }
 };
 
+// ⌘K / Ctrl+K focuses the search input on the page
+Hooks.SearchFocus = {
+  mounted() {
+    this.handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        this.el.focus();
+        this.el.select();
+      }
+    };
+    window.addEventListener("keydown", this.handler);
+  },
+  destroyed() {
+    window.removeEventListener("keydown", this.handler);
+  }
+};
+
 export default Hooks;

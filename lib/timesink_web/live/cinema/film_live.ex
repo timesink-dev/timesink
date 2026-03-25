@@ -33,7 +33,7 @@ defmodule TimesinkWeb.Cinema.FilmLive do
 
     case film do
       nil ->
-        {:ok, assign(socket, not_found: true, from_theater: false)}
+        {:ok, assign(socket, not_found: true, from_theater: false, current_path: "/")}
 
       %Film{} ->
         trailer_playback_id = Film.get_mux_playback_id(film.trailer)
@@ -54,6 +54,8 @@ defmodule TimesinkWeb.Cinema.FilmLive do
         if from_theater && socket.assigns[:current_user] && theater_slug do
           {:ok, push_navigate(socket, to: "/now-playing/#{theater_slug}")}
         else
+          current_path = current_film_path(params)
+
           {:ok,
            assign(socket,
              film: film,
@@ -61,7 +63,8 @@ defmodule TimesinkWeb.Cinema.FilmLive do
              poster_url: poster_url,
              not_found: false,
              from_theater: from_theater,
-             theater_slug: theater_slug
+             theater_slug: theater_slug,
+             current_path: current_path
            )}
         end
     end
@@ -127,14 +130,14 @@ defmodule TimesinkWeb.Cinema.FilmLive do
             </div>
             <div class="shrink-0 flex items-center gap-3">
               <.link
-                navigate={~p"/sign-in"}
+                navigate={"/sign-in?return_to=#{URI.encode(@current_path)}"}
                 class="inline-flex items-center justify-center rounded bg-white text-backroom-black px-5 py-2 text-sm font-medium transition hover:opacity-90"
               >
                 Sign in
               </.link>
               <span class="text-xs text-zinc-500">or</span>
               <.link
-                navigate={~p"/sign-in"}
+                navigate={~p"/join"}
                 class="text-sm text-gray-400 hover:opacity-80 transition-opacity"
               >
                 Become a member now!
@@ -163,5 +166,16 @@ defmodule TimesinkWeb.Cinema.FilmLive do
     |> String.replace(~r/[^a-z0-9\s-]/, "")
     |> String.replace(~r/\s+/, "-")
     |> String.trim("-")
+  end
+
+  # Build the current page's path including query params, used for return_to after login
+  defp current_film_path(%{"id" => id, "title_slug" => slug} = params) do
+    base = "/films/#{id}/#{slug}"
+    if Map.get(params, "from") == "theater", do: base <> "?from=theater", else: base
+  end
+
+  defp current_film_path(%{"id" => id} = params) do
+    base = "/films/#{id}"
+    if Map.get(params, "from") == "theater", do: base <> "?from=theater", else: base
   end
 end

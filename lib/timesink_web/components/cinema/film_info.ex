@@ -136,10 +136,10 @@ defmodule TimesinkWeb.Components.FilmInfo do
         </div>
         <div>
           <p class="text-sm font-medium text-mystery-white">TimeSink Presents</p>
-          <p class="text-xs text-zinc-500">A word on this film</p>
+          <p class="text-xs text-zinc-500">Film Review</p>
         </div>
       </div>
-      <div class="border-t border-zinc-800 pt-5 prose prose-invert prose-base max-w-none text-zinc-300 leading-relaxed prose-p:mt-4 prose-p:first-of-type:text-base prose-p:first-of-type:text-zinc-200">
+      <div class="film-review-body prose prose-invert prose-base max-w-none text-zinc-300 leading-relaxed prose-p:mt-4 prose-p:mb-6 prose-p:first-of-type:mt-0 prose-p:first-of-type:text-zinc-200">
         {Phoenix.HTML.raw(@film.review)}
       </div>
     </div>

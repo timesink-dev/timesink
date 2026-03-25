@@ -32,22 +32,26 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
        selected_year: "all",
        selected_theater: "all",
        years: years,
-       theaters: theaters
+       theaters: theaters,
+       creative_results: [],
+       film_results: []
      )
      |> assign_grouped()}
   end
 
   # ---------- EVENTS ----------
   def handle_event("search", %{"q" => q}, socket) do
-    {:noreply, socket |> assign(q: q) |> assign_grouped()}
+    {:noreply, socket |> assign(q: q) |> assign_grouped() |> assign_search_results()}
   end
 
   def handle_event("filter-year", %{"year" => year}, socket) do
-    {:noreply, socket |> assign(selected_year: year) |> assign_grouped()}
+    {:noreply,
+     socket |> assign(selected_year: year) |> assign_grouped() |> assign_search_results()}
   end
 
   def handle_event("filter-theater", %{"theater" => th}, socket) do
-    {:noreply, socket |> assign(selected_theater: th) |> assign_grouped()}
+    {:noreply,
+     socket |> assign(selected_theater: th) |> assign_grouped() |> assign_search_results()}
   end
 
   # ---------- RENDER ----------
@@ -71,24 +75,127 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
               <form phx-change="search">
                 <div class="relative">
                   <input
+                    id="archives-search"
                     name="q"
-                    value={@q}
                     placeholder="Search title, director, cast…"
                     phx-debounce="250"
+                    phx-hook="SearchFocus"
+                    autocomplete="off"
                     class="h-12 w-full rounded-2xl border border-zinc-800 bg-[#0C0C0C] text-zinc-100 placeholder-zinc-500
                  focus:outline-none focus:ring-1 focus:ring-neon-blue-light focus:border-neon-blue-light
                  px-4 pr-10"
                   />
-                  <!-- trailing hint -->
                   <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500">
                     ⌘K
                   </div>
                 </div>
               </form>
+              <!-- Search results panel -->
+              <%= if @q != "" do %>
+                <div class="mt-2 rounded-xl border border-zinc-800 bg-[#0C0C0C] overflow-hidden">
+                  <%= if Enum.empty?(@film_results) and Enum.empty?(@creative_results) do %>
+                    <p class="px-4 py-3 text-xs text-zinc-500">No results found.</p>
+                  <% else %>
+                    <%= if not Enum.empty?(@film_results) do %>
+                      <p class="px-4 pt-3 pb-1 text-[10px] uppercase tracking-widest text-zinc-600">
+                        Films
+                      </p>
+                      <ul class="divide-y divide-zinc-800/60">
+                        <%= for film <- @film_results do %>
+                          <li class="group/row relative px-4 py-2.5 hover:bg-zinc-800/30 transition-colors">
+                            <.link
+                              navigate={"/films/#{film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(film.title)}"}
+                              class="absolute inset-0"
+                              aria-hidden="true"
+                            >
+                              <span />
+                            </.link>
+                            <div class="relative pointer-events-none flex items-center justify-between">
+                              <div>
+                                <span class="text-sm text-zinc-100">{film.title}</span>
+                                <span class="ml-2 text-[11px] text-zinc-500">{film.year}</span>
+                                <%= if film.directors != "" do %>
+                                  <p class="text-[11px] text-zinc-600 mt-0.5">
+                                    Dir: {film.directors}
+                                  </p>
+                                <% end %>
+                              </div>
+                              <svg
+                                class="h-3.5 w-3.5 text-zinc-500 group-hover/row:text-zinc-300 transition-colors shrink-0"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M3 8h10M9 4l4 4-4 4"
+                                />
+                              </svg>
+                            </div>
+                          </li>
+                        <% end %>
+                      </ul>
+                    <% end %>
+                    <%= if not Enum.empty?(@creative_results) do %>
+                      <p class="px-4 pt-3 pb-1 text-[10px] uppercase tracking-widest text-zinc-600">
+                        Filmmakers
+                      </p>
+                      <ul class="divide-y divide-zinc-800/60">
+                        <%= for c <- @creative_results do %>
+                          <li class="group/row relative px-4 py-3 hover:bg-zinc-800/30 transition-colors">
+                            <.link
+                              navigate={creative_link(c)}
+                              class="absolute inset-0"
+                              aria-hidden="true"
+                            >
+                              <span />
+                            </.link>
+                            <div class="relative pointer-events-none flex items-center justify-between mb-1">
+                              <div class="flex items-baseline gap-2">
+                                <span class="text-sm font-medium text-zinc-100">
+                                  {c.first_name} {c.last_name}
+                                </span>
+                                <span class="text-[10px] text-zinc-500 capitalize">
+                                  {c.primary_role}
+                                </span>
+                              </div>
+                              <svg
+                                class="h-3.5 w-3.5 text-zinc-500 group-hover/row:text-zinc-300 transition-colors shrink-0"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M3 8h10M9 4l4 4-4 4"
+                                />
+                              </svg>
+                            </div>
+                            <div class="relative flex flex-wrap gap-1 mt-1">
+                              <%= for film <- c.films do %>
+                                <.link
+                                  navigate={"/films/#{film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(film.title)}"}
+                                  class="text-[11px] text-zinc-400 hover:text-zinc-200 transition-colors bg-zinc-800/60 rounded px-2 py-0.5 pointer-events-auto"
+                                >
+                                  {film.title} <span class="text-zinc-600">({film.year})</span>
+                                </.link>
+                              <% end %>
+                            </div>
+                          </li>
+                        <% end %>
+                      </ul>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
             </div>
             
     <!-- Year -->
-            <div>
+            <div id="archives-year-filter" phx-update="ignore">
               <form phx-change="filter-year">
                 <div class="relative">
                   <select
@@ -123,7 +230,7 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
             </div>
             
     <!-- Theater -->
-            <div>
+            <div id="archives-theater-filter" phx-update="ignore">
               <form phx-change="filter-theater">
                 <div class="relative">
                   <select
@@ -253,16 +360,23 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
         {
           year,
           Enum.map(scs, fn sc ->
+            visible_exhibitions =
+              if th == "all",
+                do: sc.exhibitions,
+                else: Enum.filter(sc.exhibitions, fn ex -> ex.theater.name == th end)
+
             %{
               id: sc.id,
               title: sc.title,
               start_at: sc.start_at,
               end_at: sc.end_at,
-              exhibitions: sc.exhibitions
+              exhibitions: visible_exhibitions
             }
           end)
+          |> Enum.reject(fn g -> Enum.empty?(g.exhibitions) end)
         }
       end)
+      |> Enum.reject(fn {_year, groups} -> Enum.empty?(groups) end)
 
     assign(socket, grouped: grouped)
   end
@@ -305,7 +419,9 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
   end
 
   defp extract_showcase_year(%{end_at: %DateTime{year: y}}), do: y
+  defp extract_showcase_year(%{end_at: %NaiveDateTime{year: y}}), do: y
   defp extract_showcase_year(%{start_at: %DateTime{year: y}}), do: y
+  defp extract_showcase_year(%{start_at: %NaiveDateTime{year: y}}), do: y
   defp extract_showcase_year(_), do: 1970
 
   # Kept for future use if you add links back
@@ -318,22 +434,100 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
   # end
 
   defp format_showcase_dates(nil, nil), do: ""
-
-  defp format_showcase_dates(start_at, nil),
-    do: "Started on " <> Calendar.strftime(start_at, "%B %d, %Y")
-
-  defp format_showcase_dates(nil, end_at),
-    do: "Ended on " <> Calendar.strftime(end_at, "%B %d, %Y")
+  defp format_showcase_dates(start_at, nil), do: format_dmy(start_at)
+  defp format_showcase_dates(nil, end_at), do: format_dmy(end_at)
 
   defp format_showcase_dates(start_at, end_at) do
-    if Calendar.strftime(start_at, "%B") == Calendar.strftime(end_at, "%B") do
-      Calendar.strftime(start_at, "%B %-d") <> "–" <> Calendar.strftime(end_at, "%-d, %Y")
-    else
-      Calendar.strftime(start_at, "%B %-d") <> " – " <> Calendar.strftime(end_at, "%B %-d, %Y")
-    end
+    format_dmy(start_at) <> " – " <> format_dmy(end_at)
   end
+
+  defp format_dmy(nil), do: "TBD"
+  defp format_dmy(%NaiveDateTime{} = ndt), do: Calendar.strftime(ndt, "%d.%m.%y")
+  defp format_dmy(%DateTime{} = dt), do: Calendar.strftime(dt, "%d.%m.%y")
 
   defp normalize_datetime(nil), do: ~U[1970-01-01 00:00:00Z]
   defp normalize_datetime(%NaiveDateTime{} = ndt), do: DateTime.from_naive!(ndt, "Etc/UTC")
   defp normalize_datetime(%DateTime{} = dt), do: dt
+
+  # ---------- SEARCH RESULTS ----------
+  defp assign_search_results(socket) do
+    q = socket.assigns.q
+    grouped = socket.assigns.grouped
+
+    if q == "" do
+      assign(socket, creative_results: [], film_results: [])
+    else
+      needle = String.downcase(q)
+
+      all_films =
+        grouped
+        |> Enum.flat_map(fn {_tag, groups} ->
+          Enum.flat_map(groups, fn group -> group.exhibitions end)
+        end)
+        |> Enum.map(fn ex -> ex.film end)
+        |> Enum.uniq_by(& &1.id)
+
+      all_pairs =
+        Enum.flat_map(all_films, fn film ->
+          film |> all_film_creatives() |> Enum.map(fn fc -> {fc, film} end)
+        end)
+
+      film_results =
+        all_films
+        |> Enum.filter(fn film ->
+          String.contains?(String.downcase(film.title || ""), needle)
+        end)
+        |> Enum.sort_by(& &1.title)
+        |> Enum.map(fn film ->
+          %{
+            id: film.id,
+            title: film.title,
+            year: film.year,
+            directors: join_names(film.directors)
+          }
+        end)
+
+      creative_results =
+        all_pairs
+        |> Enum.filter(fn {fc, _} ->
+          name = String.downcase("#{fc.creative.first_name} #{fc.creative.last_name}")
+          String.contains?(name, needle)
+        end)
+        |> Enum.group_by(fn {fc, _} -> fc.creative.id end)
+        |> Enum.map(fn {_cid, pairs} ->
+          {fc, _} = hd(pairs)
+
+          films =
+            pairs
+            |> Enum.map(fn {_, film} -> %{id: film.id, title: film.title, year: film.year} end)
+            |> Enum.uniq_by(& &1.id)
+            |> Enum.sort_by(& &1.title)
+
+          %{
+            id: fc.creative.id,
+            first_name: fc.creative.first_name,
+            last_name: fc.creative.last_name,
+            user: fc.creative.user,
+            primary_role: fc.role,
+            films: films
+          }
+        end)
+        |> Enum.sort_by(fn c -> "#{c.last_name} #{c.first_name}" end)
+
+      assign(socket, creative_results: creative_results, film_results: film_results)
+    end
+  end
+
+  defp all_film_creatives(film) do
+    (film.directors || []) ++
+      (film.writers || []) ++
+      (film.producers || []) ++
+      (film.cast || []) ++
+      (film.crew || [])
+  end
+
+  defp creative_link(%{user: %{username: username}}) when not is_nil(username),
+    do: "/@#{username}"
+
+  defp creative_link(%{id: id}), do: "/creatives/#{id}"
 end
