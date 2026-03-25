@@ -319,13 +319,10 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
                             loading="lazy"
                             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                           />
-                          
-    <!-- cinema ribbon: "Premieres" -->
-                          <div class="absolute left-2 top-2
-            bg-backroom-black text-mystery-white
-            px-2 py-1 text-[10px] font-semibold
-            border-gray-400 border rounded shadow-sm">
-                            Premieres {format_short_date(group.start_at)}
+
+                          <div class="absolute left-2 top-2 rounded-full bg-black/70 backdrop-blur px-2 py-1
+                    text-[10px] font-medium text-zinc-200 border border-zinc-700">
+                            {ex.theater.name}
                           </div>
                           
     <!-- subtle glow -->
