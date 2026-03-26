@@ -160,7 +160,6 @@ defmodule TimesinkWeb.Components.FilmInfo do
               />
             </svg>
           </span>
-          <span data-copy-label>Copy link</span>
         </button>
       </div>
       <div class="film-review-body prose prose-invert prose-base max-w-none text-zinc-300 leading-relaxed prose-p:mt-4 prose-p:mb-6 prose-p:first-of-type:mt-0 prose-p:first-of-type:text-zinc-200">

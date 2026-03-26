@@ -97,15 +97,6 @@ mux-player {
   --media-menu-color: #0C0C0C;          /* backroom-black menu text */
   --media-time-font-size: 0.75rem;
   --media-preview-time-text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-  border-radius: 0;
-}
-
-mux-player::part(range-bar) {
-  background-color: #7AA8FF; /* played portion */
-}
-
-mux-player::part(range-thumb) {
-  background-color: #7AA8FF;
 }
 
 mux-player::part(menu),

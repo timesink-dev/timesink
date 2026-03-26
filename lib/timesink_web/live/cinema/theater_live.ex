@@ -11,6 +11,27 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     {:ok, socket}
   end
 
+  def handle_params(
+        %{"theater_slug" => theater_slug},
+        _uri,
+        %{assigns: %{current_user: nil}} = socket
+      ) do
+    # Unauthenticated — redirect to the film preview page if a film is playing
+    redirect_path =
+      with {:ok, theater} <- Theater.get_by(%{slug: theater_slug}),
+           {:ok, showcase} <- Showcase.get_by(%{status: :active}),
+           {:ok, exhibition} <-
+             Exhibition.get_by(%{theater_id: theater.id, showcase_id: showcase.id}),
+           {:ok, film} <- Film.get(exhibition.film_id) do
+        film = Repo.preload(film, directors: [creative: [:user]])
+        TimesinkWeb.Cinema.FilmLive.film_path(film) <> "?from=theater"
+      else
+        _ -> "/sign-in"
+      end
+
+    {:noreply, push_navigate(socket, to: redirect_path)}
+  end
+
   def handle_params(%{"theater_slug" => theater_slug}, _uri, socket) do
     with {:ok, theater} <- Theater.get_by(%{slug: theater_slug}),
          {:ok, showcase} <- Showcase.get_by(%{status: :active}),
@@ -189,7 +210,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           <FilmInfo.film_info film={@film} />
 
           <div class="mt-12">
-            <FilmInfo.film_review film={@film} />
+            <FilmInfo.film_review
+              film={@film}
+              review_url={TimesinkWeb.Endpoint.url() <> TimesinkWeb.Cinema.FilmLive.film_path(@film) <> "#film-review"}
+            />
           </div>
         </div>
         

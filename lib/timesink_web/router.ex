@@ -81,7 +81,6 @@ defmodule TimesinkWeb.Router do
       live "/me/profile", Account.ProfileSettingsLive
       live "/me/security", Account.SecuritySettingsLive
       live "/me/film-submissions", Account.PersonalFilmSubmissionsLive
-      live "/now-playing/:theater_slug", Cinema.TheaterLive
     end
   end
 
@@ -136,6 +135,7 @@ defmodule TimesinkWeb.Router do
       live "/archives", Cinema.ArchivesLive
       live "/upcoming", Cinema.UpcomingLive
       live "/now-playing", Cinema.NowPlayingLive
+      live "/now-playing/:theater_slug", Cinema.TheaterLive
       live "/creatives/:id", Cinema.CreativeLive
       live "/films/:title/:director", Cinema.FilmLive
       live "/@:profile_username", Account.ProfileLive

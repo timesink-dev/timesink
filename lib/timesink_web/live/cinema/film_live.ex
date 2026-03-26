@@ -123,7 +123,7 @@ defmodule TimesinkWeb.Cinema.FilmLive do
             <div class="shrink-0 flex items-center gap-3">
               <.link
                 navigate={"/sign-in?return_to=#{URI.encode(@current_path)}"}
-                class="inline-flex items-center justify-center rounded bg-white text-backroom-black px-5 py-2 text-sm font-medium transition hover:opacity-90"
+                class="inline-flex items-center justify-center rounded bg-neon-blue-lightest text-backroom-black px-5 py-2 text-sm font-medium transition hover:opacity-90"
               >
                 Sign in
               </.link>

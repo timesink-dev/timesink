@@ -942,11 +942,9 @@ Hooks.CopyReviewLink = {
 
       // Success feedback
       icon.innerHTML = checkSvg;
-      label.textContent = "Copied!";
 
       setTimeout(() => {
         icon.innerHTML = linkSvg;
-        label.textContent = "Copy link";
       }, 2000);
     });
   }
