@@ -55,6 +55,8 @@ defmodule TimesinkWeb.FilmSubmissionLive do
 
     form_data = Map.put(@initial_form_data, :user, socket.assigns[:current_user])
 
+    submission_image = TimesinkWeb.Endpoint.url() <> "/images/film_submission.webp"
+
     {:ok,
      socket
      |> assign(
@@ -65,7 +67,13 @@ defmodule TimesinkWeb.FilmSubmissionLive do
        data: form_data,
        complete_film_details: film_details_complete?(form_data),
        stripe_client_secret: nil,
-       film_submission: nil
+       film_submission: nil,
+       page_title: "Submit Your Film",
+       og_title: "Submit Your Film",
+       og_description:
+         "Submit your film to TimeSink and reach real audiences in a curated, communal cinema experience.",
+       og_image: submission_image,
+       og_url: TimesinkWeb.Endpoint.url() <> "/submit"
      )
      |> update_navigation_assigns()}
   end

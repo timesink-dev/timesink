@@ -7,9 +7,36 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
   require Logger
 
-  def mount(_params, _session, socket) do
+  def mount(%{"theater_slug" => theater_slug}, _session, socket) do
+    socket =
+      with {:ok, theater} <- Theater.get_by(%{slug: theater_slug}),
+           {:ok, showcase} <- Showcase.get_by(%{status: :active}),
+           {:ok, exhibition} <-
+             Exhibition.get_by(%{theater_id: theater.id, showcase_id: showcase.id}),
+           {:ok, film} <- Film.get(exhibition.film_id) do
+        film = Repo.preload(film, [{:poster, [:blob]}, directors: [creative: [:user]]])
+        poster_url = Timesink.Cinema.Film.poster_url(film.poster)
+
+        og_description =
+          if film.synopsis && film.synopsis != "",
+            do: film.synopsis,
+            else: "Watching live on TimeSink — Real audiences. Real time. Real cinema."
+
+        assign(socket,
+          page_title: film.title,
+          og_title: film.title,
+          og_description: og_description,
+          og_image: poster_url,
+          og_url: TimesinkWeb.Endpoint.url() <> "/now-playing/#{theater_slug}"
+        )
+      else
+        _ -> socket
+      end
+
     {:ok, socket}
   end
+
+  def mount(_params, _session, socket), do: {:ok, socket}
 
   def handle_params(
         %{"theater_slug" => theater_slug},
@@ -92,6 +119,13 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         "Loaded #{length(recent_msgs)} existing comments for exhibition #{exhibition.id}. Comment IDs: #{Enum.map(recent_msgs, & &1.id) |> Enum.join(", ")}"
       )
 
+      poster_url = Timesink.Cinema.Film.poster_url(film.poster)
+
+      og_description =
+        if film.synopsis && film.synopsis != "",
+          do: film.synopsis,
+          else: "Watching live on TimeSink — Real audiences. Real time. Real cinema."
+
       {:noreply,
        socket
        # efficient diffs
@@ -110,7 +144,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        # UI state
        |> assign(:chat_open, false)
        |> assign(:active_panel_tab, :chat)
-       |> assign(:has_messages?, length(recent_msgs) > 0)}
+       |> assign(:has_messages?, length(recent_msgs) > 0)
+       |> assign(:page_title, film.title)
+       |> assign(:og_title, film.title)
+       |> assign(:og_description, og_description)
+       |> assign(:og_image, poster_url)
+       |> assign(:og_url, TimesinkWeb.Endpoint.url() <> "/now-playing/#{theater.slug}")}
     else
       _ -> {:noreply, socket |> put_flash(:error, "Not found") |> redirect(to: "/")}
     end

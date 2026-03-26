@@ -18,6 +18,8 @@ defmodule TimesinkWeb.HomepageLive do
 
       playback_states = Timesink.Cinema.compute_initial_playback_states(exhibitions, showcase)
 
+      hero_url = TimesinkWeb.Endpoint.url() <> "/images/timesink_hero.webp"
+
       socket =
         assign(socket,
           showcase: showcase,
@@ -26,7 +28,13 @@ defmodule TimesinkWeb.HomepageLive do
           presence: %{},
           upcoming_showcase: nil,
           no_showcase: false,
-          timezone: timezone
+          timezone: timezone,
+          page_title: "TimeSink Presents",
+          og_title: "TimeSink Presents",
+          og_description:
+            "Real audiences. Real-time reactions. Conversations and moments that last. No noise — pure signal.",
+          og_image: hero_url,
+          og_url: TimesinkWeb.Endpoint.url() <> "/"
         )
 
       if connected?(socket), do: send(self(), :connected)
@@ -35,6 +43,8 @@ defmodule TimesinkWeb.HomepageLive do
       nil ->
         case Cinema.get_upcoming_showcase() do
           %{} = upcoming ->
+            hero_url = TimesinkWeb.Endpoint.url() <> "/images/timesink_hero.webp"
+
             {:ok,
              assign(socket,
                showcase: nil,
@@ -43,10 +53,18 @@ defmodule TimesinkWeb.HomepageLive do
                presence: %{},
                upcoming_showcase: upcoming,
                no_showcase: false,
-               timezone: timezone
+               timezone: timezone,
+               page_title: "TimeSink Presents",
+               og_title: "TimeSink Presents",
+               og_description:
+                 "Real audiences. Real-time reactions. Conversations and moments that last. No noise — pure signal.",
+               og_image: hero_url,
+               og_url: TimesinkWeb.Endpoint.url() <> "/"
              )}
 
           nil ->
+            hero_url = TimesinkWeb.Endpoint.url() <> "/images/timesink_hero.webp"
+
             {:ok,
              assign(socket,
                showcase: nil,
@@ -55,7 +73,13 @@ defmodule TimesinkWeb.HomepageLive do
                presence: %{},
                upcoming_showcase: nil,
                no_showcase: true,
-               timezone: timezone
+               timezone: timezone,
+               page_title: "TimeSink Presents",
+               og_title: "TimeSink Presents",
+               og_description:
+                 "Real audiences. Real-time reactions. Conversations and moments that last. No noise — pure signal.",
+               og_image: hero_url,
+               og_url: TimesinkWeb.Endpoint.url() <> "/"
              )}
         end
     end
