@@ -9,10 +9,18 @@ defmodule TimesinkWeb.WaitlistLive do
 
     spots_remaining = Waitlist.get_wave_spots_remaining()
 
+    hero_url = TimesinkWeb.Endpoint.url() <> "/images/timesink_hero.webp"
+
     {:ok,
      assign(socket,
        sent?: false,
-       spots_remaining: spots_remaining
+       spots_remaining: spots_remaining,
+       page_title: "Join TimeSink",
+       og_title: "Join TimeSink",
+       og_description:
+         "Request an invitation to TimeSink — a curated, communal cinema experience for real film lovers.",
+       og_image: hero_url,
+       og_url: TimesinkWeb.Endpoint.url() <> "/join"
      ), layout: {TimesinkWeb.Layouts, :empty}}
   end
 

@@ -92,6 +92,13 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         "Loaded #{length(recent_msgs)} existing comments for exhibition #{exhibition.id}. Comment IDs: #{Enum.map(recent_msgs, & &1.id) |> Enum.join(", ")}"
       )
 
+      poster_url = Timesink.Cinema.Film.poster_url(film.poster)
+
+      og_description =
+        if film.synopsis && film.synopsis != "",
+          do: film.synopsis,
+          else: "Watching live on TimeSink — Real audiences. Real time. Real cinema."
+
       {:noreply,
        socket
        # efficient diffs
@@ -110,7 +117,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        # UI state
        |> assign(:chat_open, false)
        |> assign(:active_panel_tab, :chat)
-       |> assign(:has_messages?, length(recent_msgs) > 0)}
+       |> assign(:has_messages?, length(recent_msgs) > 0)
+       |> assign(:page_title, film.title)
+       |> assign(:og_title, film.title)
+       |> assign(:og_description, og_description)
+       |> assign(:og_image, poster_url)
+       |> assign(:og_url, TimesinkWeb.Endpoint.url() <> "/now-playing/#{theater.slug}")}
     else
       _ -> {:noreply, socket |> put_flash(:error, "Not found") |> redirect(to: "/")}
     end
