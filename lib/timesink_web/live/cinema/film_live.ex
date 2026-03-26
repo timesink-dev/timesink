@@ -8,28 +8,10 @@ defmodule TimesinkWeb.Cinema.FilmLive do
   import Ecto.Query
 
   @impl true
-  def mount(%{"id" => id} = params, _session, socket) do
+  def mount(%{"title" => title_param, "director" => director_param} = params, _session, socket) do
     from_theater = Map.get(params, "from") == "theater"
 
-    film =
-      Film
-      |> Repo.get(id)
-      |> case do
-        nil ->
-          nil
-
-        f ->
-          Repo.preload(f, [
-            :genres,
-            poster: [:blob],
-            trailer: [:blob],
-            directors: [creative: :user],
-            writers: [creative: :user],
-            producers: [creative: :user],
-            cast: [creative: :user],
-            crew: [creative: :user]
-          ])
-      end
+    film = find_film_by_slugs(title_param, director_param)
 
     case film do
       nil ->
@@ -54,7 +36,7 @@ defmodule TimesinkWeb.Cinema.FilmLive do
         if from_theater && socket.assigns[:current_user] && theater_slug do
           {:ok, push_navigate(socket, to: "/now-playing/#{theater_slug}")}
         else
-          current_path = current_film_path(params)
+          current_path = current_film_path(film, params)
 
           {:ok,
            assign(socket,
@@ -159,23 +141,80 @@ defmodule TimesinkWeb.Cinema.FilmLive do
     """
   end
 
-  # Generate a URL-friendly slug from a film title for SEO
-  def title_slug(title) do
-    title
+  # Generate a URL-friendly slug from a string
+  def title_slug(str) do
+    str
     |> String.downcase()
     |> String.replace(~r/[^a-z0-9\s-]/, "")
     |> String.replace(~r/\s+/, "-")
     |> String.trim("-")
   end
 
-  # Build the current page's path including query params, used for return_to after login
-  defp current_film_path(%{"id" => id, "title_slug" => slug} = params) do
-    base = "/films/#{id}/#{slug}"
-    if Map.get(params, "from") == "theater", do: base <> "?from=theater", else: base
+  def director_slug(%{creative: %{last_name: l}}) do
+    title_slug(l)
   end
 
-  defp current_film_path(%{"id" => id} = params) do
-    base = "/films/#{id}"
+  # Pick the canonical director for URL purposes: last alphabetically by last name
+  defp canonical_director([]), do: nil
+
+  defp canonical_director(directors) do
+    Enum.max_by(directors, fn %{creative: c} ->
+      String.downcase(c.last_name || "")
+    end)
+  end
+
+  # Return the canonical path for a film (requires directors preloaded)
+  def film_path(%Film{} = film) do
+    dir_slug =
+      case canonical_director(film.directors || []) do
+        nil -> "unknown"
+        director -> director_slug(director)
+      end
+
+    "/films/#{title_slug(film.title)}/#{dir_slug}"
+  end
+
+  # Find a film by matching title slug and director slug
+  defp find_film_by_slugs(title_param, director_param) do
+    Film
+    |> Repo.all()
+    |> Enum.find(fn f ->
+      title_slug(f.title) == title_param
+    end)
+    |> case do
+      nil ->
+        nil
+
+      f ->
+        preloaded =
+          Repo.preload(f, [
+            :genres,
+            poster: [:blob],
+            trailer: [:blob],
+            directors: [creative: :user],
+            writers: [creative: :user],
+            producers: [creative: :user],
+            cast: [creative: :user],
+            crew: [creative: :user]
+          ])
+
+        dir_slug =
+          case canonical_director(preloaded.directors) do
+            nil -> "unknown"
+            director -> director_slug(director)
+          end
+
+        if dir_slug == director_param do
+          preloaded
+        else
+          nil
+        end
+    end
+  end
+
+  # Build the current page's path including query params, used for return_to after login
+  defp current_film_path(%Film{} = film, params) do
+    base = film_path(film)
     if Map.get(params, "from") == "theater", do: base <> "?from=theater", else: base
   end
 end

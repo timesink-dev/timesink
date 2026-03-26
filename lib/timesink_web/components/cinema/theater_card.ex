@@ -99,7 +99,7 @@ defmodule TimesinkWeb.Components.TheaterCard do
                   <.button class="cursor-pointer">Go to Theater →</.button>
                 </.link>
               <% else %>
-                <.link navigate={"/films/#{@exhibition.film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(@exhibition.film.title)}?from=theater"}>
+                <.link navigate={TimesinkWeb.Cinema.FilmLive.film_path(@exhibition.film) <> "?from=theater"}>
                   <.button class="cursor-pointer">Enter Theater →</.button>
                 </.link>
               <% end %>
