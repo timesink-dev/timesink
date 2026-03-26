@@ -920,6 +920,38 @@ Hooks.TrixEditor = {
   }
 };
 
+Hooks.CopyReviewLink = {
+  mounted() {
+    const btn = this.el;
+    const label = btn.querySelector("[data-copy-label]");
+    const icon = btn.querySelector("[data-copy-icon]");
+
+    const checkSvg = `<svg class="w-3.5 h-3.5 text-zinc-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+    </svg>`;
+    const linkSvg = icon.innerHTML;
+
+    btn.addEventListener("click", async () => {
+      const url = btn.dataset.url || window.location.href;
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        window.prompt("Copy link:", url);
+        return;
+      }
+
+      // Success feedback
+      icon.innerHTML = checkSvg;
+      label.textContent = "Copied!";
+
+      setTimeout(() => {
+        icon.innerHTML = linkSvg;
+        label.textContent = "Copy link";
+      }, 2000);
+    });
+  }
+};
+
 // ⌘K / Ctrl+K focuses the search input on the page
 Hooks.SearchFocus = {
   mounted() {

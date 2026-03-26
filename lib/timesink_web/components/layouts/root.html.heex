@@ -7,12 +7,41 @@
 
     <meta
       name="description"
-      content="We bring great filmmakers — of all levels — to the stage. And we don’t waste your time discovering them. Real audiences. Real-time reactions. Conversations and moments that last. No noise — pure signal."
+      content={
+        assigns[:og_description] ||
+          "We bring great filmmakers — of all levels — to the stage. And we don’t waste your time discovering them. Real audiences. Real-time reactions. Conversations and moments that last. No noise — pure signal."
+      }
     />
 
     <.live_title suffix=" · Real audiences. Real time. Real cinema.">
       {assigns[:page_title] || "TimeSink Presents"}
     </.live_title>
+
+    <%= if assigns[:og_title] do %>
+      <meta
+        property="og:title"
+        content={"#{assigns[:og_title]} · Real audiences. Real time. Real cinema."}
+      />
+      <meta property="og:description" content={assigns[:og_description]} />
+      <meta property="og:type" content="video.movie" />
+      <%= if assigns[:og_url] do %>
+        <meta property="og:url" content={assigns[:og_url]} />
+      <% end %>
+      <%= if assigns[:og_image] do %>
+        <meta property="og:image" content={assigns[:og_image]} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+      <% end %>
+      <meta
+        name="twitter:card"
+        content={if assigns[:og_image], do: "summary_large_image", else: "summary"}
+      />
+      <meta name="twitter:title" content={assigns[:og_title]} />
+      <meta name="twitter:description" content={assigns[:og_description]} />
+      <%= if assigns[:og_image] do %>
+        <meta name="twitter:image" content={assigns[:og_image]} />
+      <% end %>
+    <% end %>
     
 <!-- ✅ FAVICONS -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />

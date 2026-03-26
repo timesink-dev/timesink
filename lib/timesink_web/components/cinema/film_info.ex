@@ -8,10 +8,7 @@ defmodule TimesinkWeb.Components.FilmInfo do
 
   def film_info(assigns) do
     ~H"""
-    <div
-      id="film-info"
-      class={["w-full mt-6 md:mt-8 border-t border-gray-800 pt-6 space-y-4", @class]}
-    >
+    <div id="film-info" class={["w-full mt-2 border-t border-gray-800 pt-3 pb-4 space-y-4", @class]}>
       <div class="text-2xl font-semibold tracking-wide text-mystery-white">
         {@film.title}
         <span class="text-gray-400 text-base ml-2">({@film.year})</span>
@@ -123,9 +120,11 @@ defmodule TimesinkWeb.Components.FilmInfo do
 
   attr :film, Film, required: true
 
+  attr :review_url, :string, default: nil
+
   def film_review(%{film: %{review: review}} = assigns) when is_binary(review) and review != "" do
     ~H"""
-    <div class="px-1">
+    <div id="film-review" class="px-1">
       <div class="flex items-center gap-3 mb-5">
         <div class="h-10 w-10 rounded-full overflow-hidden ring-1 ring-zinc-700 shrink-0">
           <img
@@ -134,10 +133,35 @@ defmodule TimesinkWeb.Components.FilmInfo do
             class="h-full w-full object-cover object-center"
           />
         </div>
-        <div>
+        <div class="flex-1">
           <p class="text-sm font-medium text-mystery-white">TimeSink Presents</p>
           <p class="text-xs text-zinc-500">Film Review</p>
         </div>
+        <button
+          id="copy-review-link"
+          phx-hook="CopyReviewLink"
+          data-url={@review_url}
+          title="Copy link to review"
+          aria-label="Copy link to review"
+          class="cursor-pointer group flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-zinc-500 ring-1 ring-zinc-700 hover:ring-zinc-500 hover:text-zinc-300 transition-all duration-200"
+        >
+          <span data-copy-icon>
+            <svg
+              class="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+              />
+            </svg>
+          </span>
+          <span data-copy-label>Copy link</span>
+        </button>
       </div>
       <div class="film-review-body prose prose-invert prose-base max-w-none text-zinc-300 leading-relaxed prose-p:mt-4 prose-p:mb-6 prose-p:first-of-type:mt-0 prose-p:first-of-type:text-zinc-200">
         {Phoenix.HTML.raw(@film.review)}

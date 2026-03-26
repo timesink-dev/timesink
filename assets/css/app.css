@@ -77,6 +77,49 @@
   overflow: hidden;
 }
 
+
+
+
+/* ── Mux Player theming ─────────────────────────────────────────────────── */
+mux-player {
+  --media-font-family: "Gangster Grotesk", sans-serif;
+  --media-primary-color: #8FA8C9; /* more muted blue */
+  --media-secondary-color: #0C0C0C;     /* backroom-black — control bar background */
+  --media-accent-color: #ADC9FF;        /* neon-blue-light — hover/focus accents */
+  --media-control-background: rgba(12, 12, 12, 0.6);
+  --media-control-hover-background: rgba(12, 12, 12, 0.85);
+  --media-range-track-color: #3B3B3B;   /* dark-theater-medium — unplayed rail */
+  --media-range-thumb-color: #7AA8FF;   /* neon-blue thumb */
+  --media-range-bar-color: #7AA8FF;     /* neon-blue played fill */
+  --media-text-color: #F5F7F9;          /* mystery-white */
+  --media-icon-color: #F5F7F9;          /* mystery-white icons */
+  --media-menu-background: #0C0C0C;     /* backroom-black menu bg */
+  --media-menu-color: #0C0C0C;          /* backroom-black menu text */
+  --media-time-font-size: 0.75rem;
+  --media-preview-time-text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  border-radius: 0;
+}
+
+mux-player::part(range-bar) {
+  background-color: #7AA8FF; /* played portion */
+}
+
+mux-player::part(range-thumb) {
+  background-color: #7AA8FF;
+}
+
+mux-player::part(menu),
+mux-player::part(menu-item) {
+  background-color: #0C0C0C;
+  color: #F5F7F9;
+}
+
+mux-player::part(menu-item[aria-checked="true"]) {
+  color: #7AA8FF; /* your blue highlight */
+}
+
+
+
 .marquee {
   white-space: nowrap;
   overflow: hidden;
