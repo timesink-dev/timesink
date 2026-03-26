@@ -501,7 +501,12 @@ defmodule TimesinkWeb.Cinema.ArchivesLive do
           films =
             pairs
             |> Enum.map(fn {_, film} ->
-              %{id: film.id, title: film.title, year: film.year, film_path: TimesinkWeb.Cinema.FilmLive.film_path(film)}
+              %{
+                id: film.id,
+                title: film.title,
+                year: film.year,
+                film_path: TimesinkWeb.Cinema.FilmLive.film_path(film)
+              }
             end)
             |> Enum.uniq_by(& &1.id)
             |> Enum.sort_by(& &1.title)

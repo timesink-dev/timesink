@@ -17,24 +17,28 @@ Trix.config.blockAttributes.heading3 = {
   group: false
 }
 
-// Replace the default single H1 button with H1 / H2 / H3 buttons
+// Replace the default single H1 button with H1 / H2 / H3 icon buttons
 document.addEventListener("trix-initialize", (event) => {
   const toolbar = event.target.toolbarElement
   const h1Btn = toolbar.querySelector('[data-trix-attribute="heading1"]')
   if (!h1Btn) return
 
-  h1Btn.textContent = "H1"
-  h1Btn.dataset.trixAttribute = "heading1"
+  // Ensure H1 uses icon class (no text)
+  h1Btn.classList.add("trix-button--icon", "trix-button--icon-heading-1")
+  h1Btn.textContent = ""
+  h1Btn.title = "Heading 1"
 
-  const h2Btn = h1Btn.cloneNode(true)
-  h2Btn.textContent = "H2"
+  const h2Btn = h1Btn.cloneNode(false)
+  h2Btn.classList.remove("trix-active", "trix-button--icon-heading-1")
+  h2Btn.classList.add("trix-button--icon-heading-2")
   h2Btn.dataset.trixAttribute = "heading2"
-  h2Btn.classList.remove("trix-active")
+  h2Btn.title = "Heading 2"
 
-  const h3Btn = h1Btn.cloneNode(true)
-  h3Btn.textContent = "H3"
+  const h3Btn = h1Btn.cloneNode(false)
+  h3Btn.classList.remove("trix-active", "trix-button--icon-heading-1")
+  h3Btn.classList.add("trix-button--icon-heading-3")
   h3Btn.dataset.trixAttribute = "heading3"
-  h3Btn.classList.remove("trix-active")
+  h3Btn.title = "Heading 3"
 
   h1Btn.after(h3Btn)
   h1Btn.after(h2Btn)
