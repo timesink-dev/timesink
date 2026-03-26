@@ -38,6 +38,11 @@ defmodule TimesinkWeb.Cinema.FilmLive do
         else
           current_path = current_film_path(film, params)
 
+          og_description =
+            if film.synopsis && film.synopsis != "",
+              do: film.synopsis,
+              else: "A film on TimeSink — Real audiences. Real time. Real cinema."
+
           {:ok,
            assign(socket,
              film: film,
@@ -46,7 +51,12 @@ defmodule TimesinkWeb.Cinema.FilmLive do
              not_found: false,
              from_theater: from_theater,
              theater_slug: theater_slug,
-             current_path: current_path
+             current_path: current_path,
+             page_title: film.title,
+             og_title: film.title,
+             og_description: og_description,
+             og_image: poster_url,
+             og_url: TimesinkWeb.Endpoint.url() <> current_path
            )}
         end
     end
@@ -74,7 +84,7 @@ defmodule TimesinkWeb.Cinema.FilmLive do
       <div class="mx-auto max-w-4xl mt-12 md:mt-16">
         
     <!-- Poster + Trailer -->
-        <div class="rounded-2xl overflow-hidden bg-backroom-black border border-zinc-800">
+        <div class="rounded overflow-hidden bg-backroom-black border border-zinc-800">
           <%= if @trailer_playback_id do %>
             <div class="aspect-video w-full bg-black">
               <mux-player
@@ -88,7 +98,7 @@ defmodule TimesinkWeb.Cinema.FilmLive do
             </div>
           <% else %>
             <%= if @poster_url do %>
-              <div class="relative w-full aspect-[2/3] sm:aspect-video max-h-[520px] overflow-hidden">
+              <div class="relative w-full aspect-2/3 sm:aspect-video max-h-[520px] overflow-hidden">
                 <img
                   src={@poster_url}
                   alt={@film.title}
@@ -113,7 +123,7 @@ defmodule TimesinkWeb.Cinema.FilmLive do
             <div class="shrink-0 flex items-center gap-3">
               <.link
                 navigate={"/sign-in?return_to=#{URI.encode(@current_path)}"}
-                class="inline-flex items-center justify-center rounded bg-white text-backroom-black px-5 py-2 text-sm font-medium transition hover:opacity-90"
+                class="inline-flex items-center justify-center rounded bg-neon-blue-lightest text-backroom-black px-5 py-2 text-sm font-medium transition hover:opacity-90"
               >
                 Sign in
               </.link>
@@ -129,12 +139,12 @@ defmodule TimesinkWeb.Cinema.FilmLive do
         <% end %>
         
     <!-- Film info -->
-        <div class="mt-5 rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800 px-6 py-8">
+        <div class="mt-5 rounded-2xl bg-backroom-black/60 backdrop-blur ring-1 ring-zinc-800 px-6 py-2 pb-6">
           <.film_info film={@film} class="mt-0 border-none pt-0" />
         </div>
 
         <div class="mt-10">
-          <.film_review film={@film} />
+          <.film_review film={@film} review_url={@og_url <> "#film-review"} />
         </div>
       </div>
     </section>
