@@ -112,7 +112,7 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
                         <%= for film <- @film_results do %>
                           <li class="group/row relative px-4 py-2.5 hover:bg-zinc-800/30 transition-colors">
                             <.link
-                              navigate={"/films/#{film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(film.title)}"}
+                              navigate={film.film_path}
                               class="absolute inset-0"
                               aria-hidden="true"
                             >
@@ -186,7 +186,7 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
                             <div class="relative flex flex-wrap gap-1 mt-1">
                               <%= for film <- c.films do %>
                                 <.link
-                                  navigate={"/films/#{film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(film.title)}"}
+                                  navigate={film.film_path}
                                   class="text-[11px] text-zinc-400 hover:text-zinc-200 transition-colors bg-zinc-800/60 rounded px-2 py-0.5 pointer-events-auto"
                                 >
                                   {film.title} <span class="text-zinc-600">({film.year})</span>
@@ -305,7 +305,7 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
     <!-- Poster grid (square, hover alive, not clickable) -->
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                   <%= for ex <- group.exhibitions do %>
-                    <.link navigate={"/films/#{ex.film.id}/#{TimesinkWeb.Cinema.FilmLive.title_slug(ex.film.title)}"}>
+                    <.link navigate={TimesinkWeb.Cinema.FilmLive.film_path(ex.film)}>
                       <article
                         class="group relative rounded-2xl overflow-hidden border border-zinc-800 bg-[#0C0C0C]
                              transition-all duration-300 cursor-pointer select-none
@@ -536,7 +536,8 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
             id: film.id,
             title: film.title,
             year: film.year,
-            directors: join_names(film.directors)
+            directors: join_names(film.directors),
+            film_path: TimesinkWeb.Cinema.FilmLive.film_path(film)
           }
         end)
 
@@ -552,7 +553,9 @@ defmodule TimesinkWeb.Cinema.UpcomingLive do
 
           films =
             pairs
-            |> Enum.map(fn {_, film} -> %{id: film.id, title: film.title, year: film.year} end)
+            |> Enum.map(fn {_, film} ->
+              %{id: film.id, title: film.title, year: film.year, film_path: TimesinkWeb.Cinema.FilmLive.film_path(film)}
+            end)
             |> Enum.uniq_by(& &1.id)
             |> Enum.sort_by(& &1.title)
 
