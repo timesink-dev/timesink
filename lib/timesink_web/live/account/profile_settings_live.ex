@@ -1,8 +1,6 @@
 defmodule TimesinkWeb.Account.ProfileSettingsLive do
   use TimesinkWeb, :live_view
 
-  on_mount {TimesinkWeb.Auth, :ensure_authenticated}
-
   alias Timesink.Account.{User, Profile, Location}
   alias Timesink.{Locations, Repo}
   alias Timesink.UserCache

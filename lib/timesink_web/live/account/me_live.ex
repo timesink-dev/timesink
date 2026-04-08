@@ -1,8 +1,5 @@
 defmodule TimesinkWeb.Account.MeLive do
   use TimesinkWeb, :live_view
-
-  on_mount {TimesinkWeb.Auth, :ensure_authenticated}
-
   import Ecto.Query, only: [from: 2]
 
   alias Timesink.Repo

@@ -126,6 +126,15 @@ defmodule TimesinkWeb.Router do
       live "/creatives/:id", Cinema.CreativeLive
       live "/films/:title/:director", Cinema.FilmLive
       live "/@:profile_username", Account.ProfileLive
+    end
+  end
+
+  scope "/", TimesinkWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :authenticated,
+      on_mount: {TimesinkWeb.Auth, :ensure_authenticated},
+      layout: {TimesinkWeb.LiveAppLayout, :app} do
       live "/me", Account.MeLive
       live "/me/profile", Account.ProfileSettingsLive
       live "/me/security", Account.SecuritySettingsLive

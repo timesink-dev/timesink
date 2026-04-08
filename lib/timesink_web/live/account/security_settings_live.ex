@@ -1,8 +1,5 @@
 defmodule TimesinkWeb.Account.SecuritySettingsLive do
   use TimesinkWeb, :live_view
-
-  on_mount {TimesinkWeb.Auth, :ensure_authenticated}
-
   alias Timesink.Account
 
   def mount(_p, _s, socket) do

@@ -1,8 +1,6 @@
 defmodule TimesinkWeb.Account.PersonalFilmSubmissionsLive do
   use TimesinkWeb, :live_view
 
-  on_mount {TimesinkWeb.Auth, :ensure_authenticated}
-
   import Ecto.Query
 
   def mount(_params, _session, socket) do
