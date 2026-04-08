@@ -300,7 +300,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     }
 
     case Timesink.Payment.Stripe.create_payment_intent(%{
-           amount: 2500,
+           amount: 500,
            currency: "usd",
            metadata: metadata
          }) do
@@ -328,7 +328,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     )
 
     case BtcPay.create_invoice(%{
-           amount: 25,
+           amount: 5,
            currency: "USD",
            metadata: data
          }) do
