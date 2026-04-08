@@ -40,7 +40,7 @@ defmodule TimesinkWeb.FilmSubmission.StepReviewAndSubmitComponent do
           <div class="md:col-span-2 bg-gray-900/60 border border-gray-700 p-4 rounded-md mt-4">
             <div class="flex items-center justify-between">
               <div class="text-white font-medium">Submission Fee</div>
-              <div class="text-green-400 font-bold">$25.00 – Paid</div>
+              <div class="text-green-400 font-bold">$5.00 – Paid</div>
             </div>
             <div class="mt-2 text-xs text-gray-400">
               Payment ID: {@data.payment_id || "Not available"}<br />

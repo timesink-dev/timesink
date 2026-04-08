@@ -13,7 +13,7 @@ defmodule TimesinkWeb.FilmSubmission.StepIntroComponent do
             Film submission
           </h1>
           <p class="text-lg mt-4 text-neon-blue-lightest font-medium">
-            $25.00 submission fee
+            $5.00 submission fee
           </p>
 
           <div class="mt-8 space-y-4 text-base text-gray-300 max-w-prose">
