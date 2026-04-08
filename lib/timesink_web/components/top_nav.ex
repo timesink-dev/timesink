@@ -258,7 +258,7 @@ defmodule TimesinkWeb.TopNav do
             <%= if @current_user do %>
               <!-- Nice labeled separator -->
               <hr class="w-full border-dark-theater-primary/60 mt-2" />
-
+              
     <!-- My Account link styled to match -->
               <li class="w-full">
                 <.link
