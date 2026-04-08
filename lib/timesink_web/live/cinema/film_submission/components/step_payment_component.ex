@@ -34,7 +34,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
         <!-- Payment Form -->
         <div class="md:w-1/2 space-y-6">
           <h2 class="text-3xl font-brand">Payment Details</h2>
-          <p class="text-gray-300">Secure your submission with a $25.00 programming fee.</p>
+          <p class="text-gray-300">Secure your submission with a $5.00 programming fee.</p>
           <%= if is_nil(@method) do %>
             <p class="text-sm text-gray-400 mt-4">Please choose a payment method to continue.</p>
           <% end %>
@@ -202,7 +202,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
               </div>
               <div class="pt-6 border-t border-gray-800">
                 <dt class="font-semibold text-white">Total</dt>
-                <dd class="text-lg font-bold text-white">$25.00</dd>
+                <dd class="text-lg font-bold text-white">$5.00</dd>
               </div>
             </dl>
           </div>

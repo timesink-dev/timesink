@@ -126,7 +126,13 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                   label="Your name"
                   placeholder="Enter your full name"
                   required
-                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                  disabled={not is_nil(@data[:user])}
+                  input_class={
+                    if @data[:user],
+                      do:
+                        "w-full p-3 rounded text-mystery-white border-none opacity-40 cursor-not-allowed bg-zinc-800",
+                      else: "w-full p-3 rounded text-mystery-white border-none"
+                  }
                 />
                 <.input
                   type="email"
@@ -134,7 +140,13 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
                   label="Email address"
                   placeholder="you@example.com"
                   required
-                  input_class="w-full p-3 rounded text-mystery-white border-none"
+                  disabled={not is_nil(@data[:user])}
+                  input_class={
+                    if @data[:user],
+                      do:
+                        "w-full p-3 rounded text-mystery-white border-none opacity-40 cursor-not-allowed bg-zinc-800",
+                      else: "w-full p-3 rounded text-mystery-white border-none"
+                  }
                 />
               </div>
             </div>
@@ -155,7 +167,10 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
   end
 
   def handle_event("validate", %{"film_submission" => params}, socket) do
-    params = ensure_https_prefix(params)
+    params =
+      params
+      |> ensure_https_prefix()
+      |> maybe_lock_contact_fields(socket.assigns.data)
 
     changeset =
       %FilmSubmission{}
@@ -166,7 +181,11 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
   end
 
   def handle_event("save_film_details", %{"film_submission" => params}, socket) do
-    params = ensure_https_prefix(params)
+    params =
+      params
+      |> ensure_https_prefix()
+      |> maybe_lock_contact_fields(socket.assigns.data)
+
     changeset = FilmSubmission.changeset(%FilmSubmission{}, params)
 
     if changeset.valid? do
@@ -228,4 +247,12 @@ defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
   end
 
   defp ensure_https_prefix(params), do: params
+
+  defp maybe_lock_contact_fields(params, %{user: user}) when not is_nil(user) do
+    params
+    |> Map.put("contact_name", user_full_name(user))
+    |> Map.put("contact_email", user_email(user))
+  end
+
+  defp maybe_lock_contact_fields(params, _data), do: params
 end

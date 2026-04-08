@@ -7,7 +7,7 @@ defmodule Timesink.Cinema.Mail do
     body = """
     Hi #{contact_name},
 
-    We’ve received your film submission, "#{submission.title}." Our team will review it carefully and get back to you soon.
+    We’ve received your film submission #{submission.title}. Our team will review it carefully and get back to you soon.
 
     You can check the status of your submission anytime from your film submissions dashboard at #{base_url()}/me/film-submissions.
 

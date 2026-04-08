@@ -99,7 +99,7 @@ defmodule TimesinkWeb.InfoPageLive do
         <div>
           <h2 class="text-white font-semibold text-lg">How much does it cost to submit a film?</h2>
           <p class="mt-1">
-            $25. This covers our infrastructure, curation process, and screening tools.
+            $5. This covers our infrastructure, curation process, and screening tools.
           </p>
         </div>
 

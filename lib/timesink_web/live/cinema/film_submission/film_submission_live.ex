@@ -84,8 +84,6 @@ defmodule TimesinkWeb.FilmSubmissionLive do
       id="film-submission"
       class="relative h-screen px-6 md:px-12 py-16 md:py-24 flex flex-col justify-between"
     >
-      <script defer async src="https://js.stripe.com/v3/">
-      </script>
       <div class="flex flex-col-reverse md:flex-row items-center gap-6">
         <div class="w-full">
           <div class="min-h-[calc(100vh-200px)] max-h-[calc(100vh-200px)] overflow-auto">
@@ -300,7 +298,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     }
 
     case Timesink.Payment.Stripe.create_payment_intent(%{
-           amount: 2500,
+           amount: 500,
            currency: "usd",
            metadata: metadata
          }) do
@@ -328,7 +326,7 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     )
 
     case BtcPay.create_invoice(%{
-           amount: 25,
+           amount: 5,
            currency: "USD",
            metadata: data
          }) do
