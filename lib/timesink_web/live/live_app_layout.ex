@@ -27,21 +27,21 @@ defmodule TimesinkWeb.LiveAppLayout do
           <div class="space-y-2 text-md md:mx-auto md:text-left">
             <p class="font-semibold text-lg mb-2">eXplOre</p>
             <div class="flex flex-col gap-y-2">
-              <a href="/now-playing" class="hover:underline hover:text-white transition">
+              <.link navigate="/now-playing" class="hover:underline hover:text-white transition">
                 Now Playing
-              </a>
-              <a href="/upcoming" class="hover:underline hover:text-white transition">
+              </.link>
+              <.link navigate="/upcoming" class="hover:underline hover:text-white transition">
                 upcoming
-              </a>
-              <a href="/archives" class="hover:underline hover:text-white transition">
+              </.link>
+              <.link navigate="/archives" class="hover:underline hover:text-white transition">
                 Archives
-              </a>
+              </.link>
               <a href="/blog" class="hover:underline hover:text-white transition">
                 Blog
               </a>
-              <a href="/info" class="hover:underline hover:text-white transition">
+              <.link navigate="/info" class="hover:underline hover:text-white transition">
                 About
-              </a>
+              </.link>
             </div>
             <br />
           </div>
@@ -52,9 +52,9 @@ defmodule TimesinkWeb.LiveAppLayout do
             <div class="space-y-2 md:mx-auto">
               <p class="font-semibold text-lg mb-4">Make your mark</p>
               <div class="flex flex-col space-y-4">
-                <a href="/submit" class="hover:underline hover:text-white transition">
+                <.link navigate="/submit" class="hover:underline hover:text-white transition">
                   <.button color="primary">Submit your film</.button>
-                </a>
+                </.link>
                 <a href="/join" class="hover:underline hover:text-white transition">
                   <.button color="secondary">Get membership</.button>
                 </a>
@@ -93,13 +93,13 @@ defmodule TimesinkWeb.LiveAppLayout do
             &copy; {DateTime.utc_now().year} TimeSink Presents. All rights reserved.
           </p>
           <div class="flex items-center gap-4">
-            <a href="/terms" class="hover:underline hover:text-white transition">
+            <.link navigate="/terms" class="hover:underline hover:text-white transition">
               Terms of Service
-            </a>
+            </.link>
             <span class="hidden sm:inline">·</span>
-            <a href="/privacy" class="hover:underline hover:text-white transition">
+            <.link navigate="/privacy" class="hover:underline hover:text-white transition">
               Privacy Policy
-            </a>
+            </.link>
           </div>
         </div>
       </div>
