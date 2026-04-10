@@ -176,8 +176,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
         <p class="text-zinc-400 mt-2 text-sm">{@theater.description}</p>
       </div>
-      
-    <!-- Toolbar -->
+
+      <%!-- <!-- Toolbar -->
       <div class="flex justify-between items-center mb-4">
         <div></div>
 
@@ -199,7 +199,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               <.icon name="hero-star" class="w-4 h-4" />
               <span>Capture moment</span>
             </button>
-            
+
     <!-- Tooltip ABOVE -->
             <div
               :if={@phase != :playing or is_nil(@offset)}
@@ -223,7 +223,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             {if @chat_open, do: "Hide Chat", else: "Show Chat"}
           </button>
         </div>
-      </div>
+      </div> --%>
       
     <!-- Main layout (mobile-first: stacked) -->
       <div class="flex flex-col md:flex-row md:gap-6 md:items-start">
@@ -231,61 +231,129 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         <div class="min-w-0 md:flex-1 transition-all duration-300">
           <% playback_id = Film.get_mux_playback_id(@film.video) %>
 
-          <%= if @phase == :playing and playback_id do %>
-            <div id="simulated-live-player" data-offset={@offset} phx-hook="SimulatedLivePlayback">
-              <mux-player
-                id={@film.title}
-                playback-id={playback_id}
-                metadata-video-title={@film.title}
-                metadata-video-id={@film.id}
-                metadata-viewer_user_id={@user.id}
-                poster={Film.poster_url(@film.poster)}
-                style="width: 100%; aspect-ratio: 16/9; border-radius: 10px; overflow: hidden; border: 1px solid #27272a;"
-                stream-type="live"
-                autoplay
-                loop
-                start-time={@offset}
-              />
-            </div>
-          <% else %>
-            <div class="text-center text-gray-400 text-xl py-8 border border-white/10 rounded-xl bg-white/2 min-h-60 flex items-center justify-center">
-              <%= if is_nil(@countdown) do %>
-                <div class="flex flex-col items-center justify-center gap-2 text-gray-400">
-                  <h3 class="font-semibold">Finding your seat...</h3>
-                  <div class="h-4 w-4 border-2 border-t-transparent border-gray-400 rounded-full animate-spin" />
-                </div>
-              <% else %>
-                <div class="flex flex-col justify-center text-center gap-y-2">
-                  <h3 class="text-gray-400">
-                    <%= case @phase do %>
-                      <% :upcoming -> %>
-                        This showcase is scheduled and will begin shortly.
-                      <% :intermission -> %>
-                        Intermission — next screening begins in
-                      <% _ -> %>
-                        Waiting for playback...
-                    <% end %>
-                  </h3>
+          <div class="relative mx-auto w-full max-w-[920px]">
+            <%= if @phase == :playing and playback_id do %>
+              <div id="simulated-live-player" data-offset={@offset} phx-hook="SimulatedLivePlayback">
+                <mux-player
+                  id={@film.title}
+                  playback-id={playback_id}
+                  metadata-video-title={@film.title}
+                  metadata-video-id={@film.id}
+                  metadata-viewer_user_id={@user.id}
+                  poster={Film.poster_url(@film.poster)}
+                  style="width: 100%; aspect-ratio: 16/9; border-radius: 10px; overflow: hidden; border: 1px solid #27272a;"
+                  stream-type="live"
+                  autoplay
+                  loop
+                  start-time={@offset}
+                />
+              </div>
+            <% else %>
+              <div class="text-center text-gray-400 text-xl py-8 border border-white/10 rounded-xl bg-white/2 min-h-60 flex items-center justify-center">
+                <%= if is_nil(@countdown) do %>
+                  <div class="flex flex-col items-center justify-center gap-2 text-gray-400">
+                    <h3 class="font-semibold">Finding your seat...</h3>
+                    <div class="h-4 w-4 border-2 border-t-transparent border-gray-400 rounded-full animate-spin" />
+                  </div>
+                <% else %>
+                  <div class="flex flex-col justify-center text-center gap-y-2">
+                    <h3 class="text-gray-400">
+                      <%= case @phase do %>
+                        <% :upcoming -> %>
+                          This showcase is scheduled and will begin shortly.
+                        <% :intermission -> %>
+                          Intermission — next screening begins in
+                        <% _ -> %>
+                          Waiting for playback...
+                      <% end %>
+                    </h3>
 
-                  <div class="flex justify-center gap-x-4 mt-2 text-center">
-                    <%= for {label, value} <- breakdown_time(@countdown) do %>
-                      <div class="flex flex-col items-center mx-2">
-                        <span class={
+                    <div class="flex justify-center gap-x-4 mt-2 text-center">
+                      <%= for {label, value} <- breakdown_time(@countdown) do %>
+                        <div class="flex flex-col items-center mx-2">
+                          <span class={
                   "text-3xl font-bold" <>
                   if(label == :seconds and @pulse_seconds_only?, do: " pulse-second text-neon-red-lightest", else: "")
                 }>
-                          {String.pad_leading(to_string(value), 2, "0")}
-                        </span>
-                        <span class="text-xs uppercase text-gray-400 tracking-wider">
-                          {Atom.to_string(label)}
-                        </span>
-                      </div>
-                    <% end %>
+                            {String.pad_leading(to_string(value), 2, "0")}
+                          </span>
+                          <span class="text-xs uppercase text-gray-400 tracking-wider">
+                            {Atom.to_string(label)}
+                          </span>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+            
+    <!-- Desktop floating toolbar -->
+            <div
+              :if={!@chat_open}
+              class="hidden md:flex absolute top-4 left-full ml-3 z-20 flex-col gap-2"
+            >
+              <!-- Chat toggle (ADD THIS ABOVE) -->
+              <div class="group relative">
+                <button
+                  phx-click="toggle_chat"
+                  aria-label={if @chat_open, do: "Hide chat", else: "Show chat"}
+                  class="h-10 w-10 rounded-lg border border-white/10 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center justify-center transition"
+                >
+                  <.icon name="hero-chat-bubble-left-right" class="w-4 h-4" />
+                </button>
+
+                <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
+                  <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
+                    {if @chat_open, do: "Hide chat", else: "Show chat"}
+                    <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
+                    </div>
                   </div>
                 </div>
-              <% end %>
+              </div>
+              
+    <!-- Capture moment (your existing block stays as-is) -->
+              <div class="group relative">
+                <button
+                  phx-click="mark_moment"
+                  disabled={@phase != :playing or is_nil(@offset)}
+                  aria-label="Save moment"
+                  class={[
+                    "h-10 w-10 rounded-lg border flex items-center justify-center transition",
+                    if(@phase == :playing and not is_nil(@offset),
+                      do:
+                        "cursor-pointer border-white/10 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white",
+                      else: "cursor-not-allowed border-white/5 bg-zinc-900/40 text-zinc-500"
+                    )
+                  ]}
+                >
+                  <.icon name="hero-bookmark" class="w-4 h-4" />
+                </button>
+
+                <div
+                  :if={@phase != :playing or is_nil(@offset)}
+                  class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10"
+                >
+                  <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
+                    Only available while the film is playing
+                    <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  :if={@phase == :playing and not is_nil(@offset)}
+                  class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10"
+                >
+                  <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
+                    Save moment
+                    <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          <% end %>
+          </div>
 
           <%!-- <div class="mt-4 flex items-center justify-end">
             <button
@@ -323,6 +391,13 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           <!-- Tabs -->
           <div class="flex items-center justify-between bg-white/[0.03] px-4 py-3 border-b border-white/10">
             <div class="flex gap-6 text-sm">
+              <button
+                phx-click="toggle_chat"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.06] transition"
+                aria-label="Close panel"
+              >
+                <.icon name="hero-x-mark" class="w-4 h-4" />
+              </button>
               <button
                 phx-click="switch_tab"
                 phx-value-to="chat"
