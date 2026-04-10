@@ -1,6 +1,7 @@
 defmodule TimesinkWeb.Cinema.TheaterLive do
   use TimesinkWeb, :live_view
   alias Timesink.Cinema.{Theater, Exhibition, Showcase, Film}
+  alias Timesink.Cinema.Exhibition.{Note}
   alias TimesinkWeb.Components.FilmInfo
   alias TimesinkWeb.PubSubTopics
   alias Timesink.Repo
@@ -138,9 +139,17 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:user, socket.assigns.current_user)
        |> assign(:presence, presence)
        |> assign(:offset, nil)
+       |> assign(:last_offset, nil)
        |> assign(:phase, nil)
        |> assign(:countdown, nil)
        |> assign(:pulse_seconds_only?, false)
+       # notes
+       |> assign(:notes, [])
+       |> assign(:note_body, "")
+       |> assign(:note_form_open, false)
+       |> assign(:note_anchor_offset, nil)
+       |> assign(:new_notes_count, 0)
+       |> assign(:notes_pulse, false)
        # UI state
        |> assign(:chat_open, false)
        |> assign(:active_panel_tab, :chat)
@@ -169,8 +178,34 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       </div>
       
     <!-- Toolbar -->
-      <div class="flex justify-between items-center mb-4">
-        <div></div>
+      <div class="flex justify-between items-center mb-4 gap-3">
+        <div>
+          <div class="group relative inline-block">
+            <button
+              phx-click="mark_moment"
+              disabled={@phase != :playing or is_nil(@offset)}
+              class={[
+                "inline-flex items-center gap-2 text-sm px-4 py-2 rounded-lg border transition",
+                if(@phase == :playing and not is_nil(@offset),
+                  do:
+                    "cursor-pointer border-white/10 bg-white/2 hover:bg-white/6 text-gray-300 hover:text-white",
+                  else: "cursor-not-allowed border-white/5 bg-white/[0.02] text-zinc-500"
+                )
+              ]}
+            >
+              <.icon name="hero-star" class="w-4 h-4" />
+              <span>Capture moment</span>
+            </button>
+
+            <div
+              :if={@phase != :playing or is_nil(@offset)}
+              class="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block group-focus-within:block z-10 whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg"
+            >
+              Only available while the film is playing
+            </div>
+          </div>
+        </div>
+
         <button
           phx-click="toggle_chat"
           class={[
@@ -246,6 +281,16 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             </div>
           <% end %>
 
+          <%!-- <div class="mt-4 flex items-center justify-end">
+            <button
+              phx-click="mark_moment"
+              class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm border border-white/10 bg-white/4 text-gray-200 hover:bg-white/8 transition"
+              disabled={@phase != :playing or is_nil(@offset)}
+            >
+              ✏︎ Mark moment
+            </button>
+          </div> --%>
+
           <FilmInfo.film_info film={@film} />
 
           <div class="mt-12">
@@ -282,6 +327,23 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 ]}
               >
                 Chat
+              </button>
+              <button
+                phx-click="switch_tab"
+                phx-value-to="notes"
+                class={[
+                  "pb-2 cursor-pointer relative",
+                  @active_panel_tab == :notes && "text-white border-b-2 border-white",
+                  @active_panel_tab != :notes && "text-gray-400 hover:text-gray-200",
+                  @notes_pulse && @active_panel_tab != :notes && "text-white"
+                ]}
+              >
+                <span>Notes</span>
+                <%= if @new_notes_count > 0 and @active_panel_tab != :notes do %>
+                  <span class="ml-2 inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-white/10 px-1 text-[10px] text-white">
+                    {@new_notes_count}
+                  </span>
+                <% end %>
               </button>
               <button
                 phx-click="switch_tab"
@@ -360,6 +422,84 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   </button>
                 </div>
               </form>
+            </div>
+
+            <div class={@active_panel_tab == :notes || "hidden"}>
+              <div class="max-h-[65vh] overflow-y-auto p-4 space-y-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="text-sm font-medium text-white">Audience Notes</h3>
+                    <p class="text-xs text-zinc-400 mt-1">
+                      Notes surface only when their moment is reached.
+                    </p>
+                  </div>
+
+                  <button
+                    phx-click="open_note_form"
+                    class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs bg-white/6 text-gray-200 hover:bg-white/[0.10] transition"
+                  >
+                    Add a note
+                  </button>
+                </div>
+
+                <%= if @note_form_open do %>
+                  <form
+                    phx-submit="note:save"
+                    phx-change="note:change"
+                    class="rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-3"
+                  >
+                    <div class="text-xs text-zinc-400">
+                      Adding note for: {format_offset(@note_anchor_offset)}
+                    </div>
+
+                    <textarea
+                      name="note[body]"
+                      rows="3"
+                      class="w-full bg-white/4 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
+                      placeholder="Post a note for this moment…"
+                    ><%= @note_body %></textarea>
+
+                    <div class="flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        phx-click="cancel_note"
+                        class="cursor-pointer rounded-lg px-3 py-2 text-xs text-zinc-300 hover:text-white"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs bg-white/6 text-gray-200 hover:bg-white/[0.10] transition"
+                      >
+                        Post
+                      </button>
+                    </div>
+                  </form>
+                <% end %>
+
+                <%= if Enum.empty?(@notes) do %>
+                  <div class="text-center text-zinc-400 text-sm py-8">
+                    No notes have surfaced yet.
+                  </div>
+                <% else %>
+                  <div class="space-y-3">
+                    <%= for note <- @notes do %>
+                      <div class="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                        <div class="flex items-center justify-between gap-3">
+                          <span class="text-xs text-zinc-400">
+                            {(note.user && "@" <> note.user.username) || "Member"}
+                          </span>
+                          <span class="text-xs text-zinc-500">
+                            {format_offset(note.offset_seconds)}
+                          </span>
+                        </div>
+
+                        <p class="text-sm text-gray-100 mt-2 whitespace-pre-wrap">{note.body}</p>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
             </div>
             
     <!-- Live Audience Tab Content -->
@@ -552,12 +692,50 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     time_parts = breakdown_time(countdown || 0)
     pulse_seconds_only? = Enum.all?(time_parts, fn {unit, _} -> unit == :seconds end)
 
+    current_offset = offset || 0
+    previous_offset = socket.assigns[:last_offset] || 0
+
+    notes =
+      if exhibition = socket.assigns[:exhibition] do
+        Timesink.Cinema.Exhibition.Note.list_visible_notes(exhibition.id, current_offset)
+      else
+        []
+      end
+
+    newly_unlocked_count =
+      cond do
+        is_nil(socket.assigns[:exhibition]) ->
+          0
+
+        current_offset <= previous_offset ->
+          0
+
+        true ->
+          notes
+          |> Enum.count(fn note ->
+            note.offset_seconds > previous_offset and note.offset_seconds <= current_offset
+          end)
+      end
+
+    should_pulse? =
+      newly_unlocked_count > 0 and socket.assigns.active_panel_tab != :notes
+
     {:noreply,
      socket
      |> assign(:phase, phase)
      |> assign(:offset, offset)
+     |> assign(:last_offset, current_offset)
      |> assign(:countdown, countdown)
-     |> assign(:pulse_seconds_only?, pulse_seconds_only?)}
+     |> assign(:pulse_seconds_only?, pulse_seconds_only?)
+     |> assign(:notes, notes)
+     |> assign(
+       :new_notes_count,
+       if(should_pulse?,
+         do: socket.assigns.new_notes_count + newly_unlocked_count,
+         else: socket.assigns.new_notes_count
+       )
+     )
+     |> assign(:notes_pulse, should_pulse?)}
   end
 
   def handle_info(%{event: "presence_diff", topic: topic}, socket) do
@@ -607,7 +785,22 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   end
 
   def handle_event("switch_tab", %{"to" => to}, socket) do
-    tab = if to == "online", do: :online, else: :chat
+    tab =
+      case to do
+        "online" -> :online
+        "notes" -> :notes
+        _ -> :chat
+      end
+
+    socket =
+      if tab == :notes do
+        socket
+        |> assign(:new_notes_count, 0)
+        |> assign(:notes_pulse, false)
+      else
+        socket
+      end
+
     {:noreply, assign(socket, :active_panel_tab, tab)}
   end
 
@@ -667,7 +860,90 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   end
 
   # ───────────────────────────────────────────────────────────
-  # Helpers (unchanged)
+  # Note event handlers
+  # ───────────────────────────────────────────────────────────
+  def handle_event("mark_moment", _params, socket) do
+    offset = socket.assigns.offset
+
+    cond do
+      is_nil(offset) ->
+        {:noreply, socket}
+
+      true ->
+        {:noreply,
+         socket
+         |> assign(:note_form_open, true)
+         |> assign(:note_anchor_offset, offset)
+         |> assign(:active_panel_tab, :notes)
+         |> assign(:chat_open, true)}
+    end
+  end
+
+  def handle_event("open_note_form", _params, socket) do
+    offset = socket.assigns.note_anchor_offset || socket.assigns.offset
+
+    {:noreply,
+     socket
+     |> assign(:note_form_open, true)
+     |> assign(:note_anchor_offset, offset)}
+  end
+
+  def handle_event("cancel_note", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:note_form_open, false)
+     |> assign(:note_body, "")}
+  end
+
+  def handle_event("note:change", %{"note" => %{"body" => body}}, socket) do
+    {:noreply, assign(socket, :note_body, body)}
+  end
+
+  def handle_event("note:save", %{"note" => %{"body" => body}}, socket) do
+    user = socket.assigns.user
+    exhibition = socket.assigns.exhibition
+    offset = socket.assigns.note_anchor_offset
+    body = String.trim(body || "")
+
+    cond do
+      is_nil(user) or is_nil(exhibition) or is_nil(offset) ->
+        {:noreply, socket}
+
+      body == "" ->
+        {:noreply, socket}
+
+      true ->
+        case Timesink.Cinema.Note.create(%{
+               source: :audience,
+               body: body,
+               offset_seconds: offset,
+               status: :visible,
+               exhibition_id: exhibition.id,
+               user_id: user.id
+             }) do
+          {:ok, _note} ->
+            notes =
+              Timesink.Cinema.Exhibition.Note.list_visible_notes(
+                exhibition.id,
+                socket.assigns.offset || 0
+              )
+
+            {:noreply,
+             socket
+             |> assign(:notes, notes)
+             |> assign(:note_form_open, false)
+             |> assign(:note_body, "")
+             |> assign(:note_anchor_offset, nil)}
+
+          {:error, changeset} ->
+            Logger.warning("Failed to create note: #{inspect(changeset.errors)}")
+            {:noreply, socket}
+        end
+    end
+  end
+
+  # ───────────────────────────────────────────────────────────
+  # Helpers
   # ───────────────────────────────────────────────────────────
   defp breakdown_time(nil), do: []
   defp breakdown_time(seconds) when is_float(seconds), do: breakdown_time(trunc(seconds))
@@ -740,5 +1016,20 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       [a, b] -> "#{a} and #{b} are typing…"
       _many -> "Several people are typing…"
     end
+  end
+
+  defp format_offset(nil), do: "00:00:00"
+
+  defp format_offset(total_seconds) when is_integer(total_seconds) do
+    hours = div(total_seconds, 3600)
+    minutes = div(rem(total_seconds, 3600), 60)
+    seconds = rem(total_seconds, 60)
+
+    [
+      String.pad_leading(to_string(hours), 2, "0"),
+      String.pad_leading(to_string(minutes), 2, "0"),
+      String.pad_leading(to_string(seconds), 2, "0")
+    ]
+    |> Enum.join(":")
   end
 end
