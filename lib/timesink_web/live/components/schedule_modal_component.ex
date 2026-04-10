@@ -21,7 +21,6 @@ defmodule TimesinkWeb.ScheduleModalComponent do
                   <div class="flex-1">
                     <div class="flex items-center gap-2 mb-2">
                       <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
-                        <div class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
                         Live Now
                       </span>
                       <span class="text-xs text-zinc-500">

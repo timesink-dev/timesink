@@ -129,7 +129,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
       {:noreply,
        socket
-       # efficient diffs
        |> stream(:messages, recent_msgs, reset: true)
        |> assign(:chat_input, "")
        |> assign(:typing_users, %{})
@@ -151,9 +150,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:new_notes_count, 0)
        |> assign(:notes_pulse, false)
        # UI state
-       |> assign(:chat_open, false)
-       |> assign(:active_panel_tab, :chat)
+       |> assign(:open_panel, nil)
+       |> assign(:chat_tab, :messages)
        |> assign(:has_messages?, length(recent_msgs) > 0)
+       # seo stuff
        |> assign(:page_title, film.title)
        |> assign(:og_title, film.title)
        |> assign(:og_description, og_description)
@@ -216,11 +216,11 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           <button
             phx-click="toggle_chat"
             class={[
-              @chat_open && "invisible md:visible",
+              @open_panel && "invisible md:visible",
               "cursor-pointer text-sm px-4 py-2 rounded-lg border border-white/10 bg-white/2 hover:bg-white/6 text-gray-300 hover:text-white transition"
             ]}
           >
-            {if @chat_open, do: "Hide Chat", else: "Show Chat"}
+            {if @open_panel, do: "Hide Chat", else: "Show Chat"}
           </button>
         </div>
       </div> --%>
@@ -290,63 +290,114 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             
     <!-- Desktop floating toolbar -->
             <div
-              :if={!@chat_open}
-              class="hidden md:flex absolute top-4 left-full ml-3 z-20 flex-col gap-2"
+              :if={is_nil(@open_panel)}
+              class="hidden md:flex absolute top-0 left-full ml-3 z-20 flex-col gap-2"
             >
-              <!-- Chat toggle (ADD THIS ABOVE) -->
               <div class="group relative">
                 <button
-                  phx-click="toggle_chat"
-                  aria-label={if @chat_open, do: "Hide chat", else: "Show chat"}
-                  class="h-10 w-10 rounded-lg border border-white/10 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center justify-center transition"
+                  phx-click="open_panel"
+                  phx-value-panel="chat"
+                  aria-label="Open live chat"
+                  class="cursor-pointer h-10 w-10 rounded-lg border border-white/10 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center justify-center transition"
                 >
                   <.icon name="hero-chat-bubble-left-right" class="w-4 h-4" />
                 </button>
 
                 <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
                   <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                    {if @chat_open, do: "Hide chat", else: "Show chat"}
+                    Live chat
                     <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
                     </div>
                   </div>
                 </div>
               </div>
-              
-    <!-- Capture moment (your existing block stays as-is) -->
+
               <div class="group relative">
                 <button
-                  phx-click="mark_moment"
-                  disabled={@phase != :playing or is_nil(@offset)}
-                  aria-label="Save moment"
+                  phx-click="open_panel"
+                  phx-value-panel="audience_notes"
+                  aria-label="Open audience notes"
                   class={[
-                    "h-10 w-10 rounded-lg border flex items-center justify-center transition",
-                    if(@phase == :playing and not is_nil(@offset),
-                      do:
-                        "cursor-pointer border-white/10 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white",
-                      else: "cursor-not-allowed border-white/5 bg-zinc-900/40 text-zinc-500"
-                    )
+                    "cursor-pointer h-10 w-10 rounded-lg border flex items-center justify-center transition bg-zinc-900/80 hover:bg-zinc-800 hover:text-white",
+                    @notes_pulse && "border-white/20 text-white",
+                    !@notes_pulse && "border-white/10 text-zinc-200"
                   ]}
                 >
-                  <.icon name="hero-bookmark" class="w-4 h-4" />
+                  <.icon name="hero-folder-open" class="w-4 h-4" />
                 </button>
 
-                <div
-                  :if={@phase != :playing or is_nil(@offset)}
-                  class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10"
-                >
+                <%= if @new_notes_count > 0 do %>
+                  <span class="absolute -top-1 -right-1 inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-white/10 px-1 text-[10px] text-white">
+                    {@new_notes_count}
+                  </span>
+                <% end %>
+
+                <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
                   <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                    Only available while the film is playing
+                    Audience notes
                     <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div
-                  :if={@phase == :playing and not is_nil(@offset)}
-                  class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10"
+              <%!-- <div class="group relative">
+                <button
+                  phx-click="open_panel"
+                  phx-value-panel="live_audience"
+                  aria-label="Open live audience"
+                  class="cursor-pointer h-10 w-10 rounded-lg border border-white/10 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center justify-center transition"
                 >
+                  <.icon name="hero-users" class="w-4 h-4" />
+                </button>
+
+                <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
                   <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                    Save moment
+                    Live audience
+                    <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
+                    </div>
+                  </div>
+                </div>
+              </div> --%>
+              <div class="group relative">
+                <button
+                  phx-click="open_panel"
+                  phx-value-panel="live_audience"
+                  aria-label="Open live audience"
+                  class="cursor-pointer h-10 w-10 rounded-lg border border-white/10 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center justify-center transition"
+                >
+                  <.icon name="hero-megaphone" class="w-4 h-4" />
+                </button>
+
+                <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
+                  <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
+                    Director's commentary
+                    <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="group relative">
+                <button
+                  phx-click="mark_moment"
+                  aria-label="Mark a moment"
+                  F
+                  disabled={@phase != :playing or is_nil(@offset)}
+                  class={[
+                    "inline-flex items-center gap-2 text-sm h-10 w-10 px-3 py-2 rounded-lg border transition",
+                    if(@phase == :playing and not is_nil(@offset),
+                      do:
+                        "cursor-pointer border-neon-blue-lightest bg-white/2 hover:bg-white/6 text-gray-300 hover:text-white",
+                      else: "cursor-not-allowed border-white/5 bg-white/2 text-zinc-500"
+                    )
+                  ]}
+                >
+                  <.icon name="hero-bookmark" class="w-4 h-4 text-neon-blue-light" />
+                </button>
+
+                <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
+                  <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
+                    Save a timestamp to make a note
                     <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
                     </div>
                   </div>
@@ -376,158 +427,192 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         </div>
         
     <!-- Right: Desktop side panel -->
-        <aside class={
-          [
-            # <--- THIS FIXES IT
-            "hidden md:block",
-            "md:sticky md:top-20 md:self-start border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02]",
-            "md:transform-gpu transition-all duration-200",
-            if(@chat_open,
-              do: "opacity-100 md:w-96 md:translate-x-0",
-              else: "opacity-0 md:w-0 md:translate-x-4 pointer-events-none"
-            )
-          ]
-        }>
-          <!-- Tabs -->
-          <div class="flex items-center justify-between bg-white/[0.03] px-4 py-3 border-b border-white/10">
-            <div class="flex gap-6 text-sm">
-              <button
-                phx-click="toggle_chat"
-                class="inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.06] transition"
-                aria-label="Close panel"
-              >
-                <.icon name="hero-x-mark" class="w-4 h-4" />
-              </button>
-              <button
-                phx-click="switch_tab"
-                phx-value-to="chat"
-                class={[
-                  "pb-2 cursor-pointer",
-                  @active_panel_tab == :chat && "text-white border-b-2 border-white",
-                  @active_panel_tab != :chat && "text-gray-400 hover:text-gray-200"
-                ]}
-              >
-                Chat
-              </button>
-              <button
-                phx-click="switch_tab"
-                phx-value-to="notes"
-                class={[
-                  "pb-2 cursor-pointer relative",
-                  @active_panel_tab == :notes && "text-white border-b-2 border-white",
-                  @active_panel_tab != :notes && "text-gray-400 hover:text-gray-200",
-                  @notes_pulse && @active_panel_tab != :notes && "text-white"
-                ]}
-              >
-                <span>Notes</span>
-                <%= if @new_notes_count > 0 and @active_panel_tab != :notes do %>
-                  <span class="ml-2 inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-white/10 px-1 text-[10px] text-white">
-                    {@new_notes_count}
-                  </span>
-                <% end %>
-              </button>
-              <button
-                phx-click="switch_tab"
-                phx-value-to="online"
-                class={[
-                  "pb-2 cursor-pointer",
-                  @active_panel_tab == :online && "text-white border-b-2 border-white",
-                  @active_panel_tab != :online && "text-gray-400 hover:text-gray-200"
-                ]}
-              >
-                Live Audience
-              </button>
+        <aside class={[
+          "hidden md:block md:sticky md:top-20 md:self-start border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02] md:transform-gpu transition-all duration-200",
+          if(is_nil(@open_panel),
+            do: "opacity-0 md:w-0 md:translate-x-4 pointer-events-none",
+            else: "opacity-100 md:w-96 md:translate-x-0"
+          )
+        ]}>
+          <div class="flex items-center justify-between bg-white/3 px-4 py-3 border-b border-white/10">
+            <div class="text-sm text-white font-medium">
+              <%= case @open_panel do %>
+                <% :chat -> %>
+                  Live Chat
+                <% :audience_notes -> %>
+                  Audience Notes
+                <% :director_notes -> %>
+                  Director’s Notes
+                <% _ -> %>
+              <% end %>
             </div>
-          </div>
-          <div id="chat-panel-desktop" class="bg-white/[0.01] relative">
-            <!-- This is where the jump button will be absolutely positioned -->
 
-            <div class={@active_panel_tab == :chat || "hidden"}>
-              <!-- Scrollable chat body (fixed height) -->
-              <div id="chat-body-desktop" class="max-h-[40vh] overflow-y-auto relative">
-                <%= if not @has_messages? do %>
-                  <!-- Empty state placeholder -->
-                  <div class="flex items-center justify-center h-full min-h-[200px] px-4 py-8">
-                    <div class="text-center">
-                      <div class="text-zinc-400 text-sm mb-2">No messages yet</div>
-                      <div class="text-zinc-500 text-xs">Be the first to start the conversation!</div>
-                    </div>
-                  </div>
-                <% else %>
-                  <!-- STREAMED LIST (desktop only) -->
-                  <ul
-                    id="chat-list"
-                    phx-update="stream"
-                    phx-hook="ChatAutoScroll"
-                    data-scroll="#chat-body-desktop"
-                    data-host="#chat-panel-desktop"
-                    class="divide-y divide-white/5"
-                  >
-                    <%= for {dom_id, msg} <- @streams.messages do %>
-                      <li id={dom_id} class="px-4 py-3">
-                        <div class="flex items-center justify-between">
-                          <span class="font-medium text-zinc-300 text-sm">
-                            {(msg.user && "@" <> msg.user.username) || "Member"}
-                          </span>
-                          <span class="text-xs text-zinc-400">{chat_time(msg.inserted_at)}</span>
+            <button
+              phx-click="close_panel"
+              class="cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.06] transition"
+              aria-label="Close panel"
+            >
+              <.icon name="hero-x-mark" class="w-4 h-4" />
+            </button>
+          </div>
+
+          <div id="theater-panel-desktop" class="bg-white/1 relative">
+            <div :if={@open_panel == :chat}>
+              <div class="flex items-center gap-6 px-4 py-3 border-b border-white/10 bg-white/[0.02] text-sm">
+                <button
+                  phx-click="switch_chat_tab"
+                  phx-value-to="messages"
+                  class={[
+                    "pb-2 cursor-pointer",
+                    @chat_tab == :messages && "text-white border-b-2 border-white",
+                    @chat_tab != :messages && "text-gray-400 hover:text-gray-200"
+                  ]}
+                >
+                  Chat
+                </button>
+
+                <button
+                  phx-click="switch_chat_tab"
+                  phx-value-to="audience"
+                  class={[
+                    "pb-2 cursor-pointer",
+                    @chat_tab == :audience && "text-white border-b-2 border-white",
+                    @chat_tab != :audience && "text-gray-400 hover:text-gray-200"
+                  ]}
+                >
+                  Live Audience
+                </button>
+              </div>
+
+              <div :if={@chat_tab == :messages}>
+                <div id="chat-body-desktop" class="max-h-[40vh] overflow-y-auto relative">
+                  <%= if not @has_messages? do %>
+                    <div class="flex items-center justify-center h-full min-h-[200px] px-4 py-8">
+                      <div class="text-center">
+                        <div class="text-zinc-400 text-sm mb-2">No messages yet</div>
+                        <div class="text-zinc-500 text-xs">
+                          Be the first to start the conversation!
                         </div>
-                        <p class="text-gray-100 text-sm mt-1">{msg.content}</p>
+                      </div>
+                    </div>
+                  <% else %>
+                    <ul
+                      id="chat-list"
+                      phx-update="stream"
+                      phx-hook="ChatAutoScroll"
+                      data-scroll="#chat-body-desktop"
+                      data-host="#theater-panel-desktop"
+                      class="divide-y divide-white/5"
+                    >
+                      <%= for {dom_id, msg} <- @streams.messages do %>
+                        <li id={dom_id} class="px-4 py-3">
+                          <div class="flex items-center justify-between">
+                            <span class="font-medium text-zinc-300 text-sm">
+                              {(msg.user && "@" <> msg.user.username) || "Member"}
+                            </span>
+                            <span class="text-xs text-zinc-400">{chat_time(msg.inserted_at)}</span>
+                          </div>
+                          <p class="text-gray-100 text-sm mt-1">{msg.content}</p>
+                        </li>
+                      <% end %>
+                    </ul>
+                  <% end %>
+
+                  <%= if map_size(@typing_users) > 0 do %>
+                    <div class="px-4 py-2 text-xs text-zinc-400 border-t border-white/5">
+                      {typing_line(@typing_users, @presence)}
+                    </div>
+                  <% end %>
+                </div>
+
+                <form phx-submit="chat:send" class="p-3 border-t border-white/10">
+                  <div class="flex items-center gap-2">
+                    <input
+                      type="text"
+                      name="chat[body]"
+                      value={@chat_input}
+                      placeholder="Type a message…"
+                      phx-change="chat:typing"
+                      phx-debounce="100"
+                      class="w-full bg-white/4 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
+                      autocomplete="off"
+                    />
+                    <button class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/6 text-gray-200 hover:bg-white/[0.10] transition">
+                      Send
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div :if={@chat_tab == :audience} class="max-h-[65vh] overflow-y-auto p-3">
+                <%= if map_size(@presence) > 0 do %>
+                  <ul class="space-y-2">
+                    <%= for {_user_id, %{metas: [meta | _]}} <- @presence do %>
+                      <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-white/[0.02] hover:bg-white/[0.04] transition">
+                        <div class="flex items-center gap-3">
+                          <div class="h-7 w-7 rounded-full bg-white/8 text-gray-100 flex items-center justify-center text-[11px] font-semibold">
+                            {meta.username |> String.first() |> String.upcase()}
+                          </div>
+                          <span class="text-sm text-gray-100">{meta.username}</span>
+                        </div>
+                        <span class="flex items-center gap-1 text-xs text-zinc-400">
+                          <span class="relative inline-flex h-2 w-2">
+                            <span class="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping">
+                            </span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500">
+                            </span>
+                          </span>
+                          online
+                        </span>
                       </li>
                     <% end %>
                   </ul>
-                <% end %>
-                
-    <!-- TYPING -->
-                <%= if map_size(@typing_users) > 0 do %>
-                  <div class="px-4 py-2 text-xs text-zinc-400 border-t border-white/5">
-                    {typing_line(@typing_users, @presence)}
+                <% else %>
+                  <div class="text-center text-zinc-400 text-sm py-8">
+                    No one is currently watching
                   </div>
                 <% end %>
               </div>
-              
-    <!-- INPUT (outside scroll area) -->
-              <form phx-submit="chat:send" class="p-3 border-t border-white/10">
-                <div class="flex items-center gap-2">
-                  <input
-                    type="text"
-                    name="chat[body]"
-                    value={@chat_input}
-                    placeholder="Type a message…"
-                    phx-change="chat:typing"
-                    phx-debounce="100"
-                    class="w-full bg-white/4 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
-                    autocomplete="off"
-                  />
-                  <button class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/6 text-gray-200 hover:bg-white/[0.10] transition">
-                    Send
-                  </button>
-                </div>
-              </form>
             </div>
 
-            <div class={@active_panel_tab == :notes || "hidden"}>
+            <div :if={@open_panel == :audience_notes}>
               <div class="max-h-[65vh] overflow-y-auto p-4 space-y-4">
-                <div class="flex items-center justify-between">
-                  <div>
+                <div class="flex items-center justify-between gap-3">
+                  <%!-- <div>
                     <h3 class="text-sm font-medium text-white">Audience Notes</h3>
                     <p class="text-xs text-zinc-400 mt-1">
                       Notes surface only when their moment is reached.
                     </p>
-                  </div>
+                  </div> --%>
 
-                  <button
-                    phx-click="open_note_form"
-                    class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs bg-white/6 text-gray-200 hover:bg-white/[0.10] transition"
-                  >
-                    Add a note
-                  </button>
+                  <div class="flex items-center gap-2">
+                    <div class="group relative">
+                      <div
+                        :if={@phase != :playing or is_nil(@offset)}
+                        class="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-10"
+                      >
+                        <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
+                          Only available while the film is playing
+                          <div class="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-zinc-900 border-r border-b border-white/10 rotate-45">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      phx-click="open_note_form"
+                      class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs bg-white/6 text-gray-200 hover:bg-white/10 transition"
+                    >
+                      <.icon name="hero-document-plus" class="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <%= if @note_form_open do %>
                   <form
                     phx-submit="note:save"
                     phx-change="note:change"
-                    class="rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-3"
+                    class="rounded-xl border border-white/10 bg-white/3 p-3 space-y-3"
                   >
                     <div class="text-xs text-zinc-400">
                       Adding note for: {format_offset(@note_anchor_offset)}
@@ -550,7 +635,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                       </button>
                       <button
                         type="submit"
-                        class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs bg-white/6 text-gray-200 hover:bg-white/[0.10] transition"
+                        class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs bg-white/6 text-gray-200 hover:bg-white/10 transition"
                       >
                         Post
                       </button>
@@ -565,7 +650,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 <% else %>
                   <div class="space-y-3">
                     <%= for note <- @notes do %>
-                      <div class="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                      <div class="rounded-xl border border-white/10 bg-white/2 p-3">
                         <div class="flex items-center justify-between gap-3">
                           <span class="text-xs text-zinc-400">
                             {(note.user && "@" <> note.user.username) || "Member"}
@@ -582,38 +667,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 <% end %>
               </div>
             </div>
-            
-    <!-- Live Audience Tab Content -->
-            <div class={[
-              "max-h-[65vh] overflow-y-auto p-3",
-              @active_panel_tab == :online || "hidden"
-            ]}>
-              <%= if map_size(@presence) > 0 do %>
-                <ul class="space-y-2">
-                  <%= for {_user_id, %{metas: [meta | _]}} <- @presence do %>
-                    <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-white/[0.02] hover:bg-white/[0.04] transition">
-                      <div class="flex items-center gap-3">
-                        <div class="h-7 w-7 rounded-full bg-white/8 text-gray-100 flex items-center justify-center text-[11px] font-semibold">
-                          {meta.username |> String.first() |> String.upcase()}
-                        </div>
-                        <span class="text-sm text-gray-100">{meta.username}</span>
-                      </div>
-                      <span class="flex items-center gap-1 text-xs text-zinc-400">
-                        <span class="relative inline-flex h-2 w-2">
-                          <span class="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping">
-                          </span>
-                          <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                        </span>
-                        online
-                      </span>
-                    </li>
-                  <% end %>
-                </ul>
-              <% else %>
-                <div class="text-center text-zinc-400 text-sm py-8">
-                  No one is currently watching
-                </div>
-              <% end %>
+            <div :if={@open_panel == :director_notes} class="p-4">
+              <div class="text-sm text-zinc-400">
+                Director’s commentary is not available for this screening yet.
+              </div>
             </div>
           </div>
         </aside>
@@ -622,7 +679,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <!-- Mobile chat drawer -->
       <div class={[
         "md:hidden fixed inset-0 z-50 flex items-end transition-opacity duration-200",
-        if(@chat_open, do: "opacity-100 pointer-events-auto", else: "opacity-0 pointer-events-none")
+        if(@open_panel, do: "opacity-100 pointer-events-auto", else: "opacity-0 pointer-events-none")
       ]}>
         <!-- backdrop -->
         <div class="absolute inset-0 bg-black/70" phx-click="toggle_chat" aria-hidden="true"></div>
@@ -630,7 +687,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <!-- sheet -->
         <div class={[
           "relative w-full rounded-t-2xl border-t border-white/10 bg-backroom-black transition-transform duration-300 ease-out",
-          if(@chat_open, do: "translate-y-0", else: "translate-y-full")
+          if(@open_panel, do: "translate-y-0", else: "translate-y-full")
         ]}>
           <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
             <div class="flex gap-4 text-sm">
@@ -639,8 +696,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 phx-value-to="chat"
                 class={[
                   "pb-2 cursor-pointer",
-                  @active_panel_tab == :chat && "text-white border-b-2 border-white",
-                  @active_panel_tab != :chat && "text-gray-400 hover:text-gray-200"
+                  @open_panel == :chat && "text-white border-b-2 border-white",
+                  @open_panel != :chat && "text-gray-400 hover:text-gray-200"
                 ]}
               >
                 Chat
@@ -650,8 +707,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 phx-value-to="online"
                 class={[
                   "pb-2 cursor-pointer",
-                  @active_panel_tab == :online && "text-white border-b-2 border-white",
-                  @active_panel_tab != :online && "text-gray-400 hover:text-gray-200"
+                  @open_panel == :online && "text-white border-b-2 border-white",
+                  @open_panel != :online && "text-gray-400 hover:text-gray-200"
                 ]}
               >
                 Live Audience
@@ -662,7 +719,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
           <div id="mobile-chat-panel" class="h-[50vh] flex flex-col relative">
             <div id="mobile-chat-body" class="flex-1 overflow-y-auto overscroll-contain">
-              <div class={@active_panel_tab == :chat || "hidden"}>
+              <div class={@open_panel == :chat || "hidden"}>
                 <%= if not @has_messages? do %>
                   <!-- Empty state placeholder -->
                   <div class="flex items-center justify-center h-full min-h-[300px] px-4 py-8">
@@ -705,7 +762,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <!-- Mobile Live Audience Tab Content -->
               <div class={[
                 "p-3",
-                @active_panel_tab == :online || "hidden"
+                @open_panel == :online || "hidden"
               ]}>
                 <%= if map_size(@presence) > 0 do %>
                   <ul class="space-y-2">
@@ -737,7 +794,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               </div>
             </div>
 
-            <%= if @active_panel_tab == :chat do %>
+            <%= if @open_panel == :chat do %>
               <form phx-submit="chat:send" class="p-3 border-t border-white/10 bg-backroom-black">
                 <div class="flex items-center gap-2">
                   <input
@@ -792,14 +849,13 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           0
 
         true ->
-          notes
-          |> Enum.count(fn note ->
+          Enum.count(notes, fn note ->
             note.offset_seconds > previous_offset and note.offset_seconds <= current_offset
           end)
       end
 
     should_pulse? =
-      newly_unlocked_count > 0 and socket.assigns.active_panel_tab != :notes
+      newly_unlocked_count > 0 and socket.assigns.open_panel != :audience_notes
 
     {:noreply,
      socket
@@ -856,33 +912,84 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   # ───────────────────────────────────────────────────────────
   # Events
   # ───────────────────────────────────────────────────────────
-  def handle_event("toggle_chat", _params, socket) do
-    new_state = not socket.assigns.chat_open
 
-    {:noreply,
-     socket
-     |> assign(:chat_open, new_state)
-     |> push_event("toggle_body_scroll", %{prevent: new_state})}
-  end
-
-  def handle_event("switch_tab", %{"to" => to}, socket) do
-    tab =
-      case to do
-        "online" -> :online
-        "notes" -> :notes
-        _ -> :chat
+  def handle_event("open_panel", %{"panel" => panel}, socket) do
+    open_panel =
+      case panel do
+        "chat" -> :chat
+        "audience_notes" -> :audience_notes
+        "director_notes" -> :director_notes
+        _ -> nil
       end
 
     socket =
-      if tab == :notes do
-        socket
-        |> assign(:new_notes_count, 0)
-        |> assign(:notes_pulse, false)
-      else
-        socket
+      socket
+      |> assign(:open_panel, open_panel)
+      |> push_event("toggle_body_scroll", %{prevent: not is_nil(open_panel)})
+
+    socket =
+      case open_panel do
+        :audience_notes ->
+          socket
+          |> assign(:new_notes_count, 0)
+          |> assign(:notes_pulse, false)
+
+        :chat ->
+          assign(socket, :chat_tab, :messages)
+
+        _ ->
+          socket
       end
 
-    {:noreply, assign(socket, :active_panel_tab, tab)}
+    {:noreply, socket}
+  end
+
+  def handle_event("close_panel", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:open_panel, nil)
+     |> push_event("toggle_body_scroll", %{prevent: false})}
+  end
+
+  def handle_event("open_panel", %{"panel" => panel}, socket) do
+    open_panel =
+      case panel do
+        "chat" -> :chat
+        "audience_notes" -> :audience_notes
+        "director_notes" -> :director_notes
+        _ -> nil
+      end
+
+    socket =
+      socket
+      |> assign(:open_panel, open_panel)
+      |> push_event("toggle_body_scroll", %{prevent: not is_nil(open_panel)})
+
+    socket =
+      case open_panel do
+        :audience_notes ->
+          socket
+          |> assign(:new_notes_count, 0)
+          |> assign(:notes_pulse, false)
+
+        :chat ->
+          assign(socket, :chat_tab, :messages)
+
+        _ ->
+          socket
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("switch_chat_tab", %{"to" => to}, socket) do
+    tab =
+      case to do
+        "audience" -> :audience
+        _ -> :messages
+      end
+
+    {:noreply, assign(socket, :chat_tab, tab)}
   end
 
   # debounced on input change
@@ -955,8 +1062,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
          socket
          |> assign(:note_form_open, true)
          |> assign(:note_anchor_offset, offset)
-         |> assign(:active_panel_tab, :notes)
-         |> assign(:chat_open, true)}
+         |> assign(:open_panel, :audience_notes)
+         |> assign(:new_notes_count, 0)
+         |> assign(:notes_pulse, false)
+         |> push_event("toggle_body_scroll", %{prevent: true})}
     end
   end
 
@@ -995,7 +1104,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
       true ->
         case Timesink.Cinema.Note.create(%{
-               source: :audience,
+               source: :live_audience,
                body: body,
                offset_seconds: offset,
                status: :visible,
