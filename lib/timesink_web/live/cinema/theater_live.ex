@@ -487,7 +487,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             else: "w-96 opacity-100 translate-x-0"
           )
         ]}>
-          <aside class="sticky top-20 self-start border border-white/10 rounded-2xl overflow-hidden bg-white/2">
+          <aside class="sticky top-20 self-start border border-white/10 rounded-2xl overflow-hidden bg-zinc-950/70">
             <div class="flex items-center justify-between px-4 py-3 border-b border-white/8">
               <div class="text-xs font-semibold uppercase tracking-widest text-zinc-400">
                 <%= case @open_panel do %>
@@ -544,7 +544,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
             <div id="theater-panel-desktop" class="relative">
               <div class={@open_panel != :chat && "hidden"}>
-                <div class="flex items-center gap-6 px-4 py-3 border-b border-white/10 bg-white/[0.02] text-sm">
+                <div class="flex items-center gap-6 px-4 py-3 border-b border-white/10 bg-zinc-900/30 text-sm">
                   <button
                     phx-click="switch_chat_tab"
                     phx-value-to="messages"
@@ -634,7 +634,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   <%= if map_size(@presence) > 0 do %>
                     <ul class="space-y-2">
                       <%= for {_user_id, %{metas: [meta | _]}} <- @presence do %>
-                        <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-white/[0.02] hover:bg-white/[0.04] transition">
+                        <li class="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 bg-zinc-900/60 hover:bg-zinc-800/60 transition">
                           <div class="flex items-center gap-3">
                             <div class="h-7 w-7 rounded-full bg-white/8 text-gray-100 flex items-center justify-center text-[11px] font-semibold">
                               {meta.username |> String.first() |> String.upcase()}
