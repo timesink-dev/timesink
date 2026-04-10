@@ -487,7 +487,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             else: "w-96 opacity-100 translate-x-0"
           )
         ]}>
-          <aside class="sticky top-20 self-start border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02]">
+          <aside class="sticky top-20 self-start border border-white/10 rounded-2xl overflow-hidden bg-white/2">
             <div class="flex items-center justify-between px-4 py-3 border-b border-white/8">
               <div class="text-xs font-semibold uppercase tracking-widest text-zinc-400">
                 <%= case @open_panel do %>
