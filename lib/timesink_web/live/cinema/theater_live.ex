@@ -178,8 +178,11 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       </div>
       
     <!-- Toolbar -->
-      <div class="flex justify-between items-center mb-4 gap-3">
-        <div>
+      <div class="flex justify-between items-center mb-4">
+        <div></div>
+
+        <div class="flex items-center gap-3">
+          <!-- Save Moment -->
           <div class="group relative inline-block">
             <button
               phx-click="mark_moment"
@@ -196,27 +199,30 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               <.icon name="hero-star" class="w-4 h-4" />
               <span>Capture moment</span>
             </button>
-
+            
+    <!-- Tooltip ABOVE -->
             <div
               :if={@phase != :playing or is_nil(@offset)}
-              class="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block group-focus-within:block z-10 whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg"
+              class="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-10"
             >
-              Only available while the film is playing
+              <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
+                Only available while the film is playing
+                <div class="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-zinc-900 border-r border-b border-white/10 rotate-45">
+                </div>
+              </div>
             </div>
           </div>
+          <!-- Show Chat -->
+          <button
+            phx-click="toggle_chat"
+            class={[
+              @chat_open && "invisible md:visible",
+              "cursor-pointer text-sm px-4 py-2 rounded-lg border border-white/10 bg-white/2 hover:bg-white/6 text-gray-300 hover:text-white transition"
+            ]}
+          >
+            {if @chat_open, do: "Hide Chat", else: "Show Chat"}
+          </button>
         </div>
-
-        <button
-          phx-click="toggle_chat"
-          class={[
-            @chat_open && "invisible md:visible",
-            "cursor-pointer text-sm px-4 py-2 rounded-lg border border-white/10 bg-white/2 hover:bg-white/6 text-gray-300 hover:text-white transition"
-          ]}
-          aria-haspopup="dialog"
-          aria-expanded="false"
-        >
-          {if @chat_open, do: "Hide Chat", else: "Show Chat"}
-        </button>
       </div>
       
     <!-- Main layout (mobile-first: stacked) -->
