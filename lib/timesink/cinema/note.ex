@@ -16,4 +16,10 @@ defmodule Timesink.Cinema.Exhibition.Note do
     |> preload([:user])
     |> Repo.all()
   end
+
+  def total_notes_count(exhibition_id) do
+    Note
+    |> where([n], n.exhibition_id == ^exhibition_id and n.status == :visible)
+    |> Repo.aggregate(:count, :id)
+  end
 end

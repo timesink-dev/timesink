@@ -8,10 +8,9 @@ defmodule TimesinkWeb.Components.FilmInfo do
 
   def film_info(assigns) do
     ~H"""
-    <div id="film-info" class={["w-full mt-2 border-t border-gray-800 pt-3 pb-4 space-y-4", @class]}>
+    <div id="film-info" class={["w-full mt-2 pt-3 pb-4 space-y-4", @class]}>
       <div class="text-2xl font-semibold tracking-wide text-mystery-white">
         {@film.title}
-        <span class="text-gray-400 text-base ml-2">({@film.year})</span>
       </div>
 
       <div class="text-xs md:text-sm text-mystery-white uppercase tracking-wider flex flex-wrap gap-x-3 md:gap-x-4 gap-y-2">
@@ -24,7 +23,6 @@ defmodule TimesinkWeb.Components.FilmInfo do
         <%= if Enum.any?(@film.genres) do %>
           <span>•</span>
         <% end %>
-
         <span>{@film.duration} min</span>
         <span>•</span>
         <span>{String.upcase(to_string(@film.format))}</span>

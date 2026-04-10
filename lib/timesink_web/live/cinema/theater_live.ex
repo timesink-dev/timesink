@@ -149,6 +149,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:note_anchor_offset, nil)
        |> assign(:new_notes_count, 0)
        |> assign(:notes_pulse, false)
+       |> assign(:total_notes_count, 0)
+       |> assign(:newly_surfaced_ids, MapSet.new())
        # UI state
        |> assign(:open_panel, nil)
        |> assign(:chat_tab, :messages)
@@ -249,7 +251,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 />
               </div>
             <% else %>
-              <div class="text-center text-gray-400 text-xl py-8 border border-white/10 rounded-xl bg-white/2 min-h-60 flex items-center justify-center">
+              <div class="text-center text-gray-400 text-xl py-8 border border-white/10 rounded-xl min-h-60 flex items-center justify-center bg-zinc-950/70">
                 <%= if is_nil(@countdown) do %>
                   <div class="flex flex-col items-center justify-center gap-2 text-gray-400">
                     <h3 class="font-semibold">Finding your seat...</h3>
@@ -325,9 +327,9 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   <.icon name="hero-folder-open" class="w-4 h-4" />
                 </button>
 
-                <%= if @new_notes_count > 0 do %>
-                  <span class="absolute -top-1 -right-1 inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-white/10 px-1 text-[10px] text-white">
-                    {@new_notes_count}
+                <%= if @total_notes_count > 0 do %>
+                  <span class="absolute -top-1 -right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[9px] text-zinc-300">
+                    {@total_notes_count}
                   </span>
                 <% end %>
 
@@ -371,7 +373,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   class={[
                     "inline-flex items-center justify-center h-9 w-9 rounded-lg border border-transparent transition",
                     if(@phase == :playing and not is_nil(@offset),
-                      do: "cursor-pointer hover:bg-white/8 text-neon-blue-light hover:text-white",
+                      do: "cursor-pointer hover:bg-white/8 text-zinc-400 hover:text-white",
                       else: "cursor-not-allowed text-zinc-600"
                     )
                   ]}
@@ -440,7 +442,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     class={[
                       "cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-md transition",
                       if(@phase == :playing and not is_nil(@offset),
-                        do: "text-neon-blue-light hover:text-white hover:bg-white/[0.06]",
+                        do: "text-shadow-zinc-400 hover:text-white hover:bg-white/6",
                         else: "text-zinc-600 cursor-not-allowed"
                       )
                     ]}
@@ -473,7 +475,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           </div>
 
           <div id="theater-panel-desktop" class="relative">
-            <div :if={@open_panel == :chat}>
+            <div class={@open_panel != :chat && "hidden"}>
               <div class="flex items-center gap-6 px-4 py-3 border-b border-white/10 bg-white/[0.02] text-sm">
                 <button
                   phx-click="switch_chat_tab"
@@ -500,39 +502,36 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 </button>
               </div>
 
-              <div :if={@chat_tab == :messages}>
+              <div class={@chat_tab != :messages && "hidden"}>
                 <div id="chat-body-desktop" class="max-h-[40vh] overflow-y-auto relative">
-                  <%= if not @has_messages? do %>
-                    <div class="flex items-center justify-center h-full min-h-[200px] px-4 py-8">
-                      <div class="text-center">
-                        <div class="text-zinc-400 text-sm mb-2">No messages yet</div>
-                        <div class="text-zinc-500 text-xs">
-                          Be the first to start the conversation!
-                        </div>
+                  <div :if={not @has_messages?} class="flex items-center justify-center min-h-40 px-6 py-8">
+                    <div class="text-center">
+                      <div class="text-zinc-400 text-sm mb-1">The room is quiet.</div>
+                      <div class="text-zinc-600 text-xs leading-relaxed">
+                        Say something — you're watching with others.
                       </div>
                     </div>
-                  <% else %>
-                    <ul
-                      id="chat-list"
-                      phx-update="stream"
-                      phx-hook="ChatAutoScroll"
-                      data-scroll="#chat-body-desktop"
-                      data-host="#theater-panel-desktop"
-                      class="divide-y divide-white/5"
-                    >
-                      <%= for {dom_id, msg} <- @streams.messages do %>
-                        <li id={dom_id} class="px-4 py-3">
-                          <div class="flex items-center justify-between">
-                            <span class="font-medium text-zinc-300 text-sm">
-                              {(msg.user && "@" <> msg.user.username) || "Member"}
-                            </span>
-                            <span class="text-xs text-zinc-400">{chat_time(msg.inserted_at)}</span>
-                          </div>
-                          <p class="text-gray-100 text-sm mt-1">{msg.content}</p>
-                        </li>
-                      <% end %>
-                    </ul>
-                  <% end %>
+                  </div>
+                  <ul
+                    id="chat-list"
+                    phx-update="stream"
+                    phx-hook="ChatAutoScroll"
+                    data-scroll="#chat-body-desktop"
+                    data-host="#theater-panel-desktop"
+                    class="divide-y divide-white/5"
+                  >
+                    <%= for {dom_id, msg} <- @streams.messages do %>
+                      <li id={dom_id} class="px-4 py-3">
+                        <div class="flex items-center justify-between">
+                          <span class="font-medium text-zinc-300 text-sm">
+                            {(msg.user && "@" <> msg.user.username) || "Member"}
+                          </span>
+                          <span class="text-xs text-zinc-400">{chat_time(msg.inserted_at)}</span>
+                        </div>
+                        <p class="text-gray-100 text-sm mt-1">{msg.content}</p>
+                      </li>
+                    <% end %>
+                  </ul>
 
                   <%= if map_size(@typing_users) > 0 do %>
                     <div class="px-4 py-2 text-xs text-zinc-400 border-t border-white/5">
@@ -591,72 +590,117 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               </div>
             </div>
 
-            <div :if={@open_panel == :audience_notes}>
-              <div class="max-h-[65vh] overflow-y-auto p-4 space-y-3">
-                <%= if @note_form_open do %>
-                  <form
-                    phx-submit="note:save"
-                    phx-change="note:change"
-                    class="rounded-xl border border-white/10 bg-white/4 p-4 space-y-3"
-                  >
-                    <div class="flex items-center gap-2 text-xs text-zinc-500">
-                      <.icon name="hero-map-pin" class="w-3 h-3 text-neon-blue-light shrink-0" />
-                      <span>at {format_offset(@note_anchor_offset)}</span>
-                    </div>
-
-                    <textarea
-                      name="note[body]"
-                      rows="3"
-                      autofocus
-                      class="w-full bg-transparent border-0 border-b border-white/10 pb-2 text-sm text-gray-100 placeholder:text-zinc-600 focus:outline-none focus:border-white/25 resize-none transition"
-                      placeholder="What's on your mind at this moment…"
-                    ><%= @note_body %></textarea>
-
-                    <div class="flex items-center justify-between">
-                      <button
-                        type="button"
-                        phx-click="cancel_note"
-                        class="cursor-pointer text-xs text-zinc-500 hover:text-zinc-300 transition"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        class="cursor-pointer inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium bg-white/8 text-gray-200 hover:bg-white/12 transition"
-                      >
-                        Post note
-                      </button>
-                    </div>
-                  </form>
-                <% end %>
-
+            <div :if={@open_panel == :audience_notes} class="flex flex-col">
+              <%!-- Scrollable notes list --%>
+              <div id="notes-body-desktop" class="max-h-[40vh] overflow-y-auto relative">
                 <%= if Enum.empty?(@notes) do %>
-                  <div class="flex flex-col items-center justify-center min-h-[180px] gap-2 text-center px-4">
+                  <div class="flex flex-col items-center justify-center min-h-[160px] gap-2 text-center px-4 py-8">
                     <.icon name="hero-pencil-square" class="w-6 h-6 text-zinc-700" />
-                    <p class="text-sm text-zinc-500">No notes yet.</p>
-                    <p class="text-xs text-zinc-600 leading-relaxed">
-                      Pin a moment during the film to leave a note for the audience.
-                    </p>
-                  </div>
-                <% else %>
-                  <div class="space-y-2">
-                    <%= for note <- @notes do %>
-                      <div class="rounded-xl border border-white/8 bg-white/3 px-3.5 py-3 hover:bg-white/5 transition">
-                        <div class="flex items-center justify-between gap-3 mb-2">
-                          <span class="text-xs font-medium text-zinc-300">
-                            {(note.user && "@" <> note.user.username) || "Member"}
-                          </span>
-                          <span class="flex items-center gap-1 text-[11px] text-zinc-600">
-                            <.icon name="hero-map-pin" class="w-3 h-3" />
-                            {format_offset(note.offset_seconds)}
-                          </span>
-                        </div>
-                        <p class="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap">{note.body}</p>
-                      </div>
+                    <%= if @total_notes_count > 0 do %>
+                      <p class="text-sm text-zinc-500">Notes are waiting in this screening.</p>
+                      <p class="text-xs text-zinc-600 leading-relaxed">
+                        They'll surface as the film plays.
+                      </p>
+                    <% else %>
+                      <p class="text-sm text-zinc-500">No notes yet.</p>
+                      <p class="text-xs text-zinc-600 leading-relaxed">
+                        Pin a moment during the film to leave a note for the audience.
+                      </p>
                     <% end %>
                   </div>
+                <% else %>
+                  <ul
+                    id="notes-list-desktop"
+                    phx-hook="ChatAutoScroll"
+                    data-scroll="#notes-body-desktop"
+                    data-host="#theater-panel-desktop"
+                    class="divide-y divide-white/5"
+                  >
+                    <%= for note <- @notes do %>
+                      <% is_new = MapSet.member?(@newly_surfaced_ids, note.id) %>
+                      <% thumb =
+                        mux_thumbnail_url(Film.get_mux_playback_id(@film.video), note.offset_seconds) %>
+                      <li class={["flex items-start gap-3 px-4 py-3", is_new && "note-surface"]}>
+                        <%= if thumb do %>
+                          <img
+                            src={thumb}
+                            alt="still at #{format_offset(note.offset_seconds)}"
+                            class="w-10 h-10 rounded-md object-cover opacity-60 shrink-0"
+                            loading="lazy"
+                          />
+                        <% end %>
+                        <div class="min-w-0 flex-1">
+                          <div class="flex items-center justify-between">
+                            <span class="font-medium text-zinc-300 text-sm">
+                              {(note.user && "@" <> note.user.username) || "Member"}
+                            </span>
+                            <span class="text-xs text-zinc-400">
+                              {format_offset(note.offset_seconds)}
+                            </span>
+                          </div>
+                          <p class="text-gray-100 text-sm mt-1 whitespace-pre-wrap">{note.body}</p>
+                        </div>
+                      </li>
+                    <% end %>
+                  </ul>
                 <% end %>
               </div>
+
+              <%!-- Note form — pinned at bottom like chat input --%>
+              <%= if @note_form_open do %>
+                <% form_thumb =
+                  mux_thumbnail_url(Film.get_mux_playback_id(@film.video), @note_anchor_offset) %>
+                <div class="border-t border-white/10">
+                  <div class="px-3 pt-3 flex items-start gap-3">
+                    <%= if form_thumb do %>
+                      <div class="relative w-10 h-10 shrink-0">
+                        <div class="absolute inset-0 rounded-md bg-white/6 animate-pulse"></div>
+                        <img
+                          src={form_thumb}
+                          alt="still at #{format_offset(@note_anchor_offset)}"
+                          class="relative w-10 h-10 rounded-md object-cover opacity-60"
+                          onload="this.previousElementSibling.style.display='none'"
+                        />
+                      </div>
+                    <% else %>
+                      <div class="w-10 h-10 rounded-md bg-white/6 shrink-0 flex items-center justify-center">
+                        <.icon name="hero-map-pin" class="w-3.5 h-3.5 text-zinc-600" />
+                      </div>
+                    <% end %>
+                    <span class="flex items-center gap-1 text-xs text-zinc-500 pt-1">
+                      <.icon name="hero-map-pin" class="w-3 h-3 shrink-0" />
+                      {format_offset(@note_anchor_offset)}
+                    </span>
+                  </div>
+                  <form phx-submit="note:save" phx-change="note:change" class="p-3">
+                    <div class="flex items-center gap-2">
+                      <textarea
+                        name="note[body]"
+                        rows="1"
+                        autofocus
+                        phx-debounce="100"
+                        class="w-full bg-white/4 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20 resize-none"
+                        placeholder="Note this moment…"
+                      ><%= @note_body %></textarea>
+                      <div class="flex flex-col gap-1 shrink-0">
+                        <button
+                          type="submit"
+                          class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm bg-white/6 text-gray-200 hover:bg-white/10 transition"
+                        >
+                          Post
+                        </button>
+                        <button
+                          type="button"
+                          phx-click="cancel_note"
+                          class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs text-zinc-500 hover:text-zinc-300 transition"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              <% end %>
             </div>
             <div :if={@open_panel == :director_notes}>
               <div class="flex flex-col items-center justify-center min-h-[180px] gap-3 text-center px-6 py-8">
@@ -833,26 +877,29 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     current_offset = offset || 0
     previous_offset = socket.assigns[:last_offset] || 0
 
-    notes =
+    {notes, newly_surfaced_ids, total_notes_count} =
       if exhibition = socket.assigns[:exhibition] do
-        Timesink.Cinema.Exhibition.Note.list_visible_notes(exhibition.id, current_offset)
+        visible =
+          Timesink.Cinema.Exhibition.Note.list_visible_notes(exhibition.id, current_offset)
+
+        newly_surfaced =
+          if current_offset > previous_offset do
+            visible
+            |> Enum.filter(fn n ->
+              n.offset_seconds > previous_offset and n.offset_seconds <= current_offset
+            end)
+            |> MapSet.new(& &1.id)
+          else
+            MapSet.new()
+          end
+
+        total = Timesink.Cinema.Exhibition.Note.total_notes_count(exhibition.id)
+        {visible, newly_surfaced, total}
       else
-        []
+        {[], MapSet.new(), 0}
       end
 
-    newly_unlocked_count =
-      cond do
-        is_nil(socket.assigns[:exhibition]) ->
-          0
-
-        current_offset <= previous_offset ->
-          0
-
-        true ->
-          Enum.count(notes, fn note ->
-            note.offset_seconds > previous_offset and note.offset_seconds <= current_offset
-          end)
-      end
+    newly_unlocked_count = MapSet.size(newly_surfaced_ids)
 
     should_pulse? =
       newly_unlocked_count > 0 and socket.assigns.open_panel != :audience_notes
@@ -865,6 +912,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
      |> assign(:countdown, countdown)
      |> assign(:pulse_seconds_only?, pulse_seconds_only?)
      |> assign(:notes, notes)
+     |> assign(:newly_surfaced_ids, newly_surfaced_ids)
+     |> assign(:total_notes_count, total_notes_count)
      |> assign(
        :new_notes_count,
        if(should_pulse?,
@@ -1028,6 +1077,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             assoc_id: exhibition_id,
             user_id: user.id
           })
+          |> Timesink.Repo.preload(:user)
 
         Logger.info(
           "Created comment: id=#{msg.id}, content=#{msg.content}, user_id=#{msg.user_id}, assoc_id=#{msg.assoc_id}"
@@ -1104,7 +1154,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
       true ->
         case Timesink.Cinema.Note.create(%{
-               source: :live_audience,
+               source: :audience,
                body: body,
                offset_seconds: offset,
                status: :visible,
@@ -1118,9 +1168,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 socket.assigns.offset || 0
               )
 
+            total = Timesink.Cinema.Exhibition.Note.total_notes_count(exhibition.id)
+
             {:noreply,
              socket
              |> assign(:notes, notes)
+             |> assign(:total_notes_count, total)
              |> assign(:note_form_open, false)
              |> assign(:note_body, "")
              |> assign(:note_anchor_offset, nil)}
@@ -1206,6 +1259,14 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       [a, b] -> "#{a} and #{b} are typing…"
       _many -> "Several people are typing…"
     end
+  end
+
+  defp mux_thumbnail_url(nil, _offset), do: nil
+
+  defp mux_thumbnail_url(playback_id, offset) when is_binary(playback_id) do
+    seconds = offset |> trunc() |> max(0)
+
+    "https://image.mux.com/#{playback_id}/thumbnail.jpg?time=#{seconds}&width=320&fit_mode=smartcrop"
   end
 
   defp format_offset(nil), do: "00:00:00"
