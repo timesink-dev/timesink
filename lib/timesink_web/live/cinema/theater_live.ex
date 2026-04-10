@@ -682,9 +682,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   <% else %>
                     <ul
                       id="notes-list-desktop"
-                      phx-hook="ChatAutoScroll"
+                      phx-hook="NotesAutoScroll"
                       data-scroll="#notes-body-desktop"
-                      data-host="#theater-panel-desktop"
                       class="divide-y divide-white/5"
                     >
                       <%= for note <- @notes do %>
@@ -990,9 +989,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               <% else %>
                 <ul
                   id="mobile-notes-list"
-                  phx-hook="ChatAutoScroll"
+                  phx-hook="NotesAutoScroll"
                   data-scroll="#mobile-chat-body"
-                  data-host="#mobile-chat-panel-wrap"
                   class="divide-y divide-white/5"
                 >
                   <%= for note <- @notes do %>
