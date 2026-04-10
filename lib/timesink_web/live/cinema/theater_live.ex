@@ -699,7 +699,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                             <img
                               src={thumb}
                               alt="still at #{format_offset(note.offset_seconds)}"
-                              class="w-10 h-10 rounded-md object-cover opacity-60 shrink-0"
+                              class="w-16 h-9 rounded-md object-cover opacity-60 shrink-0"
                               loading="lazy"
                             />
                           <% end %>
@@ -727,17 +727,17 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   <div class="border-t border-white/10">
                     <div class="px-3 pt-3 flex items-start gap-3">
                       <%= if form_thumb do %>
-                        <div class="relative w-10 h-10 shrink-0">
-                          <div class="absolute inset-0 rounded-md bg-white/6 animate-pulse"></div>
+                        <div class="relative w-16 h-9 shrink-0">
+                          <div class="absolute inset-0 rounded-md bg-zinc-800 animate-pulse"></div>
                           <img
                             src={form_thumb}
                             alt="still at #{format_offset(@note_anchor_offset)}"
-                            class="relative w-10 h-10 rounded-md object-cover opacity-60"
+                            class="relative w-16 h-9 rounded-md object-cover opacity-60"
                             onload="this.previousElementSibling.style.display='none'"
                           />
                         </div>
                       <% else %>
-                        <div class="w-10 h-10 rounded-md bg-white/6 shrink-0 flex items-center justify-center">
+                        <div class="w-16 h-9 rounded-md bg-white/6 shrink-0 flex items-center justify-center">
                           <.icon name="hero-map-pin" class="w-3.5 h-3.5 text-zinc-600" />
                         </div>
                       <% end %>
@@ -1004,7 +1004,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                         <img
                           src={thumb}
                           alt=""
-                          class="w-10 h-10 rounded-md object-cover opacity-60 shrink-0"
+                          class="w-16 h-9 rounded-md object-cover opacity-60 shrink-0"
                           loading="lazy"
                         />
                       <% end %>
@@ -1031,17 +1031,17 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               <div class="border-t border-white/8 shrink-0">
                 <div class="px-3 pt-3 flex items-start gap-3">
                   <%= if form_thumb do %>
-                    <div class="relative w-10 h-10 shrink-0">
-                      <div class="absolute inset-0 rounded-md bg-white/6 animate-pulse"></div>
+                    <div class="relative w-16 h-9 shrink-0">
+                      <div class="absolute inset-0 rounded-md bg-zinc-800 animate-pulse"></div>
                       <img
                         src={form_thumb}
                         alt=""
-                        class="relative w-10 h-10 rounded-md object-cover opacity-60"
+                        class="relative w-16 h-9 rounded-md object-cover opacity-60"
                         onload="this.previousElementSibling.style.display='none'"
                       />
                     </div>
                   <% else %>
-                    <div class="w-10 h-10 rounded-md bg-white/6 shrink-0 flex items-center justify-center">
+                    <div class="w-16 h-9 rounded-md bg-white/6 shrink-0 flex items-center justify-center">
                       <.icon name="hero-map-pin" class="w-3.5 h-3.5 text-zinc-600" />
                     </div>
                   <% end %>
@@ -1501,7 +1501,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   defp mux_thumbnail_url(playback_id, offset) when is_binary(playback_id) do
     seconds = offset |> trunc() |> max(0)
 
-    "https://image.mux.com/#{playback_id}/thumbnail.jpg?time=#{seconds}&width=320&fit_mode=smartcrop"
+    "https://image.mux.com/#{playback_id}/thumbnail.jpg?time=#{seconds}&width=320&fit_mode=preserve"
   end
 
   defp format_offset(nil), do: "00:00:00"
