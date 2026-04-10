@@ -291,14 +291,14 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <!-- Desktop floating toolbar -->
             <div
               :if={is_nil(@open_panel)}
-              class="hidden md:flex absolute top-0 left-full ml-3 z-20 flex-col gap-2"
+              class="hidden md:flex absolute top-0 left-full ml-3 z-20 flex-col gap-1 rounded-xl border border-white/8 bg-zinc-950/70 backdrop-blur-sm p-1 shadow-xl"
             >
               <div class="group relative">
                 <button
                   phx-click="open_panel"
                   phx-value-panel="chat"
                   aria-label="Open live chat"
-                  class="cursor-pointer h-10 w-10 rounded-lg border border-white/10 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center justify-center transition"
+                  class="cursor-pointer h-9 w-9 rounded-lg border border-transparent text-zinc-400 hover:bg-white/8 hover:text-white flex items-center justify-center transition"
                 >
                   <.icon name="hero-chat-bubble-left-right" class="w-4 h-4" />
                 </button>
@@ -318,9 +318,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   phx-value-panel="audience_notes"
                   aria-label="Open audience notes"
                   class={[
-                    "cursor-pointer h-10 w-10 rounded-lg border flex items-center justify-center transition bg-zinc-900/80 hover:bg-zinc-800 hover:text-white",
-                    @notes_pulse && "border-white/20 text-white",
-                    !@notes_pulse && "border-white/10 text-zinc-200"
+                    "cursor-pointer h-9 w-9 rounded-lg border border-transparent flex items-center justify-center transition hover:bg-white/8 hover:text-white",
+                    if(@notes_pulse, do: "text-white", else: "text-zinc-400")
                   ]}
                 >
                   <.icon name="hero-folder-open" class="w-4 h-4" />
@@ -341,30 +340,11 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 </div>
               </div>
 
-              <%!-- <div class="group relative">
-                <button
-                  phx-click="open_panel"
-                  phx-value-panel="live_audience"
-                  aria-label="Open live audience"
-                  class="cursor-pointer h-10 w-10 rounded-lg border border-white/10 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center justify-center transition"
-                >
-                  <.icon name="hero-users" class="w-4 h-4" />
-                </button>
-
-                <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
-                  <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                    Live audience
-                    <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
-                    </div>
-                  </div>
-                </div>
-              </div> --%>
               <div class="group relative">
                 <button
-                  phx-click="open_panel"
-                  phx-value-panel="live_audience"
-                  aria-label="Open live audience"
-                  class="cursor-pointer h-10 w-10 rounded-lg border border-white/10 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center justify-center transition"
+                  disabled
+                  aria-label="Director's commentary — coming soon"
+                  class="cursor-not-allowed h-9 w-9 rounded-lg border border-transparent text-zinc-600 flex items-center justify-center"
                 >
                   <.icon name="hero-megaphone" class="w-4 h-4" />
                 </button>
@@ -372,32 +352,36 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
                   <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
                     Director's commentary
+                    <span class="ml-2 rounded-full bg-zinc-700 px-1.5 py-0.5 text-[10px] text-zinc-400">
+                      Coming soon
+                    </span>
                     <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
                     </div>
                   </div>
                 </div>
               </div>
+
+              <div class="my-0.5 border-t border-white/8"></div>
+
               <div class="group relative">
                 <button
                   phx-click="mark_moment"
                   aria-label="Mark a moment"
-                  F
                   disabled={@phase != :playing or is_nil(@offset)}
                   class={[
-                    "inline-flex items-center gap-2 text-sm h-10 w-10 px-3 py-2 rounded-lg border transition",
+                    "inline-flex items-center justify-center h-9 w-9 rounded-lg border border-transparent transition",
                     if(@phase == :playing and not is_nil(@offset),
-                      do:
-                        "cursor-pointer border-neon-blue-lightest bg-white/2 hover:bg-white/6 text-gray-300 hover:text-white",
-                      else: "cursor-not-allowed border-white/5 bg-white/2 text-zinc-500"
+                      do: "cursor-pointer hover:bg-white/8 text-neon-blue-light hover:text-white",
+                      else: "cursor-not-allowed text-zinc-600"
                     )
                   ]}
                 >
-                  <.icon name="hero-bookmark" class="w-4 h-4 text-neon-blue-light" />
+                  <.icon name="hero-pencil-square" class="w-4 h-4" />
                 </button>
 
                 <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
                   <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                    Save a timestamp to make a note
+                    Pin this moment &amp; write a note
                     <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
                     </div>
                   </div>
@@ -428,14 +412,14 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         
     <!-- Right: Desktop side panel -->
         <aside class={[
-          "hidden md:block md:sticky md:top-20 md:self-start border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02] md:transform-gpu transition-all duration-200",
+          "hidden md:block md:sticky md:top-20 md:self-start rounded-2xl overflow-hidden md:transform-gpu transition-all duration-200 border border-white/8 bg-zinc-950/80 backdrop-blur-sm shadow-2xl",
           if(is_nil(@open_panel),
             do: "opacity-0 md:w-0 md:translate-x-4 pointer-events-none",
             else: "opacity-100 md:w-96 md:translate-x-0"
           )
         ]}>
-          <div class="flex items-center justify-between bg-white/3 px-4 py-3 border-b border-white/10">
-            <div class="text-sm text-white font-medium">
+          <div class="flex items-center justify-between px-4 py-3 border-b border-white/8">
+            <div class="text-xs font-semibold uppercase tracking-widest text-zinc-400">
               <%= case @open_panel do %>
                 <% :chat -> %>
                   Live Chat
@@ -447,16 +431,48 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               <% end %>
             </div>
 
-            <button
-              phx-click="close_panel"
-              class="cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.06] transition"
-              aria-label="Close panel"
-            >
-              <.icon name="hero-x-mark" class="w-4 h-4" />
-            </button>
+            <div class="flex items-center gap-1">
+              <%= if @open_panel == :audience_notes and not @note_form_open do %>
+                <div class="group relative">
+                  <button
+                    phx-click="open_note_form"
+                    aria-label="Add a note"
+                    class={[
+                      "cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-md transition",
+                      if(@phase == :playing and not is_nil(@offset),
+                        do: "text-neon-blue-light hover:text-white hover:bg-white/[0.06]",
+                        else: "text-zinc-600 cursor-not-allowed"
+                      )
+                    ]}
+                    disabled={@phase != :playing or is_nil(@offset)}
+                  >
+                    <.icon name="hero-pencil-square" class="w-4 h-4" />
+                  </button>
+                  <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
+                    <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
+                      <%= if @phase == :playing and not is_nil(@offset) do %>
+                        Add a note at this moment
+                      <% else %>
+                        Only available while the film is playing
+                      <% end %>
+                      <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+
+              <button
+                phx-click="close_panel"
+                class="cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.06] transition"
+                aria-label="Close panel"
+              >
+                <.icon name="hero-x-mark" class="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          <div id="theater-panel-desktop" class="bg-white/1 relative">
+          <div id="theater-panel-desktop" class="relative">
             <div :if={@open_panel == :chat}>
               <div class="flex items-center gap-6 px-4 py-3 border-b border-white/10 bg-white/[0.02] text-sm">
                 <button
@@ -576,100 +592,84 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             </div>
 
             <div :if={@open_panel == :audience_notes}>
-              <div class="max-h-[65vh] overflow-y-auto p-4 space-y-4">
-                <div class="flex items-center justify-between gap-3">
-                  <%!-- <div>
-                    <h3 class="text-sm font-medium text-white">Audience Notes</h3>
-                    <p class="text-xs text-zinc-400 mt-1">
-                      Notes surface only when their moment is reached.
-                    </p>
-                  </div> --%>
-
-                  <div class="flex items-center gap-2">
-                    <div class="group relative">
-                      <div
-                        :if={@phase != :playing or is_nil(@offset)}
-                        class="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-10"
-                      >
-                        <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                          Only available while the film is playing
-                          <div class="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-zinc-900 border-r border-b border-white/10 rotate-45">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      phx-click="open_note_form"
-                      class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs bg-white/6 text-gray-200 hover:bg-white/10 transition"
-                    >
-                      <.icon name="hero-document-plus" class="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
+              <div class="max-h-[65vh] overflow-y-auto p-4 space-y-3">
                 <%= if @note_form_open do %>
                   <form
                     phx-submit="note:save"
                     phx-change="note:change"
-                    class="rounded-xl border border-white/10 bg-white/3 p-3 space-y-3"
+                    class="rounded-xl border border-white/10 bg-white/4 p-4 space-y-3"
                   >
-                    <div class="text-xs text-zinc-400">
-                      Adding note for: {format_offset(@note_anchor_offset)}
+                    <div class="flex items-center gap-2 text-xs text-zinc-500">
+                      <.icon name="hero-map-pin" class="w-3 h-3 text-neon-blue-light shrink-0" />
+                      <span>at {format_offset(@note_anchor_offset)}</span>
                     </div>
 
                     <textarea
                       name="note[body]"
                       rows="3"
-                      class="w-full bg-white/4 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20"
-                      placeholder="Post a note for this moment…"
+                      autofocus
+                      class="w-full bg-transparent border-0 border-b border-white/10 pb-2 text-sm text-gray-100 placeholder:text-zinc-600 focus:outline-none focus:border-white/25 resize-none transition"
+                      placeholder="What's on your mind at this moment…"
                     ><%= @note_body %></textarea>
 
-                    <div class="flex items-center justify-end gap-2">
+                    <div class="flex items-center justify-between">
                       <button
                         type="button"
                         phx-click="cancel_note"
-                        class="cursor-pointer rounded-lg px-3 py-2 text-xs text-zinc-300 hover:text-white"
+                        class="cursor-pointer text-xs text-zinc-500 hover:text-zinc-300 transition"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        class="cursor-pointer inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs bg-white/6 text-gray-200 hover:bg-white/10 transition"
+                        class="cursor-pointer inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium bg-white/8 text-gray-200 hover:bg-white/12 transition"
                       >
-                        Post
+                        Post note
                       </button>
                     </div>
                   </form>
                 <% end %>
 
                 <%= if Enum.empty?(@notes) do %>
-                  <div class="text-center text-zinc-400 text-sm py-8">
-                    No notes have surfaced yet.
+                  <div class="flex flex-col items-center justify-center min-h-[180px] gap-2 text-center px-4">
+                    <.icon name="hero-pencil-square" class="w-6 h-6 text-zinc-700" />
+                    <p class="text-sm text-zinc-500">No notes yet.</p>
+                    <p class="text-xs text-zinc-600 leading-relaxed">
+                      Pin a moment during the film to leave a note for the audience.
+                    </p>
                   </div>
                 <% else %>
-                  <div class="space-y-3">
+                  <div class="space-y-2">
                     <%= for note <- @notes do %>
-                      <div class="rounded-xl border border-white/10 bg-white/2 p-3">
-                        <div class="flex items-center justify-between gap-3">
-                          <span class="text-xs text-zinc-400">
+                      <div class="rounded-xl border border-white/8 bg-white/3 px-3.5 py-3 hover:bg-white/5 transition">
+                        <div class="flex items-center justify-between gap-3 mb-2">
+                          <span class="text-xs font-medium text-zinc-300">
                             {(note.user && "@" <> note.user.username) || "Member"}
                           </span>
-                          <span class="text-xs text-zinc-500">
+                          <span class="flex items-center gap-1 text-[11px] text-zinc-600">
+                            <.icon name="hero-map-pin" class="w-3 h-3" />
                             {format_offset(note.offset_seconds)}
                           </span>
                         </div>
-
-                        <p class="text-sm text-gray-100 mt-2 whitespace-pre-wrap">{note.body}</p>
+                        <p class="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap">{note.body}</p>
                       </div>
                     <% end %>
                   </div>
                 <% end %>
               </div>
             </div>
-            <div :if={@open_panel == :director_notes} class="p-4">
-              <div class="text-sm text-zinc-400">
-                Director’s commentary is not available for this screening yet.
+            <div :if={@open_panel == :director_notes}>
+              <div class="flex flex-col items-center justify-center min-h-[180px] gap-3 text-center px-6 py-8">
+                <.icon name="hero-megaphone" class="w-6 h-6 text-zinc-700" />
+                <div>
+                  <p class="text-sm text-zinc-400 font-medium">Director’s Commentary</p>
+                  <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
+                    In-film notes from the director are coming in a future update.
+                  </p>
+                </div>
+                <span class="rounded-full border border-white/8 bg-white/4 px-3 py-1 text-xs text-zinc-500 tracking-wide">
+                  Coming soon
+                </span>
               </div>
             </div>
           </div>
