@@ -13,7 +13,7 @@ defmodule TimesinkWeb.Components.FilmInfo do
         {@film.title}
       </div>
 
-      <div class="text-xs md:text-sm text-mystery-white uppercase tracking-wider flex flex-wrap gap-x-3 md:gap-x-4 gap-y-2">
+      <div class="text-xs md:text-sm text-mystery-white uppercase tracking-wider flex flex-wrap items-center gap-2">
         <%= for genre <- @film.genres do %>
           <span class="inline-block bg-dark-theater-primary rounded-full px-2 py-1 text-xs">
             {genre.name}
