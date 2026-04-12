@@ -847,6 +847,56 @@ Hooks.ChatAutoScroll = {
   }
 };
 
+Hooks.NotesAutoScroll = {
+  STICKY_THRESHOLD: 64,
+
+  mounted() {
+    const scrollSel = this.el.dataset.scroll;
+    this.scrollEl = scrollSel ? document.querySelector(scrollSel) : this.el.parentElement;
+
+    if (!this.scrollEl) return;
+
+    this.scrollEl.style.overflowAnchor = "none";
+    this.stickToBottom = true;
+
+    this.onScroll = this.handleScroll.bind(this);
+    this.scrollEl.addEventListener("scroll", this.onScroll, { passive: true });
+
+    if (this.isNearBottom()) this.scrollToBottom(false);
+  },
+
+  updated() {
+    if (!this.scrollEl) return;
+    if (this.stickToBottom) this.scrollToBottom();
+  },
+
+  destroyed() {
+    if (this.scrollEl && this.onScroll) {
+      this.scrollEl.removeEventListener("scroll", this.onScroll);
+    }
+  },
+
+  handleScroll() {
+    this.stickToBottom = this.isNearBottom();
+  },
+
+  isNearBottom() {
+    return this.distanceFromBottom() <= this.STICKY_THRESHOLD;
+  },
+
+  distanceFromBottom() {
+    const el = this.scrollEl;
+    return el.scrollHeight - (el.scrollTop + el.clientHeight);
+  },
+
+  scrollToBottom(smooth = true) {
+    const el = this.scrollEl;
+    requestAnimationFrame(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
+    });
+  }
+};
+
 Hooks.TheaterBodyScroll = {
   mounted() {
     this.prevRootOverflow = null;

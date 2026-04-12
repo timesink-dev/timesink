@@ -172,7 +172,7 @@ defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
           <% end %>
         </div>
         
-    <!-- Review Box (unchanged) -->
+    <!-- Review Box -->
         <div class="md:w-1/2">
           <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-6 shadow-inner">
             <h3 class="text-xl font-semibold text-white mb-4">Review Submission</h3>
