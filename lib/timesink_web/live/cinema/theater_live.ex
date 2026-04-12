@@ -152,6 +152,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:newly_surfaced_ids, MapSet.new())
        |> assign(:note_status_message, nil)
        |> assign(:just_posted_note_id, nil)
+       |> assign(:freeze_notes?, false)
        # UI state
        |> assign(:open_panel, nil)
        |> assign(:chat_tab, :messages)
@@ -337,7 +338,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   class={[
                     "inline-flex items-center justify-center h-9 w-9 rounded-lg border border-transparent transition",
                     if(@phase == :playing and not is_nil(@offset),
-                      do: "cursor-pointer hover:bg-white/8 text-zinc-400 hover:text-white",
+                      do: "cursor-pointer text-zinc-400 hover:bg-white/8",
                       else: "cursor-not-allowed text-zinc-600"
                     )
                   ]}
@@ -347,7 +348,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
                 <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
                   <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                    Pin this moment &amp; write a note
+                    Pin this moment &amp; share a note
                     <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
                     </div>
                   </div>
@@ -421,7 +422,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               class={[
                 "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition",
                 if(@phase == :playing and not is_nil(@offset),
-                  do: "cursor-pointer text-neon-blue-light hover:text-white hover:bg-white/8",
+                  do: "cursor-pointer text-zinc-400 hover:bg-white/8",
                   else: "cursor-not-allowed text-zinc-600"
                 )
               ]}
@@ -480,7 +481,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                       class={[
                         "cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-md transition",
                         if(@phase == :playing and not is_nil(@offset),
-                          do: "text-shadow-zinc-400 hover:text-white hover:bg-white/6",
+                          do: "cursor-pointer text-zinc-400 hover:bg-white/8",
                           else: "text-zinc-600 cursor-not-allowed"
                         )
                       ]}
@@ -656,23 +657,24 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     <!-- Scrollable notes list -->
                 <div id="notes-body-desktop" class="max-h-[40vh] overflow-y-auto relative">
                   <%= if Enum.empty?(@notes) do %>
-                    <div class="flex flex-col items-center justify-center min-h-40 gap-2 text-center px-4 py-8">
-                      <.icon name="hero-document" class="w-6 h-6 text-zinc-700" />
+                    <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
+                      <.icon name="hero-document" class="w-5 h-5 text-zinc-700" />
                       <%= if @total_notes_count > 0 do %>
-                        <p class="text-center font-semibold text-zinc-500 leading-tight">
-                          {@total_notes_count} notes
-                        </p>
-                        <p class="text-sm text-zinc-500 leading-tight -mt-1">
-                          are waiting to be viewed in this screening.
-                        </p>
-                        <p class="text-xs text-zinc-600 leading-relaxed">
-                          They'll appear as the film plays.
-                        </p>
+                        <div class="space-y-1">
+                          <p class="text-sm text-zinc-400 font-medium">
+                            {@total_notes_count} notes in this screening
+                          </p>
+                          <p class="text-xs text-zinc-600 leading-relaxed">
+                            They surface in order as the film plays.
+                          </p>
+                        </div>
                       <% else %>
-                        <p class="text-sm text-zinc-500">No notes yet.</p>
-                        <p class="text-xs text-zinc-600 leading-relaxed">
-                          Pin a moment during the film to leave a note for the audience.
-                        </p>
+                        <div class="space-y-1">
+                          <p class="text-sm text-zinc-400 font-medium">No notes yet</p>
+                          <p class="text-xs text-zinc-600 leading-relaxed">
+                            Pin a moment to leave one.
+                          </p>
+                        </div>
                       <% end %>
                     </div>
                   <% else %>
@@ -846,7 +848,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   class={[
                     "cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-md transition",
                     if(@phase == :playing and not is_nil(@offset),
-                      do: "text-zinc-400 hover:text-white hover:bg-white/6",
+                      do: "cursor-pointer text-zinc-400 hover:bg-white/8",
                       else: "text-zinc-600 cursor-not-allowed"
                     )
                   ]}
@@ -1012,23 +1014,22 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
             <div id="mobile-chat-body" class="h-[45vh] overflow-y-auto overscroll-contain">
               <%= if Enum.empty?(@notes) do %>
-                <div class="flex flex-col items-center justify-center min-h-40 gap-2 text-center px-4 py-8">
-                  <.icon name="hero-document" class="w-6 h-6 text-zinc-700" />
+                <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
+                  <.icon name="hero-document" class="w-5 h-5 text-zinc-700" />
                   <%= if @total_notes_count > 0 do %>
-                    <p class="text-center font-semibold text-zinc-500 leading-tight">
-                      {@total_notes_count} notes
-                    </p>
-                    <p class="text-sm text-zinc-500 leading-tight -mt-1">
-                      are waiting to be viewed in this screening.
-                    </p>
-                    <p class="text-xs text-zinc-600 leading-relaxed">
-                      They'll appear as the film plays.
-                    </p>
+                    <div class="space-y-1">
+                      <p class="text-sm text-zinc-400 font-medium">
+                        {@total_notes_count} notes in this screening
+                      </p>
+                      <p class="text-xs text-zinc-600 leading-relaxed">
+                        They surface in order as the film plays.
+                      </p>
+                    </div>
                   <% else %>
-                    <p class="text-sm text-zinc-500">No notes yet.</p>
-                    <p class="text-xs text-zinc-600 leading-relaxed">
-                      Pin a moment during the film to leave a note for the audience.
-                    </p>
+                    <div class="space-y-1">
+                      <p class="text-sm text-zinc-400 font-medium">No notes yet</p>
+                      <p class="text-xs text-zinc-600 leading-relaxed">Pin a moment to leave one.</p>
+                    </div>
                   <% end %>
                 </div>
               <% else %>
@@ -1172,22 +1173,32 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
     {notes, newly_surfaced_ids, total_notes_count} =
       if exhibition = socket.assigns[:exhibition] do
-        visible =
-          Timesink.Cinema.Exhibition.Note.list_visible_notes(exhibition.id, current_offset)
-
-        newly_surfaced =
-          if current_offset > previous_offset do
-            visible
-            |> Enum.filter(fn n ->
-              n.offset_seconds > previous_offset and n.offset_seconds <= current_offset
-            end)
-            |> MapSet.new(& &1.id)
-          else
-            MapSet.new()
-          end
-
         total = Timesink.Cinema.Exhibition.Note.total_notes_count(exhibition.id)
-        {visible, newly_surfaced, total}
+
+        if socket.assigns.freeze_notes? or
+             (phase != :playing and socket.assigns.open_panel == :audience_notes) do
+          {
+            socket.assigns.notes,
+            MapSet.new(),
+            total
+          }
+        else
+          visible =
+            Timesink.Cinema.Exhibition.Note.list_visible_notes(exhibition.id, current_offset)
+
+          newly_surfaced =
+            if current_offset > previous_offset do
+              visible
+              |> Enum.filter(fn n ->
+                n.offset_seconds > previous_offset and n.offset_seconds <= current_offset
+              end)
+              |> MapSet.new(& &1.id)
+            else
+              MapSet.new()
+            end
+
+          {visible, newly_surfaced, total}
+        end
       else
         {[], MapSet.new(), 0}
       end
@@ -1232,8 +1243,14 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         },
         socket
       ) do
+    freeze? = phase != :playing and socket.assigns.open_panel == :audience_notes
+
     {:noreply,
-     socket |> assign(:phase, phase) |> assign(:offset, offset) |> assign(:countdown, countdown)}
+     socket
+     |> assign(:phase, phase)
+     |> assign(:offset, offset)
+     |> assign(:countdown, countdown)
+     |> assign(:freeze_notes?, freeze?)}
   end
 
   def handle_info({:new_message, msg}, socket) do

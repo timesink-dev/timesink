@@ -74,16 +74,23 @@
 @keyframes note-surface {
   0% {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(14px) scale(0.98);
+    filter: blur(2px);
+  }
+  60% {
+    opacity: 0.85;
+    transform: translateY(-2px) scale(1.005);
+    filter: blur(0);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 
 .note-surface {
-  animation: note-surface 0.4s ease-out forwards;
+  animation: note-surface 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 
