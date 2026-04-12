@@ -248,190 +248,25 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             <% end %>
             
     <!-- Desktop floating toolbar -->
-            <div
+            <TheaterPanel.desktop_toolbar
               :if={is_nil(@open_panel)}
-              class="hidden md:flex absolute top-0 left-full ml-3 z-20 flex-col gap-1 rounded-xl border border-white/8 bg-zinc-950/70 backdrop-blur-sm p-1 shadow-xl"
-            >
-              <div class="group relative">
-                <button
-                  phx-click="open_panel"
-                  phx-value-panel="chat"
-                  aria-label="Open live chat"
-                  class="cursor-pointer h-9 w-9 rounded-lg border border-transparent text-zinc-400 hover:bg-white/8 hover:text-white flex items-center justify-center transition"
-                >
-                  <.icon name="hero-chat-bubble-left-right" class="w-4 h-4" />
-                </button>
-
-                <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
-                  <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                    Live chat
-                    <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="group relative">
-                <button
-                  phx-click="open_panel"
-                  phx-value-panel="audience_notes"
-                  aria-label="Open audience notes"
-                  class={[
-                    "cursor-pointer h-9 w-9 rounded-lg border border-transparent flex items-center justify-center transition relative",
-                    if(@notes_pulse,
-                      do: "text-white bg-white/8 ring-1 ring-white/15",
-                      else: "text-zinc-400 hover:bg-white/8 hover:text-white"
-                    )
-                  ]}
-                >
-                  <.icon name="hero-folder-open" class="w-4 h-4" />
-                </button>
-
-                <%= if @new_notes_count > 0 do %>
-                  <span class="absolute -top-1 -right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-white px-1 text-[9px] font-semibold leading-none text-zinc-900 shadow-sm">
-                    +{@new_notes_count}
-                  </span>
-                <% else %>
-                  <%= if @total_notes_count > 0 do %>
-                    <span class="absolute -top-1 -right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[9px] leading-none text-zinc-300 shadow-sm">
-                      {@total_notes_count}
-                    </span>
-                  <% end %>
-                <% end %>
-
-                <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
-                  <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                    Audience notes
-                    <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="group relative">
-                <button
-                  disabled
-                  aria-label="Director's commentary — coming soon"
-                  class="cursor-not-allowed h-9 w-9 rounded-lg border border-transparent text-zinc-600 flex items-center justify-center"
-                >
-                  <.icon name="hero-megaphone" class="w-4 h-4" />
-                </button>
-
-                <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
-                  <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                    Director's commentary
-                    <span class="ml-2 rounded-full bg-zinc-700 px-1.5 py-0.5 text-[10px] text-zinc-400">
-                      Coming soon
-                    </span>
-                    <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="my-0.5 border-t border-white/8"></div>
-
-              <div class="group relative">
-                <button
-                  phx-click="mark_moment"
-                  aria-label="Mark a moment"
-                  disabled={@phase != :playing or is_nil(@offset)}
-                  class={[
-                    "inline-flex items-center justify-center h-9 w-9 rounded-lg border border-transparent transition",
-                    if(@phase == :playing and not is_nil(@offset),
-                      do: "cursor-pointer text-zinc-400 hover:bg-white/8",
-                      else: "cursor-not-allowed text-zinc-600"
-                    )
-                  ]}
-                >
-                  <.icon name="hero-pencil-square" class="w-4 h-4" />
-                </button>
-
-                <div class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block z-10">
-                  <div class="relative whitespace-nowrap rounded-md border border-white/10 bg-zinc-900 px-3 py-2 text-xs text-zinc-300 shadow-lg">
-                    Pin this moment &amp; share a note
-                    <div class="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-2 h-2 bg-zinc-900 border-t border-r border-white/10 rotate-45">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              notes_pulse={@notes_pulse}
+              new_notes_count={@new_notes_count}
+              total_notes_count={@total_notes_count}
+              phase={@phase}
+              offset={@offset}
+            />
           </div>
           
     <!-- Mobile toolbar — below player, above film info -->
-          <div class="md:hidden flex items-center gap-1 mt-3 rounded-xl border border-white/8 bg-zinc-950/70 backdrop-blur-sm p-1">
-            <button
-              phx-click="open_panel"
-              phx-value-panel="chat"
-              aria-label="Open live chat"
-              class={[
-                "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition",
-                if(@open_panel == :chat,
-                  do: "bg-white/10 text-white",
-                  else: "text-zinc-400 hover:text-white"
-                )
-              ]}
-            >
-              <.icon name="hero-chat-bubble-left-right" class="w-4 h-4" />
-              <span>Chat</span>
-            </button>
-
-            <button
-              phx-click="open_panel"
-              phx-value-panel="audience_notes"
-              aria-label="Open audience notes"
-              class={[
-                "flex-1 h-9 rounded-lg border border-transparent text-xs transition",
-                if(@open_panel == :audience_notes,
-                  do: "bg-white/10 text-white",
-                  else: if(@notes_pulse, do: "text-white", else: "text-zinc-400 hover:text-white")
-                )
-              ]}
-            >
-              <span class="relative inline-flex items-center justify-center gap-2">
-                <.icon name="hero-folder-open" class="w-4 h-4" />
-                <span>Notes</span>
-                <%= if @new_notes_count > 0 do %>
-                  <span class="absolute -top-3 -right-4 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-white px-1 text-[9px] font-semibold leading-none text-zinc-900 shadow-sm">
-                    +{@new_notes_count}
-                  </span>
-                <% else %>
-                  <%= if @total_notes_count > 0 do %>
-                    <span class="absolute -top-3 -right-4 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[9px] leading-none text-zinc-300 shadow-sm">
-                      {@total_notes_count}
-                    </span>
-                  <% end %>
-                <% end %>
-              </span>
-            </button>
-
-            <button
-              disabled
-              aria-label="Director's commentary — coming soon"
-              class="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs text-zinc-600 cursor-not-allowed"
-            >
-              <.icon name="hero-megaphone" class="w-4 h-4" />
-              <span>Director</span>
-            </button>
-
-            <div class="w-px h-5 bg-white/8 shrink-0"></div>
-
-            <button
-              phx-click="mark_moment"
-              aria-label="Mark a moment"
-              disabled={@phase != :playing or is_nil(@offset)}
-              class={[
-                "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition",
-                if(@phase == :playing and not is_nil(@offset),
-                  do: "cursor-pointer text-zinc-400 hover:bg-white/8",
-                  else: "cursor-not-allowed text-zinc-600"
-                )
-              ]}
-            >
-              <.icon name="hero-pencil-square" class="w-4 h-4" />
-              <span>Pin</span>
-            </button>
-          </div>
+          <TheaterPanel.mobile_toolbar
+            open_panel={@open_panel}
+            notes_pulse={@notes_pulse}
+            new_notes_count={@new_notes_count}
+            total_notes_count={@total_notes_count}
+            phase={@phase}
+            offset={@offset}
+          />
 
           <FilmInfo.film_info film={@film} />
 
@@ -573,7 +408,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
   end
 
   # ───────────────────────────────────────────────────────────
-  # Tick / Presence / Phase (unchanged)
+  # Tick / Presence / Phase
   # ───────────────────────────────────────────────────────────
   def handle_info(
         %{event: "tick", playback_state: %{phase: phase, offset: offset, countdown: countdown}},
