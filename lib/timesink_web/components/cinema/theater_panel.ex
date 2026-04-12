@@ -151,7 +151,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         >
           <.icon name="hero-pencil-square" class="w-4 h-4" />
         </button>
-        <.toolbar_tooltip label="Pin this moment &amp; share a note" />
+        <.toolbar_tooltip label="Pin this moment & share a note" />
       </div>
     </div>
     """
