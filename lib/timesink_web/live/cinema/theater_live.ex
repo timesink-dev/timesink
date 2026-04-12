@@ -390,12 +390,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 <.icon name="hero-folder-open" class="w-4 h-4" />
                 <span>Notes</span>
                 <%= if @new_notes_count > 0 do %>
-                  <span class="absolute -top-2 -right-4 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-white px-1 text-[9px] font-semibold leading-none text-zinc-900 shadow-sm">
+                  <span class="absolute -top-3 -right-4 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-white px-1 text-[9px] font-semibold leading-none text-zinc-900 shadow-sm">
                     +{@new_notes_count}
                   </span>
                 <% else %>
                   <%= if @total_notes_count > 0 do %>
-                    <span class="absolute -top-2 -right-4 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[9px] leading-none text-zinc-300 shadow-sm">
+                    <span class="absolute -top-3 -right-4 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[9px] leading-none text-zinc-300 shadow-sm">
                       {@total_notes_count}
                     </span>
                   <% end %>
@@ -457,8 +457,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     Live Chat
                   <% :audience_notes -> %>
                     <span class="flex items-center gap-2">
-                      <span>Audience Notes ·</span>
-
+                      <span>Audience Notes</span>
+                      <span>·</span>
                       <%= if @total_notes_count > 0 do %>
                         <span class="text-[10px] font-normal tracking-normal text-zinc-500">
                           {@notes |> length} of {@total_notes_count}
@@ -648,7 +648,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 <% end %>
 
                 <%= if @note_status_message do %>
-                  <div class="mx-4 mt-3 rounded-lg border border-green-400/20 bg-green-400/10 px-3 py-2 text-xs text-green-200">
+                  <div class="mx-4 mt-3 rounded-lg border border-green-500/15 bg-green-500/6 px-3 py-2 text-xs text-green-300">
                     {@note_status_message}
                   </div>
                 <% end %>
@@ -657,7 +657,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 <div id="notes-body-desktop" class="max-h-[40vh] overflow-y-auto relative">
                   <%= if Enum.empty?(@notes) do %>
                     <div class="flex flex-col items-center justify-center min-h-40 gap-2 text-center px-4 py-8">
-                      <.icon name="hero-document-text" class="w-6 h-6 text-zinc-700" />
+                      <.icon name="hero-document" class="w-6 h-6 text-zinc-700" />
                       <%= if @total_notes_count > 0 do %>
                         <p class="text-center font-semibold text-zinc-500 leading-tight">
                           {@total_notes_count} notes
@@ -818,17 +818,25 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         ]}>
           <!-- Sheet header -->
           <div class="flex items-center justify-between px-4 py-3 border-b border-white/8 shrink-0">
-            <span class="text-xs font-semibold uppercase tracking-widest text-zinc-400">
+            <div class="text-xs font-semibold uppercase tracking-widest text-zinc-400">
               <%= case @open_panel do %>
                 <% :chat -> %>
                   Live Chat
                 <% :audience_notes -> %>
-                  Audience Notes
+                  <span class="flex items-center gap-2">
+                    <span>Audience Notes</span>
+                    <span>·</span>
+                    <%= if @total_notes_count > 0 do %>
+                      <span class="text-[10px] font-normal tracking-normal text-zinc-500">
+                        {length(@notes)} of {@total_notes_count}
+                      </span>
+                    <% end %>
+                  </span>
                 <% :director_notes -> %>
                   Director's Commentary
                 <% _ -> %>
               <% end %>
-            </span>
+            </div>
 
             <div class="flex items-center gap-1">
               <%= if @open_panel == :audience_notes and not @note_form_open do %>
@@ -847,6 +855,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   <.icon name="hero-pencil-square" class="w-4 h-4" />
                 </button>
               <% end %>
+
               <button
                 phx-click="close_panel"
                 class="cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/6 transition"
@@ -900,6 +909,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     </div>
                   </div>
                 </div>
+
                 <ul
                   id="mobile-chat-list"
                   phx-update="stream"
@@ -920,6 +930,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     </li>
                   <% end %>
                 </ul>
+
                 <%= if map_size(@typing_users) > 0 do %>
                   <div class="px-4 py-2 text-xs text-zinc-400 border-t border-white/5">
                     {typing_line(@typing_users, @presence)}
@@ -985,22 +996,16 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             <%= if @new_notes_count > 0 do %>
               <div class="mx-4 mt-3 rounded-lg border border-white/8 bg-white/[0.04] px-3 py-2 text-xs text-zinc-300">
                 <span class="inline-flex items-center gap-2">
-                  <span class="relative inline-flex h-2 w-2">
-                    <span class="absolute inline-flex h-full w-full rounded-full bg-zinc-300/50 animate-ping">
-                    </span>
-                    <span class="relative inline-flex h-2 w-2 rounded-full bg-zinc-300"></span>
+                  <span class="font-medium text-zinc-100">
+                    +{@new_notes_count}
                   </span>
-                  <%= if @new_notes_count == 1 do %>
-                    +{@new_notes_count} note appeared
-                  <% else %>
-                    +{@new_notes_count} new notes appeared
-                  <% end %>
+                  <span class="text-zinc-500">notes appeared</span>
                 </span>
               </div>
             <% end %>
 
             <%= if @note_status_message do %>
-              <div class="mx-4 mt-3 rounded-lg border border-white/8 bg-white/[0.03] px-3 py-2 text-xs text-zinc-400">
+              <div class="mx-4 mt-3 rounded-lg border border-green-500/15 bg-green-500/6 px-3 py-2 text-xs text-green-300">
                 {@note_status_message}
               </div>
             <% end %>
@@ -1008,10 +1013,13 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             <div id="mobile-chat-body" class="h-[45vh] overflow-y-auto overscroll-contain">
               <%= if Enum.empty?(@notes) do %>
                 <div class="flex flex-col items-center justify-center min-h-40 gap-2 text-center px-4 py-8">
-                  <.icon name="hero-pencil-square" class="w-6 h-6 text-zinc-700" />
+                  <.icon name="hero-document" class="w-6 h-6 text-zinc-700" />
                   <%= if @total_notes_count > 0 do %>
-                    <p class="text-sm text-zinc-500">
-                      {@total_notes_count} notes are waiting in this screening.
+                    <p class="text-center font-semibold text-zinc-500 leading-tight">
+                      {@total_notes_count} notes
+                    </p>
+                    <p class="text-sm text-zinc-500 leading-tight -mt-1">
+                      are waiting to be viewed in this screening.
                     </p>
                     <p class="text-xs text-zinc-600 leading-relaxed">
                       They'll appear as the film plays.
@@ -1038,7 +1046,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                     <li class="px-4 py-2">
                       <div class={[
                         "flex items-start gap-3 px-4 py-3 rounded-xl border transition-all duration-700",
-                        is_new && "note-appear-ring border-white/15 bg-white/3",
+                        is_new && "note-appear-ring border-white/15 bg-white/[0.03]",
                         is_just_posted && "border-white/10 bg-white/[0.02]",
                         !is_new && !is_just_posted && "border-transparent"
                       ]}>
