@@ -22,7 +22,7 @@ defmodule TimesinkWeb.FilmSubmission.StepReviewAndSubmitComponent do
           <div class="space-y-2">
             <h3 class="font-semibold text-lg text-white">Your Info</h3>
             <div><strong>Name:</strong> {@data.contact_name || "No name provided"}</div>
-            <div><strong>Email:</strong> {@data.contact_email || "No email pxrovided"}</div>
+            <div><strong>Email:</strong> {@data.contact_email || "No email provided"}</div>
           </div>
           
     <!-- Film Info -->
