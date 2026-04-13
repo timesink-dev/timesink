@@ -376,22 +376,27 @@ Hooks.EmblaMain = {
   }
 }
 
-  Hooks.EmblaThumbs = {
+Hooks.EmblaThumbs = {
   mounted() {
-    
-
-    // Grab reference to the main embla instance (set globally by EmblaMain)
     this.emblaMain = window.__emblaMain__
     this.emblaThumbs = EmblaCarousel(this.el, {
       containScroll: 'keepSnaps',
       dragFree: true,
     })
-
-    // Set up event handlers
     this.setupThumbClicks()
-    this.emblaMain.on('init', this.highlightSelected.bind(this))
-    this.emblaMain.on('reInit', this.highlightSelected.bind(this))
-    this.emblaMain.on('select', this.highlightSelected.bind(this))
+    if (this.emblaMain) {
+      this.emblaMain.on('select', this.highlightSelected.bind(this))
+      this.highlightSelected()
+    } else {
+      // EmblaMain not mounted yet — wait one frame
+      this._raf = requestAnimationFrame(() => {
+        this.emblaMain = window.__emblaMain__
+        if (this.emblaMain) {
+          this.emblaMain.on('select', this.highlightSelected.bind(this))
+          this.highlightSelected()
+        }
+      })
+    }
   },
 
   setupThumbClicks() {
@@ -412,23 +417,22 @@ Hooks.EmblaMain = {
 
     thumbs.forEach((thumb, index) => {
       if (index === selectedIndex) {
-        thumb.classList.add('ring-2', 'ring-neon-blue-lightest')
-        this.emblaThumbs.scrollTo(this.emblaMain.selectedScrollSnap())
+        thumb.style.outline = '2px solid #E0EBFF'
+        thumb.style.outlineOffset = '2px'
+        this.emblaThumbs.scrollTo(selectedIndex)
       } else {
-        thumb.classList.remove('ring-2', 'ring-neon-blue-lightest')
+        thumb.style.outline = ''
+        thumb.style.outlineOffset = ''
       }
     })
   },
 
   updated() {
-    if (!this.emblaThumbs || !this.emblaMain) return
-
-    const index = this.emblaMain.selectedScrollSnap()
-    this.emblaThumbs.reInit()
-    this.emblaThumbs.scrollTo(index)
+    this.highlightSelected()
   },
 
   destroyed() {
+    if (this._raf) cancelAnimationFrame(this._raf)
     if (this.emblaThumbs) this.emblaThumbs.destroy()
   }
 }
