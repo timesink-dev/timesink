@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.TheaterShowcaseComponent do
+defmodule TimesinkWeb.Components.TheaterShowcase do
   use TimesinkWeb, :live_component
 
   import TimesinkWeb.Components.{TheaterCard, TheaterCardMobile}
@@ -87,7 +87,7 @@ defmodule TimesinkWeb.TheaterShowcaseComponent do
       </div>
 
       <div class="block lg:hidden px-4 space-y-6 max-w-screen-lg mx-auto">
-        <div id="embla-main" phx-hook="EmblaMain" class="overflow-hidden">
+        <div id="embla-main" phx-hook="EmblaMain" phx-update="ignore" class="overflow-hidden">
           <div class="flex gap-4 px-2">
             <%= for {exhibition, _index} <- Enum.with_index(@exhibitions) do %>
               <.theater_card_mobile

@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.FilmSubmission.StepFilmDetailsComponent do
+defmodule TimesinkWeb.Components.FilmSubmission.StepFilmDetails do
   use TimesinkWeb, :live_component
 
   alias Timesink.Cinema.FilmSubmission

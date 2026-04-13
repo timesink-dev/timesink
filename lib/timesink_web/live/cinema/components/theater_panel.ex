@@ -418,6 +418,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   attr :just_posted_note_id, :any, required: true
   attr :new_notes_count, :integer, required: true
   attr :note_status_message, :any, required: true
+  attr :note_moment_message, :any, required: true
   attr :note_form_open, :boolean, required: true
   attr :note_body, :string, required: true
   attr :note_anchor_offset, :any, required: true
@@ -440,9 +441,19 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         </div>
       <% end %>
 
+      <%= if @note_moment_message do %>
+        <div class="mx-4 mt-3 rounded-lg border border-blue-500/20 bg-blue-500/8 px-3 py-2 text-xs text-blue-300/80 flex items-center gap-2">
+          <.icon name="hero-bookmark" class="w-3.5 h-3.5 shrink-0 text-blue-400/60" />
+          <span class="text-zinc-400">Moment pinned at</span>
+          <span class="text-blue-300/90 font-medium">{@note_moment_message}</span>
+        </div>
+      <% end %>
+
       <%= if @note_status_message do %>
-        <div class="mx-4 mt-3 rounded-lg border border-green-500/15 bg-green-500/6 px-3 py-2 text-xs text-green-300">
-          {@note_status_message}
+        <div class="mx-4 mt-3 rounded-lg border border-emerald-500/20 bg-emerald-500/8 px-3 py-2 text-xs text-emerald-300/80 flex items-center gap-2">
+          <.icon name="hero-check-circle" class="w-3.5 h-3.5 shrink-0 text-emerald-400/60" />
+          <span class="text-zinc-400">Note pinned at</span>
+          <span class="text-emerald-300/90 font-medium">{@note_status_message}</span>
         </div>
       <% end %>
 
@@ -544,7 +555,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
             <textarea
               name="note[body]"
               rows="2"
-              autofocus
+              phx-mounted={JS.focus()}
               phx-debounce="100"
               class="w-full bg-white/4 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-white/20 resize-none"
               placeholder="Note this moment…"

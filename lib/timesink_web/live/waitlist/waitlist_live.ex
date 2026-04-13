@@ -28,7 +28,7 @@ defmodule TimesinkWeb.WaitlistLive do
     ~H"""
     <div class="w-full min-h-screen bg-backroom-black flex items-center justify-center overflow-hidden">
       <.live_component
-        module={TimesinkWeb.WaitlistFormComponent}
+        module={TimesinkWeb.Components.WaitlistForm}
         id="waitlist_form"
         sent?={@sent?}
         spots_remaining={@spots_remaining}

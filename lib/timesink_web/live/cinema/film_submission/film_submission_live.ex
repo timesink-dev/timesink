@@ -3,10 +3,10 @@ defmodule TimesinkWeb.FilmSubmissionLive do
 
   alias Timesink.Cinema.Mail
 
-  alias TimesinkWeb.FilmSubmission.{
-    StepIntroComponent,
-    StepFilmDetailsComponent,
-    StepPaymentComponent
+  alias TimesinkWeb.Components.FilmSubmission.{
+    StepIntro,
+    StepFilmDetails,
+    StepPayment
   }
 
   require Logger
@@ -20,9 +20,9 @@ defmodule TimesinkWeb.FilmSubmissionLive do
     :payment
   ]
   @steps %{
-    intro: StepIntroComponent,
-    film_details: StepFilmDetailsComponent,
-    payment: StepPaymentComponent
+    intro: StepIntro,
+    film_details: StepFilmDetails,
+    payment: StepPayment
   }
 
   @step_display_names %{

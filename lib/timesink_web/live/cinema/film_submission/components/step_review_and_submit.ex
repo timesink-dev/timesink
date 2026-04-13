@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.FilmSubmission.StepReviewAndSubmitComponent do
+defmodule TimesinkWeb.Components.FilmSubmission.StepReviewAndSubmit do
   use TimesinkWeb, :live_component
 
   import TimesinkWeb.CoreComponents, only: [button: 1]

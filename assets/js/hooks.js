@@ -365,12 +365,9 @@ Hooks.EmblaMain = {
   mounted() {
     this.embla = EmblaCarousel(this.el, { loop: true })
     window.__emblaMain__ = this.embla // Make globally available for thumbs
-
   },
 
-  updated() {
-    if (this.embla) this.embla.reInit()
-  },
+  updated() {},
 
   destroyed() {
     this.embla?.destroy()

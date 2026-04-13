@@ -3,11 +3,13 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
 
   alias TimesinkWeb.Presence
   alias Timesink.Cinema
-  alias TimesinkWeb.{TheaterShowcaseComponent, PubSubTopics}
+  alias TimesinkWeb.{PubSubTopics}
   alias Timesink.{Repo, UserCache}
   alias Timesink.Account.{User, Profile}
-  import TimesinkWeb.Components.NoShowcase
+  import TimesinkWeb.Components.{NoShowcase}
 
+  @spec mount(nil | maybe_improper_list() | map(), any(), Phoenix.LiveView.Socket.t()) ::
+          {:ok, Phoenix.LiveView.Socket.t()}
   def mount(params, _session, socket) do
     current_user = socket.assigns[:current_user]
 
@@ -86,7 +88,7 @@ defmodule TimesinkWeb.Cinema.NowPlayingLive do
         <% @showcase -> %>
           <.live_component
             id="theater-showcase"
-            module={TheaterShowcaseComponent}
+            module={TimesinkWeb.Components.TheaterShowcase}
             showcase={@showcase}
             exhibitions={@exhibitions}
             presence={@presence}

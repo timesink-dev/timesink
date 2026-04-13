@@ -102,9 +102,9 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
             <.icon name="hero-user-group" class="h-5 w-5 inline-block" /> {@live_viewer_count}
           </p>
           <%= if @current_user do %>
-            <.link href={"/now-playing/#{@exhibition.theater.slug}"}>
+            <a href={"/now-playing/#{@exhibition.theater.slug}"} data-phx-link="redirect" data-phx-link-state="push">
               <.button class="cursor-pointer">Go to Theater →</.button>
-            </.link>
+            </a>
           <% else %>
             <.link navigate={TimesinkWeb.Cinema.FilmLive.film_path(@exhibition.film) <> "?from=theater"}>
               <.button class="cursor-pointer">Enter Theater →</.button>

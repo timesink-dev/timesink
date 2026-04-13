@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.FilmSubmission.StepPaymentComponent do
+defmodule TimesinkWeb.Components.FilmSubmission.StepPayment do
   use TimesinkWeb, :live_component
   alias Timesink.Cinema.FilmSubmission
 

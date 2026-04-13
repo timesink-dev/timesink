@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.WaitlistFormComponent do
+defmodule TimesinkWeb.Components.WaitlistForm do
   use TimesinkWeb, :live_component
 
   alias Timesink.Waitlist.Applicant
