@@ -2,6 +2,8 @@ defmodule TimesinkWeb.WaitlistLive do
   use TimesinkWeb, :live_view
   alias Timesink.Waitlist
 
+  @spec mount(any(), any(), Phoenix.LiveView.Socket.t()) ::
+          {:ok, any(), [{:layout, {any(), any()}}, ...]}
   def mount(_params, _session, socket) do
     if connected?(socket) do
       :timer.send_interval(10_000, self(), :update_waitlist_status)

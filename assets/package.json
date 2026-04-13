@@ -4,6 +4,7 @@
     "@mux/mux-uploader": "^1.2.0",
     "daisyui": "^5.5.5",
     "embla-carousel": "^8.6.0",
+    "posthog-js": "^1.257.2",
     "trix": "^2.1.17"
   },
   "devDependencies": {

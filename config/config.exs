@@ -109,7 +109,8 @@ config :tesla, adapter: {Tesla.Adapter.Finch, name: Timesink.Finch}
 config :timesink, Timesink.Storage.Mux, webhook_key: "mux-test"
 
 # Discord notifications — add a key per channel; each URL is set via runtime.exs
-config :timesink, Timesink.Notifications.Discord, webhooks: [audience_notes: nil, ops: nil]
+config :timesink, Timesink.Notifications.Discord,
+  webhooks: [waitlist: nil, signups: nil, film_submissions: nil, audience_notes: nil]
 
 # PostHog analytics — keys set via runtime.exs
 config :timesink, :posthog, public_key: nil, api_key: nil, host: "https://us.i.posthog.com"

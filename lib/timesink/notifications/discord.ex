@@ -12,7 +12,11 @@ defmodule Timesink.Notifications.Discord do
           film_submissions: System.get_env("TIMESINK_DISCORD_WEBHOOK_FILM_SUBMISSIONS")
         ]
 
-  The `audience_notes` channel is used by `audience_note_posted/1`.
+  Channels:
+  - `waitlist`         — waitlist joins
+  - `signups`          — member signup completions
+  - `film_submissions` — film submissions
+  - `audience_notes`   — audience notes posted during screenings
   """
 
   require Logger
@@ -21,17 +25,17 @@ defmodule Timesink.Notifications.Discord do
 
   @spec notify_waitlist_join(String.t()) :: :ok
   def notify_waitlist_join(email) do
-    post(:ops, %{content: "📋 **Waitlist join** — #{email}"})
+    post(:waitlist, %{content: "📋 **Waitlist join** — #{email}"})
   end
 
   @spec notify_user_signup(String.t(), String.t()) :: :ok
   def notify_user_signup(username, email) do
-    post(:ops, %{content: "🎉 **New member** — @#{username} (#{email})"})
+    post(:signups, %{content: "🎉 **New member** — @#{username} (#{email})"})
   end
 
   @spec notify_film_submission(String.t(), String.t()) :: :ok
   def notify_film_submission(title, director_name) do
-    post(:ops, %{content: "🎬 **Film submitted** — *#{title}* by #{director_name}"})
+    post(:film_submissions, %{content: "🎬 **Film submitted** — *#{title}* by #{director_name}"})
   end
 
   @spec audience_note_posted(map()) :: :ok

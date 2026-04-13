@@ -226,8 +226,10 @@ end
 if env in [:staging, :prod] do
   config :timesink, Timesink.Notifications.Discord,
     webhooks: [
-      audience_notes: System.get_env("TIMESINK_DISCORD_WEBHOOK_AUDIENCE_NOTES"),
-      ops: System.get_env("TIMESINK_DISCORD_WEBHOOK_OPS")
+      waitlist: System.get_env("TIMESINK_DISCORD_WEBHOOK_WAITLIST"),
+      signups: System.get_env("TIMESINK_DISCORD_WEBHOOK_SIGNUPS"),
+      film_submissions: System.get_env("TIMESINK_DISCORD_WEBHOOK_FILM_SUBMISSIONS"),
+      audience_notes: System.get_env("TIMESINK_DISCORD_WEBHOOK_AUDIENCE_NOTES")
     ]
 
   config :timesink, :posthog,
