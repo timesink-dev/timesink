@@ -107,3 +107,9 @@ config :timesink, :here_maps_api_key, System.get_env("TIMESINK_HERE_MAPS_API_KEY
 config :tesla, adapter: {Tesla.Adapter.Finch, name: Timesink.Finch}
 
 config :timesink, Timesink.Storage.Mux, webhook_key: "mux-test"
+
+# Discord notifications — add a key per channel; each URL is set via runtime.exs
+config :timesink, Timesink.Notifications.Discord, webhooks: [audience_notes: nil, ops: nil]
+
+# PostHog analytics — keys set via runtime.exs
+config :timesink, :posthog, public_key: nil, api_key: nil, host: "https://us.i.posthog.com"

@@ -4,6 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
+    <meta
+      name="posthog-key"
+      content={Application.get_env(:timesink, :posthog, [])[:public_key] || ""}
+    />
+    <meta name="posthog-host" content={Application.get_env(:timesink, :posthog, [])[:host] || ""} />
+    <meta
+      name="posthog-user-id"
+      content={(assigns[:current_user] && assigns[:current_user].id) || ""}
+    />
 
     <meta
       name="description"

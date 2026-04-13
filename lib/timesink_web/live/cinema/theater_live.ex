@@ -726,6 +726,19 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
             total = Timesink.Cinema.Exhibition.Note.total_notes_count(exhibition.id)
 
+            film = socket.assigns.film
+            theater = socket.assigns.theater
+
+            Task.start(fn ->
+              Timesink.Notifications.Discord.audience_note_posted(%{
+                username: user.username,
+                body: note.body,
+                offset_seconds: note.offset_seconds,
+                film_title: film.title,
+                theater_name: theater.name
+              })
+            end)
+
             Process.send_after(self(), :clear_note_status_message, 2500)
             Process.send_after(self(), :clear_just_posted_note, 2500)
 

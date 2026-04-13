@@ -19,6 +19,20 @@ defmodule TimesinkWeb.BtcPayWebhookHandler do
           submission
         )
 
+        Timesink.Analytics.capture(
+          "film submitted",
+          submission.submitted_by_id || submission.contact_email,
+          %{
+            "title" => submission.title,
+            "contact_name" => submission.contact_name
+          }
+        )
+
+        Timesink.Notifications.Discord.notify_film_submission(
+          submission.title,
+          submission.contact_name
+        )
+
         :ok
 
       {:error, reason} ->
