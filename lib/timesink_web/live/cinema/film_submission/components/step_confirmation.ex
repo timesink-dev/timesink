@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.FilmSubmission.StepConfirmationComponent do
+defmodule TimesinkWeb.Components.FilmSubmission.StepConfirmation do
   use TimesinkWeb, :live_component
 
   @impl true

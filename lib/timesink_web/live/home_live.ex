@@ -3,7 +3,7 @@ defmodule TimesinkWeb.HomepageLive do
 
   alias TimesinkWeb.Presence
   alias Timesink.Cinema
-  alias TimesinkWeb.{TheaterShowcaseComponent, PubSubTopics, ScheduleModalComponent}
+  alias TimesinkWeb.{PubSubTopics, ScheduleModalComponent}
   import TimesinkWeb.Components.{Hero, NoShowcase}
 
   def mount(_params, _session, socket) do
@@ -105,7 +105,7 @@ defmodule TimesinkWeb.HomepageLive do
         <% @showcase -> %>
           <.live_component
             id="theater-showcase"
-            module={TheaterShowcaseComponent}
+            module={TimesinkWeb.Components.TheaterShowcase}
             showcase={@showcase}
             exhibitions={@exhibitions}
             presence={@presence}

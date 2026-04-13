@@ -1,4 +1,4 @@
-defmodule TimesinkWeb.TheaterShowcaseComponent do
+defmodule TimesinkWeb.Components.TheaterShowcase do
   use TimesinkWeb, :live_component
 
   import TimesinkWeb.Components.{TheaterCard, TheaterCardMobile}

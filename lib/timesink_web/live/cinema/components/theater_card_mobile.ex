@@ -50,17 +50,27 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
         </div>
       </div>
       <div class="relative rounded-xl w-full aspect-video min-h-[240px] overflow-hidden group">
-        <mux-player
-          id={"mux-player-#{film.id}-mobile#{Enum.random(?a..?z)}"}
-          playback-id={Film.get_mux_playback_id(film.trailer)}
-          muted
-          loop
-          playsinline
-          preload="metadata"
-          style="--controls: none;"
-          class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-85"
-          phx-hook="HoverPlay"
-        />
+        <% trailer_id = Film.get_mux_playback_id(film.trailer) %>
+        <% poster_url = Film.poster_url(film.poster) %>
+        <%= if trailer_id do %>
+          <mux-player
+            id={"mux-player-#{film.id}-mobile#{Enum.random(?a..?z)}"}
+            playback-id={trailer_id}
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            style="--controls: none;"
+            class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-85"
+            phx-hook="HoverPlay"
+          />
+        <% else %>
+          <img
+            src={poster_url}
+            alt={film.title}
+            class="absolute inset-0 w-full h-full object-cover brightness-75"
+          />
+        <% end %>
       </div>
 
       <div class="text-mystery-white px-4 pt-3 pb-8 space-y-3">
@@ -102,9 +112,13 @@ defmodule TimesinkWeb.Components.TheaterCardMobile do
             <.icon name="hero-user-group" class="h-5 w-5 inline-block" /> {@live_viewer_count}
           </p>
           <%= if @current_user do %>
-            <.link href={"/now-playing/#{@exhibition.theater.slug}"}>
+            <a
+              href={"/now-playing/#{@exhibition.theater.slug}"}
+              data-phx-link="redirect"
+              data-phx-link-state="push"
+            >
               <.button class="cursor-pointer">Go to Theater →</.button>
-            </.link>
+            </a>
           <% else %>
             <.link navigate={TimesinkWeb.Cinema.FilmLive.film_path(@exhibition.film) <> "?from=theater"}>
               <.button class="cursor-pointer">Enter Theater →</.button>

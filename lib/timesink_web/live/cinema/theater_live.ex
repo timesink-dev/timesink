@@ -152,6 +152,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:total_notes_count, 0)
        |> assign(:newly_surfaced_ids, MapSet.new())
        |> assign(:note_status_message, nil)
+       |> assign(:note_moment_message, nil)
        |> assign(:just_posted_note_id, nil)
        |> assign(:freeze_notes?, false)
        # UI state
@@ -323,6 +324,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                   just_posted_note_id={@just_posted_note_id}
                   new_notes_count={@new_notes_count}
                   note_status_message={@note_status_message}
+                  note_moment_message={@note_moment_message}
                   note_form_open={@note_form_open}
                   note_body={@note_body}
                   note_anchor_offset={@note_anchor_offset}
@@ -388,6 +390,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               just_posted_note_id={@just_posted_note_id}
               new_notes_count={@new_notes_count}
               note_status_message={@note_status_message}
+              note_moment_message={@note_moment_message}
               note_form_open={@note_form_open}
               note_body={@note_body}
               note_anchor_offset={@note_anchor_offset}
@@ -524,6 +527,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     {:noreply, assign(socket, :note_status_message, nil)}
   end
 
+  def handle_info(:clear_note_moment_message, socket) do
+    {:noreply, assign(socket, :note_moment_message, nil)}
+  end
+
   def handle_info(:clear_new_notes_count, socket) do
     {:noreply,
      socket
@@ -655,8 +662,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         {:noreply, socket}
 
       true ->
-        Process.send_after(self(), :clear_note_status_message, 2500)
-
         {:noreply,
          socket
          |> assign(:note_form_open, true)
@@ -665,7 +670,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
          |> assign(:new_notes_count, 0)
          |> assign(:notes_pulse, false)
          |> assign(:newly_surfaced_ids, MapSet.new())
-         |> assign(:note_status_message, "Moment saved · #{format_offset(offset)}")
+         |> assign(:note_moment_message, "#{format_offset(offset)}")
          |> push_event("toggle_body_scroll", %{prevent: true})}
     end
   end
@@ -682,7 +687,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
      socket
      |> assign(:note_form_open, false)
      |> assign(:note_body, "")
-     |> assign(:note_anchor_offset, nil)}
+     |> assign(:note_anchor_offset, nil)
+     |> assign(:note_moment_message, nil)}
   end
 
   def handle_event("note:change", %{"note" => %{"body" => body}}, socket) do
@@ -720,6 +726,19 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
             total = Timesink.Cinema.Exhibition.Note.total_notes_count(exhibition.id)
 
+            film = socket.assigns.film
+            theater = socket.assigns.theater
+
+            Task.start(fn ->
+              Timesink.Notifications.Discord.audience_note_posted(%{
+                username: user.username,
+                body: note.body,
+                offset_seconds: note.offset_seconds,
+                film_title: film.title,
+                theater_name: theater.name
+              })
+            end)
+
             Process.send_after(self(), :clear_note_status_message, 2500)
             Process.send_after(self(), :clear_just_posted_note, 2500)
 
@@ -730,9 +749,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
              |> assign(:note_form_open, false)
              |> assign(:note_body, "")
              |> assign(:note_anchor_offset, nil)
+             |> assign(:note_moment_message, nil)
              |> assign(
                :note_status_message,
-               "You successfully pinned a note to #{format_offset(offset)}!"
+               format_offset(offset)
              )
              |> assign(:just_posted_note_id, note.id)}
 

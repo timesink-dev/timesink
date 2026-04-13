@@ -53,17 +53,27 @@ defmodule TimesinkWeb.Components.TheaterCard do
 
       <div class="max-w-4xl">
         <div class="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl group transition-transform duration-300 hover:scale-[1.02]">
-          <mux-player
-            id={"mux-player-#{film.id}"}
-            playback-id={Film.get_mux_playback_id(film.trailer)}
-            muted
-            loop
-            playsinline
-            preload="metadata"
-            style="--controls: none;"
-            class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-85"
-            phx-hook="HoverPlay"
-          />
+          <% trailer_id = Film.get_mux_playback_id(film.trailer) %>
+          <% poster_url = Film.poster_url(film.poster) %>
+          <%= if trailer_id do %>
+            <mux-player
+              id={"mux-player-#{film.id}"}
+              playback-id={trailer_id}
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              style="--controls: none;"
+              class="absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 transition-transform duration-500 group-hover:brightness-85"
+              phx-hook="HoverPlay"
+            />
+          <% else %>
+            <img
+              src={poster_url}
+              alt={film.title}
+              class="absolute inset-0 w-full h-full object-cover brightness-75"
+            />
+          <% end %>
 
           <div class="absolute inset-0 bg-linear-to-t from-black/80 to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 space-y-2 z-10">
             <h3 class="text-2xl font-bold">{film.title}</h3>

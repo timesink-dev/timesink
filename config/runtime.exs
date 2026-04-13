@@ -223,6 +223,21 @@ end
 # -----------------------------------------------------------------------------
 # :staging
 # -----------------------------------------------------------------------------
+if env in [:staging, :prod] do
+  config :timesink, Timesink.Notifications.Discord,
+    webhooks: [
+      waitlist: System.get_env("TIMESINK_DISCORD_WEBHOOK_WAITLIST"),
+      signups: System.get_env("TIMESINK_DISCORD_WEBHOOK_SIGNUPS"),
+      film_submissions: System.get_env("TIMESINK_DISCORD_WEBHOOK_FILM_SUBMISSIONS"),
+      audience_notes: System.get_env("TIMESINK_DISCORD_WEBHOOK_AUDIENCE_NOTES")
+    ]
+
+  config :timesink, :posthog,
+    public_key: System.get_env("TIMESINK_POSTHOG_PUBLIC_KEY"),
+    api_key: System.get_env("TIMESINK_POSTHOG_API_KEY"),
+    host: System.get_env("TIMESINK_POSTHOG_HOST", "https://eu.i.posthog.com")
+end
+
 if env == :staging do
   # Mailer
   config :timesink, Timesink.Mailer, api_key: fetch_env!.("TIMESINK_STAGING_RESEND_API_KEY")

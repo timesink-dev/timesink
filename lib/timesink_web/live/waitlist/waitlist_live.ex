@@ -2,6 +2,8 @@ defmodule TimesinkWeb.WaitlistLive do
   use TimesinkWeb, :live_view
   alias Timesink.Waitlist
 
+  @spec mount(any(), any(), Phoenix.LiveView.Socket.t()) ::
+          {:ok, any(), [{:layout, {any(), any()}}, ...]}
   def mount(_params, _session, socket) do
     if connected?(socket) do
       :timer.send_interval(10_000, self(), :update_waitlist_status)
@@ -28,7 +30,7 @@ defmodule TimesinkWeb.WaitlistLive do
     ~H"""
     <div class="w-full min-h-screen bg-backroom-black flex items-center justify-center overflow-hidden">
       <.live_component
-        module={TimesinkWeb.WaitlistFormComponent}
+        module={TimesinkWeb.Components.WaitlistForm}
         id="waitlist_form"
         sent?={@sent?}
         spots_remaining={@spots_remaining}
