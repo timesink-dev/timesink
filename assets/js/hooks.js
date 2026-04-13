@@ -370,7 +370,9 @@ Hooks.EmblaMain = {
   updated() {},
 
   destroyed() {
-    this.embla?.destroy()
+    // Don't call destroy() — it removes the translateX transform causing a flash to slide 0.
+    // The DOM is being removed anyway so cleanup is unnecessary.
+    window.__emblaMain__ = null
   }
 }
 
