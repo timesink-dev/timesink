@@ -15,6 +15,26 @@
 //     import "some-package"
 //
 
+// PostHog analytics
+import posthog from "posthog-js"
+const phKey = document.querySelector('meta[name="posthog-key"]')?.content
+const phHost = document.querySelector('meta[name="posthog-host"]')?.content
+if (phKey) {
+  posthog.init(phKey, {
+    api_host: phHost || "https://eu.i.posthog.com",
+    defaults: "2026-01-30",
+    person_profiles: "identified_only",
+    capture_pageview: false,
+  })
+
+  const userId = document.querySelector('meta[name="posthog-user-id"]')?.content
+  if (userId) posthog.identify(userId)
+
+  window.addEventListener("phx:page-loading-stop", () => {
+    posthog.capture("$pageview", { "$current_url": window.location.href })
+  })
+}
+
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html";
 import "trix";

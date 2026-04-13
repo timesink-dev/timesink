@@ -141,6 +141,13 @@ defmodule TimesinkWeb.OnboardingLive do
       {:ok, user} ->
         token = CoreAuth.generate_token(user)
 
+        Timesink.Analytics.capture("user signed up", user.id, %{
+          "email" => user.email,
+          "username" => user.username
+        })
+
+        Timesink.Notifications.Discord.notify_user_signup(user.username, user.email)
+
         Waitlist.Mail.send_platform_greeting(user.email, user.first_name)
 
         # Enqueue newsletter subscription job (non-blocking)
