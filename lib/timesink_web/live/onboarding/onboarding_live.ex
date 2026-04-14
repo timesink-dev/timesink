@@ -9,9 +9,6 @@ defmodule TimesinkWeb.OnboardingLive do
   alias Timesink.Repo
 
   alias TimesinkWeb.Onboarding.{
-    # StepEmailComponent,
-    # StepVerifyEmailComponent,
-    # StepNameComponent,
     StepBirthdateComponent,
     StepLocationComponent,
     StepUsernameComponent,
@@ -141,9 +138,20 @@ defmodule TimesinkWeb.OnboardingLive do
       {:ok, user} ->
         token = CoreAuth.generate_token(user)
 
+        user = Repo.preload(user, :profile)
+        location = user.profile && user.profile.location
+
         Timesink.Analytics.capture("user signed up", user.id, %{
-          "email" => user.email,
-          "username" => user.username
+          "$set" => %{
+            "email" => user.email,
+            "username" => user.username,
+            "first_name" => user.first_name,
+            "last_name" => user.last_name,
+            "location_label" => location && location.label,
+            "location_country" => location && location.country,
+            "location_country_code" => location && to_string(location.country_code),
+            "location_locality" => location && location.locality
+          }
         })
 
         Timesink.Notifications.Discord.notify_user_signup(user.username, user.email)
