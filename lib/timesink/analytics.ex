@@ -3,7 +3,6 @@ defmodule Timesink.Analytics do
   PostHog server-side event capture.
 
   Reads config from:
-
       config :timesink, :posthog,
         project_key: "phc_...",   # Project API Key — used by both JS SDK and server capture
         host: "https://eu.i.posthog.com"
