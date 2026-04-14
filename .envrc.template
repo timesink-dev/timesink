@@ -86,10 +86,9 @@
 # export TIMESINK_TEST_GHOST_PUBLISHING_WEBHOOK_KEY=
 # export TIMESINK_GHOST_PUBLISHING_WEBHOOK_KEY=
 
-# Tracking/Analytics (only for prod)
-# export TIMESINK_POSTHOG_API_KEY
-# export TIMESINK_POSTHOG_PUBLIC_KEY
-# export TIMESINK_POSTHOG_HOST
+# Tracking/Analytics (only for prod/staging)
+# export TIMESINK_POSTHOG_PROJECT_KEY   # phc_... Project API Key (same key used by JS SDK)
+# export TIMESINK_POSTHOG_HOST          # defaults to https://eu.i.posthog.com
 
 # Channel Notifications
 # export TIMESINK_DISCORD_WEBHOOK_WAITLIST

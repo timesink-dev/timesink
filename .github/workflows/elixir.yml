@@ -64,32 +64,33 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: asdf-vm/actions/setup@v3
+
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ env.OTP_VERSION }}
           elixir-version: ${{ env.ELIXIR_VERSION }}
+
       - uses: actions/cache@v4
         with:
-          key: ${{ runner.os }}-asdf_${{ hashFiles('.tool-versions') }}-mix_${{ hashFiles('**/mix.lock') }}
-          path: |
-            deps
-            $HOME/.asdf
+          key: ${{ runner.os }}-mix_${{ hashFiles('**/mix.lock') }}
+          path: deps
 
-      # Start a MinIO container on :9000
       - run: docker run -d -p 9000:9000 --name minio minio/minio server /data && sleep 5
 
-      # MinIO basic setup
-      - run: asdf plugin add mc
-      - run: asdf install mc
-      - run: sleep 5; mc --debug --insecure config host add minio http://localhost:9000 minioadmin minioadmin
+      - name: Install MinIO client
+        run: |
+          curl -L https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc
+          chmod +x /usr/local/bin/mc
+          mc --version
+
+      - run: sleep 5; mc --debug --insecure alias set minio http://localhost:9000 minioadmin minioadmin
       - run: sleep 1; mc --debug --insecure mb -p minio/timesink-test
 
       - run: mix deps.get
       - run: mix compile
       - run: mix do ecto.create + ecto.migrate + run priv/repo/seeds.exs
       - run: mix test
-
+      
   deploy:
     # Only deploy from staging or production branches.
     if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/production'
