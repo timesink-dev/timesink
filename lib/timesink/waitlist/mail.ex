@@ -16,14 +16,22 @@ defmodule Timesink.Waitlist.Mail do
 
     If you have any questions, just reply to this email.
 
-    The TimeSink Team
+    TimeSink
     """
 
-    send_mail(to_email, subject, body)
+    html = TimesinkWeb.WaitlistConfirmationEmail.render_to_html(first_name)
+    send_mail(to_email, subject, body, html)
+
+    send_mail(
+      "hello@timesinkpresents.com",
+      "New waitlist signup: #{first_name}",
+      "#{first_name} (#{to_email}) just joined the waitlist."
+    )
   end
 
   def send_invite_code(to_email, first_name, code) do
     subject = "Your invitation to join TimeSink"
+    invite_url = "#{base_url()}/invite/#{code}"
 
     body = """
     Hi #{first_name},
@@ -31,17 +39,19 @@ defmodule Timesink.Waitlist.Mail do
     Great news! Your spot is ready. You’re now officially invited to join TimeSink.
 
     Click the link below to create your account and step inside:
-    #{base_url()}/invite/#{code}
+    #{invite_url}
 
     We’re glad to have you with us.
 
-    The TimeSink Team
+    TimeSink
     """
 
-    send_mail(to_email, subject, body)
+    html = TimesinkWeb.InviteEmail.render_to_html(first_name, invite_url)
+
+    send_mail(to_email, subject, body, html)
   end
 
-  def send_platform_greeting(to_email, first_name) do
+  def send_platform_greeting(to_email, first_name, last_name) do
     subject = "Welcome to TimeSink. You've made it here at the beginning."
 
     body = """
@@ -90,7 +100,14 @@ defmodule Timesink.Waitlist.Mail do
     P.S. If you ever want to share thoughts, ideas, or just say hi, hit reply. I'll read everything.
     """
 
-    send_mail(to_email, subject, body)
+    html = TimesinkWeb.PlatformGreetingEmail.render_to_html(first_name)
+    send_mail(to_email, subject, body, html)
+
+    send_mail(
+      "hello@timesinkpresents.com",
+      "New member signup: #{first_name} #{last_name}",
+      "#{first_name} #{last_name} (#{to_email}) just completed registration."
+    )
   end
 
   defp base_url do
