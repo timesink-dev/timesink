@@ -25,8 +25,7 @@ defmodule Timesink.Cinema.Mail do
 
     send_mail(to_email, subject, body, html)
 
-    send_mail(
-      "hello@timesinkpresents.com",
+    notify_internal(
       "New film submission: #{submission.title}",
       "#{contact_name} (#{to_email}) submitted \"#{submission.title}\".\n\nReview: #{base_url()}/admin/film-submissions"
     )
@@ -91,7 +90,7 @@ defmodule Timesink.Cinema.Mail do
     #{base_url()}/admin/creative-claims
     """
 
-    send_mail("hello@timesinkpresents.com", subject, body)
+    notify_internal(subject, body)
   end
 
   def send_creative_claim_approved(user, creative) do
