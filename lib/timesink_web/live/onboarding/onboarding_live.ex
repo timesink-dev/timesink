@@ -141,7 +141,7 @@ defmodule TimesinkWeb.OnboardingLive do
         user = Repo.preload(user, :profile)
         location = user.profile && user.profile.location
 
-        Timesink.Analytics.capture("user signed up", user.id, %{
+        Timesink.Analytics.capture("User Signed Up", user.id, %{
           "$set" => %{
             "email" => user.email,
             "username" => user.username,
