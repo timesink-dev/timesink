@@ -6,7 +6,7 @@
     <meta name="csrf-token" content={get_csrf_token()} />
     <meta
       name="posthog-key"
-      content={Application.get_env(:timesink, :posthog, [])[:public_key] || ""}
+      content={Application.get_env(:timesink, :posthog, [])[:project_key] || ""}
     />
     <meta name="posthog-host" content={Application.get_env(:timesink, :posthog, [])[:host] || ""} />
     <meta

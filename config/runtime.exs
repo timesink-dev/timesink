@@ -233,8 +233,7 @@ if env in [:staging, :prod] do
     ]
 
   config :timesink, :posthog,
-    public_key: System.get_env("TIMESINK_POSTHOG_PUBLIC_KEY"),
-    api_key: System.get_env("TIMESINK_POSTHOG_API_KEY"),
+    project_key: System.get_env("TIMESINK_POSTHOG_PROJECT_KEY"),
     host: System.get_env("TIMESINK_POSTHOG_HOST", "https://eu.i.posthog.com")
 end
 

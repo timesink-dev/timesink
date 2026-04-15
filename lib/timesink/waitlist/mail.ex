@@ -16,14 +16,22 @@ defmodule Timesink.Waitlist.Mail do
 
     If you have any questions, just reply to this email.
 
-    The TimeSink Team
+    TimeSink
     """
 
-    send_mail(to_email, subject, body)
+    html = TimesinkWeb.WaitlistConfirmationEmail.render_to_html(first_name)
+    send_mail(to_email, subject, body, html)
+
+    send_mail(
+      "hello@timesinkpresents.com",
+      "New waitlist signup: #{first_name}",
+      "#{first_name} (#{to_email}) just joined the waitlist."
+    )
   end
 
   def send_invite_code(to_email, first_name, code) do
     subject = "Your invitation to join TimeSink"
+    invite_url = "#{base_url()}/invite/#{code}"
 
     body = """
     Hi #{first_name},
@@ -31,61 +39,59 @@ defmodule Timesink.Waitlist.Mail do
     Great news! Your spot is ready. You’re now officially invited to join TimeSink.
 
     Click the link below to create your account and step inside:
-    #{base_url()}/invite/#{code}
+    #{invite_url}
 
     We’re glad to have you with us.
 
-    The TimeSink Team
+    TimeSink
     """
 
-    send_mail(to_email, subject, body)
+    html = TimesinkWeb.InviteEmail.render_to_html(first_name, invite_url)
+
+    send_mail(to_email, subject, body, html)
   end
 
-  def send_platform_greeting(to_email, first_name) do
+  def send_platform_greeting(to_email, first_name, last_name) do
     subject = "Welcome to TimeSink. You've made it here at the beginning."
 
     body = """
     Hi #{first_name},
 
-    Welcome to TimeSink. I’m genuinely glad you’re here.
+    Welcome to TimeSink. I'm really glad you're here.
 
-    This platform started years ago in the mid-to-late 2010's, when I was an ambitious young filmmaker living in New York City, chasing the sparks of ideas, trying to bridge that impossible distance between the desire to create and the moment something finally takes shape.
+    TimeSink was built around a simple idea: a film shouldn't have to end the moment it does.
 
-    I spent countless nights at Anthology Film Archives, watching films that rattled me awake. I’d leave the theater buzzing. Wanting to talk, to debate, to stay in that feeling. But the moment the doors opened, the energy dissipated onto the street. Everyone walked off into the night, and the conversation evaporated with them.
+    You leave a screening still thinking, still feeling, still wanting to talk about what you just saw — but most of the time, that energy has nowhere to go. The lights come up, people scatter, and whatever was sparked in the room disappears too quickly.
 
-    There was nowhere to go that wasn’t just a bar.
-    Nowhere to linger with meaning.
-    Nowhere for that spark to land.
+    TimeSink is built to hold onto that.
 
-    TimeSink grew out of that missing space.
+    It also provides a stage for filmmakers. Musicians have countless stages to share their work. Cinema deserves more spaces like that too — especially for films that need the right room, the right context, and the right audience.
 
-    A place for the afterglow.
-    A place where cinema doesn’t end when the credits roll.
-    A place where the buzzing, fragile, electric thing that happens inside a theater can actually live a little longer through conversation, through community, through other people who felt something too.
+    What matters here isn’t budget, scale, or access — just whether something is worth experiencing and talking about. That can come from anywhere.
 
-    You’re joining us very early.
-    There are no showcases yet.
-    But you’re exactly on time.
+    Just as importantly, I want TimeSink to grow into a rich community of viewers, creators, programmers, and curious people from all over the world — connecting through cinema, ideas, taste, disagreement, interpretation, and discovery. As Duchamp said, the viewer completes the work. Film doesn't only live on the screen, but in the response it creates and the conversation it opens.
 
-    Here’s where we’re going:
+    You're joining early, as everything is beginning to take shape.
+
+    Here's where we're going:
 
     * Curated film showcases, each with its own theater room
-    * “Simulated live” screenings where everyone watches together in sync
-    * A vibrant chat where conversations don’t die on the sidewalk
-    * A home for filmmakers to share work and viewers to share reactions
-    * A virtual arthouse cinema built for lingering, not scrolling
+    * Shared screenings that bring people into the same experience together
+    * A vibrant chat where conversations don't die on the sidewalk
+    * Audience notes attached to specific moments in a film, appearing as it plays so others can experience what you saw or felt
+    * Director commentary presented in the same way, tied directly to moments in the film
+    * A home for filmmakers to present work and for viewers to respond
+    * An arthouse cinema built for connecting, not scrolling
 
-    We’ve also opened a Substack where we’ll publish featured editorials, film notes, and behind-the-scenes posts. A place to extend the conversation and give context to the films we bring onto the platform.
-    You can find it here: https://timesinkpresents.substack.com/
+    We've also opened a Substack where we'll publish editorials, film notes, and behind-the-scenes writing around the films and ideas that shape the platform:
+    https://timesinkpresents.substack.com/
 
-    TimeSink is small right now. This is intentional.
-    It’s personal, handmade, and growing slowly, like all meaningful communities do.
+    TimeSink is small right now, intentionally.
+    I'm building it slowly and carefully, with the goal of shaping something distinctive, alive, and lasting.
 
-    This is just the beginning. As we bring the first films, showcases, and premieres onto the platform, you’ll hear from us. Thank you for being here at the start. Your presence here is immense.
+    This is just the beginning. As the next showcases and premieres take shape, you'll hear from us.
 
-    Thank you for stepping inside at this early moment.
-    Thank you for helping shape what this becomes.
-    And thank you for believing, even a little, in the idea behind it.
+    Thanks for being here early.
 
     See you in the theater,
     Aaron
@@ -94,7 +100,14 @@ defmodule Timesink.Waitlist.Mail do
     P.S. If you ever want to share thoughts, ideas, or just say hi, hit reply. I'll read everything.
     """
 
-    send_mail(to_email, subject, body)
+    html = TimesinkWeb.PlatformGreetingEmail.render_to_html(first_name)
+    send_mail(to_email, subject, body, html)
+
+    send_mail(
+      "hello@timesinkpresents.com",
+      "New member signup: #{first_name} #{last_name}",
+      "#{first_name} #{last_name} (#{to_email}) just completed registration."
+    )
   end
 
   defp base_url do

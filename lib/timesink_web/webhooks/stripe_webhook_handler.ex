@@ -26,7 +26,7 @@ defmodule TimesinkWeb.StripeWebhookHandler do
         )
 
         Timesink.Analytics.capture(
-          "film submitted",
+          "Film Submitted",
           submission.submitted_by_id || submission.contact_email,
           %{
             "title" => submission.title,

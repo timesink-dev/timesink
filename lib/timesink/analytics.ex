@@ -5,17 +5,16 @@ defmodule Timesink.Analytics do
   Reads config from:
 
       config :timesink, :posthog,
-        api_key: "phc_...",          # server-side (private) key
-        public_key: "phc_...",       # used by the JS snippet via meta tag
-        host: "https://us.i.posthog.com"
+        project_key: "phc_...",   # Project API Key — used by both JS SDK and server capture
+        host: "https://eu.i.posthog.com"
 
-  A missing or blank `api_key` is a no-op — safe in all environments.
+  A missing or blank `project_key` is a no-op — safe in all environments.
   All HTTP calls are fire-and-forget (Task.start) so they never block the caller.
   """
 
   require Logger
 
-  @posthog_path "/capture/"
+  @posthog_path "/i/v0/e/"
 
   @doc """
   Capture an event for `distinct_id` with optional `properties` map.
@@ -25,16 +24,16 @@ defmodule Timesink.Analytics do
   @spec capture(String.t(), any(), map()) :: :ok
   def capture(event, distinct_id, properties \\ %{}) do
     config = Application.get_env(:timesink, :posthog, [])
-    api_key = config[:api_key]
-    host = config[:host] || "https://us.i.posthog.com"
+    project_key = config[:project_key]
+    host = config[:host] || "https://eu.i.posthog.com"
 
-    if is_nil(api_key) or api_key == "" do
+    if is_nil(project_key) or project_key == "" do
       :ok
     else
       Task.start(fn ->
         payload =
           Jason.encode!(%{
-            api_key: api_key,
+            api_key: project_key,
             event: event,
             distinct_id: to_string(distinct_id),
             properties: Map.merge(%{"$lib" => "elixir"}, properties),
@@ -46,11 +45,11 @@ defmodule Timesink.Analytics do
         req = Finch.build(:post, url, headers, payload)
 
         case Finch.request(req, Timesink.Finch) do
-          {:ok, %Finch.Response{status: status}} when status in 200..299 ->
-            :ok
+          {:ok, %Finch.Response{status: status, body: body}} when status in 200..299 ->
+            Logger.debug("[PostHog] Captured #{event} (#{status}): #{body}")
 
-          {:ok, %Finch.Response{status: status}} ->
-            Logger.warning("[PostHog] Unexpected status #{status} for event #{event}")
+          {:ok, %Finch.Response{status: status, body: body}} ->
+            Logger.warning("[PostHog] Unexpected status #{status} for event #{event}: #{body}")
 
           {:error, reason} ->
             Logger.warning("[PostHog] Capture failed for event #{event}: #{inspect(reason)}")
