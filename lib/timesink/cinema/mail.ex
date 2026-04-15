@@ -16,7 +16,19 @@ defmodule Timesink.Cinema.Mail do
     Thank you for sharing your work with TimeSink.
     """
 
-    send_mail(to_email, subject, body)
+    html =
+      TimesinkWeb.FilmSubmissionReceivedEmail.render_to_html(
+        contact_name,
+        submission.title,
+        "#{base_url()}/me/film-submissions"
+      )
+
+    send_mail(to_email, subject, body, html)
+
+    notify_internal(
+      "New film submission: #{submission.title}",
+      "#{contact_name} (#{to_email}) submitted \"#{submission.title}\".\n\nReview: #{base_url()}/admin/film-submissions"
+    )
   end
 
   def send_film_status_update(submission, new_status) do
@@ -29,10 +41,17 @@ defmodule Timesink.Cinema.Mail do
 
     If you have any questions, you can always reach us at hello@timesinkpresents.com.
 
-    The TimeSink Team
+    TimeSink
     """
 
-    send_mail(submission.contact_email, subject, body)
+    html =
+      TimesinkWeb.FilmStatusUpdateEmail.render_to_html(
+        submission.contact_name,
+        build_status_message(submission, new_status),
+        new_status
+      )
+
+    send_mail(submission.contact_email, subject, body, html)
   end
 
   defp format_status(:received), do: "received"
@@ -71,7 +90,7 @@ defmodule Timesink.Cinema.Mail do
     #{base_url()}/admin/creative-claims
     """
 
-    send_mail("hello@timesinkpresents.com", subject, body)
+    notify_internal(subject, body)
   end
 
   def send_creative_claim_approved(user, creative) do
@@ -85,10 +104,16 @@ defmodule Timesink.Cinema.Mail do
     Your TimeSink profile now reflects your status as a verified creative. Your name will appear as a link in film credits where your work is listed.
 
     See you in the theater,
-    The TimeSink Team
+    TimeSink
     """
 
-    send_mail(user.email, subject, body)
+    html =
+      TimesinkWeb.CreativeClaimApprovedEmail.render_to_html(
+        user.first_name,
+        "#{creative.first_name} #{creative.last_name}"
+      )
+
+    send_mail(user.email, subject, body, html)
   end
 
   def send_creative_claim_rejected(user, creative) do
@@ -101,10 +126,16 @@ defmodule Timesink.Cinema.Mail do
 
     After review, we were unable to verify this claim at this time. If you believe this is a mistake or have additional information to share, please reply to this email.
 
-    The TimeSink Team
+    TimeSink
     """
 
-    send_mail(user.email, subject, body)
+    html =
+      TimesinkWeb.CreativeClaimRejectedEmail.render_to_html(
+        user.first_name,
+        "#{creative.first_name} #{creative.last_name}"
+      )
+
+    send_mail(user.email, subject, body, html)
   end
 
   defp base_url do

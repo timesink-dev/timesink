@@ -33,7 +33,7 @@ defmodule Timesink.Account.Mail do
 
       If you didn't request this change, you can safely ignore this email.
 
-      — The TimeSink Team
+      — TimeSink
       """
     )
   end
@@ -56,7 +56,7 @@ defmodule Timesink.Account.Mail do
 
       If you didn't request this, you can safely ignore this email and your password will remain unchanged.
 
-      — The TimeSink Team
+      — TimeSink
       """
     )
   end

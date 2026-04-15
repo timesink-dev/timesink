@@ -12,7 +12,8 @@ defmodule Timesink.Mailer do
       "to" => contact_to_map(email.to),
       "from" => contact_to_map(email.from),
       "subject" => email.subject,
-      "text_body" => email.text_body
+      "text_body" => email.text_body,
+      "html_body" => email.html_body
     }
   end
 
@@ -32,8 +33,8 @@ defmodule Timesink.Mailer do
       to: map_to_contact(to),
       from: map_to_contact(from),
       subject: subject,
-      text_body: text_body
-      # Add a text_html if needed.
+      text_body: text_body,
+      html_body: args["html_body"]
     ]
 
     Swoosh.Email.new(opts)
@@ -60,18 +61,26 @@ defmodule Timesink.Mailer do
       import Swoosh.Email
       alias Timesink.Workers.SendMail
 
-      def send_mail(recipient, subject, body) do
+      def send_mail(recipient, subject, body, html \\ nil) do
         email =
           new()
           |> to(recipient)
           |> from({"TimeSink Presents", "hello@timesinkpresents.com"})
           |> subject(subject)
           |> text_body(body)
+          |> then(fn e -> if html, do: html_body(e, html), else: e end)
 
         with email_map <- Timesink.Mailer.to_map(email),
              {:ok, _job} <- enqueue_worker(email_map) do
           {:ok, email}
         end
+      end
+
+      def notify_internal(subject, body) do
+        if Application.get_env(:timesink, :env) == :prod,
+          do: send_mail("hello@timesinkpresents.com", subject, body)
+
+        :ok
       end
 
       defp enqueue_worker(email) do

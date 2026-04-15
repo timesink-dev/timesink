@@ -72,7 +72,7 @@ Being a member means being part of something bigger than just watching films –
 
 ### 📼 Film Submission
 
-A **Film Submission** is the process by which creators bring their films to TimeSink, proposing them for potential showcases. This is the gateway for filmmakers to share their work with an engaged audience, providing an opportunity for their films to be featured in the TimeSink theaters. Each submission includes essential details—such as the film’s title, release year, genre, and a screening link—allowing the TimeSink team to carefully review and consider it for inclusion in future showcases.
+A **Film Submission** is the process by which creators bring their films to TimeSink, proposing them for potential showcases. This is the gateway for filmmakers to share their work with an engaged audience, providing an opportunity for their films to be featured in the TimeSink theaters. Each submission includes essential details—such as the film’s title, release year, genre, and a screening link—allowing TimeSink to carefully review and consider it for inclusion in future showcases.
 
 Through the submission process, TimeSink enables creators to share their stories, expand their reach, and become part of a community where their work is celebrated, discussed, and, ultimately, experienced as a meaningful part of cinema's ongoing journey.
 

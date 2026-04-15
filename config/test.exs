@@ -1,5 +1,7 @@
 import Config
 
+config :timesink, env: :test
+
 # Configure test database
 #
 # The MIX_TEST_PARTITION environment variable can be used

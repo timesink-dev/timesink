@@ -1,5 +1,7 @@
 import Config
 
+config :timesink, env: :dev
+
 # Configure your database
 config :timesink, Timesink.Repo,
   username: "postgres",

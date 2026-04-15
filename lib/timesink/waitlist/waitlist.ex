@@ -161,7 +161,7 @@ defmodule Timesink.Waitlist do
           # Mail.send_waitlist_confirmation(applicant.email, applicant.first_name)
           InviteScheduler.schedule_invite(applicant.id)
 
-          Timesink.Analytics.capture("waitlist joined", applicant.email, %{
+          Timesink.Analytics.capture("Waitlist Joined", applicant.email, %{
             "email" => applicant.email
           })
 

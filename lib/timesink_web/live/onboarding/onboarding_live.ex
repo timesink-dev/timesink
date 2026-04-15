@@ -141,7 +141,7 @@ defmodule TimesinkWeb.OnboardingLive do
         user = Repo.preload(user, :profile)
         location = user.profile && user.profile.location
 
-        Timesink.Analytics.capture("user signed up", user.id, %{
+        Timesink.Analytics.capture("User Signed Up", user.id, %{
           "$set" => %{
             "email" => user.email,
             "username" => user.username,
@@ -156,7 +156,7 @@ defmodule TimesinkWeb.OnboardingLive do
 
         Timesink.Notifications.Discord.notify_user_signup(user.username, user.email)
 
-        Waitlist.Mail.send_platform_greeting(user.email, user.first_name)
+        Waitlist.Mail.send_platform_greeting(user.email, user.first_name, user.last_name)
 
         # Enqueue newsletter subscription job (non-blocking)
         %{"email" => user.email}

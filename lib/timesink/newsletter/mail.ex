@@ -21,12 +21,12 @@ defmodule Timesink.Newsletter.Mail do
 
     This step helps us make sure it’s really you and keeps our list free of spam and noise.
 
-    Once confirmed, you’ll start receiving updates about new screenings, live events, and editorial notes — all hand-curated by the TimeSink team.
+    Once confirmed, you’ll start receiving updates about new screenings, live events, and editorial notes — all hand-curated by TimeSink.
 
     If you didn’t request this, you can safely ignore this email.
 
     See you at the next screening,
-    The TimeSink Team
+    TimeSink
     """
 
     send_mail(to_email, subject, body)
@@ -49,7 +49,7 @@ defmodule Timesink.Newsletter.Mail do
     No noise — just cinema, conversation, and discovery.
 
     Stay tuned,
-    The TimeSink Team
+    TimeSink
     """
 
     send_mail(to_email, subject, body)
