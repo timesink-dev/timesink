@@ -77,7 +77,9 @@ defmodule Timesink.Mailer do
       end
 
       def notify_internal(subject, body) do
-        if Application.get_env(:timesink, :env) == :prod, do: send_mail("hello@timesinkpresents.com", subject, body)
+        if Application.get_env(:timesink, :env) == :prod,
+          do: send_mail("hello@timesinkpresents.com", subject, body)
+
         :ok
       end
 
