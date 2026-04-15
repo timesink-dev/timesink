@@ -22,8 +22,7 @@ defmodule Timesink.Waitlist.Mail do
     html = TimesinkWeb.WaitlistConfirmationEmail.render_to_html(first_name)
     send_mail(to_email, subject, body, html)
 
-    send_mail(
-      "hello@timesinkpresents.com",
+    notify_internal(
       "New waitlist signup: #{first_name}",
       "#{first_name} (#{to_email}) just joined the waitlist."
     )
@@ -103,8 +102,7 @@ defmodule Timesink.Waitlist.Mail do
     html = TimesinkWeb.PlatformGreetingEmail.render_to_html(first_name)
     send_mail(to_email, subject, body, html)
 
-    send_mail(
-      "hello@timesinkpresents.com",
+    notify_internal(
       "New member signup: #{first_name} #{last_name}",
       "#{first_name} #{last_name} (#{to_email}) just completed registration."
     )
