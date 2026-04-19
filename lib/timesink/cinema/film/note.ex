@@ -7,8 +7,8 @@ defmodule Timesink.Cinema.Film.Note do
   def list_commentary(film_id) do
     Note
     |> where([n], n.film_id == ^film_id and n.source == :director and n.status == :visible)
-    |> order_by([n], asc: n.offset_seconds)
-    |> preload([:user])
+    |> order_by([n], asc: n.offset_seconds, asc: n.inserted_at)
+    |> preload(user: :creative)
     |> Repo.all()
   end
 
@@ -22,8 +22,8 @@ defmodule Timesink.Cinema.Film.Note do
         n.status == :visible and
         n.offset_seconds <= ^current_offset
     )
-    |> order_by([n], asc: n.offset_seconds)
-    |> preload([:user])
+    |> order_by([n], asc: n.offset_seconds, asc: n.inserted_at)
+    |> preload(user: :creative)
     |> Repo.all()
   end
 

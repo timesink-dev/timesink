@@ -616,8 +616,9 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         <ul class="divide-y divide-white/5">
           <%= for entry <- @commentary do %>
             <% thumb = mux_thumbnail_url(Film.get_mux_playback_id(@film.video), entry.offset_seconds) %>
-            <li class="px-4 py-3">
-              <div class="flex items-start gap-3">
+            <% director_name = entry.user && entry.user.creative && Timesink.Cinema.Creative.full_name(entry.user.creative) %>
+            <li class="px-4 py-2">
+              <div class="flex items-start gap-3 px-4 py-3 rounded-xl border border-transparent">
                 <%= if thumb do %>
                   <img
                     src={thumb}
@@ -627,23 +628,18 @@ defmodule TimesinkWeb.Components.TheaterPanel do
                   />
                 <% end %>
                 <div class="min-w-0 flex-1">
-                  <div class="flex items-center gap-2 mb-1">
+                  <div class="flex items-center justify-between mb-1">
                     <span class="inline-flex items-center gap-1 text-[10px] font-medium text-amber-500/80 uppercase tracking-wider">
                       <.icon name="hero-megaphone" class="w-3 h-3" />
-                      Director
+                      {if director_name, do: director_name, else: "Director"}
                     </span>
-                    <span class="text-[10px] text-zinc-500 font-mono">
+                    <span class="text-xs text-zinc-400 font-mono shrink-0">
                       {format_offset(entry.offset_seconds)}
                     </span>
                   </div>
-                  <p class="text-sm text-zinc-200 leading-snug font-light whitespace-pre-line">
+                  <p class="mt-0.5 font-light text-zinc-100/60 text-sm whitespace-pre-line leading-snug">
                     {entry.body}
                   </p>
-                  <%= if entry.user do %>
-                    <p class="mt-1 text-[10px] text-zinc-600">
-                      — {entry.user.username}
-                    </p>
-                  <% end %>
                 </div>
               </div>
             </li>
