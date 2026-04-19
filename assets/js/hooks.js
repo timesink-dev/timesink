@@ -1020,4 +1020,51 @@ Hooks.SearchFocus = {
   }
 };
 
+// Director's Commentary — controls the on-demand Mux player in the private screening room.
+// Responsibilities:
+//   - Sends `player:timeupdate` to the server on every timeupdate tick so the server
+//     knows the current offset when a commentary entry is saved.
+//   - Listens for `director:seek` from the server (clicking a timestamp in the panel)
+//     and seeks the player to that offset.
+//   - Listens for `director:pause` from the server (opening the add form) and pauses.
+Hooks.DirectorPlayer = {
+  mounted() {
+    // The hook is mounted directly on the mux-player element
+    this.player = this.el
+
+    // Send current time to server on every timeupdate
+    this.onTimeUpdate = () => {
+      this.pushEvent("player:timeupdate", { offset: this.player.currentTime })
+    }
+    this.player.addEventListener("timeupdate", this.onTimeUpdate)
+
+    // Server wants to seek the player to a timestamp
+    this.handleEvent("director:seek", ({ offset }) => {
+      this.player.currentTime = offset
+      this.player.play().catch(() => {})
+    })
+
+    // Server wants to pause the player (e.g. add form opened)
+    this.handleEvent("director:pause", () => {
+      this.player.pause()
+    })
+  },
+
+  destroyed() {
+    if (this.onTimeUpdate) {
+      this.player.removeEventListener("timeupdate", this.onTimeUpdate)
+    }
+  }
+}
+
+// Auto-focuses a textarea when it is mounted (e.g. when the add/edit form appears).
+Hooks.DirectorCommentaryInput = {
+  mounted() {
+    this.el.focus()
+    // Move cursor to end of existing text (for edit forms)
+    const len = this.el.value.length
+    this.el.setSelectionRange(len, len)
+  }
+}
+
 export default Hooks;

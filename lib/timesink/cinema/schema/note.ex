@@ -5,7 +5,7 @@ defmodule Timesink.Cinema.Note do
   import Ecto.Changeset
 
   alias Timesink.Account.User
-  alias Timesink.Cinema.Exhibition
+  alias Timesink.Cinema.{Exhibition, Film}
 
   @type source :: :audience | :director
   @source [:audience, :director]
@@ -18,7 +18,8 @@ defmodule Timesink.Cinema.Note do
           offset_seconds: :number,
           status: :string,
           user: User.t(),
-          exhibition: Exhibition.t()
+          exhibition: Exhibition.t() | nil,
+          film: Film.t() | nil
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -32,16 +33,34 @@ defmodule Timesink.Cinema.Note do
 
     belongs_to :user, User
     belongs_to :exhibition, Exhibition
+    belongs_to :film, Film
 
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset(note :: t(), params :: %{optional(atom()) => term()}) ::
-          Ecto.Changeset.t()
+  @spec changeset(note :: t() | %__MODULE__{}, params :: map()) :: Ecto.Changeset.t()
   def changeset(note, params, _metadata \\ []) do
     note
-    |> cast(params, [:source, :body, :offset_seconds, :status, :user_id, :exhibition_id])
-    |> validate_required([:source, :body, :offset_seconds, :status, :user_id, :exhibition_id])
+    |> cast(params, [:source, :body, :offset_seconds, :status, :user_id, :exhibition_id, :film_id])
+    |> validate_required([:source, :body, :offset_seconds, :status, :user_id])
     |> validate_length(:body, min: 3)
+    |> validate_source_association()
+  end
+
+  defp validate_source_association(changeset) do
+    source = get_field(changeset, :source)
+    exhibition_id = get_field(changeset, :exhibition_id)
+    film_id = get_field(changeset, :film_id)
+
+    case source do
+      :audience when is_nil(exhibition_id) ->
+        add_error(changeset, :exhibition_id, "can't be blank")
+
+      :director when is_nil(film_id) ->
+        add_error(changeset, :film_id, "can't be blank")
+
+      _ ->
+        changeset
+    end
   end
 end

@@ -8,7 +8,9 @@ defmodule TimesinkWeb.Account.MeLive do
   alias Timesink.Repo
   alias Timesink.Token
   alias Timesink.UserGeneratedInvite
+  alias Timesink.Cinema.DirectorCommentary
   import TimesinkWeb.Account.MePageItem
+  import TimesinkWeb.Cinema.FilmLive, only: [film_path: 1]
 
   @max_invites 2
   @copy_reset_ms 2000
@@ -16,6 +18,7 @@ defmodule TimesinkWeb.Account.MeLive do
   def mount(_params, _session, socket) do
     user = socket.assigns.current_user
     invites = list_invites(user.id)
+    director_films = DirectorCommentary.list_director_films(user)
 
     {:ok,
      assign(socket,
@@ -23,7 +26,8 @@ defmodule TimesinkWeb.Account.MeLive do
        invites: invites,
        invites_left: max(@max_invites - length(invites), 0),
        copied_url: nil,
-       max_invites: @max_invites
+       max_invites: @max_invites,
+       director_films: director_films
      )}
   end
 
@@ -71,6 +75,33 @@ defmodule TimesinkWeb.Account.MeLive do
             }
           ]}
         />
+        <!-- Director's Commentary -->
+        <%= if @director_films != [] do %>
+          <div class="mt-8 rounded-2xl border border-amber-600/40 bg-dark-theater-primary/60 p-5 md:p-6">
+            <div class="flex items-center gap-2 mb-1">
+              <.icon name="hero-megaphone" class="w-4 h-4 text-amber-500/80 shrink-0" />
+              <p class="text-xs uppercase tracking-widest text-amber-500/80">Director's Commentary</p>
+            </div>
+            <h3 class="text-lg text-mystery-white font-semibold mb-1">Your films</h3>
+            <p class="text-sm text-zinc-400 mb-4">
+              Leave timestamped commentary for audiences to experience during screenings.
+            </p>
+            <ul class="space-y-2">
+              <li :for={film <- @director_films}>
+                <.link
+                  navigate={"#{film_path(film)}/commentary"}
+                  class="flex items-center justify-between rounded-xl border border-amber-600/20 bg-backroom-black/40 px-4 py-3 text-sm text-zinc-200 hover:border-amber-500/40 hover:bg-amber-600/5 transition group"
+                >
+                  <span class="font-medium">{film.title}</span>
+                  <.icon
+                    name="hero-arrow-right"
+                    class="w-4 h-4 text-zinc-600 group-hover:text-amber-400 transition shrink-0"
+                  />
+                </.link>
+              </li>
+            </ul>
+          </div>
+        <% end %>
         <!-- Invites UI -->
         <%!-- <div class="mt-8 rounded-2xl border border-zinc-800 bg-dark-theater-primary/60 p-5 md:p-6">
           <div class="flex items-center justify-between gap-x-8 md:gap-x-2">

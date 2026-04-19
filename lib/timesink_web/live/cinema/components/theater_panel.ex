@@ -7,6 +7,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   attr :open_panel, :atom, required: true
   attr :notes, :list, required: true
   attr :total_notes_count, :integer, required: true
+  attr :director_commentary, :list, default: []
 
   def panel_title(assigns) do
     ~H"""
@@ -25,7 +26,14 @@ defmodule TimesinkWeb.Components.TheaterPanel do
             <% end %>
           </span>
         <% :director_notes -> %>
-          Director's Notes
+          <span class="flex items-center gap-2 text-amber-400/80">
+            <span>Director's Commentary</span>
+            <%= if length(@director_commentary) > 0 do %>
+              <span class="text-[10px] font-normal tracking-normal text-amber-600/60">
+                · {length(@director_commentary)}
+              </span>
+            <% end %>
+          </span>
         <% _ -> %>
       <% end %>
     </div>
@@ -85,6 +93,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   attr :notes_pulse, :boolean, required: true
   attr :new_notes_count, :integer, required: true
   attr :total_notes_count, :integer, required: true
+  attr :total_director_commentary_count, :integer, required: true
   attr :phase, :atom, required: true
   attr :offset, :any, required: true
 
@@ -122,18 +131,19 @@ defmodule TimesinkWeb.Components.TheaterPanel do
       </div>
       <div class="group relative">
         <button
-          disabled
-          aria-label="Director's commentary — coming soon"
-          class="cursor-not-allowed h-9 w-9 rounded-lg border border-transparent text-zinc-600 flex items-center justify-center"
+          phx-click="open_panel"
+          phx-value-panel="director_notes"
+          aria-label="Director's commentary"
+          class="cursor-pointer h-9 w-9 rounded-lg border border-transparent text-amber-600/70 hover:bg-amber-600/10 hover:text-amber-400 flex items-center justify-center transition relative"
         >
           <.icon name="hero-megaphone" class="w-4 h-4" />
+          <%= if @total_director_commentary_count > 0 do %>
+            <span class="absolute -top-1 -right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-600/80 px-1 text-[9px] font-semibold leading-none text-white shadow-sm">
+              {@total_director_commentary_count}
+            </span>
+          <% end %>
         </button>
-        <.toolbar_tooltip>
-          Director's commentary
-          <span class="ml-2 rounded-full bg-zinc-700 px-1.5 py-0.5 text-[10px] text-zinc-400">
-            Coming soon
-          </span>
-        </.toolbar_tooltip>
+        <.toolbar_tooltip label="Director's commentary" />
       </div>
       <div class="my-0.5 border-t border-white/8"></div>
       <div class="group relative">
@@ -161,6 +171,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   attr :notes_pulse, :boolean, required: true
   attr :new_notes_count, :integer, required: true
   attr :total_notes_count, :integer, required: true
+  attr :total_director_commentary_count, :integer, required: true
   attr :phase, :atom, required: true
   attr :offset, :any, required: true
 
@@ -201,12 +212,24 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         </span>
       </button>
       <button
-        disabled
-        aria-label="Director's commentary — coming soon"
-        class="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs text-zinc-600 cursor-not-allowed"
+        phx-click="open_panel"
+        phx-value-panel="director_notes"
+        aria-label="Director's commentary"
+        class={[
+          "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition relative",
+          if(@open_panel == :director_notes,
+            do: "bg-amber-600/15 text-amber-300",
+            else: "text-amber-600/70 hover:text-amber-400"
+          )
+        ]}
       >
         <.icon name="hero-megaphone" class="w-4 h-4" />
         <span>Director</span>
+        <%= if @total_director_commentary_count > 0 do %>
+          <span class="absolute -top-1 right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-600/80 px-1 text-[9px] font-semibold leading-none text-white shadow-sm">
+            {@total_director_commentary_count}
+          </span>
+        <% end %>
       </button>
       <div class="w-px h-5 bg-white/8 shrink-0"></div>
       <button
@@ -584,21 +607,80 @@ defmodule TimesinkWeb.Components.TheaterPanel do
 
   # ── Director ───────────────────────────────────────────────
 
+  attr :commentary, :list, required: true
+  attr :total_count, :integer, required: true
+  attr :film, :any, required: true
+  attr :body_class, :string, default: "max-h-[40vh]"
+
   def director_panel(assigns) do
     ~H"""
-    <div class="flex flex-col items-center justify-center min-h-[180px] gap-3 text-center px-6 py-8">
-      <.icon name="hero-megaphone" class="w-6 h-6 text-zinc-700" />
-      <div>
-        <p class="text-sm text-zinc-400 font-medium">Director's Commentary</p>
-        <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
-          In-film notes from the director are coming in a future update.
-        </p>
-      </div>
-      <span class="rounded-full border border-white/8 bg-white/4 px-3 py-1 text-xs text-zinc-500 tracking-wide">
-        Coming soon
-      </span>
+    <div class={[@body_class, "overflow-y-auto overscroll-contain"]}>
+      <%= if Enum.empty?(@commentary) do %>
+        <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
+          <.icon name="hero-megaphone" class="w-5 h-5 text-zinc-700" />
+          <%= if @total_count > 0 do %>
+            <div>
+              <p class="text-sm text-zinc-400 font-medium">Commentary ahead</p>
+              <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
+                The director has left commentary that will appear as the film plays.
+              </p>
+            </div>
+          <% else %>
+            <div>
+              <p class="text-sm text-zinc-400 font-medium">No commentary</p>
+              <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
+                The director hasn't left any commentary for this film.
+              </p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <ul class="divide-y divide-white/5">
+          <%= for entry <- @commentary do %>
+            <% thumb = mux_thumbnail_url(Film.get_mux_playback_id(@film.video), entry.offset_seconds) %>
+            <% director_name =
+              entry.user && entry.user.creative &&
+                Timesink.Cinema.Creative.full_name(entry.user.creative) %>
+            <li class="px-4 py-2">
+              <div class="flex items-start gap-3 px-4 py-3 rounded-xl border border-transparent">
+                <%= if thumb do %>
+                  <img
+                    src={thumb}
+                    alt=""
+                    class="w-16 h-9 rounded-md object-cover shrink-0 opacity-60"
+                    loading="lazy"
+                  />
+                <% end %>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-medium text-amber-500/80 uppercase tracking-wider">
+                      <.icon name="hero-megaphone" class="w-3 h-3" />
+                      {if director_name, do: director_name, else: "Director"}
+                    </span>
+                    <span class="text-xs text-zinc-400 font-mono shrink-0">
+                      {format_offset(entry.offset_seconds)}
+                    </span>
+                  </div>
+                  <p class="mt-0.5 font-light text-zinc-100/60 text-sm whitespace-pre-line leading-snug">
+                    {entry.body}
+                  </p>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
     </div>
     """
+  end
+
+  defp format_offset(nil), do: "00:00:00"
+
+  defp format_offset(seconds) do
+    h = div(seconds, 3600)
+    m = seconds |> rem(3600) |> div(60)
+    s = rem(seconds, 60)
+    :io_lib.format("~2..0B:~2..0B:~2..0B", [h, m, s]) |> to_string()
   end
 
   # ── Private ────────────────────────────────────────────────

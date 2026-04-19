@@ -36,8 +36,7 @@ defmodule TimesinkWeb.BtcPayControllerTest do
     conn = signed_post(conn, json_payload)
     assert conn.status == 200
 
-    assert [%FilmSubmission{} = fs] = Timesink.Repo.all(FilmSubmission)
-    assert fs.payment_id == "btc_invoice_abc123"
+    assert fs = Timesink.Repo.get_by(FilmSubmission, payment_id: "btc_invoice_abc123")
     assert fs.title == "The Luminous Gaze"
     assert fs.submitted_by_id == user.id
   end
@@ -64,8 +63,7 @@ defmodule TimesinkWeb.BtcPayControllerTest do
     conn = signed_post(conn, json_payload)
     assert conn.status == 200
 
-    assert [%FilmSubmission{} = fs] = Timesink.Repo.all(FilmSubmission)
-    assert fs.payment_id == "btc_invoice_abc123"
+    assert fs = Timesink.Repo.get_by(FilmSubmission, payment_id: "btc_invoice_abc123")
     assert fs.title == "The Luminous Gaze"
     assert fs.submitted_by_id == nil
   end

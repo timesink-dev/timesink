@@ -1,6 +1,7 @@
 defmodule TimesinkWeb.Cinema.TheaterLive do
   use TimesinkWeb, :live_view
   alias Timesink.Cinema.{Theater, Exhibition, Showcase, Film}
+  alias Timesink.Cinema.Film.Note, as: FilmNote
   alias TimesinkWeb.Components.FilmInfo
   alias TimesinkWeb.Components.TheaterPanel
   alias TimesinkWeb.PubSubTopics
@@ -155,6 +156,9 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:note_moment_message, nil)
        |> assign(:just_posted_note_id, nil)
        |> assign(:freeze_notes?, false)
+       # director commentary
+       |> assign(:director_commentary, [])
+       |> assign(:total_director_commentary_count, length(FilmNote.list_commentary(film.id)))
        # UI state
        |> assign(:open_panel, nil)
        |> assign(:chat_tab, :messages)
@@ -254,6 +258,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               notes_pulse={@notes_pulse}
               new_notes_count={@new_notes_count}
               total_notes_count={@total_notes_count}
+              total_director_commentary_count={@total_director_commentary_count}
               phase={@phase}
               offset={@offset}
             />
@@ -265,6 +270,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             notes_pulse={@notes_pulse}
             new_notes_count={@new_notes_count}
             total_notes_count={@total_notes_count}
+            total_director_commentary_count={@total_director_commentary_count}
             phase={@phase}
             offset={@offset}
           />
@@ -293,6 +299,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 open_panel={@open_panel}
                 notes={@notes}
                 total_notes_count={@total_notes_count}
+                director_commentary={@director_commentary}
               />
               <TheaterPanel.panel_actions
                 open_panel={@open_panel}
@@ -335,7 +342,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 />
               </div>
               <div :if={@open_panel == :director_notes}>
-                <TheaterPanel.director_panel />
+                <TheaterPanel.director_panel
+                  commentary={@director_commentary}
+                  total_count={@total_director_commentary_count}
+                  film={@film}
+                  body_class="max-h-[40vh]"
+                />
               </div>
             </div>
           </aside>
@@ -402,7 +414,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           </div>
 
           <div :if={@open_panel == :director_notes}>
-            <TheaterPanel.director_panel />
+            <TheaterPanel.director_panel
+              commentary={@director_commentary}
+              total_count={@total_director_commentary_count}
+              film={@film}
+              body_class="h-[45vh]"
+            />
           </div>
         </div>
       </div>
@@ -463,6 +480,13 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       Process.send_after(self(), :clear_new_notes_count, 4000)
     end
 
+    director_commentary =
+      if film = socket.assigns[:film] do
+        FilmNote.list_commentary(film.id, current_offset)
+      else
+        []
+      end
+
     {:noreply,
      socket
      |> assign(:phase, phase)
@@ -480,7 +504,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
          else: socket.assigns.new_notes_count
        )
      )
-     |> assign(:notes_pulse, should_pulse?)}
+     |> assign(:notes_pulse, should_pulse?)
+     |> assign(:director_commentary, director_commentary)}
   end
 
   def handle_info(%{event: "presence_diff", topic: topic}, socket) do
