@@ -187,11 +187,21 @@ end
 # :test
 # -----------------------------------------------------------------------------
 if env == :test do
+  # ExAws credentials for test MinIO instance
+  config :ex_aws,
+    access_key_id: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_ID", "minioadmin"),
+    secret_access_key: System.get_env("TIMESINK_TEST_S3_ACCESS_KEY_SECRET", "minioadmin"),
+    region: System.get_env("AWS_REGION", "eu-west-3")
+
   # Point ExAws S3 at test MinIO instance
   System.get_env("TIMESINK_TEST_S3_HOST", "http://localhost:9000")
   |> URI.parse()
   |> then(fn %{scheme: scheme, host: host, port: port} ->
-    config :ex_aws, :s3, scheme: "#{scheme}://", host: host, port: port
+    config :ex_aws, :s3,
+      scheme: "#{scheme}://",
+      host: host,
+      port: port,
+      virtual_host: false
   end)
 
   config :timesink, Timesink.Storage.S3,
