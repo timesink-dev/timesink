@@ -153,14 +153,6 @@ defmodule TimesinkWeb.TopNav do
                 aria-label="Account menu"
               >
                 <.link
-                  navigate="/me/profile"
-                  class="block px-4 py-2 text-sm hover:bg-dark-theater-medium"
-                  role="menuitem"
-                  phx-click={close_dd("#account-menu")}
-                >
-                  View profile
-                </.link>
-                <.link
                   navigate="/me"
                   class="block px-4 py-2 text-sm hover:bg-dark-theater-medium"
                   role="menuitem"

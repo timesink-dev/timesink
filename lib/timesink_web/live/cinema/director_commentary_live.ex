@@ -107,7 +107,9 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
     <div class="max-w-7xl mx-auto px-4 md:px-6 mt-16 text-gray-100">
       <!-- Header -->
       <div class="border-b border-white/10 pb-4 mb-8">
-        <p class="text-xs uppercase tracking-widest text-zinc-500 mb-1">Director's Commentary</p>
+        <p class="text-xs uppercase tracking-widest text-neon-blue-primary mb-1">
+          Director's Commentary
+        </p>
         <h1 class="text-lg font-bold font-gangster">{@film.title}</h1>
       </div>
       
@@ -139,7 +141,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
             <div class="mt-4 flex justify-end">
               <button
                 phx-click="open_add_form"
-                class="cursor-pointer inline-flex items-center gap-2 rounded-lg bg-amber-600/20 text-amber-300 ring-1 ring-amber-600/40 px-4 py-2 text-sm font-medium hover:bg-amber-600/30 transition"
+                class="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-neon-blue-primary text-neon-blue-primary ring-neon-blue-heavy/40 px-4 py-2 text-sm font-medium transition hover:bg-neon-blue-light hover:text-backroom-black"
               >
                 <.icon name="hero-plus" class="w-4 h-4" /> Add Commentary
               </button>
@@ -170,12 +172,12 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
                   name="body"
                   rows="3"
                   placeholder="What would you like to say about this moment?"
-                  class="w-full rounded bg-zinc-800 text-sm text-zinc-100 px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-amber-500/50 placeholder-zinc-600"
+                  class="w-full rounded bg-zinc-800 text-sm text-zinc-100 px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-neon-blue-primary/50 placeholder-zinc-600"
                 >{@add_body}</textarea>
                 <div class="flex items-center justify-between mt-2">
                   <span class={[
                     "text-xs",
-                    if(@char_count >= 450, do: "text-amber-400", else: "text-zinc-600")
+                    if(@char_count >= 450, do: "text-neon-blue-lightest", else: "text-zinc-600")
                   ]}>
                     {@char_count}/500
                   </span>
@@ -193,7 +195,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
                       class={[
                         "cursor-pointer px-4 py-1.5 rounded-lg text-sm font-medium transition",
                         if(@add_body != "" and String.length(@add_body) >= 3,
-                          do: "bg-amber-600 text-white hover:bg-amber-500",
+                          do: "bg-neon-blue-primary text-backroom-black hover:opacity-90",
                           else: "bg-zinc-700 text-zinc-500 cursor-not-allowed"
                         )
                       ]}
@@ -237,7 +239,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
                       <button
                         phx-click="seek_to"
                         phx-value-offset={entry.offset_seconds}
-                        class="cursor-pointer flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 transition mb-1.5 font-mono"
+                        class="cursor-pointer flex items-center gap-1.5 text-xs text-neon-blue-primary hover:text-neon-blue-lightest transition mb-1.5 font-mono"
                       >
                         <.icon name="hero-play-circle" class="w-3.5 h-3.5" />
                         {format_offset(entry.offset_seconds)}
@@ -251,7 +253,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
                             phx-hook="DirectorCommentaryInput"
                             name="body"
                             rows="3"
-                            class="w-full rounded bg-zinc-800 text-sm text-zinc-100 px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                            class="w-full rounded bg-zinc-800 text-sm text-zinc-100 px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-neon-blue-primary/50"
                           >{@edit_body}</textarea>
                           <div class="flex gap-2 mt-2 justify-end">
                             <button
@@ -263,7 +265,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
                             </button>
                             <button
                               type="submit"
-                              class="cursor-pointer px-3 py-1 rounded text-xs bg-amber-600 text-white hover:bg-amber-500 transition"
+                              class="cursor-pointer px-3 py-1 rounded text-xs bg-neon-blue-primary text-white hover:opacity-90 transition"
                             >
                               Save
                             </button>

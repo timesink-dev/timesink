@@ -77,21 +77,23 @@ defmodule TimesinkWeb.Account.MeLive do
         />
         <!-- Director's Commentary -->
         <%= if @director_films != [] do %>
-          <div class="mt-8 rounded-2xl border border-zinc-800 bg-dark-theater-primary/60 p-5 md:p-6">
-            <h3 class="text-lg text-mystery-white pb-1 font-semibold">Director's Commentary</h3>
+          <div class="mt-8 rounded-2xl border border-neon-blue-heavy/30 bg-dark-theater-primary/60 p-5 md:p-6">
+            <div class="flex items-center gap-2 mb-1">
+              <.icon name="hero-star" class="w-4 h-4 text-neon-blue-primary shrink-0" />
+              <p class="text-xs uppercase tracking-widest text-neon-blue-primary">Director's Commentary</p>
+            </div>
+            <h3 class="text-lg text-mystery-white font-semibold mb-1">Your films</h3>
             <p class="text-sm text-zinc-400 mb-4">
-              Leave timestamped commentary on your films for audiences to enjoy during screenings.
+              Leave timestamped commentary for audiences to hear during screenings.
             </p>
             <ul class="space-y-2">
               <li :for={film <- @director_films}>
                 <.link
                   navigate={"#{film_path(film)}/commentary"}
-                  class="flex items-center justify-between rounded-xl border border-zinc-800 bg-backroom-black/40 px-4 py-3 text-sm text-zinc-200 hover:border-amber-600/40 hover:bg-amber-600/5 transition group"
+                  class="flex items-center justify-between rounded-xl border border-neon-blue-heavy/20 bg-backroom-black/40 px-4 py-3 text-sm text-zinc-200 hover:border-neon-blue-primary/40 hover:bg-neon-blue-primary/5 transition group"
                 >
                   <span class="font-medium">{film.title}</span>
-                  <span class="text-xs text-zinc-500 group-hover:text-amber-400 transition flex items-center gap-1">
-                    Open screening room <.icon name="hero-arrow-right" class="w-3 h-3" />
-                  </span>
+                  <.icon name="hero-arrow-right" class="w-4 h-4 text-zinc-600 group-hover:text-neon-blue-primary transition shrink-0" />
                 </.link>
               </li>
             </ul>
