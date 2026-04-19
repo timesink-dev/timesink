@@ -93,6 +93,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   attr :notes_pulse, :boolean, required: true
   attr :new_notes_count, :integer, required: true
   attr :total_notes_count, :integer, required: true
+  attr :total_director_commentary_count, :integer, required: true
   attr :phase, :atom, required: true
   attr :offset, :any, required: true
 
@@ -133,9 +134,14 @@ defmodule TimesinkWeb.Components.TheaterPanel do
           phx-click="open_panel"
           phx-value-panel="director_notes"
           aria-label="Director's commentary"
-          class="cursor-pointer h-9 w-9 rounded-lg border border-transparent text-amber-600/70 hover:bg-amber-600/10 hover:text-amber-400 flex items-center justify-center transition"
+          class="cursor-pointer h-9 w-9 rounded-lg border border-transparent text-amber-600/70 hover:bg-amber-600/10 hover:text-amber-400 flex items-center justify-center transition relative"
         >
           <.icon name="hero-megaphone" class="w-4 h-4" />
+          <%= if @total_director_commentary_count > 0 do %>
+            <span class="absolute -top-1 -right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-600/80 px-1 text-[9px] font-semibold leading-none text-white shadow-sm">
+              {@total_director_commentary_count}
+            </span>
+          <% end %>
         </button>
         <.toolbar_tooltip label="Director's commentary" />
       </div>
@@ -165,6 +171,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   attr :notes_pulse, :boolean, required: true
   attr :new_notes_count, :integer, required: true
   attr :total_notes_count, :integer, required: true
+  attr :total_director_commentary_count, :integer, required: true
   attr :phase, :atom, required: true
   attr :offset, :any, required: true
 
@@ -209,7 +216,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         phx-value-panel="director_notes"
         aria-label="Director's commentary"
         class={[
-          "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition",
+          "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition relative",
           if(@open_panel == :director_notes,
             do: "bg-amber-600/15 text-amber-300",
             else: "text-amber-600/70 hover:text-amber-400"
@@ -218,6 +225,11 @@ defmodule TimesinkWeb.Components.TheaterPanel do
       >
         <.icon name="hero-megaphone" class="w-4 h-4" />
         <span>Director</span>
+        <%= if @total_director_commentary_count > 0 do %>
+          <span class="absolute -top-1 right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-600/80 px-1 text-[9px] font-semibold leading-none text-white shadow-sm">
+            {@total_director_commentary_count}
+          </span>
+        <% end %>
       </button>
       <div class="w-px h-5 bg-white/8 shrink-0"></div>
       <button
@@ -596,6 +608,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   # ── Director ───────────────────────────────────────────────
 
   attr :commentary, :list, required: true
+  attr :total_count, :integer, required: true
   attr :film, :any, required: true
   attr :body_class, :string, default: "max-h-[40vh]"
 
@@ -605,18 +618,29 @@ defmodule TimesinkWeb.Components.TheaterPanel do
       <%= if Enum.empty?(@commentary) do %>
         <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
           <.icon name="hero-megaphone" class="w-5 h-5 text-zinc-700" />
-          <div>
-            <p class="text-sm text-zinc-400 font-medium">No commentary yet</p>
-            <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
-              The director hasn't left any commentary for this film.
-            </p>
-          </div>
+          <%= if @total_count > 0 do %>
+            <div>
+              <p class="text-sm text-zinc-400 font-medium">Commentary ahead</p>
+              <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
+                The director has left commentary that will appear as the film plays.
+              </p>
+            </div>
+          <% else %>
+            <div>
+              <p class="text-sm text-zinc-400 font-medium">No commentary</p>
+              <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
+                The director hasn't left any commentary for this film.
+              </p>
+            </div>
+          <% end %>
         </div>
       <% else %>
         <ul class="divide-y divide-white/5">
           <%= for entry <- @commentary do %>
             <% thumb = mux_thumbnail_url(Film.get_mux_playback_id(@film.video), entry.offset_seconds) %>
-            <% director_name = entry.user && entry.user.creative && Timesink.Cinema.Creative.full_name(entry.user.creative) %>
+            <% director_name =
+              entry.user && entry.user.creative &&
+                Timesink.Cinema.Creative.full_name(entry.user.creative) %>
             <li class="px-4 py-2">
               <div class="flex items-start gap-3 px-4 py-3 rounded-xl border border-transparent">
                 <%= if thumb do %>

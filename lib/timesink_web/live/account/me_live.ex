@@ -90,8 +90,7 @@ defmodule TimesinkWeb.Account.MeLive do
                 >
                   <span class="font-medium">{film.title}</span>
                   <span class="text-xs text-zinc-500 group-hover:text-amber-400 transition flex items-center gap-1">
-                    Open screening room
-                    <.icon name="hero-arrow-right" class="w-3 h-3" />
+                    Open screening room <.icon name="hero-arrow-right" class="w-3 h-3" />
                   </span>
                 </.link>
               </li>

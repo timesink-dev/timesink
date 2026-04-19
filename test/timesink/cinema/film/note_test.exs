@@ -180,13 +180,13 @@ defmodule Timesink.Cinema.Film.NoteTest do
     end
   end
 
-  describe "update_commentary/2" do
+  describe "NoteSchema.update/2 (director note)" do
     test "updates the body of an existing director note" do
       film = insert(:film)
       user = insert(:user)
       note = insert_director_note(film, user, %{body: "original text"})
 
-      assert {:ok, updated} = Note.update_commentary(note, %{body: "revised text"})
+      assert {:ok, updated} = NoteSchema.update(note, %{body: "revised text"})
 
       assert updated.body == "revised text"
     end
@@ -196,7 +196,7 @@ defmodule Timesink.Cinema.Film.NoteTest do
       user = insert(:user)
       note = insert_director_note(film, user)
 
-      assert {:error, changeset} = Note.update_commentary(note, %{body: "hi"})
+      assert {:error, changeset} = NoteSchema.update(note, %{body: "hi"})
       assert %{body: [_ | _]} = errors_on(changeset)
     end
 
@@ -205,7 +205,7 @@ defmodule Timesink.Cinema.Film.NoteTest do
       user = insert(:user)
       note = insert_director_note(film, user)
 
-      assert {:error, changeset} = Note.update_commentary(note, %{body: ""})
+      assert {:error, changeset} = NoteSchema.update(note, %{body: ""})
       assert %{body: [_ | _]} = errors_on(changeset)
     end
 
@@ -214,20 +214,20 @@ defmodule Timesink.Cinema.Film.NoteTest do
       user = insert(:user)
       note = insert_director_note(film, user)
 
-      assert {:ok, updated} = Note.update_commentary(note, %{body: "new body here"})
+      assert {:ok, updated} = NoteSchema.update(note, %{body: "new body here"})
 
       assert updated.source == :director
       assert updated.film_id == film.id
     end
   end
 
-  describe "delete_commentary/1" do
+  describe "NoteSchema.delete/1 (director note)" do
     test "removes the note from the database" do
       film = insert(:film)
       user = insert(:user)
       note = insert_director_note(film, user)
 
-      assert {:ok, _deleted} = Note.delete_commentary(note)
+      assert {:ok, _deleted} = NoteSchema.delete(note)
       assert is_nil(Repo.get(NoteSchema, note.id))
     end
 
@@ -236,7 +236,7 @@ defmodule Timesink.Cinema.Film.NoteTest do
       user = insert(:user)
       note = insert_director_note(film, user)
 
-      Note.delete_commentary(note)
+      NoteSchema.delete(note)
 
       assert Note.list_commentary(film.id) == []
     end

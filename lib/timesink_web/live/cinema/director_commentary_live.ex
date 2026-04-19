@@ -2,6 +2,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
   use TimesinkWeb, :live_view
 
   alias Timesink.Cinema.{Film, DirectorCommentary}
+  alias Timesink.Cinema.Note
   alias Timesink.Cinema.Film.Note, as: FilmNote
   import TimesinkWeb.Cinema.FilmLive, only: [title_slug: 1]
 
@@ -389,8 +390,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
   def handle_event("save_edit", %{"_id" => id}, socket) do
     entry = Enum.find(socket.assigns.commentary, &(&1.id == id))
 
-    case entry &&
-           FilmNote.update_commentary(entry, %{body: String.trim(socket.assigns.edit_body)}) do
+    case entry && Note.update(entry, %{body: String.trim(socket.assigns.edit_body)}) do
       {:ok, _updated} ->
         commentary = FilmNote.list_commentary(socket.assigns.film.id)
 
@@ -428,7 +428,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
     id = socket.assigns.confirm_delete_id
     entry = Enum.find(socket.assigns.commentary, &(&1.id == id))
 
-    case entry && FilmNote.delete_commentary(entry) do
+    case entry && Note.delete(entry) do
       {:ok, _} ->
         commentary = FilmNote.list_commentary(socket.assigns.film.id)
 
@@ -451,7 +451,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
   def handle_event("delete_commentary", %{"id" => id}, socket) do
     entry = Enum.find(socket.assigns.commentary, &(&1.id == id))
 
-    case entry && FilmNote.delete_commentary(entry) do
+    case entry && Note.delete(entry) do
       {:ok, _} ->
         commentary = FilmNote.list_commentary(socket.assigns.film.id)
         {:noreply, assign(socket, commentary: commentary)}

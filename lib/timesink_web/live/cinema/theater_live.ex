@@ -158,6 +158,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:freeze_notes?, false)
        # director commentary
        |> assign(:director_commentary, [])
+       |> assign(:total_director_commentary_count, length(FilmNote.list_commentary(film.id)))
        # UI state
        |> assign(:open_panel, nil)
        |> assign(:chat_tab, :messages)
@@ -257,6 +258,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               notes_pulse={@notes_pulse}
               new_notes_count={@new_notes_count}
               total_notes_count={@total_notes_count}
+              total_director_commentary_count={@total_director_commentary_count}
               phase={@phase}
               offset={@offset}
             />
@@ -268,6 +270,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             notes_pulse={@notes_pulse}
             new_notes_count={@new_notes_count}
             total_notes_count={@total_notes_count}
+            total_director_commentary_count={@total_director_commentary_count}
             phase={@phase}
             offset={@offset}
           />
@@ -341,6 +344,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               <div :if={@open_panel == :director_notes}>
                 <TheaterPanel.director_panel
                   commentary={@director_commentary}
+                  total_count={@total_director_commentary_count}
                   film={@film}
                   body_class="max-h-[40vh]"
                 />
@@ -412,6 +416,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           <div :if={@open_panel == :director_notes}>
             <TheaterPanel.director_panel
               commentary={@director_commentary}
+              total_count={@total_director_commentary_count}
               film={@film}
               body_class="h-[45vh]"
             />

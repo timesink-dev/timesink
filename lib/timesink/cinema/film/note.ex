@@ -30,27 +30,12 @@ defmodule Timesink.Cinema.Film.Note do
   @spec create_commentary(user :: map(), film_id :: binary(), params :: map()) ::
           {:ok, Note.t()} | {:error, Ecto.Changeset.t()}
   def create_commentary(user, film_id, params) do
-    %Note{}
-    |> Note.changeset(
+    Note.create(
       Map.merge(params, %{
         source: :director,
         user_id: user.id,
         film_id: film_id
       })
     )
-    |> Repo.insert()
-  end
-
-  @spec update_commentary(note :: Note.t(), params :: map()) ::
-          {:ok, Note.t()} | {:error, Ecto.Changeset.t()}
-  def update_commentary(note, params) do
-    note
-    |> Note.changeset(params)
-    |> Repo.update()
-  end
-
-  @spec delete_commentary(note :: Note.t()) :: {:ok, Note.t()} | {:error, Ecto.Changeset.t()}
-  def delete_commentary(note) do
-    Repo.delete(note)
   end
 end
