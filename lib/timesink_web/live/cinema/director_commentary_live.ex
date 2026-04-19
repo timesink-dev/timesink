@@ -76,7 +76,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
           phx-click-away="cancel_delete"
         >
           <div class="flex items-start gap-4 mb-5">
-            <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-red-500/15 ring-1 ring-red-500/30">
+            <div class="shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-red-500/15 ring-1 ring-red-500/30">
               <.icon name="hero-trash" class="w-5 h-5 text-red-400" />
             </div>
             <div>
@@ -107,7 +107,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
     <div class="max-w-7xl mx-auto px-4 md:px-6 mt-16 text-gray-100">
       <!-- Header -->
       <div class="border-b border-white/10 pb-4 mb-8">
-        <p class="text-xs uppercase tracking-widest text-neon-blue-primary mb-1">
+        <p class="text-xs uppercase tracking-widest text-zinc-500 mb-1">
           Director's Commentary
         </p>
         <h1 class="text-lg font-bold font-gangster">{@film.title}</h1>
@@ -177,7 +177,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
                 <div class="flex items-center justify-between mt-2">
                   <span class={[
                     "text-xs",
-                    if(@char_count >= 450, do: "text-neon-blue-lightest", else: "text-zinc-600")
+                    if(@char_count >= 450, do: "text-amber-400", else: "text-zinc-600")
                   ]}>
                     {@char_count}/500
                   </span>
@@ -211,7 +211,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
         
     <!-- Commentary panel -->
         <div class="mt-6 md:mt-0 md:w-80 lg:w-96 shrink-0">
-          <div class="rounded-xl bg-zinc-900 ring-1 ring-zinc-800 overflow-hidden">
+          <div class="relative rounded-xl bg-zinc-900 ring-1 ring-zinc-800">
             <div class="px-4 py-3 border-b border-zinc-800">
               <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400">
                 Commentary
@@ -231,89 +231,95 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
                 </p>
               </div>
             <% else %>
-              <ul id="commentary-list" class="divide-y divide-zinc-800 max-h-[600px] overflow-y-auto">
-                <li :for={entry <- @commentary} id={"commentary-#{entry.id}"} class="px-4 py-3">
-                  <div class="flex items-start justify-between gap-2">
-                    <!-- Left: timestamp + body/edit form -->
-                    <div class="min-w-0 flex-1">
-                      <button
-                        phx-click="seek_to"
-                        phx-value-offset={entry.offset_seconds}
-                        class="cursor-pointer flex items-center gap-1.5 text-xs text-neon-blue-primary hover:text-neon-blue-lightest transition mb-1.5 font-mono"
-                      >
-                        <.icon name="hero-play-circle" class="w-3.5 h-3.5" />
-                        {format_offset(entry.offset_seconds)}
-                      </button>
-
-                      <%= if @editing_id == entry.id do %>
-                        <form phx-change="edit_body_change" phx-submit="save_edit">
-                          <input type="hidden" name="_id" value={entry.id} />
-                          <textarea
-                            id={"edit-input-#{entry.id}"}
-                            phx-hook="DirectorCommentaryInput"
-                            name="body"
-                            rows="3"
-                            class="w-full rounded bg-zinc-800 text-sm text-zinc-100 px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-neon-blue-primary/50"
-                          >{@edit_body}</textarea>
-                          <div class="flex gap-2 mt-2 justify-end">
-                            <button
-                              type="button"
-                              phx-click="cancel_edit"
-                              class="cursor-pointer px-3 py-1 text-xs text-zinc-400 hover:text-zinc-200 transition"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="submit"
-                              class="cursor-pointer px-3 py-1 rounded text-xs bg-neon-blue-primary text-white hover:opacity-90 transition"
-                            >
-                              Save
-                            </button>
-                          </div>
-                        </form>
-                      <% else %>
-                        <p class="text-sm text-zinc-200 leading-relaxed">{entry.body}</p>
-                      <% end %>
-                    </div>
-                    
-    <!-- Right: 3-dot context menu (always visible, hidden during edit) -->
-                    <%= if @editing_id != entry.id do %>
-                      <div class="relative shrink-0">
+              <div class="max-h-[600px] overflow-y-auto">
+                <ul id="commentary-list" class="divide-y divide-zinc-800">
+                  <li
+                    :for={entry <- @commentary}
+                    id={"commentary-#{entry.id}"}
+                    class="px-4 py-3 relative"
+                  >
+                    <div class="flex items-start justify-between gap-2">
+                      <!-- Left: timestamp + body/edit form -->
+                      <div class="min-w-0 flex-1">
                         <button
-                          phx-click="toggle_menu"
-                          phx-value-id={entry.id}
-                          class="cursor-pointer inline-flex items-center justify-center w-7 h-7 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-white/6 transition"
-                          aria-label="Options"
+                          phx-click="seek_to"
+                          phx-value-offset={entry.offset_seconds}
+                          class="cursor-pointer flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 transition mb-1.5 font-mono"
                         >
-                          <.icon name="hero-ellipsis-horizontal" class="w-4 h-4" />
+                          <.icon name="hero-play-circle" class="w-3.5 h-3.5" />
+                          {format_offset(entry.offset_seconds)}
                         </button>
 
-                        <%= if @open_menu_id == entry.id do %>
-                          <div
-                            class="absolute right-0 top-8 z-20 min-w-[120px] rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl py-1"
-                            phx-click-away="close_menu"
-                          >
-                            <button
-                              phx-click="edit_commentary"
-                              phx-value-id={entry.id}
-                              class="cursor-pointer w-full text-left px-3 py-2 text-xs text-zinc-300 hover:bg-white/6 hover:text-white transition flex items-center gap-2"
-                            >
-                              <.icon name="hero-pencil" class="w-3.5 h-3.5" /> Edit
-                            </button>
-                            <button
-                              phx-click="prompt_delete"
-                              phx-value-id={entry.id}
-                              class="cursor-pointer w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 transition flex items-center gap-2"
-                            >
-                              <.icon name="hero-trash" class="w-3.5 h-3.5" /> Delete
-                            </button>
-                          </div>
+                        <%= if @editing_id == entry.id do %>
+                          <form phx-change="edit_body_change" phx-submit="save_edit">
+                            <input type="hidden" name="_id" value={entry.id} />
+                            <textarea
+                              id={"edit-input-#{entry.id}"}
+                              phx-hook="DirectorCommentaryInput"
+                              name="body"
+                              rows="3"
+                              class="w-full rounded bg-zinc-800 text-sm text-zinc-100 px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-neon-blue-primary/50"
+                            >{@edit_body}</textarea>
+                            <div class="flex gap-2 mt-2 justify-end">
+                              <button
+                                type="button"
+                                phx-click="cancel_edit"
+                                class="cursor-pointer px-3 py-1 text-xs text-zinc-400 hover:text-zinc-200 transition"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="submit"
+                                class="cursor-pointer px-3 py-1 rounded text-xs bg-neon-blue-primary text-backroom-black hover:opacity-90 transition"
+                              >
+                                Save
+                              </button>
+                            </div>
+                          </form>
+                        <% else %>
+                          <p class="text-sm text-zinc-200 leading-relaxed">{entry.body}</p>
                         <% end %>
                       </div>
-                    <% end %>
-                  </div>
-                </li>
-              </ul>
+                      
+    <!-- Right: 3-dot context menu -->
+                      <%= if @editing_id != entry.id do %>
+                        <div class="shrink-0">
+                          <button
+                            phx-click="toggle_menu"
+                            phx-value-id={entry.id}
+                            class="cursor-pointer inline-flex items-center justify-center w-7 h-7 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-white/6 transition"
+                            aria-label="Options"
+                          >
+                            <.icon name="hero-ellipsis-horizontal" class="w-4 h-4" />
+                          </button>
+
+                          <%= if @open_menu_id == entry.id do %>
+                            <div
+                              class="absolute right-3 top-8 z-[100] min-w-[120px] rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl py-1"
+                              phx-click-away="close_menu"
+                            >
+                              <button
+                                phx-click="edit_commentary"
+                                phx-value-id={entry.id}
+                                class="cursor-pointer w-full text-left px-3 py-2 text-xs text-zinc-300 hover:bg-white/6 hover:text-white transition flex items-center gap-2"
+                              >
+                                <.icon name="hero-pencil" class="w-3.5 h-3.5" /> Edit
+                              </button>
+                              <button
+                                phx-click="prompt_delete"
+                                phx-value-id={entry.id}
+                                class="cursor-pointer w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 transition flex items-center gap-2"
+                              >
+                                <.icon name="hero-trash" class="w-3.5 h-3.5" /> Delete
+                              </button>
+                            </div>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </li>
+                </ul>
+              </div>
             <% end %>
           </div>
         </div>
