@@ -104,7 +104,7 @@ defmodule Timesink.Factory do
 
   def genre_factory do
     %Timesink.Cinema.Genre{
-      name: "#{Faker.Lorem.word()} #{Enum.random(1_000..9_999)}",
+      name: "#{Faker.Lorem.word()}-#{Ecto.UUID.generate()}",
       description: Faker.Lorem.paragraph(1..2)
     }
   end
