@@ -237,7 +237,7 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
               <div class="px-4 py-8 text-center">
                 <p class="text-sm text-zinc-500">No commentary yet.</p>
                 <p class="text-xs text-zinc-600 mt-1">
-                  Pause the film and click "Add Commentary" to begin.
+                  Seek to a moment and click "Add Commentary" to begin.
                 </p>
               </div>
             <% else %>
