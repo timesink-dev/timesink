@@ -56,22 +56,20 @@ defmodule TimesinkWeb.TopNav do
 
             <div
               id="films-dropdown"
-              class="dd hidden absolute mt-2 w-56 rounded-md bg-dark-theater-primary text-mystery-white shadow-lg z-100 overflow-hidden"
+              class="dd hidden absolute mt-2 w-44 rounded-lg border border-white/10 bg-zinc-900 text-mystery-white shadow-xl z-100 overflow-hidden p-1"
               phx-click-away={close_dd("#films-dropdown")}
               phx-window-keydown={close_dd("#films-dropdown")}
               phx-key="escape"
               role="menu"
               aria-label="Cinema menu"
             >
-              <!-- header label -->
-              <div class="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-zinc-400">
+              <div class="px-3 pt-2 pb-1 text-[10px] uppercase tracking-widest text-zinc-500">
                 Explore
               </div>
-              <div class="my-1 h-px bg-zinc-700/50"></div>
-
+              <div class="my-1 h-px bg-white/8"></div>
               <.link
                 navigate="/now-playing"
-                class="block px-4 py-2 hover:bg-dark-theater-medium"
+                class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
                 role="menuitem"
                 phx-click={close_dd("#films-dropdown")}
               >
@@ -79,7 +77,7 @@ defmodule TimesinkWeb.TopNav do
               </.link>
               <.link
                 navigate="/upcoming"
-                class="block px-4 py-2 hover:bg-dark-theater-medium"
+                class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
                 role="menuitem"
                 phx-click={close_dd("#films-dropdown")}
               >
@@ -87,7 +85,7 @@ defmodule TimesinkWeb.TopNav do
               </.link>
               <.link
                 navigate="/archives"
-                class="block px-4 py-2 hover:bg-dark-theater-medium"
+                class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
                 role="menuitem"
                 phx-click={close_dd("#films-dropdown")}
               >
@@ -145,7 +143,7 @@ defmodule TimesinkWeb.TopNav do
 
               <div
                 id="account-menu"
-                class="dd hidden absolute right-0 mt-1 w-56 rounded-md bg-dark-theater-primary  text-mystery-white shadow-lg z-50 overflow-hidden"
+                class="dd hidden absolute right-0 mt-2 w-48 rounded-lg border border-white/10 bg-zinc-900 text-mystery-white shadow-xl z-50 overflow-hidden p-1"
                 phx-click-away={close_dd("#account-menu")}
                 phx-window-keydown={close_dd("#account-menu")}
                 phx-key="escape"
@@ -154,19 +152,19 @@ defmodule TimesinkWeb.TopNav do
               >
                 <.link
                   navigate="/me"
-                  class="block px-4 py-2 text-sm hover:bg-dark-theater-medium"
+                  class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
                   role="menuitem"
                   phx-click={close_dd("#account-menu")}
                 >
                   Account
                 </.link>
 
-                <div class="my-1 h-px bg-zinc-700/50"></div>
+                <div class="my-1 h-px bg-white/8"></div>
 
-                <.form method="post" action="/sign_out" for={%{}}>
+                <.form method="post" action="/sign_out" for={%{}} class="w-full">
                   <button
                     type="submit"
-                    class="w-full text-left px-4 py-2 text-sm hover:bg-dark-theater-medium"
+                    class="w-full cursor-pointer flex items-center rounded-md px-3 py-2 text-sm text-zinc-400 hover:bg-white/8 hover:text-white transition-colors"
                     role="menuitem"
                     phx-click={close_dd("#account-menu")}
                   >

@@ -142,6 +142,51 @@ Required environment variables (see `.envrc.template`):
 - Test helpers in `test/support/`
 - Tests run with isolated test database
 
+## UI Style Guide
+
+### Color Palette
+Defined in `assets/css/app.css` as CSS variables:
+- `backroom-black` — `#0C0C0C` — page background
+- `dark-theater-primary` — `#222222`
+- `dark-theater-medium` — `#3B3B3B`
+- `mystery-white` — off-white for primary text
+- `neon-blue-primary` — `#7AA8FF` — used only for director-private UI (Add Commentary, Save buttons, form focus rings)
+- Amber — used for director-facing UI in the theater panel and account page
+
+### Dropdown Menus
+Use this pattern consistently for all nav/context dropdowns:
+
+```html
+<div class="... rounded-lg border border-white/10 bg-zinc-900 shadow-xl overflow-hidden p-1">
+  <!-- optional section label -->
+  <div class="px-3 pt-2 pb-1 text-[10px] uppercase tracking-widest text-zinc-500">Label</div>
+  <div class="my-1 h-px bg-white/8"></div>
+  <!-- menu items -->
+  <a class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors">Item</a>
+  <!-- destructive/secondary items -->
+  <button class="w-full cursor-pointer flex items-center rounded-md px-3 py-2 text-sm text-zinc-400 hover:bg-white/8 hover:text-white transition-colors">Sign out</button>
+</div>
+```
+
+Key rules:
+- `bg-zinc-900` + `border border-white/10` — NOT `bg-dark-theater-primary`
+- `p-1` on container so items get rounded corners on hover without bleed
+- `rounded-md` on each item, `hover:bg-white/8`
+- Dividers: `h-px bg-white/8` (not `bg-zinc-700/50`)
+- Section labels: `text-[10px] uppercase tracking-widest text-zinc-500`
+- Forms wrapping submit buttons must have `class="w-full"` and button must have `cursor-pointer`
+
+### Status/Count Badges (Pills)
+Use low-opacity bg + same-color border — NOT opaque fills:
+- **Amber** (director): `bg-amber-500/15 border border-amber-500/30 text-amber-400`
+- **White/new** (unread notes): `bg-white/15 border border-white/30 text-white`
+- **Neutral/seen**: `bg-zinc-600/30 border border-zinc-500/30 text-zinc-400`
+
+### Hover States (Buttons/Toolbar)
+- Subtle: `hover:bg-white/8` — used throughout theater toolbar, dropdowns
+- Text brightens: `text-zinc-400 hover:text-white`
+- Always add `transition-colors` or `transition`
+
 ## Important Notes
 
 - The project uses Phoenix 1.7+ with LiveView as primary rendering engine

@@ -108,9 +108,19 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
       <!-- Header -->
       <div class="border-b border-white/10 pb-4 mb-8">
         <p class="text-xs uppercase tracking-widest text-zinc-500 mb-1">
-          Director's Commentary
+          Director's Commentary // Private Screening Room
         </p>
         <h1 class="text-lg font-bold font-gangster">{@film.title}</h1>
+      </div>
+      
+    <!-- Welcome message -->
+      <div class="mb-8 rounded-xl bg-amber-500/5 border border-amber-500/15 px-5 py-4 max-w-2xl">
+        <p class="text-sm font-medium text-amber-300 mb-1 flex items-center gap-2">
+          <.icon name="hero-megaphone" class="w-4 h-4" /> Congratulations on making it to TimeSink!
+        </p>
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          Seek to any moment in your film, then hit "Add Commentary" to leave a note. Your words will surface for the audience at that exact timestamp as they watch.
+        </p>
       </div>
       
     <!-- Main layout: player left, commentary panel right -->
@@ -295,20 +305,20 @@ defmodule TimesinkWeb.Cinema.DirectorCommentaryLive do
 
                           <%= if @open_menu_id == entry.id do %>
                             <div
-                              class="absolute right-3 top-8 z-[100] min-w-[120px] rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl py-1"
+                              class="absolute right-3 top-8 z-[100] min-w-[130px] rounded-lg border border-white/10 bg-zinc-900 shadow-xl p-1"
                               phx-click-away="close_menu"
                             >
                               <button
                                 phx-click="edit_commentary"
                                 phx-value-id={entry.id}
-                                class="cursor-pointer w-full text-left px-3 py-2 text-xs text-zinc-300 hover:bg-white/6 hover:text-white transition flex items-center gap-2"
+                                class="cursor-pointer w-full flex items-center gap-2 rounded-md px-3 py-2 text-xs text-zinc-300 hover:bg-white/8 hover:text-white transition-colors"
                               >
                                 <.icon name="hero-pencil" class="w-3.5 h-3.5" /> Edit
                               </button>
                               <button
                                 phx-click="prompt_delete"
                                 phx-value-id={entry.id}
-                                class="cursor-pointer w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 transition flex items-center gap-2"
+                                class="cursor-pointer w-full flex items-center gap-2 rounded-md px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
                               >
                                 <.icon name="hero-trash" class="w-3.5 h-3.5" /> Delete
                               </button>
