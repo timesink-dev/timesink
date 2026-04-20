@@ -134,11 +134,11 @@ defmodule TimesinkWeb.Components.TheaterPanel do
           phx-click="open_panel"
           phx-value-panel="director_notes"
           aria-label="Director's commentary"
-          class="cursor-pointer h-9 w-9 rounded-lg border border-transparent text-amber-600/70 hover:bg-amber-600/10 hover:text-amber-400 flex items-center justify-center transition relative"
+          class="cursor-pointer h-9 w-9 rounded-lg border border-transparent text-zinc-400 hover:bg-white/8 hover:text-white flex items-center justify-center transition relative"
         >
           <.icon name="hero-megaphone" class="w-4 h-4" />
           <%= if @total_director_commentary_count > 0 do %>
-            <span class="absolute -top-1 -right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-600/80 px-1 text-[9px] font-semibold leading-none text-white shadow-sm">
+            <span class="absolute -top-1 -right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/30 px-1 text-[9px] font-semibold leading-none text-amber-400">
               {@total_director_commentary_count}
             </span>
           <% end %>
@@ -198,14 +198,14 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         phx-value-panel="audience_notes"
         aria-label="Open audience notes"
         class={[
-          "flex-1 h-9 rounded-lg border border-transparent text-xs transition",
+          "flex-1 flex items-center justify-center h-9 rounded-lg border border-transparent text-xs transition",
           if(@open_panel == :audience_notes,
             do: "bg-white/10 text-white",
             else: if(@notes_pulse, do: "text-white", else: "text-zinc-400 hover:text-white")
           )
         ]}
       >
-        <span class="relative inline-flex items-center justify-center gap-2">
+        <span class="relative inline-flex items-center gap-2">
           <.icon name="hero-folder-open" class="w-4 h-4" />
           <span>Notes</span>
           <.notes_badge new_count={@new_notes_count} total={@total_notes_count} mobile />
@@ -218,15 +218,15 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         class={[
           "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition relative",
           if(@open_panel == :director_notes,
-            do: "bg-amber-600/15 text-amber-300",
-            else: "text-amber-600/70 hover:text-amber-400"
+            do: "bg-white/10 text-white",
+            else: "text-zinc-400 hover:text-white"
           )
         ]}
       >
         <.icon name="hero-megaphone" class="w-4 h-4" />
         <span>Director</span>
         <%= if @total_director_commentary_count > 0 do %>
-          <span class="absolute -top-1 right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-600/80 px-1 text-[9px] font-semibold leading-none text-white shadow-sm">
+          <span class="absolute -top-1 right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/30 px-1 text-[9px] font-semibold leading-none text-amber-400">
             {@total_director_commentary_count}
           </span>
         <% end %>
@@ -280,7 +280,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
     ~H"""
     <%= if @new_count > 0 do %>
       <span class={[
-        "inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-white px-1 text-[9px] font-semibold leading-none text-zinc-900 shadow-sm",
+        "inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-white/15 border border-white/30 px-1 text-[9px] font-semibold leading-none text-white",
         if(@mobile, do: "absolute -top-3 -right-4", else: "absolute -top-1 -right-1")
       ]}>
         +{@new_count}
@@ -288,7 +288,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
     <% else %>
       <%= if @total > 0 do %>
         <span class={[
-          "inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[9px] leading-none text-zinc-300 shadow-sm",
+          "inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-zinc-600/30 border border-zinc-500/30 px-1 text-[9px] leading-none text-zinc-400",
           if(@mobile, do: "absolute -top-3 -right-4", else: "absolute -top-1 -right-1")
         ]}>
           {@total}
@@ -490,7 +490,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
                   {@total_notes_count} notes in this screening
                 </p>
                 <p class="text-xs text-zinc-600 leading-relaxed">
-                  They surface in order as the film plays.
+                  They are presented in order as the film plays.
                 </p>
               </div>
             <% else %>
