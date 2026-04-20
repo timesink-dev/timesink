@@ -109,6 +109,17 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             joined_at: System.system_time(:second)
           }
         )
+
+        user = socket.assigns.current_user
+
+        Timesink.Analytics.capture("Theater Entered", user.id, %{
+          "theater_id" => theater.id,
+          "theater_slug" => theater.slug,
+          "theater_name" => theater.name,
+          "exhibition_id" => exhibition.id,
+          "film_id" => film.id,
+          "film_title" => film.title
+        })
       end
 
       presence_topic = PubSubTopics.presence_topic(theater.id)
@@ -600,6 +611,24 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           socket
       end
 
+    user = socket.assigns[:user]
+
+    if open_panel && user do
+      event_name =
+        case open_panel do
+          :chat -> "Theater Panel Opened: Live Chat"
+          :audience_notes -> "Theater Panel Opened: Audience Notes"
+          :director_notes -> "Theater Panel Opened: Director Commentary"
+        end
+
+      Timesink.Analytics.capture(event_name, user.id, %{
+        "theater_id" => socket.assigns[:theater] && socket.assigns.theater.id,
+        "exhibition_id" => socket.assigns[:exhibition] && socket.assigns.exhibition.id,
+        "film_id" => socket.assigns[:film] && socket.assigns.film.id,
+        "film_title" => socket.assigns[:film] && socket.assigns.film.title
+      })
+    end
+
     {:noreply, socket}
   end
 
@@ -616,6 +645,20 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         "audience" -> :audience
         _ -> :messages
       end
+
+    if user = socket.assigns[:user] do
+      event_name =
+        case tab do
+          :audience -> "Theater Chat Tab Switched: Live Audience"
+          :messages -> "Theater Chat Tab Switched: Live Discussion"
+        end
+
+      Timesink.Analytics.capture(event_name, user.id, %{
+        "theater_id" => socket.assigns[:theater] && socket.assigns.theater.id,
+        "exhibition_id" => socket.assigns[:exhibition] && socket.assigns.exhibition.id,
+        "film_id" => socket.assigns[:film] && socket.assigns.film.id
+      })
+    end
 
     {:noreply, assign(socket, :chat_tab, tab)}
   end
