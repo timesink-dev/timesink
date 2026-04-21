@@ -513,12 +513,12 @@ defmodule TimesinkWeb.Components.TheaterPanel do
               <% is_new = MapSet.member?(@newly_surfaced_ids, note.id) %>
               <% is_just_posted = @just_posted_note_id == note.id %>
               <% thumb = mux_thumbnail_url(Film.get_mux_playback_id(@film.video), note.offset_seconds) %>
-              <li class={["px-4 py-2", is_new && "note-surface"]}>
+              <li class={["px-3 py-1.5", is_new && "note-surface"]}>
                 <div class={[
-                  "flex items-start gap-3 px-4 py-3 rounded-xl border transition-all duration-700",
-                  is_new && "border-white/15 bg-white/3",
-                  is_just_posted && "border-white/10 bg-white/2",
-                  !is_new && !is_just_posted && "border-transparent"
+                  "flex items-start gap-3 px-3 py-3 rounded-xl border-l-2 border border-white/6 transition-all duration-700",
+                  is_new && "border-l-white/40 bg-white/5",
+                  is_just_posted && "border-l-white/25 bg-white/4",
+                  !is_new && !is_just_posted && "border-l-zinc-600/40 bg-white/[0.02]"
                 ]}>
                   <%= if thumb do %>
                     <img
