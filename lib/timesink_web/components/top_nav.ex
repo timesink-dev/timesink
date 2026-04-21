@@ -160,7 +160,7 @@ defmodule TimesinkWeb.TopNav do
                 </.link>
 
                 <.link
-                  navigate={"/@#{@current_user.username}"}
+                  navigate="/me/profile"
                   class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
                   role="menuitem"
                   phx-click={close_dd("#account-menu")}
@@ -297,7 +297,7 @@ defmodule TimesinkWeb.TopNav do
               Account
             </.link>
             <.link
-              navigate={"/@#{@current_user.username}"}
+              navigate="/me/profile"
               class="flex items-center rounded-md px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
               phx-click={hide_hamburger()}
             >
