@@ -516,7 +516,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        )
      )
      |> assign(:notes_pulse, should_pulse?)
-     |> assign(:director_commentary, director_commentary)}
+     |> assign(:director_commentary, director_commentary)
+     |> then(fn s ->
+       if has_newly_unlocked?,
+         do: push_event(s, "new_notes", %{count: newly_unlocked_count}),
+         else: s
+     end)}
   end
 
   def handle_info(%{event: "presence_diff", topic: topic}, socket) do

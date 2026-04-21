@@ -919,6 +919,21 @@ Hooks.NotesAutoScroll = {
   }
 };
 
+Hooks.NotesNewBanner = {
+  mounted() {
+    this.handleEvent("new_notes", ({ count }) => {
+      if (this.el.offsetParent === null) return; // panel is hidden, skip
+      const label = count === 1 ? "note appeared" : "new notes appeared";
+      const banner = document.createElement("div");
+      banner.className = "absolute top-2 left-1/2 -translate-x-1/2 z-20 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-xs flex items-center gap-2 transition-opacity duration-500 whitespace-nowrap shadow-lg";
+      banner.innerHTML = `<span class="font-medium text-blue-300/90">+${count}</span><span class="text-zinc-400">${label}</span>`;
+      this.el.parentElement.insertBefore(banner, this.el);
+      setTimeout(() => { banner.style.opacity = "0"; }, 3000);
+      setTimeout(() => { banner.remove(); }, 3500);
+    });
+  }
+};
+
 Hooks.TheaterBodyScroll = {
   mounted() {
     this.prevRootOverflow = null;

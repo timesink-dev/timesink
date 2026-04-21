@@ -454,8 +454,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
 
   def notes_panel(assigns) do
     ~H"""
-    <div class="flex flex-col">
-
+    <div class="flex flex-col relative">
       <%= if @note_moment_message do %>
         <div class="mx-4 mt-3 rounded-lg border border-blue-500/20 bg-blue-500/8 px-3 py-2 text-xs text-blue-300/80 flex items-center gap-2">
           <.icon name="hero-bookmark" class="w-3.5 h-3.5 shrink-0 text-blue-400/60" />
@@ -472,7 +471,11 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         </div>
       <% end %>
 
-      <div id={@scroll_id} class={[@body_class, "overflow-y-auto overscroll-contain relative"]}>
+      <div
+        id={@scroll_id}
+        phx-hook="NotesNewBanner"
+        class={[@body_class, "overflow-y-auto overscroll-contain relative"]}
+      >
         <%= if Enum.empty?(@notes) do %>
           <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
             <.icon name="hero-document" class="w-5 h-5 text-zinc-700" />
