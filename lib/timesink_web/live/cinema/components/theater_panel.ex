@@ -455,16 +455,6 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   def notes_panel(assigns) do
     ~H"""
     <div class="flex flex-col">
-      <%= if @new_notes_count > 0 do %>
-        <div class="mx-4 mt-3 rounded-lg border border-white/8 bg-white/4 px-3 py-2 text-xs text-zinc-300">
-          <span class="inline-flex items-center gap-2">
-            <span class="font-medium text-zinc-100">+{@new_notes_count}</span>
-            <span class="text-zinc-500">
-              {if @new_notes_count == 1, do: "note appeared", else: "new notes appeared"}
-            </span>
-          </span>
-        </div>
-      <% end %>
 
       <%= if @note_moment_message do %>
         <div class="mx-4 mt-3 rounded-lg border border-blue-500/20 bg-blue-500/8 px-3 py-2 text-xs text-blue-300/80 flex items-center gap-2">

@@ -851,7 +851,7 @@ Hooks.ChatAutoScroll = {
 };
 
 Hooks.NotesAutoScroll = {
-  STICKY_THRESHOLD: 64,
+  STICKY_THRESHOLD: 300,
 
   mounted() {
     const scrollSel = this.el.dataset.scroll;
@@ -861,16 +861,28 @@ Hooks.NotesAutoScroll = {
 
     this.scrollEl.style.overflowAnchor = "none";
     this.stickToBottom = true;
+    this.isScrolling = false;
+    this.childCountBefore = this.el.childElementCount;
 
     this.onScroll = this.handleScroll.bind(this);
     this.scrollEl.addEventListener("scroll", this.onScroll, { passive: true });
 
-    if (this.isNearBottom()) this.scrollToBottom(false);
+    this.scrollToBottom(false);
+  },
+
+  beforeUpdate() {
+    if (!this.scrollEl) return;
+    this.childCountBefore = this.el.childElementCount;
+    // Only update stickToBottom from user scroll events (handleScroll), not here
   },
 
   updated() {
     if (!this.scrollEl) return;
-    if (this.stickToBottom) this.scrollToBottom();
+    const listGrew = this.el.childElementCount > this.childCountBefore;
+    if (listGrew && this.stickToBottom) {
+      this.scrollToBottom();
+    }
+    // Non-list updates (assigns changing): do nothing, let browser keep its position
   },
 
   destroyed() {
@@ -880,7 +892,9 @@ Hooks.NotesAutoScroll = {
   },
 
   handleScroll() {
-    this.stickToBottom = this.isNearBottom();
+    if (!this.isScrolling) {
+      this.stickToBottom = this.isNearBottom();
+    }
   },
 
   isNearBottom() {
@@ -894,9 +908,14 @@ Hooks.NotesAutoScroll = {
 
   scrollToBottom(smooth = true) {
     const el = this.scrollEl;
-    requestAnimationFrame(() => {
-      el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
-    });
+    this.isScrolling = true;
+    el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "instant" });
+    const done = () => { this.isScrolling = false; };
+    if ("onscrollend" in el) {
+      el.addEventListener("scrollend", done, { once: true });
+    } else {
+      setTimeout(done, 400);
+    }
   }
 };
 
