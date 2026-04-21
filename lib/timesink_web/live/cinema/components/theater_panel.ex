@@ -183,7 +183,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         phx-value-panel="chat"
         aria-label="Open live chat"
         class={[
-          "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition",
+          "flex-1 flex items-center justify-center gap-1 h-9 rounded-lg border border-transparent text-xs transition",
           if(@open_panel == :chat,
             do: "bg-white/10 text-white",
             else: "text-zinc-400 hover:text-white"
@@ -205,7 +205,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
           )
         ]}
       >
-        <span class="relative inline-flex items-center gap-2">
+        <span class="relative inline-flex items-center gap-1">
           <.icon name="hero-folder-open" class="w-4 h-4" />
           <span>Notes</span>
           <.notes_badge new_count={@new_notes_count} total={@total_notes_count} mobile />
@@ -216,20 +216,22 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         phx-value-panel="director_notes"
         aria-label="Director's commentary"
         class={[
-          "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition relative",
+          "flex-1 flex items-center justify-center gap-1 h-9 rounded-lg border border-transparent text-xs transition",
           if(@open_panel == :director_notes,
             do: "bg-white/10 text-white",
             else: "text-zinc-400 hover:text-white"
           )
         ]}
       >
-        <.icon name="hero-megaphone" class="w-4 h-4" />
-        <span>Director</span>
-        <%= if @total_director_commentary_count > 0 do %>
-          <span class="absolute -top-1 right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/30 px-1 text-[9px] font-semibold leading-none text-amber-400">
-            {@total_director_commentary_count}
-          </span>
-        <% end %>
+        <span class="relative inline-flex items-center gap-1">
+          <.icon name="hero-megaphone" class="w-4 h-4" />
+          <span>Director</span>
+          <%= if @total_director_commentary_count > 0 do %>
+            <span class="absolute -top-3 -right-4 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/30 px-1 text-[9px] font-semibold leading-none text-amber-400">
+              {@total_director_commentary_count}
+            </span>
+          <% end %>
+        </span>
       </button>
       <div class="w-px h-5 bg-white/8 shrink-0"></div>
       <button
