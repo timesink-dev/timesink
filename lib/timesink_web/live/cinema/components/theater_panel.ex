@@ -183,7 +183,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         phx-value-panel="chat"
         aria-label="Open live chat"
         class={[
-          "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition",
+          "flex-1 flex items-center justify-center gap-1 h-9 rounded-lg border border-transparent text-xs transition",
           if(@open_panel == :chat,
             do: "bg-white/10 text-white",
             else: "text-zinc-400 hover:text-white"
@@ -205,7 +205,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
           )
         ]}
       >
-        <span class="relative inline-flex items-center gap-2">
+        <span class="relative inline-flex items-center gap-1">
           <.icon name="hero-folder-open" class="w-4 h-4" />
           <span>Notes</span>
           <.notes_badge new_count={@new_notes_count} total={@total_notes_count} mobile />
@@ -216,20 +216,22 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         phx-value-panel="director_notes"
         aria-label="Director's commentary"
         class={[
-          "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition relative",
+          "flex-1 flex items-center justify-center gap-1 h-9 rounded-lg border border-transparent text-xs transition",
           if(@open_panel == :director_notes,
             do: "bg-white/10 text-white",
             else: "text-zinc-400 hover:text-white"
           )
         ]}
       >
-        <.icon name="hero-megaphone" class="w-4 h-4" />
-        <span>Director</span>
-        <%= if @total_director_commentary_count > 0 do %>
-          <span class="absolute -top-1 right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/30 px-1 text-[9px] font-semibold leading-none text-amber-400">
-            {@total_director_commentary_count}
-          </span>
-        <% end %>
+        <span class="relative inline-flex items-center gap-1">
+          <.icon name="hero-megaphone" class="w-4 h-4" />
+          <span>Director</span>
+          <%= if @total_director_commentary_count > 0 do %>
+            <span class="absolute -top-3 -right-4 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/30 px-1 text-[9px] font-semibold leading-none text-amber-400">
+              {@total_director_commentary_count}
+            </span>
+          <% end %>
+        </span>
       </button>
       <div class="w-px h-5 bg-white/8 shrink-0"></div>
       <button
@@ -452,18 +454,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
 
   def notes_panel(assigns) do
     ~H"""
-    <div class="flex flex-col">
-      <%= if @new_notes_count > 0 do %>
-        <div class="mx-4 mt-3 rounded-lg border border-white/8 bg-white/4 px-3 py-2 text-xs text-zinc-300">
-          <span class="inline-flex items-center gap-2">
-            <span class="font-medium text-zinc-100">+{@new_notes_count}</span>
-            <span class="text-zinc-500">
-              {if @new_notes_count == 1, do: "note appeared", else: "new notes appeared"}
-            </span>
-          </span>
-        </div>
-      <% end %>
-
+    <div class="flex flex-col relative">
       <%= if @note_moment_message do %>
         <div class="mx-4 mt-3 rounded-lg border border-blue-500/20 bg-blue-500/8 px-3 py-2 text-xs text-blue-300/80 flex items-center gap-2">
           <.icon name="hero-bookmark" class="w-3.5 h-3.5 shrink-0 text-blue-400/60" />
@@ -480,7 +471,11 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         </div>
       <% end %>
 
-      <div id={@scroll_id} class={[@body_class, "overflow-y-auto overscroll-contain relative"]}>
+      <div
+        id={@scroll_id}
+        phx-hook="NotesNewBanner"
+        class={[@body_class, "overflow-y-auto overscroll-contain relative"]}
+      >
         <%= if Enum.empty?(@notes) do %>
           <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
             <.icon name="hero-document" class="w-5 h-5 text-zinc-700" />
@@ -511,12 +506,12 @@ defmodule TimesinkWeb.Components.TheaterPanel do
               <% is_new = MapSet.member?(@newly_surfaced_ids, note.id) %>
               <% is_just_posted = @just_posted_note_id == note.id %>
               <% thumb = mux_thumbnail_url(Film.get_mux_playback_id(@film.video), note.offset_seconds) %>
-              <li class={["px-4 py-2", is_new && "note-surface"]}>
+              <li class={["px-3 py-1.5", is_new && "note-surface"]}>
                 <div class={[
-                  "flex items-start gap-3 px-4 py-3 rounded-xl border transition-all duration-700",
-                  is_new && "border-white/15 bg-white/3",
-                  is_just_posted && "border-white/10 bg-white/2",
-                  !is_new && !is_just_posted && "border-transparent"
+                  "flex items-start gap-3 px-3 py-3 rounded-xl border-l-2 border border-white/6 transition-all duration-700",
+                  is_new && "border-l-white/40 bg-white/5",
+                  is_just_posted && "border-l-white/25 bg-white/4",
+                  !is_new && !is_just_posted && "border-l-zinc-600/40 bg-white/[0.02]"
                 ]}>
                   <%= if thumb do %>
                     <img

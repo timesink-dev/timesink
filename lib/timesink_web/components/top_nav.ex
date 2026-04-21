@@ -159,6 +159,15 @@ defmodule TimesinkWeb.TopNav do
                   Account
                 </.link>
 
+                <.link
+                  navigate="/me/profile"
+                  class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
+                  role="menuitem"
+                  phx-click={close_dd("#account-menu")}
+                >
+                  Profile
+                </.link>
+
                 <div class="my-1 h-px bg-white/8"></div>
 
                 <.form method="post" action="/sign_out" for={%{}} class="w-full">
@@ -286,6 +295,13 @@ defmodule TimesinkWeb.TopNav do
               phx-click={hide_hamburger()}
             >
               Account
+            </.link>
+            <.link
+              navigate="/me/profile"
+              class="flex items-center rounded-md px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
+              phx-click={hide_hamburger()}
+            >
+              Profile
             </.link>
           <% end %>
         </div>

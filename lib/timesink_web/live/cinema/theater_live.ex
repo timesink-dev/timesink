@@ -419,7 +419,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               note_anchor_offset={@note_anchor_offset}
               film={@film}
               list_id="mobile-notes-list"
-              scroll_id="mobile-chat-body"
+              scroll_id="mobile-notes-body"
               body_class="h-[45vh]"
             />
           </div>
@@ -516,7 +516,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        )
      )
      |> assign(:notes_pulse, should_pulse?)
-     |> assign(:director_commentary, director_commentary)}
+     |> assign(:director_commentary, director_commentary)
+     |> then(fn s ->
+       if has_newly_unlocked?,
+         do: push_event(s, "new_notes", %{count: newly_unlocked_count}),
+         else: s
+     end)}
   end
 
   def handle_info(%{event: "presence_diff", topic: topic}, socket) do
@@ -807,9 +812,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               })
             end)
 
-            Process.send_after(self(), :clear_note_status_message, 2500)
-            Process.send_after(self(), :clear_just_posted_note, 2500)
-
             {:noreply,
              socket
              |> assign(:notes, notes)
@@ -818,11 +820,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
              |> assign(:note_body, "")
              |> assign(:note_anchor_offset, nil)
              |> assign(:note_moment_message, nil)
-             |> assign(
-               :note_status_message,
-               format_offset(offset)
-             )
-             |> assign(:just_posted_note_id, note.id)}
+             |> assign(:note_status_message, nil)
+             |> assign(:just_posted_note_id, nil)}
 
           {:error, changeset} ->
             Logger.warning("Failed to create note: #{inspect(changeset.errors)}")
