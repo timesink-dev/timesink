@@ -45,32 +45,52 @@ defmodule TimesinkWeb.Components.FilmInfo do
         <div class="border-t border-white/5 pt-4 space-y-2.5">
           <%= if Enum.any?(@film.directors) do %>
             <div class="flex gap-3 text-sm">
-              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">Director</span>
-              <span class="text-zinc-300 font-light"><.creative_names film_creatives={@film.directors} /></span>
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">
+                Director
+              </span>
+              <span class="text-zinc-300 font-light">
+                <.creative_names film_creatives={@film.directors} />
+              </span>
             </div>
           <% end %>
           <%= if Enum.any?(@film.writers) do %>
             <div class="flex gap-3 text-sm">
-              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">Writer</span>
-              <span class="text-zinc-300 font-light"><.creative_names film_creatives={@film.writers} /></span>
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">
+                Writer
+              </span>
+              <span class="text-zinc-300 font-light">
+                <.creative_names film_creatives={@film.writers} />
+              </span>
             </div>
           <% end %>
           <%= if Enum.any?(@film.producers) do %>
             <div class="flex gap-3 text-sm">
-              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">Producer</span>
-              <span class="text-zinc-300 font-light"><.creative_names film_creatives={@film.producers} /></span>
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">
+                Producer
+              </span>
+              <span class="text-zinc-300 font-light">
+                <.creative_names film_creatives={@film.producers} />
+              </span>
             </div>
           <% end %>
           <%= if Enum.any?(@film.cast) do %>
             <div class="flex gap-3 text-sm">
-              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">Cast</span>
-              <span class="text-zinc-300 font-light"><.creative_names film_creatives={@film.cast} with_roles /></span>
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">
+                Cast
+              </span>
+              <span class="text-zinc-300 font-light">
+                <.creative_names film_creatives={@film.cast} with_roles />
+              </span>
             </div>
           <% end %>
           <%= if Enum.any?(@film.crew) do %>
             <div class="flex gap-3 text-sm">
-              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">Crew</span>
-              <span class="text-zinc-300 font-light"><.creative_names film_creatives={@film.crew} with_roles /></span>
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">
+                Crew
+              </span>
+              <span class="text-zinc-300 font-light">
+                <.creative_names film_creatives={@film.crew} with_roles />
+              </span>
             </div>
           <% end %>
         </div>
@@ -88,7 +108,10 @@ defmodule TimesinkWeb.Components.FilmInfo do
       <%= for {fc, idx} <- Enum.with_index(@film_creatives) do %>
         <%= if @with_roles do %>
           <%!-- Cast/crew: pill per person --%>
-          <% path = if fc.creative.user, do: "/@#{fc.creative.user.username}", else: "/creatives/#{fc.creative.id}" %>
+          <% path =
+            if fc.creative.user,
+              do: "/@#{fc.creative.user.username}",
+              else: "/creatives/#{fc.creative.id}" %>
           <.link
             navigate={path}
             class="inline-flex items-center rounded-full bg-zinc-800/60 border border-white/6 px-2.5 py-0.5 text-xs text-zinc-300 hover:text-white hover:border-white/15 transition-colors"
@@ -100,13 +123,17 @@ defmodule TimesinkWeb.Components.FilmInfo do
           <%= if idx > 0 do %>
             <span class="mx-1.5 text-zinc-600">·</span>
           <% end %>
-          <% path = if fc.creative.user, do: "/@#{fc.creative.user.username}", else: "/creatives/#{fc.creative.id}" %>
+          <% path =
+            if fc.creative.user,
+              do: "/@#{fc.creative.user.username}",
+              else: "/creatives/#{fc.creative.id}" %>
           <.link
             navigate={path}
             class={[
               "transition-colors underline-offset-2",
               if(fc.creative.user,
-                do: "text-zinc-300 hover:text-white decoration-zinc-600 hover:underline hover:decoration-zinc-400",
+                do:
+                  "text-zinc-300 hover:text-white decoration-zinc-600 hover:underline hover:decoration-zinc-400",
                 else: "text-zinc-400 hover:text-zinc-300 cursor-default pointer-events-none"
               )
             ]}

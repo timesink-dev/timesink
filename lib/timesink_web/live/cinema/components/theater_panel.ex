@@ -643,15 +643,18 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         <% else %>
           <%!-- Film is playing — show "next up" hint at top if something is about to surface --%>
           <%= if not MapSet.equal?(@about_to_surface_ids, MapSet.new()) do %>
-            <% countdown_label = cond do
+            <% countdown_label =
+              cond do
                 @next_director_seconds_away != nil and @next_director_seconds_away < 10 ->
                   "New commentary is moments away..."
+
                 @next_director_seconds_away != nil ->
                   rounded = round(@next_director_seconds_away / 5) * 5
                   "New commentary is on its way · ~#{rounded}s"
-                true -> "New commentary is on its way..."
-              end
-            %>
+
+                true ->
+                  "New commentary is on its way..."
+              end %>
             <div class="mx-4 mt-3 mb-1 px-3 py-2 rounded-lg border border-amber-500/15 bg-amber-500/5 flex items-center gap-2">
               <span class="text-[11px] text-amber-600/80 tracking-wide">{countdown_label}</span>
             </div>
@@ -661,7 +664,8 @@ defmodule TimesinkWeb.Components.TheaterPanel do
               <% is_surfaced = MapSet.member?(@surfaced_ids, entry.id) %>
               <% is_new = MapSet.member?(@newly_surfaced_director_ids, entry.id) %>
               <% is_next = MapSet.member?(@about_to_surface_ids, entry.id) %>
-              <% thumb = mux_thumbnail_url(Film.get_mux_playback_id(@film.video), entry.offset_seconds) %>
+              <% thumb =
+                mux_thumbnail_url(Film.get_mux_playback_id(@film.video), entry.offset_seconds) %>
               <% director_name =
                 entry.user && entry.user.creative &&
                   Timesink.Cinema.Creative.full_name(entry.user.creative) %>
