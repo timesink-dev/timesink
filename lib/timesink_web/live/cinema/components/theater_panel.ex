@@ -7,6 +7,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   attr :open_panel, :atom, required: true
   attr :notes, :list, required: true
   attr :total_notes_count, :integer, required: true
+  attr :director_commentary, :list, default: []
 
   def panel_title(assigns) do
     ~H"""
@@ -25,7 +26,14 @@ defmodule TimesinkWeb.Components.TheaterPanel do
             <% end %>
           </span>
         <% :director_notes -> %>
-          Director's Notes
+          <span class="flex items-center gap-2 text-amber-400/80">
+            <span>Director's Commentary</span>
+            <%= if length(@director_commentary) > 0 do %>
+              <span class="text-[10px] font-normal tracking-normal text-amber-600/60">
+                · {length(@director_commentary)}
+              </span>
+            <% end %>
+          </span>
         <% _ -> %>
       <% end %>
     </div>
@@ -85,6 +93,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   attr :notes_pulse, :boolean, required: true
   attr :new_notes_count, :integer, required: true
   attr :total_notes_count, :integer, required: true
+  attr :total_director_commentary_count, :integer, required: true
   attr :phase, :atom, required: true
   attr :offset, :any, required: true
 
@@ -122,18 +131,19 @@ defmodule TimesinkWeb.Components.TheaterPanel do
       </div>
       <div class="group relative">
         <button
-          disabled
-          aria-label="Director's commentary — coming soon"
-          class="cursor-not-allowed h-9 w-9 rounded-lg border border-transparent text-zinc-600 flex items-center justify-center"
+          phx-click="open_panel"
+          phx-value-panel="director_notes"
+          aria-label="Director's commentary"
+          class="cursor-pointer h-9 w-9 rounded-lg border border-transparent text-zinc-400 hover:bg-white/8 hover:text-white flex items-center justify-center transition relative"
         >
           <.icon name="hero-megaphone" class="w-4 h-4" />
+          <%= if @total_director_commentary_count > 0 do %>
+            <span class="absolute -top-1 -right-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/30 px-1 text-[9px] font-semibold leading-none text-amber-400">
+              {@total_director_commentary_count}
+            </span>
+          <% end %>
         </button>
-        <.toolbar_tooltip>
-          Director's commentary
-          <span class="ml-2 rounded-full bg-zinc-700 px-1.5 py-0.5 text-[10px] text-zinc-400">
-            Coming soon
-          </span>
-        </.toolbar_tooltip>
+        <.toolbar_tooltip label="Director's commentary" />
       </div>
       <div class="my-0.5 border-t border-white/8"></div>
       <div class="group relative">
@@ -161,6 +171,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
   attr :notes_pulse, :boolean, required: true
   attr :new_notes_count, :integer, required: true
   attr :total_notes_count, :integer, required: true
+  attr :total_director_commentary_count, :integer, required: true
   attr :phase, :atom, required: true
   attr :offset, :any, required: true
 
@@ -172,7 +183,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         phx-value-panel="chat"
         aria-label="Open live chat"
         class={[
-          "flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs transition",
+          "flex-1 flex items-center justify-center gap-1 h-9 rounded-lg border border-transparent text-xs transition",
           if(@open_panel == :chat,
             do: "bg-white/10 text-white",
             else: "text-zinc-400 hover:text-white"
@@ -187,26 +198,40 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         phx-value-panel="audience_notes"
         aria-label="Open audience notes"
         class={[
-          "flex-1 h-9 rounded-lg border border-transparent text-xs transition",
+          "flex-1 flex items-center justify-center h-9 rounded-lg border border-transparent text-xs transition",
           if(@open_panel == :audience_notes,
             do: "bg-white/10 text-white",
             else: if(@notes_pulse, do: "text-white", else: "text-zinc-400 hover:text-white")
           )
         ]}
       >
-        <span class="relative inline-flex items-center justify-center gap-2">
+        <span class="relative inline-flex items-center gap-1">
           <.icon name="hero-folder-open" class="w-4 h-4" />
           <span>Notes</span>
           <.notes_badge new_count={@new_notes_count} total={@total_notes_count} mobile />
         </span>
       </button>
       <button
-        disabled
-        aria-label="Director's commentary — coming soon"
-        class="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-transparent text-xs text-zinc-600 cursor-not-allowed"
+        phx-click="open_panel"
+        phx-value-panel="director_notes"
+        aria-label="Director's commentary"
+        class={[
+          "flex-1 flex items-center justify-center gap-1 h-9 rounded-lg border border-transparent text-xs transition",
+          if(@open_panel == :director_notes,
+            do: "bg-white/10 text-white",
+            else: "text-zinc-400 hover:text-white"
+          )
+        ]}
       >
-        <.icon name="hero-megaphone" class="w-4 h-4" />
-        <span>Director</span>
+        <span class="relative inline-flex items-center gap-1">
+          <.icon name="hero-megaphone" class="w-4 h-4" />
+          <span>Director</span>
+          <%= if @total_director_commentary_count > 0 do %>
+            <span class="absolute -top-3 -right-4 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/30 px-1 text-[9px] font-semibold leading-none text-amber-400">
+              {@total_director_commentary_count}
+            </span>
+          <% end %>
+        </span>
       </button>
       <div class="w-px h-5 bg-white/8 shrink-0"></div>
       <button
@@ -257,7 +282,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
     ~H"""
     <%= if @new_count > 0 do %>
       <span class={[
-        "inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-white px-1 text-[9px] font-semibold leading-none text-zinc-900 shadow-sm",
+        "inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-white/15 border border-white/30 px-1 text-[9px] font-semibold leading-none text-white",
         if(@mobile, do: "absolute -top-3 -right-4", else: "absolute -top-1 -right-1")
       ]}>
         +{@new_count}
@@ -265,7 +290,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
     <% else %>
       <%= if @total > 0 do %>
         <span class={[
-          "inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[9px] leading-none text-zinc-300 shadow-sm",
+          "inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-zinc-600/30 border border-zinc-500/30 px-1 text-[9px] leading-none text-zinc-400",
           if(@mobile, do: "absolute -top-3 -right-4", else: "absolute -top-1 -right-1")
         ]}>
           {@total}
@@ -429,18 +454,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
 
   def notes_panel(assigns) do
     ~H"""
-    <div class="flex flex-col">
-      <%= if @new_notes_count > 0 do %>
-        <div class="mx-4 mt-3 rounded-lg border border-white/8 bg-white/4 px-3 py-2 text-xs text-zinc-300">
-          <span class="inline-flex items-center gap-2">
-            <span class="font-medium text-zinc-100">+{@new_notes_count}</span>
-            <span class="text-zinc-500">
-              {if @new_notes_count == 1, do: "note appeared", else: "new notes appeared"}
-            </span>
-          </span>
-        </div>
-      <% end %>
-
+    <div class="flex flex-col relative">
       <%= if @note_moment_message do %>
         <div class="mx-4 mt-3 rounded-lg border border-blue-500/20 bg-blue-500/8 px-3 py-2 text-xs text-blue-300/80 flex items-center gap-2">
           <.icon name="hero-bookmark" class="w-3.5 h-3.5 shrink-0 text-blue-400/60" />
@@ -457,7 +471,11 @@ defmodule TimesinkWeb.Components.TheaterPanel do
         </div>
       <% end %>
 
-      <div id={@scroll_id} class={[@body_class, "overflow-y-auto overscroll-contain relative"]}>
+      <div
+        id={@scroll_id}
+        phx-hook="NotesNewBanner"
+        class={[@body_class, "overflow-y-auto overscroll-contain relative"]}
+      >
         <%= if Enum.empty?(@notes) do %>
           <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
             <.icon name="hero-document" class="w-5 h-5 text-zinc-700" />
@@ -467,7 +485,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
                   {@total_notes_count} notes in this screening
                 </p>
                 <p class="text-xs text-zinc-600 leading-relaxed">
-                  They surface in order as the film plays.
+                  They are presented in order as the film plays.
                 </p>
               </div>
             <% else %>
@@ -488,12 +506,12 @@ defmodule TimesinkWeb.Components.TheaterPanel do
               <% is_new = MapSet.member?(@newly_surfaced_ids, note.id) %>
               <% is_just_posted = @just_posted_note_id == note.id %>
               <% thumb = mux_thumbnail_url(Film.get_mux_playback_id(@film.video), note.offset_seconds) %>
-              <li class={["px-4 py-2", is_new && "note-surface"]}>
+              <li class={["px-3 py-1.5", is_new && "note-surface"]}>
                 <div class={[
-                  "flex items-start gap-3 px-4 py-3 rounded-xl border transition-all duration-700",
-                  is_new && "border-white/15 bg-white/3",
-                  is_just_posted && "border-white/10 bg-white/2",
-                  !is_new && !is_just_posted && "border-transparent"
+                  "flex items-start gap-3 px-3 py-3 rounded-xl border-l-2 border border-white/6 transition-all duration-700",
+                  is_new && "border-l-white/40 bg-white/5",
+                  is_just_posted && "border-l-white/25 bg-white/4",
+                  !is_new && !is_just_posted && "border-l-zinc-600/40 bg-white/[0.02]"
                 ]}>
                   <%= if thumb do %>
                     <img
@@ -525,6 +543,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
             <% end %>
           </ul>
         <% end %>
+        <div id={"#{@scroll_id}-incoming"} phx-hook="NotesIncoming" class="hidden"></div>
       </div>
 
       <%= if @note_form_open do %>
@@ -584,21 +603,126 @@ defmodule TimesinkWeb.Components.TheaterPanel do
 
   # ── Director ───────────────────────────────────────────────
 
+  attr :all_commentary, :list, required: true
+  attr :surfaced_ids, :any, required: true
+  attr :newly_surfaced_director_ids, :any, required: true
+  attr :about_to_surface_ids, :any, required: true
+  attr :next_director_seconds_away, :integer, default: nil
+  attr :total_count, :integer, required: true
+  attr :film, :any, required: true
+  attr :phase, :atom, required: true
+  attr :scroll_id, :string, required: true
+  attr :body_class, :string, default: "max-h-[40vh]"
+
   def director_panel(assigns) do
     ~H"""
-    <div class="flex flex-col items-center justify-center min-h-[180px] gap-3 text-center px-6 py-8">
-      <.icon name="hero-megaphone" class="w-6 h-6 text-zinc-700" />
-      <div>
-        <p class="text-sm text-zinc-400 font-medium">Director's Commentary</p>
-        <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
-          In-film notes from the director are coming in a future update.
-        </p>
-      </div>
-      <span class="rounded-full border border-white/8 bg-white/4 px-3 py-1 text-xs text-zinc-500 tracking-wide">
-        Coming soon
-      </span>
+    <div class={[@body_class, "overflow-y-auto overscroll-contain"]}>
+      <%= if @total_count == 0 do %>
+        <%!-- No commentary at all --%>
+        <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
+          <.icon name="hero-megaphone" class="w-5 h-5 text-zinc-700" />
+          <div>
+            <p class="text-sm text-zinc-400 font-medium">No commentary</p>
+            <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
+              The director hasn't left any commentary for this film.
+            </p>
+          </div>
+        </div>
+      <% else %>
+        <%= if @phase != :playing do %>
+          <%!-- Film hasn't started — tease that commentary exists but don't reveal cards --%>
+          <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
+            <.icon name="hero-megaphone" class="w-5 h-5 text-amber-700/50" />
+            <div>
+              <p class="text-sm text-amber-400/70 font-medium">Commentary ahead</p>
+              <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
+                The director has left commentary that will unlock as the film plays.
+              </p>
+            </div>
+          </div>
+        <% else %>
+          <%!-- Film is playing — show "next up" hint at top if something is about to surface --%>
+          <%= if not MapSet.equal?(@about_to_surface_ids, MapSet.new()) do %>
+            <% countdown_label =
+              cond do
+                @next_director_seconds_away != nil and @next_director_seconds_away < 10 ->
+                  "New commentary is moments away..."
+
+                @next_director_seconds_away != nil ->
+                  rounded = round(@next_director_seconds_away / 5) * 5
+                  "New commentary is on its way · ~#{rounded}s"
+
+                true ->
+                  "New commentary is on its way..."
+              end %>
+            <div class="mx-4 mt-3 mb-1 px-3 py-2 rounded-lg border border-amber-500/15 bg-amber-500/5 flex items-center gap-2">
+              <span class="text-[11px] text-amber-600/80 tracking-wide">{countdown_label}</span>
+            </div>
+          <% end %>
+          <ul class="divide-y divide-white/5">
+            <%= for entry <- @all_commentary do %>
+              <% is_surfaced = MapSet.member?(@surfaced_ids, entry.id) %>
+              <% is_new = MapSet.member?(@newly_surfaced_director_ids, entry.id) %>
+              <% is_next = MapSet.member?(@about_to_surface_ids, entry.id) %>
+              <% thumb =
+                mux_thumbnail_url(Film.get_mux_playback_id(@film.video), entry.offset_seconds) %>
+              <% director_name =
+                entry.user && entry.user.creative &&
+                  Timesink.Cinema.Creative.full_name(entry.user.creative) %>
+              <li class="px-4 py-2">
+                <div class={[
+                  "flex items-start gap-3 px-4 py-3 rounded-xl border-l-2 border border-white/6 transition-all duration-700",
+                  is_new && "border-l-amber-400 bg-amber-900/20",
+                  is_surfaced && not is_new && "border-l-amber-600/40 bg-amber-950/10",
+                  not is_surfaced && is_next && "border-l-amber-700/40 bg-amber-950/5 animate-pulse",
+                  not is_surfaced && not is_next && "border-l-zinc-800/40 bg-white/1"
+                ]}>
+                  <%= if thumb do %>
+                    <img
+                      src={thumb}
+                      alt=""
+                      class={[
+                        "w-16 h-9 rounded-md object-cover shrink-0 transition-all duration-700",
+                        is_surfaced && "opacity-60",
+                        not is_surfaced && "opacity-15 blur-sm"
+                      ]}
+                      loading="lazy"
+                    />
+                  <% end %>
+                  <div class={[
+                    "min-w-0 flex-1 transition-all duration-700",
+                    not is_surfaced && "blur-sm select-none"
+                  ]}>
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="inline-flex items-center gap-1 text-[10px] font-medium text-amber-500/80 uppercase tracking-wider">
+                        <.icon name="hero-megaphone" class="w-3 h-3" />
+                        {if director_name, do: director_name, else: "Director"}
+                      </span>
+                      <span class="text-xs text-zinc-400 font-mono shrink-0">
+                        {format_offset(entry.offset_seconds)}
+                      </span>
+                    </div>
+                    <p class="mt-0.5 font-light text-zinc-100/60 text-sm whitespace-pre-line leading-snug">
+                      {entry.body}
+                    </p>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
     </div>
     """
+  end
+
+  defp format_offset(nil), do: "00:00:00"
+
+  defp format_offset(seconds) do
+    h = div(seconds, 3600)
+    m = seconds |> rem(3600) |> div(60)
+    s = rem(seconds, 60)
+    :io_lib.format("~2..0B:~2..0B:~2..0B", [h, m, s]) |> to_string()
   end
 
   # ── Private ────────────────────────────────────────────────

@@ -124,6 +124,7 @@ defmodule TimesinkWeb.Router do
       live "/now-playing", Cinema.NowPlayingLive
       live "/now-playing/:theater_slug", Cinema.TheaterLive
       live "/creatives/:id", Cinema.CreativeLive
+      live "/films/:title/:director/commentary", Cinema.DirectorCommentaryLive
       live "/films/:title/:director", Cinema.FilmLive
       live "/@:profile_username", Account.ProfileLive
       live "/me", Account.MeLive

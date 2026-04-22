@@ -1,5 +1,5 @@
-import EmblaCarousel from 'embla-carousel'
-import Trix from 'trix'
+import EmblaCarousel from "embla-carousel"
+import Trix from "trix"
 
 // ── Trix custom heading levels ──────────────────────────────────────────────
 // Register h2 and h3 as custom block attributes (Trix only ships with h1)
@@ -7,14 +7,14 @@ Trix.config.blockAttributes.heading2 = {
   tagName: "h2",
   terminal: true,
   breakOnReturn: true,
-  group: false
+  group: false,
 }
 
 Trix.config.blockAttributes.heading3 = {
   tagName: "h3",
   terminal: true,
   breakOnReturn: true,
-  group: false
+  group: false,
 }
 
 // Replace the default single H1 button with H1 / H2 / H3 icon buttons
@@ -44,18 +44,16 @@ document.addEventListener("trix-initialize", (event) => {
   h1Btn.after(h2Btn)
 })
 
-const Hooks = {};
+const Hooks = {}
 
 Hooks.HideFlash = {
   mounted() {
     setTimeout(() => {
-      this.pushEvent("lv:clear-flash", { key: this.el.dataset.key });
-      this.el.style.display = "none";
-    }, 3000);
+      this.pushEvent("lv:clear-flash", { key: this.el.dataset.key })
+      this.el.style.display = "none"
+    }, 3000)
   },
-};
-
-
+}
 
 Hooks.DigitsOnlyAutoTab = {
   mounted() {
@@ -78,20 +76,19 @@ Hooks.DigitsOnlyAutoTab = {
         }
       }
     })
-  }
+  },
 }
 
-
 Hooks.Countdown = {
-mounted() {
-  this.started = false
+  mounted() {
+    this.started = false
 
-  this.handleEvent("start_countdown", ({ to, duration }) => {
-    if (this.el.id === to) {
-      this.startCountdown(duration)
-    }
-  })
-},
+    this.handleEvent("start_countdown", ({ to, duration }) => {
+      if (this.el.id === to) {
+        this.startCountdown(duration)
+      }
+    })
+  },
   startCountdown(duration = 60) {
     if (this.started) return
     this.started = true
@@ -128,192 +125,190 @@ mounted() {
 
   destroyed() {
     clearInterval(this._interval)
-  }
+  },
 }
-
-
 
 Hooks.AutoFocus = {
   mounted() {
     this.el.addEventListener("input", (e) => {
-      let index = parseInt(this.el.getAttribute("phx-value-index"));
-      let nextInput = document.querySelector(`[phx-value-index="${index + 1}"]`);
+      let index = parseInt(this.el.getAttribute("phx-value-index"))
+      let nextInput = document.querySelector(`[phx-value-index="${index + 1}"]`)
       if (nextInput && e.target.value !== "") {
-        nextInput.focus();
+        nextInput.focus()
       }
-    });
+    })
 
     this.el.addEventListener("keydown", (e) => {
       if (e.key === "Backspace" && e.target.value === "") {
-        let index = parseInt(this.el.getAttribute("phx-value-index"));
-        let prevInput = document.querySelector(`[phx-value-index="${index - 1}"]`);
+        let index = parseInt(this.el.getAttribute("phx-value-index"))
+        let prevInput = document.querySelector(`[phx-value-index="${index - 1}"]`)
         if (prevInput) {
-          prevInput.focus();
+          prevInput.focus()
         }
       }
-    });
-  }
+    })
+  },
 }
 
 Hooks.PasteHandler = {
-    mounted() {
+  mounted() {
     this.el.addEventListener("paste", (e) => {
-      let pastedData = e.clipboardData.getData("text");
-      this.pushEvent("paste_code", { value: pastedData });
-    });
-  }
+      let pastedData = e.clipboardData.getData("text")
+      this.pushEvent("paste_code", { value: pastedData })
+    })
+  },
 }
 
-
-Hooks.CodeInputs =  {
+Hooks.CodeInputs = {
   mounted() {
-    this.handlePaste = this.handlePaste.bind(this);
-    
+    this.handlePaste = this.handlePaste.bind(this)
+
     // Focus the first input when the component mounts
-    const firstInput = this.el.querySelector('input[data-index="0"]');
+    const firstInput = this.el.querySelector('input[data-index="0"]')
     if (firstInput) {
-      setTimeout(() => firstInput.focus(), 100);
+      setTimeout(() => firstInput.focus(), 100)
     }
-    
+
     // Add paste event listener to all inputs
-    this.el.querySelectorAll('input').forEach(input => {
-      input.addEventListener('paste', this.handlePaste);
-      
+    this.el.querySelectorAll("input").forEach((input) => {
+      input.addEventListener("paste", this.handlePaste)
+
       // Auto-focus next input on input if the current one is filled
-      input.addEventListener('input', (e) => {
-        const currentIndex = parseInt(e.target.getAttribute('data-index'));
-        
+      input.addEventListener("input", (e) => {
+        const currentIndex = parseInt(e.target.getAttribute("data-index"))
+
         // Clear non-numeric input
         if (!/^\d*$/.test(e.target.value)) {
-          e.target.value = e.target.value.replace(/\D/g, '');
+          e.target.value = e.target.value.replace(/\D/g, "")
         }
-        
+
         // Auto-advance focus if a digit was entered
         if (e.target.value.length === 1) {
           // Push the change immediately to LiveView (don't wait for blur)
-          this.pushInputValueChange(input);
-          
-          const nextInput = this.el.querySelector(`input[data-index="${currentIndex + 1}"]`);
+          this.pushInputValueChange(input)
+
+          const nextInput = this.el.querySelector(`input[data-index="${currentIndex + 1}"]`)
           if (nextInput) {
-            nextInput.focus();
+            nextInput.focus()
           } else {
             // If this is the last input, submit the form
-            this.submitFormIfComplete();
+            this.submitFormIfComplete()
           }
         }
-      });
-      
+      })
+
       // Support backspace to go to previous input
-      input.addEventListener('keydown', (e) => {
-        const currentIndex = parseInt(e.target.getAttribute('data-index'));
-        
+      input.addEventListener("keydown", (e) => {
+        const currentIndex = parseInt(e.target.getAttribute("data-index"))
+
         // If backspace is pressed and the input is empty, focus the previous input
-        if (e.key === 'Backspace' && e.target.value === '') {
-          const prevInput = this.el.querySelector(`input[data-index="${currentIndex - 1}"]`);
+        if (e.key === "Backspace" && e.target.value === "") {
+          const prevInput = this.el.querySelector(`input[data-index="${currentIndex - 1}"]`)
           if (prevInput) {
-            prevInput.focus();
+            prevInput.focus()
           }
         }
-      });
-    });
+      })
+    })
   },
-  
+
   pushInputValueChange(input) {
     // Get the form
-    const form = input.closest('form');
-    if (!form) return;
-    
+    const form = input.closest("form")
+    if (!form) return
+
     // Create the FormData
-    const formData = new FormData(form);
-    formData.append("_target", input.name);
+    const formData = new FormData(form)
+    formData.append("_target", input.name)
   },
-  
+
   submitFormIfComplete() {
     // Check if all inputs are filled
-    const inputs = Array.from(this.el.querySelectorAll('input'));
-    const allFilled = inputs.every(input => input.value.length === 1 && /^\d$/.test(input.value));
-    
+    const inputs = Array.from(this.el.querySelectorAll("input"))
+    const allFilled = inputs.every((input) => input.value.length === 1 && /^\d$/.test(input.value))
+
     if (allFilled) {
-      const form = this.el.closest('form');
+      const form = this.el.closest("form")
       if (form) {
         // Give a short delay to ensure the last input's change has propagated
         setTimeout(() => {
-          form.requestSubmit();
-        }, 400);
+          form.requestSubmit()
+        }, 400)
       }
     }
   },
 
   handlePaste(e) {
-    e.preventDefault();
-    
+    e.preventDefault()
+
     // Get pasted text
-    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-    
+    const pastedText = (e.clipboardData || window.clipboardData).getData("text")
+
     // If it looks like a verification code (only digits)
     if (/^\d+$/.test(pastedText)) {
       // Get all inputs
-      const inputs = Array.from(this.el.querySelectorAll('input'));
-      
+      const inputs = Array.from(this.el.querySelectorAll("input"))
+
       // Fill each input with the corresponding digit
-      const digits = pastedText.substring(0, inputs.length).split('');
-      let allFilled = true;
-      
+      const digits = pastedText.substring(0, inputs.length).split("")
+      let allFilled = true
+
       digits.forEach((digit, index) => {
         if (inputs[index]) {
-          inputs[index].value = digit;
-          this.pushInputValueChange(inputs[index]);
+          inputs[index].value = digit
+          this.pushInputValueChange(inputs[index])
         } else {
-          allFilled = false;
+          allFilled = false
         }
-      });
-      
+      })
+
       // Focus the last input or the one after the last filled input
-      const lastIndex = Math.min(digits.length, inputs.length) - 1;
+      const lastIndex = Math.min(digits.length, inputs.length) - 1
       if (lastIndex >= 0 && inputs[lastIndex]) {
-        inputs[lastIndex].focus();
+        inputs[lastIndex].focus()
       }
-      
+
       // If all boxes are filled, trigger form submission
       if (allFilled && digits.length >= inputs.length) {
-        this.submitFormIfComplete();
+        this.submitFormIfComplete()
       }
     }
   },
 
   destroyed() {
     // Clean up event listeners
-    this.el.querySelectorAll('input').forEach(input => {
-      input.removeEventListener('paste', this.handlePaste);
-    });
-  }
-};
+    this.el.querySelectorAll("input").forEach((input) => {
+      input.removeEventListener("paste", this.handlePaste)
+    })
+  },
+}
 
 Hooks.ExhibitionDraggable = {
   mounted() {
     this.handleDragStart = (e) => {
-      e.dataTransfer.setData("film_id", this.el.dataset.filmId);
-    };
-    this.el.addEventListener("dragstart", this.handleDragStart);
+      e.dataTransfer.setData("film_id", this.el.dataset.filmId)
+    }
+    this.el.addEventListener("dragstart", this.handleDragStart)
   },
   destroyed() {
-    this.el.removeEventListener("dragstart", this.handleDragStart);
-  }
+    this.el.removeEventListener("dragstart", this.handleDragStart)
+  },
 }
 
 Hooks.ExhibitionDropZone = {
   mounted() {
     this.el.addEventListener("dragleave", () => {
-      this.el.classList.remove("ring", "ring-neon-blue-lightest");
-    });
-    this.el.addEventListener("dragover", (e) => { e.preventDefault()
+      this.el.classList.remove("ring", "ring-neon-blue-lightest")
+    })
+    this.el.addEventListener("dragover", (e) => {
+      e.preventDefault()
 
-            this.el.classList.add("ring", "ring-neon-blue-lightest");}
-);
-    
+      this.el.classList.add("ring", "ring-neon-blue-lightest")
+    })
+
     this.el.addEventListener("drop", (e) => {
       e.preventDefault()
-            this.el.classList.remove("ring", "ring-neon-blue-lightest");
+      this.el.classList.remove("ring", "ring-neon-blue-lightest")
 
       const filmId = e.dataTransfer.getData("film_id")
       const showcaseId = this.el.dataset.showcaseId
@@ -321,44 +316,43 @@ Hooks.ExhibitionDropZone = {
       this.pushEvent("create_exhibition", {
         film_id: filmId,
         showcase_id: showcaseId,
-        theater_id: theaterId
+        theater_id: theaterId,
       })
     })
   },
 
   destroyed() {
-    this.el.removeEventListener("dragleave", this.handleDragLeave);
-    this.el.removeEventListener("dragover", this.handleDragOver);
-    this.el.removeEventListener("drop", this.handleDrop);
-  }
+    this.el.removeEventListener("dragleave", this.handleDragLeave)
+    this.el.removeEventListener("dragover", this.handleDragOver)
+    this.el.removeEventListener("drop", this.handleDrop)
+  },
 }
-
 
 Hooks.HoverPlay = {
   mounted() {
-    const player = this.el;
+    const player = this.el
 
     // Prevent it from autoplaying on mount
-    player.pause();
+    player.pause()
 
-    const container = player.closest(".group");
+    const container = player.closest(".group")
     if (container) {
       container.addEventListener("mouseenter", () => {
-        player.play().catch(() => {});
-      });
+        player.play().catch(() => {})
+      })
       container.addEventListener("mouseleave", () => {
-        player.pause();
-        player.currentTime = 0;
-      });
+        player.pause()
+        player.currentTime = 0
+      })
     }
   },
   destroyed() {
-    const container = this.el.closest(".group");
+    const container = this.el.closest(".group")
     if (container) {
-      container.removeEventListener("mouseenter", this.handleMouseEnter);
-      container.removeEventListener("mouseleave", this.handleMouseLeave);
+      container.removeEventListener("mouseenter", this.handleMouseEnter)
+      container.removeEventListener("mouseleave", this.handleMouseLeave)
     }
-  }
+  },
 }
 
 Hooks.EmblaMain = {
@@ -373,26 +367,26 @@ Hooks.EmblaMain = {
     // Don't call destroy() — it removes the translateX transform causing a flash to slide 0.
     // The DOM is being removed anyway so cleanup is unnecessary.
     window.__emblaMain__ = null
-  }
+  },
 }
 
 Hooks.EmblaThumbs = {
   mounted() {
     this.emblaMain = window.__emblaMain__
     this.emblaThumbs = EmblaCarousel(this.el, {
-      containScroll: 'keepSnaps',
+      containScroll: "keepSnaps",
       dragFree: true,
     })
     this.setupThumbClicks()
     if (this.emblaMain) {
-      this.emblaMain.on('select', this.highlightSelected.bind(this))
+      this.emblaMain.on("select", this.highlightSelected.bind(this))
       this.highlightSelected()
     } else {
       // EmblaMain not mounted yet — wait one frame
       this._raf = requestAnimationFrame(() => {
         this.emblaMain = window.__emblaMain__
         if (this.emblaMain) {
-          this.emblaMain.on('select', this.highlightSelected.bind(this))
+          this.emblaMain.on("select", this.highlightSelected.bind(this))
           this.highlightSelected()
         }
       })
@@ -400,9 +394,9 @@ Hooks.EmblaThumbs = {
   },
 
   setupThumbClicks() {
-    const thumbs = this.el.querySelectorAll('[data-thumb-index]')
+    const thumbs = this.el.querySelectorAll("[data-thumb-index]")
     thumbs.forEach((thumb, index) => {
-      thumb.addEventListener('click', () => {
+      thumb.addEventListener("click", () => {
         if (!this.emblaMain) return
         this.emblaMain.scrollTo(index)
       })
@@ -413,16 +407,16 @@ Hooks.EmblaThumbs = {
     if (!this.emblaMain || !this.emblaThumbs) return
 
     const selectedIndex = this.emblaMain.selectedScrollSnap()
-    const thumbs = this.el.querySelectorAll('[data-thumb-index]')
+    const thumbs = this.el.querySelectorAll("[data-thumb-index]")
 
     thumbs.forEach((thumb, index) => {
       if (index === selectedIndex) {
-        thumb.style.outline = '2px solid #E0EBFF'
-        thumb.style.outlineOffset = '2px'
+        thumb.style.outline = "2px solid #E0EBFF"
+        thumb.style.outlineOffset = "2px"
         this.emblaThumbs.scrollTo(selectedIndex)
       } else {
-        thumb.style.outline = ''
-        thumb.style.outlineOffset = ''
+        thumb.style.outline = ""
+        thumb.style.outlineOffset = ""
       }
     })
   },
@@ -434,48 +428,46 @@ Hooks.EmblaThumbs = {
   destroyed() {
     if (this._raf) cancelAnimationFrame(this._raf)
     if (this.emblaThumbs) this.emblaThumbs.destroy()
-  }
+  },
 }
 
 Hooks.ScrollObserver = {
   mounted() {
-    const threshold = 800; // px
+    const threshold = 800 // px
 
-    const indicator = document.getElementById("scroll-indicator");
-    const theaterSection = document.getElementById("cinema-barrier");
+    const indicator = document.getElementById("scroll-indicator")
+    const theaterSection = document.getElementById("cinema-barrier")
 
-    if (!indicator || !theaterSection) return;
+    if (!indicator || !theaterSection) return
 
     const updateVisibility = () => {
-      const theaterTop = theaterSection.getBoundingClientRect().bottom;
+      const theaterTop = theaterSection.getBoundingClientRect().bottom
 
       if (theaterTop <= threshold) {
         // Theater has entered viewport — hide the indicator
-                indicator.classList.remove("opacity-80", "pointer-events-none");
+        indicator.classList.remove("opacity-80", "pointer-events-none")
 
-        indicator.classList.add("opacity-0", "pointer-events-none");
+        indicator.classList.add("opacity-0", "pointer-events-none")
       } else {
         // Theater is below viewport — show the indicator
-        indicator.classList.remove("opacity-0", "pointer-events-none");
-                indicator.classList.add("opacity-80", "pointer-events-none");
-
+        indicator.classList.remove("opacity-0", "pointer-events-none")
+        indicator.classList.add("opacity-80", "pointer-events-none")
       }
-    };
+    }
 
-    window.addEventListener("scroll", updateVisibility);
-    window.addEventListener("resize", updateVisibility);
-    updateVisibility(); // Initial check
+    window.addEventListener("scroll", updateVisibility)
+    window.addEventListener("resize", updateVisibility)
+    updateVisibility() // Initial check
 
     this.cleanup = () => {
-      window.removeEventListener("scroll", updateVisibility);
-      window.removeEventListener("resize", updateVisibility);
-    };
+      window.removeEventListener("scroll", updateVisibility)
+      window.removeEventListener("resize", updateVisibility)
+    }
   },
   destroyed() {
-    this.cleanup && this.cleanup();
-  }
-};
-
+    this.cleanup && this.cleanup()
+  },
+}
 
 Hooks.SimulatedLivePlayback = {
   mounted() {
@@ -497,16 +489,13 @@ Hooks.SimulatedLivePlayback = {
         })
       }
     })
-  }
+  },
 }
-
-
-
 
 Hooks.StripePayment = {
   mounted() {
-    if (this.el.dataset.mounted) return;
-    this.el.dataset.mounted = "true";
+    if (this.el.dataset.mounted) return
+    this.el.dataset.mounted = "true"
 
     const appearance = {
       theme: "night",
@@ -521,34 +510,34 @@ Hooks.StripePayment = {
         ".Input": { backgroundColor: "#11182799", borderColor: "#1f2937" },
         ".Input:focus": { borderColor: "#ADC9FF" },
       },
-    };
+    }
 
-    const stripe = Stripe(this.el.dataset.stripeKey);
+    const stripe = Stripe(this.el.dataset.stripeKey)
     const elements = stripe.elements({
       clientSecret: this.el.dataset.stripeSecret,
-      appearance
-    });
+      appearance,
+    })
 
     const paymentElement = elements.create("payment", {
       fields: { billingDetails: { name: "never", email: "never" } },
-      wallets: { link: "never", applePay: "auto", googlePay: "auto" }
-    });
+      wallets: { link: "never", applePay: "auto", googlePay: "auto" },
+    })
 
-    paymentElement.mount("#payment-element");
+    paymentElement.mount("#payment-element")
 
-    const submitBtn = this.el.querySelector("#stripe-submit");
-    const rightSlot = submitBtn?.querySelector("span:last-child"); // our spinner slot
-    const errorEl = this.el.querySelector("#card-errors");
+    const submitBtn = this.el.querySelector("#stripe-submit")
+    const rightSlot = submitBtn?.querySelector("span:last-child") // our spinner slot
+    const errorEl = this.el.querySelector("#card-errors")
 
     // Enable the button only when Stripe is ready
     paymentElement.on("ready", () => {
-      if (submitBtn) submitBtn.disabled = false;
-    });
+      if (submitBtn) submitBtn.disabled = false
+    })
 
     const setLoading = (isLoading) => {
-      if (!submitBtn || !rightSlot) return;
-      submitBtn.disabled = !!isLoading;
-      submitBtn.setAttribute("aria-busy", String(!!isLoading));
+      if (!submitBtn || !rightSlot) return
+      submitBtn.disabled = !!isLoading
+      submitBtn.setAttribute("aria-busy", String(!!isLoading))
 
       if (isLoading) {
         rightSlot.innerHTML = `
@@ -556,16 +545,16 @@ Hooks.StripePayment = {
                viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity=".25"></circle>
             <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3"></path>
-          </svg>`;
+          </svg>`
       } else {
-        rightSlot.innerHTML = ""; // keep the slot, remove spinner
+        rightSlot.innerHTML = "" // keep the slot, remove spinner
       }
-    };
+    }
 
     this.el.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (errorEl) errorEl.textContent = "";
-      setLoading(true);
+      e.preventDefault()
+      if (errorEl) errorEl.textContent = ""
+      setLoading(true)
 
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
@@ -574,20 +563,20 @@ Hooks.StripePayment = {
           payment_method_data: {
             billing_details: {
               name: this.el.dataset.contactName,
-              email: this.el.dataset.contactEmail
-            }
-          }
+              email: this.el.dataset.contactEmail,
+            },
+          },
         },
-        redirect: "if_required"
-      });
+        redirect: "if_required",
+      })
 
       // If redirect is needed, Stripe will navigate away — spinner stays until navigation.
       // If no redirect, we’re still here:
       if (error) {
-        console.error("Payment error:", error.message);
-        if (errorEl) errorEl.textContent = error.message;
-        setLoading(false);
-        return;
+        console.error("Payment error:", error.message)
+        if (errorEl) errorEl.textContent = error.message
+        setLoading(false)
+        return
       }
 
       // If we get a PI back with succeeded status (no redirect path)
@@ -597,11 +586,11 @@ Hooks.StripePayment = {
         // setLoading(false); // optionally clear spinner if you stay on the page
       } else {
         // e.g., requires_action handled via redirect (won’t hit here), or processing
-        setLoading(false);
+        setLoading(false)
       }
-    });
-  }
-};
+    })
+  },
+}
 
 Hooks.CopyBus = {
   mounted() {
@@ -630,7 +619,7 @@ Hooks.CopyBus = {
       // Last resort: prompt the user to copy manually
       window.prompt("Copy this text:", text)
     })
-  }
+  },
 }
 
 /**  YouTube-style autoscroll:
@@ -643,146 +632,156 @@ Hooks.ChatAutoScroll = {
 
   mounted() {
     // ── find scroll + host elements from data attributes ──
-    const scrollSel = this.el.dataset.scroll;
-    const hostSel = this.el.dataset.host;
+    const scrollSel = this.el.dataset.scroll
+    const hostSel = this.el.dataset.host
 
-    this.scrollEl = scrollSel ? document.querySelector(scrollSel) : this.el.parentElement;
-    this.hostEl   = hostSel   ? document.querySelector(hostSel)   : this.scrollEl;
+    this.scrollEl = scrollSel ? document.querySelector(scrollSel) : this.el.parentElement
+    this.hostEl = hostSel ? document.querySelector(hostSel) : this.scrollEl
 
     if (!this.scrollEl || !this.hostEl) {
       console.warn("[ChatAutoScroll] Missing scrollEl or hostEl", {
         scrollSel,
         hostSel,
-        el: this.el
-      });
-      return;
+        el: this.el,
+      })
+      return
     }
 
-    this.scrollEl.style.overflowAnchor = "none";
+    this.scrollEl.style.overflowAnchor = "none"
 
     // state
-    this.stickToBottom = true;
-    this.prevCount = this.getMessageCount();
-    this.baselineCount = this.prevCount;
-    this.newCount = 0;
+    this.stickToBottom = true
+    this.prevCount = this.getMessageCount()
+    this.baselineCount = this.prevCount
+    this.newCount = 0
 
     // build button *outside* LiveView DOM so patches can't kill it
-    this.buildJumpButton();
+    this.buildJumpButton()
 
     // bind events
-    this.onScroll      = this.handleScroll.bind(this);
-    this.onReposition  = this.positionButton.bind(this);
+    this.onScroll = this.handleScroll.bind(this)
+    this.onReposition = this.positionButton.bind(this)
 
-    this.scrollEl.addEventListener("scroll", this.onScroll, { passive: true });
-    window.addEventListener("resize", this.onReposition, { passive: true });
-    window.addEventListener("scroll", this.onReposition, { passive: true });
+    this.scrollEl.addEventListener("scroll", this.onScroll, { passive: true })
+    window.addEventListener("resize", this.onReposition, { passive: true })
+    window.addEventListener("scroll", this.onReposition, { passive: true })
 
     // initial stickiness
-    this.stickToBottom = this.isNearBottom();
-    if (this.stickToBottom) this.scrollToBottom(false);
+    this.stickToBottom = this.isNearBottom()
+    if (this.stickToBottom) this.scrollToBottom(false)
 
     // initial position
-    this.positionButton();
+    this.positionButton()
   },
 
   updated() {
-    if (!this.scrollEl || !this.jumpBtn) return;
+    if (!this.scrollEl || !this.jumpBtn) return
 
-    const currentCount = this.getMessageCount();
+    const currentCount = this.getMessageCount()
 
     if (this.stickToBottom) {
-      this.scrollToBottom();
-      this.hideJumpButton();
-      this.baselineCount = currentCount;
-      this.newCount = 0;
+      this.scrollToBottom()
+      this.hideJumpButton()
+      this.baselineCount = currentCount
+      this.newCount = 0
     } else {
-      const diff = Math.max(0, currentCount - this.baselineCount);
+      const diff = Math.max(0, currentCount - this.baselineCount)
       // for debugging:
       // console.log("[ChatAutoScroll] updated diff", diff, "baseline", this.baselineCount, "current", currentCount);
 
-      this.newCount = diff;
-      this.updateJumpButton();
+      this.newCount = diff
+      this.updateJumpButton()
       if (diff > 0) {
-        this.showJumpButton();
+        this.showJumpButton()
       }
     }
 
     // keep button aligned if heights changed
-    this.positionButton();
+    this.positionButton()
   },
 
   destroyed() {
     if (this.scrollEl && this.onScroll) {
-      this.scrollEl.removeEventListener("scroll", this.onScroll);
+      this.scrollEl.removeEventListener("scroll", this.onScroll)
     }
-    window.removeEventListener("resize", this.onReposition);
-    window.removeEventListener("scroll", this.onReposition);
+    window.removeEventListener("resize", this.onReposition)
+    window.removeEventListener("scroll", this.onReposition)
 
     if (this.jumpBtn && document.body.contains(this.jumpBtn)) {
-      document.body.removeChild(this.jumpBtn);
+      document.body.removeChild(this.jumpBtn)
     }
   },
 
   // ── behavior helpers ──────────────────────────────────────
   getMessageCount() {
     // count direct li children only
-    return this.el.querySelectorAll(":scope > li").length;
+    return this.el.querySelectorAll(":scope > li").length
   },
 
   handleScroll() {
-    if (!this.scrollEl) return;
+    if (!this.scrollEl) return
 
-    const dist = this.distanceFromBottom();
+    const dist = this.distanceFromBottom()
     if (dist <= this.STICKY_THRESHOLD) {
-      this.stickToBottom = true;
-      this.baselineCount = this.getMessageCount();
-      this.newCount = 0;
-      this.hideJumpButton();
+      this.stickToBottom = true
+      this.baselineCount = this.getMessageCount()
+      this.newCount = 0
+      this.hideJumpButton()
     } else {
       if (this.stickToBottom) {
-        this.baselineCount = this.getMessageCount();
+        this.baselineCount = this.getMessageCount()
       }
-      this.stickToBottom = false;
+      this.stickToBottom = false
     }
 
-    this.positionButton();
+    this.positionButton()
   },
 
   isNearBottom() {
-    return this.distanceFromBottom() <= this.STICKY_THRESHOLD;
+    return this.distanceFromBottom() <= this.STICKY_THRESHOLD
   },
 
   distanceFromBottom() {
-    const el = this.scrollEl;
-    return el.scrollHeight - (el.scrollTop + el.clientHeight);
+    const el = this.scrollEl
+    return el.scrollHeight - (el.scrollTop + el.clientHeight)
   },
 
   scrollToBottom(smooth = true) {
-    const el = this.scrollEl;
+    const el = this.scrollEl
     requestAnimationFrame(() => {
-      el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
-    });
+      el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" })
+    })
   },
 
   // ── button creation & positioning ─────────────────────────
   buildJumpButton() {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.title = "Jump to latest";
-    btn.style.display = "none";
+    const btn = document.createElement("button")
+    btn.type = "button"
+    btn.title = "Jump to latest"
+    btn.style.display = "none"
 
     btn.className = [
-      "inline-flex", "items-center", "gap-2",
-      "rounded-full", "border", "border-white/10",
-      "bg-white/10", "backdrop-blur",
-      "px-4", "py-2",
-      "text-xs", "font-medium", "text-gray-100",
-      "shadow-lg", "hover:bg-white/20",
-      "transition-all", "duration-200"
-    ].join(" ");
+      "inline-flex",
+      "items-center",
+      "gap-2",
+      "rounded-full",
+      "border",
+      "border-white/10",
+      "bg-white/10",
+      "backdrop-blur",
+      "px-4",
+      "py-2",
+      "text-xs",
+      "font-medium",
+      "text-gray-100",
+      "shadow-lg",
+      "hover:bg-white/20",
+      "transition-all",
+      "duration-200",
+    ].join(" ")
 
-    btn.style.position = "fixed";
-    btn.style.zIndex = "9999";
+    btn.style.position = "fixed"
+    btn.style.zIndex = "9999"
 
     btn.innerHTML = `
       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -790,234 +789,522 @@ Hooks.ChatAutoScroll = {
           d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
       </svg>
       <span>New messages</span>
-    `;
+    `
 
     btn.addEventListener("click", () => {
-      this.stickToBottom = true;
-      this.scrollToBottom();
-      const current = this.getMessageCount();
-      this.baselineCount = current;
-      this.newCount = 0;
-      this.hideJumpButton();
-    });
+      this.stickToBottom = true
+      this.scrollToBottom()
+      const current = this.getMessageCount()
+      this.baselineCount = current
+      this.newCount = 0
+      this.hideJumpButton()
+    })
 
-    document.body.appendChild(btn);
-    this.jumpBtn = btn;
+    document.body.appendChild(btn)
+    this.jumpBtn = btn
   },
 
   positionButton() {
-    if (!this.jumpBtn || !this.hostEl) return;
+    if (!this.jumpBtn || !this.hostEl) return
 
-    const rect = this.hostEl.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
+    const rect = this.hostEl.getBoundingClientRect()
+    if (!rect.width || !rect.height) return
 
     // center horizontally over the chat panel
-    const btn = this.jumpBtn;
-    const padBottom = 48; // px inside panel from the bottom
+    const btn = this.jumpBtn
+    const padBottom = 48 // px inside panel from the bottom
 
-    const btnWidth = btn.offsetWidth || 120;
-    const btnHeight = btn.offsetHeight || 32;
+    const btnWidth = btn.offsetWidth || 120
+    const btnHeight = btn.offsetHeight || 32
 
-    const x = rect.left + (rect.width - btnWidth) / 2;
-    const y = rect.bottom - padBottom - btnHeight;
+    const x = rect.left + (rect.width - btnWidth) / 2
+    const y = rect.bottom - padBottom - btnHeight
 
-    btn.style.left = `${Math.max(0, x)}px`;
-    btn.style.top  = `${Math.max(0, y)}px`;
+    btn.style.left = `${Math.max(0, x)}px`
+    btn.style.top = `${Math.max(0, y)}px`
   },
 
   updateJumpButton() {
-    if (!this.jumpBtn) return;
-    const span = this.jumpBtn.querySelector("span");
+    if (!this.jumpBtn) return
+    const span = this.jumpBtn.querySelector("span")
     if (span) {
       span.textContent =
-        this.newCount > 0
-          ? `${this.newCount} new message${this.newCount > 1 ? "s" : ""}`
-          : "New messages";
+        this.newCount > 0 ? `${this.newCount} new message${this.newCount > 1 ? "s" : ""}` : "New messages"
     }
   },
 
   showJumpButton() {
     if (this.jumpBtn) {
-      this.jumpBtn.style.display = "inline-flex";
-      this.positionButton();
+      this.jumpBtn.style.display = "inline-flex"
+      this.positionButton()
     }
   },
 
   hideJumpButton() {
     if (this.jumpBtn) {
-      this.jumpBtn.style.display = "none";
+      this.jumpBtn.style.display = "none"
     }
-  }
-};
+  },
+}
 
 Hooks.NotesAutoScroll = {
-  STICKY_THRESHOLD: 64,
+  STICKY_THRESHOLD: 300,
 
   mounted() {
-    const scrollSel = this.el.dataset.scroll;
-    this.scrollEl = scrollSel ? document.querySelector(scrollSel) : this.el.parentElement;
+    const scrollSel = this.el.dataset.scroll
+    this.scrollEl = scrollSel ? document.querySelector(scrollSel) : this.el.parentElement
 
-    if (!this.scrollEl) return;
+    if (!this.scrollEl) return
 
-    this.scrollEl.style.overflowAnchor = "none";
-    this.stickToBottom = true;
+    this.scrollEl.style.overflowAnchor = "none"
+    this.stickToBottom = true
+    this.isScrolling = false
+    this.childCountBefore = this.el.childElementCount
 
-    this.onScroll = this.handleScroll.bind(this);
-    this.scrollEl.addEventListener("scroll", this.onScroll, { passive: true });
+    this.onScroll = this.handleScroll.bind(this)
+    this.scrollEl.addEventListener("scroll", this.onScroll, { passive: true })
 
-    if (this.isNearBottom()) this.scrollToBottom(false);
+    this.scrollToBottom(false)
+  },
+
+  beforeUpdate() {
+    if (!this.scrollEl) return
+    this.childCountBefore = this.el.childElementCount
+    // Only update stickToBottom from user scroll events (handleScroll), not here
   },
 
   updated() {
-    if (!this.scrollEl) return;
-    if (this.stickToBottom) this.scrollToBottom();
+    if (!this.scrollEl) return
+    const listGrew = this.el.childElementCount > this.childCountBefore
+    if (listGrew && this.stickToBottom) {
+      this.scrollToBottom()
+    }
+    // Non-list updates (assigns changing): do nothing, let browser keep its position
   },
 
   destroyed() {
     if (this.scrollEl && this.onScroll) {
-      this.scrollEl.removeEventListener("scroll", this.onScroll);
+      this.scrollEl.removeEventListener("scroll", this.onScroll)
     }
   },
 
   handleScroll() {
-    this.stickToBottom = this.isNearBottom();
+    if (!this.isScrolling) {
+      this.stickToBottom = this.isNearBottom()
+    }
   },
 
   isNearBottom() {
-    return this.distanceFromBottom() <= this.STICKY_THRESHOLD;
+    return this.distanceFromBottom() <= this.STICKY_THRESHOLD
   },
 
   distanceFromBottom() {
-    const el = this.scrollEl;
-    return el.scrollHeight - (el.scrollTop + el.clientHeight);
+    const el = this.scrollEl
+    return el.scrollHeight - (el.scrollTop + el.clientHeight)
   },
 
   scrollToBottom(smooth = true) {
-    const el = this.scrollEl;
-    requestAnimationFrame(() => {
-      el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
-    });
+    const el = this.scrollEl
+    this.isScrolling = true
+    el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "instant" })
+    const done = () => {
+      this.isScrolling = false
+    }
+    if ("onscrollend" in el) {
+      el.addEventListener("scrollend", done, { once: true })
+    } else {
+      setTimeout(done, 400)
+    }
+  },
+}
+
+// Ghost card at the bottom of the notes scroll container (inside panel)
+Hooks.NotesIncoming = {
+  mounted() {
+    this.handleEvent("note_incoming", ({ incoming, username, seconds_away }) => {
+      if (!incoming) {
+        this.el.classList.add("hidden")
+        this.el.innerHTML = ""
+        return
+      }
+
+      let label
+      if (seconds_away < 10) {
+        label = "A note is moments away..."
+      } else if (seconds_away < 90) {
+        const rounded = Math.round(seconds_away / 5) * 5
+        label = `A note is on its way · ~${rounded}s`
+      } else {
+        const mins = Math.round(seconds_away / 60)
+        label = `A note is on its way · ~${mins}m`
+      }
+
+      this.el.innerHTML = `
+        <div class="px-3 py-1.5">
+          <div class="px-3 py-3 rounded-xl border-l-2 border border-white/6 border-l-zinc-600/20 bg-white/[0.02] animate-pulse">
+            <div class="space-y-1.5">
+              <div class="h-2.5 rounded bg-white/6 blur-sm w-full"></div>
+              <div class="h-2.5 rounded bg-white/6 blur-sm w-4/5"></div>
+              <div class="h-2.5 rounded bg-white/6 blur-sm w-2/3"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mt-2.5 px-1">
+            <span class="inline-flex gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:0ms"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:150ms"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:300ms"></span>
+            </span>
+            <span class="text-[11px] text-zinc-600 tracking-wide">${label}</span>
+          </div>
+        </div>
+      `
+      this.el.classList.remove("hidden")
+    })
+  },
+}
+
+// Ghost card at the bottom of the director panel scroll container
+Hooks.DirectorIncoming = {
+  mounted() {
+    this.handleEvent("director_incoming", ({ incoming, seconds_away }) => {
+      if (!incoming) {
+        this.el.classList.add("hidden")
+        this.el.innerHTML = ""
+        return
+      }
+
+      let label
+      if (seconds_away < 10) {
+        label = "Commentary is moments away..."
+      } else if (seconds_away < 90) {
+        const rounded = Math.round(seconds_away / 5) * 5
+        label = `Commentary is on its way · ~${rounded}s`
+      } else {
+        const mins = Math.round(seconds_away / 60)
+        label = `Commentary is on its way · ~${mins}m`
+      }
+
+      this.el.innerHTML = `
+        <div class="px-4 py-2">
+          <div class="flex items-start gap-3 px-4 py-3 rounded-xl border border-amber-500/10 bg-amber-500/[0.03] animate-pulse">
+            <div class="w-16 h-9 rounded-md bg-amber-500/8 blur-sm shrink-0"></div>
+            <div class="min-w-0 flex-1 space-y-1.5">
+              <div class="h-2 rounded bg-amber-500/10 blur-sm w-1/3"></div>
+              <div class="h-2.5 rounded bg-amber-500/8 blur-sm w-full"></div>
+              <div class="h-2.5 rounded bg-amber-500/8 blur-sm w-4/5"></div>
+            </div>
+          </div>
+          <div class="mt-2.5 px-1">
+            <span class="text-[11px] text-amber-700/70 tracking-wide">${label}</span>
+          </div>
+        </div>
+      `
+      this.el.classList.remove("hidden")
+    })
+  },
+}
+
+// Shared stack container for TV banners — appended once, both hooks write into it
+function getTvBannerStack() {
+  let stack = document.getElementById("tv-banner-stack")
+  if (!stack) {
+    stack = document.createElement("div")
+    stack.id = "tv-banner-stack"
+    stack.className = "fixed bottom-4 right-4 z-50 flex flex-col gap-2 items-end"
+    document.body.appendChild(stack)
   }
-};
+  return stack
+}
+
+function makeTvBanner({
+  label,
+  labelClass,
+  body,
+  countdown,
+  accentClass,
+  borderClass,
+  onClickSelector,
+  autoRemoveMs = 4000,
+}) {
+  const stack = getTvBannerStack()
+  const btn = document.createElement("button")
+  btn.type = "button"
+  btn.className = `cursor-pointer w-64 flex items-center justify-between gap-3 rounded-2xl border ${borderClass} bg-zinc-950/90 backdrop-blur-md px-4 py-3 shadow-xl ring-1 ring-white/10 transition-all duration-300 text-left hover:ring-white/20`
+  btn.innerHTML = `
+    <div class="flex flex-col gap-1 min-w-0">
+      <span class="text-[10px] uppercase tracking-widest font-medium ${labelClass}">${label}</span>
+      <span class="text-xs text-zinc-100/90 leading-snug">${body} · <span class="${accentClass}">${countdown}</span></span>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0 ${accentClass} opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+  `
+  btn.addEventListener("click", () => {
+    const target = document.querySelector(onClickSelector)
+    if (target) target.click()
+    btn.remove()
+  })
+  stack.appendChild(btn)
+  setTimeout(() => {
+    btn.style.opacity = "0"
+  }, autoRemoveMs)
+  setTimeout(() => {
+    btn.remove()
+  }, autoRemoveMs + 500)
+  return btn
+}
+
+// TV-style "coming up" banner — always mounted globally, shows even when panel is closed
+Hooks.NotesTvBanner = {
+  mounted() {
+    this._bannerShownAt = null
+
+    this.handleEvent("note_incoming", ({ incoming, username, seconds_away }) => {
+      if (!incoming) {
+        this._bannerShownAt = null
+        return
+      }
+
+      const shouldShowBanner = this._bannerShownAt === null || seconds_away > this._bannerShownAt + 30
+
+      if (shouldShowBanner && seconds_away <= 90) {
+        this._bannerShownAt = seconds_away
+
+        const countdown = seconds_away < 10 ? "in a few seconds" : `in ~${Math.round(seconds_away / 5) * 5}s`
+        const who = username ? `from @${username}` : "from the audience"
+
+        makeTvBanner({
+          label: "Coming up",
+          labelClass: "text-zinc-500",
+          body: `New note ${who}`,
+          accentClass: "text-zinc-400",
+          borderClass: "border-white/10",
+          countdown,
+          onClickSelector: "[phx-value-panel='audience_notes']",
+        })
+      }
+    })
+  },
+}
+
+// TV-style banner for upcoming director's commentary — amber styled
+Hooks.DirectorTvBanner = {
+  mounted() {
+    this._bannerShownAt = null
+
+    this.handleEvent("director_incoming", ({ incoming, seconds_away }) => {
+      if (!incoming) {
+        this._bannerShownAt = null
+        return
+      }
+
+      const shouldShowBanner = this._bannerShownAt === null || seconds_away > this._bannerShownAt + 30
+
+      if (shouldShowBanner && seconds_away <= 90) {
+        this._bannerShownAt = seconds_away
+
+        const countdown = seconds_away < 10 ? "any moment now" : `in ~${Math.round(seconds_away / 5) * 5}s`
+
+        makeTvBanner({
+          label: "Coming up",
+          labelClass: "text-amber-500/80",
+          body: "New Director's Commentary",
+          accentClass: "text-amber-400/80",
+          borderClass: "border-amber-500/20",
+          countdown,
+          onClickSelector: "[phx-value-panel='director_notes']",
+        })
+      }
+    })
+  },
+}
+
+Hooks.NotesNewBanner = {
+  mounted() {
+    this.handleEvent("new_notes", ({ count }) => {
+      if (this.el.offsetParent === null) return
+      const label = count === 1 ? "new note appeared" : "new notes appeared"
+      const banner = document.createElement("div")
+      banner.className =
+        "absolute top-2 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-500 whitespace-nowrap rounded-lg bg-[#0C0C0C] p-px"
+      banner.innerHTML = `
+        <div class="rounded-lg border border-blue-500/20 bg-blue-500/8 px-3 py-2 text-[11px] flex items-center gap-2 tracking-wide">
+          <span class="font-semibold text-blue-400/90">+${count}</span><span class="text-zinc-400">${label}</span>
+        </div>
+      `
+      this.el.parentElement.insertBefore(banner, this.el)
+      setTimeout(() => {
+        banner.style.opacity = "0"
+      }, 3000)
+      setTimeout(() => {
+        banner.remove()
+      }, 3500)
+    })
+  },
+}
 
 Hooks.TheaterBodyScroll = {
   mounted() {
-    this.prevRootOverflow = null;
-    this.prevBodyOverflow = null;
+    this.prevRootOverflow = null
+    this.prevBodyOverflow = null
 
     this.handleEvent("toggle_body_scroll", ({ prevent }) => {
       // Only lock scroll on mobile (< md)
-      const isMobile = window.matchMedia("(max-width: 767px)").matches;
-      if (!isMobile) return;
+      const isMobile = window.matchMedia("(max-width: 767px)").matches
+      if (!isMobile) return
 
-      const root = document.documentElement;
-      const body = document.body;
+      const root = document.documentElement
+      const body = document.body
 
       if (prevent) {
-        console.log({prevent})
+        console.log({ prevent })
         // save previous styles to restore later
-        this.prevRootOverflow = root.style.overflow;
-        this.prevBodyOverflow = body.style.overflow;
+        this.prevRootOverflow = root.style.overflow
+        this.prevBodyOverflow = body.style.overflow
 
-        root.style.overflow = "hidden";
-        body.style.overflow = "hidden";
+        root.style.overflow = "hidden"
+        body.style.overflow = "hidden"
       } else {
-        root.style.overflow = this.prevRootOverflow || "";
-        body.style.overflow = this.prevBodyOverflow || "";
+        root.style.overflow = this.prevRootOverflow || ""
+        body.style.overflow = this.prevBodyOverflow || ""
       }
-    });
-  }
-};
+    })
+  },
+}
 
 Hooks.MarqueeTicker = {
   mounted() {
-    this.setTickerSpeed();
+    this.setTickerSpeed()
   },
 
   updated() {
-    this.setTickerSpeed();
+    this.setTickerSpeed()
   },
 
   setTickerSpeed() {
-    const marquee = this.el;
-    const contentWidth = marquee.scrollWidth;
+    const marquee = this.el
+    const contentWidth = marquee.scrollWidth
 
     // Set a consistent speed: 80 pixels per second
     // This means larger content takes proportionally longer
-    const pixelsPerSecond = 80;
-    const duration = contentWidth / pixelsPerSecond;
+    const pixelsPerSecond = 80
+    const duration = contentWidth / pixelsPerSecond
 
     // Apply the duration to the animation
-    marquee.style.animationDuration = `${duration}s`;
-  }
-};
-
+    marquee.style.animationDuration = `${duration}s`
+  },
+}
 
 // Trix rich text editor — Trix natively syncs to the hidden input via the `input` attribute.
 // This hook just notifies LiveView of changes so form validation stays reactive.
 Hooks.TrixEditor = {
   mounted() {
-    this.hiddenInput = document.getElementById(this.el.dataset.inputId);
-    if (!this.hiddenInput) return;
+    this.hiddenInput = document.getElementById(this.el.dataset.inputId)
+    if (!this.hiddenInput) return
 
     this.handleChange = () => {
-      this.hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
-    };
+      this.hiddenInput.dispatchEvent(new Event("input", { bubbles: true }))
+    }
 
-    this.el.addEventListener("trix-change", this.handleChange);
+    this.el.addEventListener("trix-change", this.handleChange)
   },
   destroyed() {
     if (this.el && this.handleChange) {
-      this.el.removeEventListener("trix-change", this.handleChange);
+      this.el.removeEventListener("trix-change", this.handleChange)
     }
-  }
-};
+  },
+}
 
 Hooks.CopyReviewLink = {
   mounted() {
-    const btn = this.el;
-    const label = btn.querySelector("[data-copy-label]");
-    const icon = btn.querySelector("[data-copy-icon]");
+    const btn = this.el
+    const label = btn.querySelector("[data-copy-label]")
+    const icon = btn.querySelector("[data-copy-icon]")
 
     const checkSvg = `<svg class="w-3.5 h-3.5 text-zinc-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-    </svg>`;
-    const linkSvg = icon.innerHTML;
+    </svg>`
+    const linkSvg = icon.innerHTML
 
     btn.addEventListener("click", async () => {
-      const url = btn.dataset.url || window.location.href;
+      const url = btn.dataset.url || window.location.href
       try {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(url)
       } catch {
-        window.prompt("Copy link:", url);
-        return;
+        window.prompt("Copy link:", url)
+        return
       }
 
       // Success feedback
-      icon.innerHTML = checkSvg;
+      icon.innerHTML = checkSvg
 
       setTimeout(() => {
-        icon.innerHTML = linkSvg;
-      }, 2000);
-    });
-  }
-};
+        icon.innerHTML = linkSvg
+      }, 2000)
+    })
+  },
+}
 
 // ⌘K / Ctrl+K focuses the search input on the page
 Hooks.SearchFocus = {
   mounted() {
     this.handler = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        this.el.focus();
-        this.el.select();
+        e.preventDefault()
+        this.el.focus()
+        this.el.select()
       }
-    };
-    window.addEventListener("keydown", this.handler);
+    }
+    window.addEventListener("keydown", this.handler)
   },
   destroyed() {
-    window.removeEventListener("keydown", this.handler);
-  }
-};
+    window.removeEventListener("keydown", this.handler)
+  },
+}
 
-export default Hooks;
+// Director's Commentary — controls the on-demand Mux player in the private screening room.
+// Responsibilities:
+//   - Sends `player:timeupdate` to the server on every timeupdate tick so the server
+//     knows the current offset when a commentary entry is saved.
+//   - Listens for `director:seek` from the server (clicking a timestamp in the panel)
+//     and seeks the player to that offset.
+//   - Listens for `director:pause` from the server (opening the add form) and pauses.
+Hooks.DirectorPlayer = {
+  mounted() {
+    // The hook is mounted directly on the mux-player element
+    this.player = this.el
+
+    // Send current time to server on every timeupdate
+    this.onTimeUpdate = () => {
+      this.pushEvent("player:timeupdate", { offset: this.player.currentTime })
+    }
+    this.player.addEventListener("timeupdate", this.onTimeUpdate)
+
+    // Server wants to seek the player to a timestamp
+    this.handleEvent("director:seek", ({ offset }) => {
+      this.player.currentTime = offset
+      this.player.play().catch(() => {})
+    })
+
+    // Server wants to pause the player (e.g. add form opened)
+    this.handleEvent("director:pause", () => {
+      this.player.pause()
+    })
+  },
+
+  destroyed() {
+    if (this.onTimeUpdate) {
+      this.player.removeEventListener("timeupdate", this.onTimeUpdate)
+    }
+  },
+}
+
+// Auto-focuses a textarea when it is mounted (e.g. when the add/edit form appears).
+Hooks.DirectorCommentaryInput = {
+  mounted() {
+    this.el.focus()
+    // Move cursor to end of existing text (for edit forms)
+    const len = this.el.value.length
+    this.el.setSelectionRange(len, len)
+  },
+}
+
+export default Hooks

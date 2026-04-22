@@ -1,6 +1,7 @@
 defmodule TimesinkWeb.Cinema.TheaterLive do
   use TimesinkWeb, :live_view
   alias Timesink.Cinema.{Theater, Exhibition, Showcase, Film}
+  alias Timesink.Cinema.Film.Note, as: FilmNote
   alias TimesinkWeb.Components.FilmInfo
   alias TimesinkWeb.Components.TheaterPanel
   alias TimesinkWeb.PubSubTopics
@@ -108,6 +109,17 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             joined_at: System.system_time(:second)
           }
         )
+
+        user = socket.assigns.current_user
+
+        Timesink.Analytics.capture("Theater Entered", user.id, %{
+          "theater_id" => theater.id,
+          "theater_slug" => theater.slug,
+          "theater_name" => theater.name,
+          "exhibition_id" => exhibition.id,
+          "film_id" => film.id,
+          "film_title" => film.title
+        })
       end
 
       presence_topic = PubSubTopics.presence_topic(theater.id)
@@ -155,6 +167,13 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:note_moment_message, nil)
        |> assign(:just_posted_note_id, nil)
        |> assign(:freeze_notes?, false)
+       # director commentary
+       |> assign(:director_commentary, [])
+       |> assign(:all_director_commentary, FilmNote.list_commentary(film.id))
+       |> assign(:total_director_commentary_count, length(FilmNote.list_commentary(film.id)))
+       |> assign(:newly_surfaced_director_ids, MapSet.new())
+       |> assign(:about_to_surface_director_ids, MapSet.new())
+       |> assign(:next_director_seconds_away, nil)
        # UI state
        |> assign(:open_panel, nil)
        |> assign(:chat_tab, :messages)
@@ -177,6 +196,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       phx-hook="TheaterBodyScroll"
       class="max-w-7xl md:max-w-4xl mx-auto px-4 md:px-6 mt-16 text-gray-100"
     >
+      <div id="notes-tv-banner" phx-hook="NotesTvBanner" class="hidden"></div>
+      <div id="director-tv-banner" phx-hook="DirectorTvBanner" class="hidden"></div>
       <!-- Header -->
       <div class="border-b border-white/10 pb-4 mb-10">
         <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
@@ -254,6 +275,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               notes_pulse={@notes_pulse}
               new_notes_count={@new_notes_count}
               total_notes_count={@total_notes_count}
+              total_director_commentary_count={@total_director_commentary_count}
               phase={@phase}
               offset={@offset}
             />
@@ -265,6 +287,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
             notes_pulse={@notes_pulse}
             new_notes_count={@new_notes_count}
             total_notes_count={@total_notes_count}
+            total_director_commentary_count={@total_director_commentary_count}
             phase={@phase}
             offset={@offset}
           />
@@ -293,6 +316,7 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 open_panel={@open_panel}
                 notes={@notes}
                 total_notes_count={@total_notes_count}
+                director_commentary={@director_commentary}
               />
               <TheaterPanel.panel_actions
                 open_panel={@open_panel}
@@ -335,7 +359,18 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
                 />
               </div>
               <div :if={@open_panel == :director_notes}>
-                <TheaterPanel.director_panel />
+                <TheaterPanel.director_panel
+                  all_commentary={@all_director_commentary}
+                  surfaced_ids={MapSet.new(@director_commentary, & &1.id)}
+                  newly_surfaced_director_ids={@newly_surfaced_director_ids}
+                  about_to_surface_ids={@about_to_surface_director_ids}
+                  next_director_seconds_away={@next_director_seconds_away}
+                  phase={@phase}
+                  total_count={@total_director_commentary_count}
+                  film={@film}
+                  scroll_id="director-body-desktop"
+                  body_class="max-h-[40vh]"
+                />
               </div>
             </div>
           </aside>
@@ -396,13 +431,24 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               note_anchor_offset={@note_anchor_offset}
               film={@film}
               list_id="mobile-notes-list"
-              scroll_id="mobile-chat-body"
+              scroll_id="mobile-notes-body"
               body_class="h-[45vh]"
             />
           </div>
 
           <div :if={@open_panel == :director_notes}>
-            <TheaterPanel.director_panel />
+            <TheaterPanel.director_panel
+              all_commentary={@all_director_commentary}
+              surfaced_ids={MapSet.new(@director_commentary, & &1.id)}
+              newly_surfaced_director_ids={@newly_surfaced_director_ids}
+              about_to_surface_ids={@about_to_surface_director_ids}
+              next_director_seconds_away={@next_director_seconds_away}
+              phase={@phase}
+              total_count={@total_director_commentary_count}
+              film={@film}
+              scroll_id="director-body-mobile"
+              body_class="h-[45vh]"
+            />
           </div>
         </div>
       </div>
@@ -463,6 +509,48 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       Process.send_after(self(), :clear_new_notes_count, 4000)
     end
 
+    {director_commentary, newly_surfaced_director_ids, about_to_surface_director_ids,
+     next_director_seconds_away} =
+      if film = socket.assigns[:film] do
+        surfaced = FilmNote.list_commentary(film.id, current_offset)
+
+        newly_surfaced =
+          if current_offset > previous_offset do
+            prev_ids = MapSet.new(socket.assigns.director_commentary, & &1.id)
+
+            surfaced
+            |> Enum.filter(fn n -> not MapSet.member?(prev_ids, n.id) end)
+            |> MapSet.new(& &1.id)
+          else
+            MapSet.new()
+          end
+
+        next_unsurfaced =
+          socket.assigns.all_director_commentary
+          |> Enum.find(fn n -> n.offset_seconds > current_offset end)
+
+        {about_to_surface, seconds_away} =
+          if next_unsurfaced do
+            secs = next_unsurfaced.offset_seconds - current_offset
+
+            if secs <= 90 do
+              {MapSet.new([next_unsurfaced.id]), secs}
+            else
+              {MapSet.new(), nil}
+            end
+          else
+            {MapSet.new(), nil}
+          end
+
+        {surfaced, newly_surfaced, about_to_surface, seconds_away}
+      else
+        {[], MapSet.new(), MapSet.new(), nil}
+      end
+
+    if MapSet.size(newly_surfaced_director_ids) > 0 do
+      Process.send_after(self(), :clear_newly_surfaced_director_ids, 3500)
+    end
+
     {:noreply,
      socket
      |> assign(:phase, phase)
@@ -480,7 +568,22 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
          else: socket.assigns.new_notes_count
        )
      )
-     |> assign(:notes_pulse, should_pulse?)}
+     |> assign(:notes_pulse, should_pulse?)
+     |> assign(:director_commentary, director_commentary)
+     |> assign(:newly_surfaced_director_ids, newly_surfaced_director_ids)
+     |> assign(:about_to_surface_director_ids, about_to_surface_director_ids)
+     |> assign(:next_director_seconds_away, next_director_seconds_away)
+     |> then(fn s ->
+       if has_newly_unlocked?,
+         do: push_event(s, "new_notes", %{count: newly_unlocked_count}),
+         else: s
+     end)
+     |> then(fn s ->
+       if phase == :playing, do: push_note_incoming(s, exhibition, notes, current_offset), else: s
+     end)
+     |> then(fn s ->
+       if phase == :playing, do: push_director_incoming(s, current_offset), else: s
+     end)}
   end
 
   def handle_info(%{event: "presence_diff", topic: topic}, socket) do
@@ -542,6 +645,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
     {:noreply, assign(socket, :just_posted_note_id, nil)}
   end
 
+  def handle_info(:clear_newly_surfaced_director_ids, socket) do
+    {:noreply, assign(socket, :newly_surfaced_director_ids, MapSet.new())}
+  end
+
   # ───────────────────────────────────────────────────────────
   # Events
   # ───────────────────────────────────────────────────────────
@@ -575,6 +682,24 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
           socket
       end
 
+    user = socket.assigns[:user]
+
+    if open_panel && user do
+      event_name =
+        case open_panel do
+          :chat -> "Theater Panel Opened: Live Chat"
+          :audience_notes -> "Theater Panel Opened: Audience Notes"
+          :director_notes -> "Theater Panel Opened: Director Commentary"
+        end
+
+      Timesink.Analytics.capture(event_name, user.id, %{
+        "theater_id" => socket.assigns[:theater] && socket.assigns.theater.id,
+        "exhibition_id" => socket.assigns[:exhibition] && socket.assigns.exhibition.id,
+        "film_id" => socket.assigns[:film] && socket.assigns.film.id,
+        "film_title" => socket.assigns[:film] && socket.assigns.film.title
+      })
+    end
+
     {:noreply, socket}
   end
 
@@ -591,6 +716,20 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
         "audience" -> :audience
         _ -> :messages
       end
+
+    if user = socket.assigns[:user] do
+      event_name =
+        case tab do
+          :audience -> "Theater Chat Tab Switched: Live Audience"
+          :messages -> "Theater Chat Tab Switched: Live Discussion"
+        end
+
+      Timesink.Analytics.capture(event_name, user.id, %{
+        "theater_id" => socket.assigns[:theater] && socket.assigns.theater.id,
+        "exhibition_id" => socket.assigns[:exhibition] && socket.assigns.exhibition.id,
+        "film_id" => socket.assigns[:film] && socket.assigns.film.id
+      })
+    end
 
     {:noreply, assign(socket, :chat_tab, tab)}
   end
@@ -739,9 +878,6 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               })
             end)
 
-            Process.send_after(self(), :clear_note_status_message, 2500)
-            Process.send_after(self(), :clear_just_posted_note, 2500)
-
             {:noreply,
              socket
              |> assign(:notes, notes)
@@ -750,11 +886,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
              |> assign(:note_body, "")
              |> assign(:note_anchor_offset, nil)
              |> assign(:note_moment_message, nil)
-             |> assign(
-               :note_status_message,
-               format_offset(offset)
-             )
-             |> assign(:just_posted_note_id, note.id)}
+             |> assign(:note_status_message, nil)
+             |> assign(:just_posted_note_id, nil)}
 
           {:error, changeset} ->
             Logger.warning("Failed to create note: #{inspect(changeset.errors)}")
@@ -860,5 +993,53 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       String.pad_leading(to_string(seconds), 2, "0")
     ]
     |> Enum.join(":")
+  end
+
+  defp push_director_incoming(socket, current_offset) do
+    film = socket.assigns[:film]
+
+    if is_nil(film) do
+      push_event(socket, "director_incoming", %{incoming: false})
+    else
+      preview = Timesink.Cinema.Film.Note.next_commentary_preview(film.id, current_offset)
+
+      if is_nil(preview) do
+        push_event(socket, "director_incoming", %{incoming: false})
+      else
+        seconds_away = preview.offset_seconds - current_offset
+
+        if seconds_away > 300 do
+          push_event(socket, "director_incoming", %{incoming: false})
+        else
+          push_event(socket, "director_incoming", %{
+            incoming: true,
+            username: preview.username,
+            seconds_away: seconds_away
+          })
+        end
+      end
+    end
+  end
+
+  defp push_note_incoming(socket, exhibition, _visible_notes, current_offset) do
+    preview =
+      Timesink.Cinema.Exhibition.Note.next_note_preview(exhibition.id, current_offset)
+
+    if is_nil(preview) do
+      push_event(socket, "note_incoming", %{incoming: false})
+    else
+      seconds_away = preview.offset_seconds - current_offset
+
+      if seconds_away > 300 do
+        push_event(socket, "note_incoming", %{incoming: false})
+      else
+        push_event(socket, "note_incoming", %{
+          incoming: true,
+          body: preview.body,
+          username: preview.username,
+          seconds_away: seconds_away
+        })
+      end
+    end
   end
 end

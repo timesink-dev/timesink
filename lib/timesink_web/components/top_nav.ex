@@ -56,22 +56,20 @@ defmodule TimesinkWeb.TopNav do
 
             <div
               id="films-dropdown"
-              class="dd hidden absolute mt-2 w-56 rounded-md bg-dark-theater-primary text-mystery-white shadow-lg z-100 overflow-hidden"
+              class="dd hidden absolute mt-2 w-44 rounded-lg border border-white/10 bg-zinc-900 text-mystery-white shadow-xl z-100 overflow-hidden p-1"
               phx-click-away={close_dd("#films-dropdown")}
               phx-window-keydown={close_dd("#films-dropdown")}
               phx-key="escape"
               role="menu"
               aria-label="Cinema menu"
             >
-              <!-- header label -->
-              <div class="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-zinc-400">
+              <div class="px-3 pt-2 pb-1 text-[10px] uppercase tracking-widest text-zinc-500">
                 Explore
               </div>
-              <div class="my-1 h-px bg-zinc-700/50"></div>
-
+              <div class="my-1 h-px bg-white/8"></div>
               <.link
                 navigate="/now-playing"
-                class="block px-4 py-2 hover:bg-dark-theater-medium"
+                class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
                 role="menuitem"
                 phx-click={close_dd("#films-dropdown")}
               >
@@ -79,7 +77,7 @@ defmodule TimesinkWeb.TopNav do
               </.link>
               <.link
                 navigate="/upcoming"
-                class="block px-4 py-2 hover:bg-dark-theater-medium"
+                class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
                 role="menuitem"
                 phx-click={close_dd("#films-dropdown")}
               >
@@ -87,7 +85,7 @@ defmodule TimesinkWeb.TopNav do
               </.link>
               <.link
                 navigate="/archives"
-                class="block px-4 py-2 hover:bg-dark-theater-medium"
+                class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
                 role="menuitem"
                 phx-click={close_dd("#films-dropdown")}
               >
@@ -145,7 +143,7 @@ defmodule TimesinkWeb.TopNav do
 
               <div
                 id="account-menu"
-                class="dd hidden absolute right-0 mt-1 w-56 rounded-md bg-dark-theater-primary  text-mystery-white shadow-lg z-50 overflow-hidden"
+                class="dd hidden absolute right-0 mt-2 w-48 rounded-lg border border-white/10 bg-zinc-900 text-mystery-white shadow-xl z-50 overflow-hidden p-1"
                 phx-click-away={close_dd("#account-menu")}
                 phx-window-keydown={close_dd("#account-menu")}
                 phx-key="escape"
@@ -153,28 +151,29 @@ defmodule TimesinkWeb.TopNav do
                 aria-label="Account menu"
               >
                 <.link
-                  navigate="/me/profile"
-                  class="block px-4 py-2 text-sm hover:bg-dark-theater-medium"
-                  role="menuitem"
-                  phx-click={close_dd("#account-menu")}
-                >
-                  View profile
-                </.link>
-                <.link
                   navigate="/me"
-                  class="block px-4 py-2 text-sm hover:bg-dark-theater-medium"
+                  class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
                   role="menuitem"
                   phx-click={close_dd("#account-menu")}
                 >
                   Account
                 </.link>
 
-                <div class="my-1 h-px bg-zinc-700/50"></div>
+                <.link
+                  navigate="/me/profile"
+                  class="flex items-center rounded-md px-3 py-2 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
+                  role="menuitem"
+                  phx-click={close_dd("#account-menu")}
+                >
+                  Profile
+                </.link>
 
-                <.form method="post" action="/sign_out" for={%{}}>
+                <div class="my-1 h-px bg-white/8"></div>
+
+                <.form method="post" action="/sign_out" for={%{}} class="w-full">
                   <button
                     type="submit"
-                    class="w-full text-left px-4 py-2 text-sm hover:bg-dark-theater-medium"
+                    class="w-full cursor-pointer flex items-center rounded-md px-3 py-2 text-sm text-zinc-400 hover:bg-white/8 hover:text-white transition-colors"
                     role="menuitem"
                     phx-click={close_dd("#account-menu")}
                   >
@@ -214,10 +213,9 @@ defmodule TimesinkWeb.TopNav do
         phx-click={show_hamburger()}
         aria-label="Open menu"
         aria-controls="hamburger-content"
-        class="cursor-pointer inline-flex items-center justify-center h-12 w-12 rounded-xl border border-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-            focus-visible:ring-zinc-400 focus-visible:ring-offset-black "
+        class="cursor-pointer inline-flex items-center justify-center h-9 w-9 rounded-lg text-zinc-400 hover:text-white hover:bg-white/8 transition-colors"
       >
-        <.icon name="hero-bars-3" class="h-6 w-6" />
+        <.icon name="hero-bars-3" class="h-5 w-5" />
         <span class="sr-only">Open menu</span>
       </button>
     </div>
@@ -227,78 +225,109 @@ defmodule TimesinkWeb.TopNav do
   defp open_hamburger(assigns) do
     ~H"""
     <div id="hamburger-container" class="hidden relative z-50">
-      <div id="hamburger-backdrop" class="fixed inset-0 bg-zinc-900/90 transition-opacity"></div>
+      <div
+        id="hamburger-backdrop"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        phx-click={hide_hamburger()}
+      >
+      </div>
       <nav
         id="hamburger-content"
-        class="rounded fixed top-0 right-0 bottom-0 flex flex-col grow justify-between w-5/6 md:w-1/2 py-2 bg-backroom-black overflow-y-auto"
+        class="fixed top-0 right-0 bottom-0 flex flex-col w-72 bg-zinc-950 border-l border-white/8 shadow-2xl overflow-y-auto"
         role="dialog"
         aria-modal="true"
         aria-label="Main menu"
       >
-        <div class="mx-6">
-          <div class="flex items-center mb-4 place-content-between pb-6 py-2 border-solid border-b-[0.5px] border-dark-theater-primary">
-            <div class="flex items-center gap-4">
-              <p class="font-brand rounded-xl font-medium leading-6">
-                Menu Du Jour
-              </p>
-            </div>
-            <.button class="navbar-close" color="none" phx-click={hide_hamburger()}>
-              <span class="sr-only">Close menu</span>
-              <.icon name="hero-x-mark" class="h-6 w-6" />
-            </.button>
-          </div>
+        <!-- Header -->
+        <div class="flex items-center justify-between px-5 py-4 border-b border-white/8">
+          <span class="text-xs uppercase tracking-widest text-zinc-500">Menu Du Jour</span>
+          <button
+            phx-click={hide_hamburger()}
+            class="cursor-pointer inline-flex items-center justify-center h-8 w-8 rounded-lg text-zinc-400 hover:text-white hover:bg-white/8 transition-colors"
+            aria-label="Close menu"
+          >
+            <.icon name="hero-x-mark" class="h-4 w-4" />
+          </button>
+        </div>
+        
+    <!-- Nav links -->
+        <div class="flex-1 px-3 py-4 space-y-0.5">
+          <.link
+            navigate="/now-playing"
+            class="flex items-center rounded-md px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
+            phx-click={hide_hamburger()}
+          >
+            Now Playing
+          </.link>
+          <.link
+            navigate="/upcoming"
+            class="flex items-center rounded-md px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
+            phx-click={hide_hamburger()}
+          >
+            Upcoming
+          </.link>
+          <.link
+            navigate="/archives"
+            class="flex items-center rounded-md px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
+            phx-click={hide_hamburger()}
+          >
+            Archives
+          </.link>
+          <a
+            href="/blog"
+            class="flex items-center rounded-md px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
+          >
+            Blog
+          </a>
+          <.link
+            navigate="/info"
+            class="flex items-center rounded-md px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
+            phx-click={hide_hamburger()}
+          >
+            Info
+          </.link>
 
-          <ul class="flex flex-col justify-start items-start gap-y-4 pt-2.5">
-            <li><.link navigate="/now-playing">Now Playing</.link></li>
-            <li><.link navigate="/upcoming">Upcoming</.link></li>
-            <li><.link navigate="/archives">Archives</.link></li>
-            <li><a href="/blog">Blog</a></li>
-            <li><.link navigate="/info">Info</.link></li>
-
-            <%= if @current_user do %>
-              <!-- Nice labeled separator -->
-              <hr class="w-full border-dark-theater-primary/60 mt-2" />
-              
-    <!-- My Account link styled to match -->
-              <li class="w-full">
-                <.link
-                  navigate="/me"
-                  class="flex items-center gap-3 w-full rounded-lg px-3 py-2 text-mystery-white"
-                >
-                  <span>My Account</span>
-                </.link>
-              </li>
-            <% end %>
-
-            <hr class="w-full border-dark-theater-primary/60 mt-2 mb-4" />
-
-            <div class="w-full flex flex-col gap-y-4">
-              <%= if @current_user do %>
-                <.form method="post" action="/sign_out" for={%{}}>
-                  <.button type="submit" color="tertiary" class="w-full md:w-1/2">
-                    Sign Out
-                  </.button>
-                </.form>
-
-                <.link navigate="/submit">
-                  <.button color="primary" class="w-full md:w-1/2">
-                    Submit film
-                  </.button>
-                </.link>
-              <% else %>
-                <.link navigate="/sign-in">
-                  <.button class="w-full md:w-1/2">
-                    Sign in
-                  </.button>
-                </.link>
-                <a href="/join">
-                  <.button color="tertiary" class="w-full md:w-1/2">
-                    Get free early access
-                  </.button>
-                </a>
-              <% end %>
-            </div>
-          </ul>
+          <%= if @current_user do %>
+            <div class="my-3 h-px bg-white/8"></div>
+            <.link
+              navigate="/me"
+              class="flex items-center rounded-md px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
+              phx-click={hide_hamburger()}
+            >
+              Account
+            </.link>
+            <.link
+              navigate="/me/profile"
+              class="flex items-center rounded-md px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/8 hover:text-white transition-colors"
+              phx-click={hide_hamburger()}
+            >
+              Profile
+            </.link>
+          <% end %>
+        </div>
+        
+    <!-- Bottom actions -->
+        <div class="px-3 py-4 border-t border-white/8 flex flex-col space-y-2">
+          <%= if @current_user do %>
+            <.link navigate="/submit" phx-click={hide_hamburger()}>
+              <.button color="primary" class="w-full">Submit film</.button>
+            </.link>
+            <.form method="post" action="/sign_out" for={%{}} class="w-full">
+              <button
+                type="submit"
+                class="w-full cursor-pointer flex items-center justify-center rounded-md px-3 py-2 text-sm text-zinc-400 hover:bg-white/8 hover:text-white transition-colors"
+              >
+                Sign out
+              </button>
+            </.form>
+          <% else %>
+            <.link navigate="/sign-in" phx-click={hide_hamburger()}>
+              <.button color="tertiary" class="w-full">Sign in</.button>
+            </.link>
+            <a href="/join">
+              <.button color="none" class="w-full">Get free early access</.button>
+            </a>
+          <% end %>
         </div>
       </nav>
     </div>

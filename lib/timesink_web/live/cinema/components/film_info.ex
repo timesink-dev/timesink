@@ -8,77 +8,94 @@ defmodule TimesinkWeb.Components.FilmInfo do
 
   def film_info(assigns) do
     ~H"""
-    <div id="film-info" class={["w-full mt-2 pt-3 pb-4 space-y-4", @class]}>
-      <div class="text-2xl font-semibold tracking-wide text-mystery-white">
+    <div id="film-info" class={["w-full mt-2 pt-3 pb-4", @class]}>
+      <%!-- Title --%>
+      <h2 class="text-2xl font-semibold tracking-wide text-mystery-white mb-3">
         {@film.title}
-      </div>
+      </h2>
 
-      <div class="text-xs md:text-sm text-mystery-white uppercase tracking-wider flex flex-wrap items-center gap-2">
+      <%!-- Genre pills + metadata --%>
+      <div class="flex flex-wrap items-center gap-2 mb-4">
         <%= for genre <- @film.genres do %>
-          <span class="inline-block bg-dark-theater-primary rounded-full px-2 py-1 text-xs">
+          <span class="inline-flex items-center rounded-full bg-zinc-600/30 border border-zinc-500/30 px-2.5 py-0.fo.ex
+         -5 text-[11px] uppercase tracking-widest text-zinc-400">
             {genre.name}
           </span>
         <% end %>
-
-        <%= if Enum.any?(@film.genres) do %>
-          <span>•</span>
+        <%= if Enum.any?(@film.genres) and @film.duration do %>
+          <span class="text-zinc-700">·</span>
         <% end %>
-        <span>{@film.duration} min</span>
-        <span>•</span>
-        <span>{String.upcase(to_string(@film.format))}</span>
-        <span>•</span>
-        <span>{@film.aspect_ratio} aspect</span>
-
-        <%= if @film.color do %>
-          <span>•</span>
-          <span class="capitalize">{String.replace(to_string(@film.color), "_", " ")}</span>
+        <%= if @film.duration do %>
+          <span class="text-xs text-zinc-500">{@film.duration} min</span>
+        <% end %>
+        <%= if @film.format do %>
+          <span class="text-zinc-700">·</span>
+          <span class="text-xs text-zinc-500 uppercase">{@film.format}</span>
         <% end %>
       </div>
 
-      <div class="text-base text-gray-300 leading-relaxed font-light max-w-prose">
-        {@film.synopsis}
-      </div>
+      <%!-- Synopsis --%>
+      <%= if @film.synopsis && @film.synopsis != "" do %>
+        <p class="text-sm text-zinc-400 leading-relaxed font-light max-w-prose mb-6">
+          {@film.synopsis}
+        </p>
+      <% end %>
 
-      <div class="text-sm text-gray-400 font-light space-y-2 pt-4 border-t border-gray-900 mt-6">
-        <%= if Enum.any?(@film.directors) do %>
-          <div>
-            <span class="text-gray-500 uppercase tracking-wider">Director:</span>
-            <span class="text-gray-300"><.creative_names film_creatives={@film.directors} /></span>
-          </div>
-        <% end %>
-
-        <%= if Enum.any?(@film.writers) do %>
-          <div>
-            <span class="text-gray-500 uppercase tracking-wider">Writer:</span>
-            <span class="text-gray-300"><.creative_names film_creatives={@film.writers} /></span>
-          </div>
-        <% end %>
-
-        <%= if Enum.any?(@film.producers) do %>
-          <div>
-            <span class="text-gray-500 uppercase tracking-wider">Producer:</span>
-            <span class="text-gray-300"><.creative_names film_creatives={@film.producers} /></span>
-          </div>
-        <% end %>
-
-        <%= if Enum.any?(@film.cast) do %>
-          <div>
-            <span class="text-gray-500 uppercase tracking-wider">Cast:</span>
-            <div class="text-gray-300">
-              <.creative_names film_creatives={@film.cast} with_roles />
+      <%!-- Credits --%>
+      <%= if Enum.any?(@film.directors) or Enum.any?(@film.writers) or Enum.any?(@film.producers) or Enum.any?(@film.cast) or Enum.any?(@film.crew) do %>
+        <div class="border-t border-white/5 pt-4 space-y-2.5">
+          <%= if Enum.any?(@film.directors) do %>
+            <div class="flex gap-3 text-sm">
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">
+                Director
+              </span>
+              <span class="text-zinc-300 font-light">
+                <.creative_names film_creatives={@film.directors} />
+              </span>
             </div>
-          </div>
-        <% end %>
-
-        <%= if Enum.any?(@film.crew) do %>
-          <div>
-            <span class="text-gray-500 uppercase tracking-wider">Crew:</span>
-            <div class="text-gray-300">
-              <.creative_names film_creatives={@film.crew} with_roles />
+          <% end %>
+          <%= if Enum.any?(@film.writers) do %>
+            <div class="flex gap-3 text-sm">
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">
+                Writer
+              </span>
+              <span class="text-zinc-300 font-light">
+                <.creative_names film_creatives={@film.writers} />
+              </span>
             </div>
-          </div>
-        <% end %>
-      </div>
+          <% end %>
+          <%= if Enum.any?(@film.producers) do %>
+            <div class="flex gap-3 text-sm">
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">
+                Producer
+              </span>
+              <span class="text-zinc-300 font-light">
+                <.creative_names film_creatives={@film.producers} />
+              </span>
+            </div>
+          <% end %>
+          <%= if Enum.any?(@film.cast) do %>
+            <div class="flex gap-3 text-sm">
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">
+                Cast
+              </span>
+              <span class="text-zinc-300 font-light">
+                <.creative_names film_creatives={@film.cast} with_roles />
+              </span>
+            </div>
+          <% end %>
+          <%= if Enum.any?(@film.crew) do %>
+            <div class="flex gap-3 text-sm">
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 pt-0.5 w-20 shrink-0">
+                Crew
+              </span>
+              <span class="text-zinc-300 font-light">
+                <.creative_names film_creatives={@film.crew} with_roles />
+              </span>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     </div>
     """
   end
@@ -88,24 +105,29 @@ defmodule TimesinkWeb.Components.FilmInfo do
 
   defp creative_names(assigns) do
     ~H"""
-    <%= for {fc, idx} <- Enum.with_index(@film_creatives) do %>
-      {if idx > 0, do: ", "}
-      <%= if fc.creative.user do %>
+    <span class="inline">
+      <%= for {fc, idx} <- Enum.with_index(@film_creatives) do %>
+        <%= if idx > 0 do %>
+          <span class="mx-1.5 text-zinc-600">·</span>
+        <% end %>
+        <% path =
+          if fc.creative.user,
+            do: "/@#{fc.creative.user.username}",
+            else: "/creatives/#{fc.creative.id}" %>
         <.link
-          navigate={"/@#{fc.creative.user.username}"}
-          class="hover:text-mystery-white transition-colors"
-        >
-          {creative_label(fc, @with_roles)}
-        </.link>
-      <% else %>
-        <.link
-          navigate={"/creatives/#{fc.creative.id}"}
-          class="hover:text-mystery-white transition-colors"
+          navigate={path}
+          class={[
+            "transition-colors underline-offset-2 hover:underline hover:decoration-zinc-400",
+            if(fc.creative.user,
+              do: "text-zinc-300 hover:text-white decoration-zinc-600",
+              else: "text-zinc-500 hover:text-zinc-300 decoration-zinc-700"
+            )
+          ]}
         >
           {creative_label(fc, @with_roles)}
         </.link>
       <% end %>
-    <% end %>
+    </span>
     """
   end
 
@@ -122,7 +144,7 @@ defmodule TimesinkWeb.Components.FilmInfo do
 
   def film_review(%{film: %{review: review}} = assigns) when is_binary(review) and review != "" do
     ~H"""
-    <div id="film-review" class="px-1">
+    <div id="film-review" class="rounded-xl bg-zinc-900/40 border border-white/5 px-6 py-5">
       <div class="flex items-center gap-3 mb-5">
         <div class="h-10 w-10 rounded-full overflow-hidden ring-1 ring-zinc-700 shrink-0">
           <img
