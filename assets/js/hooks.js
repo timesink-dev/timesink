@@ -1124,10 +1124,10 @@ Hooks.NotesNewBanner = {
       const label = count === 1 ? "new note appeared" : "new notes appeared"
       const banner = document.createElement("div")
       banner.className =
-        "absolute top-2 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-500 whitespace-nowrap"
+        "absolute top-2 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-500 whitespace-nowrap rounded-lg bg-[#0C0C0C] p-px"
       banner.innerHTML = `
-        <div class="rounded-lg border border-neon-blue-primary/20 bg-neon-blue-primary/8 px-3 py-2 text-[11px] flex items-center gap-2 tracking-wide">
-          <span class="font-semibold text-neon-blue-primary/90">+${count}</span><span class="text-zinc-400">${label}</span>
+        <div class="rounded-lg border border-blue-500/20 bg-blue-500/8 px-3 py-2 text-[11px] flex items-center gap-2 tracking-wide">
+          <span class="font-semibold text-blue-400/90">+${count}</span><span class="text-zinc-400">${label}</span>
         </div>
       `
       this.el.parentElement.insertBefore(banner, this.el)
