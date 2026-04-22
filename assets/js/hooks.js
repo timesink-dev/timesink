@@ -930,36 +930,31 @@ Hooks.NotesIncoming = {
 
       let label
       if (seconds_away < 10) {
-        label = "a note is about to drop..."
+        label = "A note is moments away..."
       } else if (seconds_away < 90) {
         const rounded = Math.round(seconds_away / 5) * 5
-        label = `a note drops in ~${rounded}s`
+        label = `A note is on its way · ~${rounded}s`
       } else {
         const mins = Math.round(seconds_away / 60)
-        label = `a note drops in ~${mins}m`
+        label = `A note is on its way · ~${mins}m`
       }
 
       this.el.innerHTML = `
         <div class="px-3 py-1.5">
-          <div class="flex items-start gap-3 px-3 py-3 rounded-xl border-l-2 border border-white/6 border-l-zinc-600/20 bg-white/[0.02] animate-pulse">
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-zinc-600 text-xs blur-sm select-none">${username ? `@${username}` : "Member"}</span>
-                <span class="text-[10px] text-zinc-500 italic tracking-wide flex items-center gap-1">
-                  <span class="inline-flex gap-0.5">
-                    <span class="w-1 h-1 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:0ms"></span>
-                    <span class="w-1 h-1 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:150ms"></span>
-                    <span class="w-1 h-1 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:300ms"></span>
-                  </span>
-                  ${label}
-                </span>
-              </div>
-              <div class="space-y-1.5">
-                <div class="h-2.5 rounded bg-white/6 blur-sm w-full"></div>
-                <div class="h-2.5 rounded bg-white/6 blur-sm w-4/5"></div>
-                <div class="h-2.5 rounded bg-white/6 blur-sm w-2/3"></div>
-              </div>
+          <div class="px-3 py-3 rounded-xl border-l-2 border border-white/6 border-l-zinc-600/20 bg-white/[0.02] animate-pulse">
+            <div class="space-y-1.5">
+              <div class="h-2.5 rounded bg-white/6 blur-sm w-full"></div>
+              <div class="h-2.5 rounded bg-white/6 blur-sm w-4/5"></div>
+              <div class="h-2.5 rounded bg-white/6 blur-sm w-2/3"></div>
             </div>
+          </div>
+          <div class="flex items-center gap-2 mt-2.5 px-1">
+            <span class="inline-flex gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:0ms"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:150ms"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:300ms"></span>
+            </span>
+            <span class="text-[11px] text-zinc-600 tracking-wide">${label}</span>
           </div>
         </div>
       `
