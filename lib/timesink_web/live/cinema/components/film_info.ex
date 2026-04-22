@@ -80,7 +80,7 @@ defmodule TimesinkWeb.Components.FilmInfo do
                 Cast
               </span>
               <span class="text-zinc-300 font-light">
-                <.creative_names film_creatives={@film.cast} with_roles />
+                <.creative_names film_creatives={@film.cast} credit_type={:cast} />
               </span>
             </div>
           <% end %>
@@ -90,7 +90,7 @@ defmodule TimesinkWeb.Components.FilmInfo do
                 Crew
               </span>
               <span class="text-zinc-300 font-light">
-                <.creative_names film_creatives={@film.crew} with_roles />
+                <.creative_names film_creatives={@film.crew} credit_type={:crew} />
               </span>
             </div>
           <% end %>
@@ -101,7 +101,7 @@ defmodule TimesinkWeb.Components.FilmInfo do
   end
 
   attr :film_creatives, :list, required: true
-  attr :with_roles, :boolean, default: false
+  attr :credit_type, :atom, default: :plain
 
   defp creative_names(assigns) do
     ~H"""
@@ -114,29 +114,61 @@ defmodule TimesinkWeb.Components.FilmInfo do
           if fc.creative.user,
             do: "/@#{fc.creative.user.username}",
             else: "/creatives/#{fc.creative.id}" %>
-        <.link
-          navigate={path}
-          class={[
-            "transition-colors underline-offset-2 hover:underline hover:decoration-zinc-400",
-            if(fc.creative.user,
-              do: "text-zinc-300 hover:text-white decoration-zinc-600",
-              else: "text-zinc-500 hover:text-zinc-300 decoration-zinc-700"
-            )
-          ]}
-        >
-          {creative_label(fc, @with_roles)}
-        </.link>
+        <%= if @credit_type == :crew do %>
+          <%!-- Crew: "Role BY Name" — role leads in muted text, name is the link --%>
+          <% {role_part, name_part} = crew_label(fc) %>
+          <%= if role_part do %>
+            <span class="text-zinc-600 uppercase text-[10px] tracking-wider">{role_part}</span>
+            <span class="text-zinc-500 text-[10px] uppercase tracking-wider">BY </span>
+          <% end %>
+          <.link
+            navigate={path}
+            class={[
+              "transition-colors underline-offset-2 hover:underline hover:decoration-zinc-400",
+              if(fc.creative.user,
+                do: "text-zinc-300 hover:text-white decoration-zinc-600",
+                else: "text-zinc-500 hover:text-zinc-300 decoration-zinc-700"
+              )
+            ]}
+          >
+            {name_part}
+          </.link>
+        <% else %>
+          <% {name_part, role_part} = cast_label(fc) %>
+          <.link
+            navigate={path}
+            class={[
+              "transition-colors underline-offset-2 hover:underline hover:decoration-zinc-400",
+              if(fc.creative.user,
+                do: "text-zinc-300 hover:text-white decoration-zinc-600",
+                else: "text-zinc-500 hover:text-zinc-300 decoration-zinc-700"
+              )
+            ]}
+          >
+            {name_part}
+          </.link>
+          <%= if role_part do %>
+            <span class="text-zinc-500 text-[10px] uppercase tracking-wider"> AS </span>
+            <span class="text-zinc-400">{role_part}</span>
+          <% end %>
+        <% end %>
       <% end %>
     </span>
     """
   end
 
-  defp creative_label(%{creative: c, subrole: r}, _with_roles = true) do
+  # Cast: "Name AS Character" — name normal, AS keyword styled like BY
+  defp cast_label(%{creative: c, subrole: r}) do
     name = Creative.full_name(c)
-    if r && r != "", do: "#{name} (#{r})", else: name
+    if r && r != "", do: {name, r}, else: {name, nil}
   end
 
-  defp creative_label(%{creative: c}, _with_roles), do: Creative.full_name(c)
+  # Crew: returns {role, name} so the template can style them separately
+  defp crew_label(%{creative: c, subrole: r}) do
+    name = Creative.full_name(c)
+    role = if r && r != "", do: r, else: nil
+    {role, name}
+  end
 
   attr :film, Film, required: true
 
