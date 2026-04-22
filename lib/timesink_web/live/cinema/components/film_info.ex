@@ -17,7 +17,8 @@ defmodule TimesinkWeb.Components.FilmInfo do
       <%!-- Genre pills + metadata --%>
       <div class="flex flex-wrap items-center gap-2 mb-4">
         <%= for genre <- @film.genres do %>
-          <span class="inline-flex items-center rounded-full bg-zinc-600/30 border border-zinc-500/30 px-2.5 py-0.5 text-[11px] uppercase tracking-widest text-zinc-400">
+          <span class="inline-flex items-center rounded-full bg-zinc-600/30 border border-zinc-500/30 px-2.5 py-0.fo.ex
+         -5 text-[11px] uppercase tracking-widest text-zinc-400">
             {genre.name}
           </span>
         <% end %>
