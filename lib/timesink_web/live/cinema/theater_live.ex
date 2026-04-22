@@ -192,6 +192,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       phx-hook="TheaterBodyScroll"
       class="max-w-7xl md:max-w-4xl mx-auto px-4 md:px-6 mt-16 text-gray-100"
     >
+      <div id="notes-tv-banner" phx-hook="NotesTvBanner" class="hidden"></div>
+      <div id="director-tv-banner" phx-hook="DirectorTvBanner" class="hidden"></div>
       <!-- Header -->
       <div class="border-b border-white/10 pb-4 mb-10">
         <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
@@ -521,6 +523,12 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        if has_newly_unlocked?,
          do: push_event(s, "new_notes", %{count: newly_unlocked_count}),
          else: s
+     end)
+     |> then(fn s ->
+       if phase == :playing, do: push_note_incoming(s, exhibition, notes, current_offset), else: s
+     end)
+     |> then(fn s ->
+       if phase == :playing, do: push_director_incoming(s, current_offset), else: s
      end)}
   end
 
@@ -927,5 +935,53 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       String.pad_leading(to_string(seconds), 2, "0")
     ]
     |> Enum.join(":")
+  end
+
+  defp push_director_incoming(socket, current_offset) do
+    film = socket.assigns[:film]
+
+    if is_nil(film) do
+      push_event(socket, "director_incoming", %{incoming: false})
+    else
+      preview = Timesink.Cinema.Film.Note.next_commentary_preview(film.id, current_offset)
+
+      if is_nil(preview) do
+        push_event(socket, "director_incoming", %{incoming: false})
+      else
+        seconds_away = preview.offset_seconds - current_offset
+
+        if seconds_away > 300 do
+          push_event(socket, "director_incoming", %{incoming: false})
+        else
+          push_event(socket, "director_incoming", %{
+            incoming: true,
+            username: preview.username,
+            seconds_away: seconds_away
+          })
+        end
+      end
+    end
+  end
+
+  defp push_note_incoming(socket, exhibition, _visible_notes, current_offset) do
+    preview =
+      Timesink.Cinema.Exhibition.Note.next_note_preview(exhibition.id, current_offset)
+
+    if is_nil(preview) do
+      push_event(socket, "note_incoming", %{incoming: false})
+    else
+      seconds_away = preview.offset_seconds - current_offset
+
+      if seconds_away > 300 do
+        push_event(socket, "note_incoming", %{incoming: false})
+      else
+        push_event(socket, "note_incoming", %{
+          incoming: true,
+          body: preview.body,
+          username: preview.username,
+          seconds_away: seconds_away
+        })
+      end
+    end
   end
 end

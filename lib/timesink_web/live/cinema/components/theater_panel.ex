@@ -543,6 +543,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
             <% end %>
           </ul>
         <% end %>
+        <div id={"#{@scroll_id}-incoming"} phx-hook="NotesIncoming" class="hidden"></div>
       </div>
 
       <%= if @note_form_open do %>

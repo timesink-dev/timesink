@@ -918,6 +918,169 @@ Hooks.NotesAutoScroll = {
   },
 }
 
+// Ghost card at the bottom of the notes scroll container (inside panel)
+Hooks.NotesIncoming = {
+  mounted() {
+    this.handleEvent("note_incoming", ({ incoming, username, seconds_away }) => {
+      if (!incoming) {
+        this.el.classList.add("hidden")
+        this.el.innerHTML = ""
+        return
+      }
+
+      let label
+      if (seconds_away < 10) {
+        label = "a note is about to drop..."
+      } else if (seconds_away < 90) {
+        const rounded = Math.round(seconds_away / 5) * 5
+        label = `a note drops in ~${rounded}s`
+      } else {
+        const mins = Math.round(seconds_away / 60)
+        label = `a note drops in ~${mins}m`
+      }
+
+      this.el.innerHTML = `
+        <div class="px-3 py-1.5">
+          <div class="flex items-start gap-3 px-3 py-3 rounded-xl border-l-2 border border-white/6 border-l-zinc-600/20 bg-white/[0.02] animate-pulse">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-zinc-600 text-xs blur-sm select-none">${username ? `@${username}` : "Member"}</span>
+                <span class="text-[10px] text-zinc-500 italic tracking-wide flex items-center gap-1">
+                  <span class="inline-flex gap-0.5">
+                    <span class="w-1 h-1 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:0ms"></span>
+                    <span class="w-1 h-1 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:150ms"></span>
+                    <span class="w-1 h-1 rounded-full bg-zinc-600 animate-bounce" style="animation-delay:300ms"></span>
+                  </span>
+                  ${label}
+                </span>
+              </div>
+              <div class="space-y-1.5">
+                <div class="h-2.5 rounded bg-white/6 blur-sm w-full"></div>
+                <div class="h-2.5 rounded bg-white/6 blur-sm w-4/5"></div>
+                <div class="h-2.5 rounded bg-white/6 blur-sm w-2/3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `
+      this.el.classList.remove("hidden")
+    })
+  },
+}
+
+// Shared stack container for TV banners — appended once, both hooks write into it
+function getTvBannerStack() {
+  let stack = document.getElementById("tv-banner-stack")
+  if (!stack) {
+    stack = document.createElement("div")
+    stack.id = "tv-banner-stack"
+    stack.className = "fixed bottom-4 right-4 z-50 flex flex-col gap-2 items-end"
+    document.body.appendChild(stack)
+  }
+  return stack
+}
+
+function makeTvBanner({
+  label,
+  labelClass,
+  body,
+  countdown,
+  accentClass,
+  borderClass,
+  onClickSelector,
+  autoRemoveMs = 4000,
+}) {
+  const stack = getTvBannerStack()
+  const btn = document.createElement("button")
+  btn.type = "button"
+  btn.className = `cursor-pointer w-64 flex items-center justify-between gap-3 rounded-2xl border ${borderClass} bg-zinc-950/90 backdrop-blur-md px-4 py-3 shadow-xl ring-1 ring-white/10 transition-all duration-300 text-left hover:ring-white/20`
+  btn.innerHTML = `
+    <div class="flex flex-col gap-1 min-w-0">
+      <span class="text-[10px] uppercase tracking-widest font-medium ${labelClass}">${label}</span>
+      <span class="text-xs text-zinc-100/90 leading-snug">${body} · <span class="${accentClass}">${countdown}</span></span>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0 ${accentClass} opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+  `
+  btn.addEventListener("click", () => {
+    const target = document.querySelector(onClickSelector)
+    if (target) target.click()
+    btn.remove()
+  })
+  stack.appendChild(btn)
+  setTimeout(() => {
+    btn.style.opacity = "0"
+  }, autoRemoveMs)
+  setTimeout(() => {
+    btn.remove()
+  }, autoRemoveMs + 500)
+  return btn
+}
+
+// TV-style "coming up" banner — always mounted globally, shows even when panel is closed
+Hooks.NotesTvBanner = {
+  mounted() {
+    this._bannerShownAt = null
+
+    this.handleEvent("note_incoming", ({ incoming, username, seconds_away }) => {
+      if (!incoming) {
+        this._bannerShownAt = null
+        return
+      }
+
+      const shouldShowBanner = this._bannerShownAt === null || seconds_away > this._bannerShownAt + 30
+
+      if (shouldShowBanner && seconds_away <= 90) {
+        this._bannerShownAt = seconds_away
+
+        const countdown = seconds_away < 10 ? "in a few seconds" : `in ~${Math.round(seconds_away / 5) * 5}s`
+        const who = username ? `from @${username}` : "from the audience"
+
+        makeTvBanner({
+          label: "Coming up",
+          labelClass: "text-zinc-500",
+          body: `New note ${who}`,
+          accentClass: "text-zinc-400",
+          borderClass: "border-white/10",
+          countdown,
+          onClickSelector: "[phx-value-panel='audience_notes']",
+        })
+      }
+    })
+  },
+}
+
+// TV-style banner for upcoming director's commentary — amber styled
+Hooks.DirectorTvBanner = {
+  mounted() {
+    this._bannerShownAt = null
+
+    this.handleEvent("director_incoming", ({ incoming, seconds_away }) => {
+      if (!incoming) {
+        this._bannerShownAt = null
+        return
+      }
+
+      const shouldShowBanner = this._bannerShownAt === null || seconds_away > this._bannerShownAt + 30
+
+      if (shouldShowBanner && seconds_away <= 90) {
+        this._bannerShownAt = seconds_away
+
+        const countdown = seconds_away < 10 ? "any moment now" : `in ~${Math.round(seconds_away / 5) * 5}s`
+
+        makeTvBanner({
+          label: "Coming up",
+          labelClass: "text-amber-500/80",
+          body: "New Director's Commentary",
+          accentClass: "text-amber-400/80",
+          borderClass: "border-amber-500/20",
+          countdown,
+          onClickSelector: "[phx-value-panel='director_notes']",
+        })
+      }
+    })
+  },
+}
+
 Hooks.NotesNewBanner = {
   mounted() {
     this.handleEvent("new_notes", ({ count }) => {
@@ -925,8 +1088,12 @@ Hooks.NotesNewBanner = {
       const label = count === 1 ? "note appeared" : "new notes appeared"
       const banner = document.createElement("div")
       banner.className =
-        "absolute top-2 left-1/2 -translate-x-1/2 z-20 rounded-lg border border-blue-500/40 bg-blue-500/20 backdrop-blur-sm px-3 py-2 text-xs flex items-center gap-2 transition-opacity duration-500 whitespace-nowrap"
-      banner.innerHTML = `<span class="font-medium text-blue-300/90">+${count}</span><span class="text-zinc-400">${label}</span>`
+        "absolute top-2 left-1/2 -translate-x-1/2 z-20 rounded-lg p-1 bg-zinc-950 transition-opacity duration-500 whitespace-nowrap"
+      banner.innerHTML = `
+        <div class="rounded-md border border-blue-500/40 bg-blue-500/20 px-3 py-2 text-xs flex items-center gap-2">
+          <span class="font-medium text-blue-300/90">+${count}</span><span class="text-zinc-400">${label}</span>
+        </div>
+      `
       this.el.parentElement.insertBefore(banner, this.el)
       setTimeout(() => {
         banner.style.opacity = "0"
