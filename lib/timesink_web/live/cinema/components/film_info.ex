@@ -17,7 +17,8 @@ defmodule TimesinkWeb.Components.FilmInfo do
       <%!-- Genre pills + metadata --%>
       <div class="flex flex-wrap items-center gap-2 mb-4">
         <%= for genre <- @film.genres do %>
-          <span class="inline-flex items-center rounded-full bg-zinc-600/30 border border-zinc-500/30 px-2.5 py-0.5 text-[11px] uppercase tracking-widest text-zinc-400">
+          <span class="inline-flex items-center rounded-full bg-zinc-600/30 border border-zinc-500/30 px-2.5 py-0.fo.ex
+         -5 text-[11px] uppercase tracking-widest text-zinc-400">
             {genre.name}
           </span>
         <% end %>
@@ -104,43 +105,27 @@ defmodule TimesinkWeb.Components.FilmInfo do
 
   defp creative_names(assigns) do
     ~H"""
-    <span class={if @with_roles, do: "flex flex-wrap gap-1.5", else: "inline"}>
+    <span class="inline">
       <%= for {fc, idx} <- Enum.with_index(@film_creatives) do %>
-        <%= if @with_roles do %>
-          <%!-- Cast/crew: pill per person --%>
-          <% path =
-            if fc.creative.user,
-              do: "/@#{fc.creative.user.username}",
-              else: "/creatives/#{fc.creative.id}" %>
-          <.link
-            navigate={path}
-            class="inline-flex items-center rounded-full bg-zinc-800/60 border border-white/6 px-2.5 py-0.5 text-xs text-zinc-300 hover:text-white hover:border-white/15 transition-colors"
-          >
-            {creative_label(fc, true)}
-          </.link>
-        <% else %>
-          <%!-- Directors/writers: separator + name --%>
-          <%= if idx > 0 do %>
-            <span class="mx-1.5 text-zinc-600">·</span>
-          <% end %>
-          <% path =
-            if fc.creative.user,
-              do: "/@#{fc.creative.user.username}",
-              else: "/creatives/#{fc.creative.id}" %>
-          <.link
-            navigate={path}
-            class={[
-              "transition-colors underline-offset-2",
-              if(fc.creative.user,
-                do:
-                  "text-zinc-300 hover:text-white decoration-zinc-600 hover:underline hover:decoration-zinc-400",
-                else: "text-zinc-400 hover:text-zinc-300 cursor-default pointer-events-none"
-              )
-            ]}
-          >
-            {creative_label(fc, false)}
-          </.link>
+        <%= if idx > 0 do %>
+          <span class="mx-1.5 text-zinc-600">·</span>
         <% end %>
+        <% path =
+          if fc.creative.user,
+            do: "/@#{fc.creative.user.username}",
+            else: "/creatives/#{fc.creative.id}" %>
+        <.link
+          navigate={path}
+          class={[
+            "transition-colors underline-offset-2 hover:underline hover:decoration-zinc-400",
+            if(fc.creative.user,
+              do: "text-zinc-300 hover:text-white decoration-zinc-600",
+              else: "text-zinc-500 hover:text-zinc-300 decoration-zinc-700"
+            )
+          ]}
+        >
+          {creative_label(fc, @with_roles)}
+        </.link>
       <% end %>
     </span>
     """
@@ -159,7 +144,7 @@ defmodule TimesinkWeb.Components.FilmInfo do
 
   def film_review(%{film: %{review: review}} = assigns) when is_binary(review) and review != "" do
     ~H"""
-    <div id="film-review" class="px-1">
+    <div id="film-review" class="rounded-xl bg-zinc-900/40 border border-white/5 px-6 py-5">
       <div class="flex items-center gap-3 mb-5">
         <div class="h-10 w-10 rounded-full overflow-hidden ring-1 ring-zinc-700 shrink-0">
           <img
