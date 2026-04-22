@@ -1126,8 +1126,8 @@ Hooks.NotesNewBanner = {
       banner.className =
         "absolute top-2 left-1/2 -translate-x-1/2 z-20 rounded-lg p-1 bg-zinc-950 transition-opacity duration-500 whitespace-nowrap"
       banner.innerHTML = `
-        <div class="rounded-md border border-blue-500/40 bg-blue-500/20 px-3 py-2 text-xs flex items-center gap-2">
-          <span class="font-medium text-blue-300/90">+${count}</span><span class="text-zinc-400">${label}</span>
+        <div class="rounded-md border border-blue-500/15 bg-blue-500/5 px-3 py-2 text-xs flex items-center gap-2">
+          <span class="font-medium text-blue-400/80">+${count}</span><span class="text-zinc-500">${label}</span>
         </div>
       `
       this.el.parentElement.insertBefore(banner, this.el)
