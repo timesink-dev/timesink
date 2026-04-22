@@ -963,6 +963,47 @@ Hooks.NotesIncoming = {
   },
 }
 
+// Ghost card at the bottom of the director panel scroll container
+Hooks.DirectorIncoming = {
+  mounted() {
+    this.handleEvent("director_incoming", ({ incoming, seconds_away }) => {
+      if (!incoming) {
+        this.el.classList.add("hidden")
+        this.el.innerHTML = ""
+        return
+      }
+
+      let label
+      if (seconds_away < 10) {
+        label = "Commentary is moments away..."
+      } else if (seconds_away < 90) {
+        const rounded = Math.round(seconds_away / 5) * 5
+        label = `Commentary is on its way · ~${rounded}s`
+      } else {
+        const mins = Math.round(seconds_away / 60)
+        label = `Commentary is on its way · ~${mins}m`
+      }
+
+      this.el.innerHTML = `
+        <div class="px-4 py-2">
+          <div class="flex items-start gap-3 px-4 py-3 rounded-xl border border-amber-500/10 bg-amber-500/[0.03] animate-pulse">
+            <div class="w-16 h-9 rounded-md bg-amber-500/8 blur-sm shrink-0"></div>
+            <div class="min-w-0 flex-1 space-y-1.5">
+              <div class="h-2 rounded bg-amber-500/10 blur-sm w-1/3"></div>
+              <div class="h-2.5 rounded bg-amber-500/8 blur-sm w-full"></div>
+              <div class="h-2.5 rounded bg-amber-500/8 blur-sm w-4/5"></div>
+            </div>
+          </div>
+          <div class="mt-2.5 px-1">
+            <span class="text-[11px] text-amber-700/70 tracking-wide">${label}</span>
+          </div>
+        </div>
+      `
+      this.el.classList.remove("hidden")
+    })
+  },
+}
+
 // Shared stack container for TV banners — appended once, both hooks write into it
 function getTvBannerStack() {
   let stack = document.getElementById("tv-banner-stack")
