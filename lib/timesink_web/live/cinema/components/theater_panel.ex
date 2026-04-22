@@ -543,6 +543,7 @@ defmodule TimesinkWeb.Components.TheaterPanel do
             <% end %>
           </ul>
         <% end %>
+        <div id={"#{@scroll_id}-incoming"} phx-hook="NotesIncoming" class="hidden"></div>
       </div>
 
       <%= if @note_form_open do %>
@@ -602,68 +603,114 @@ defmodule TimesinkWeb.Components.TheaterPanel do
 
   # ── Director ───────────────────────────────────────────────
 
-  attr :commentary, :list, required: true
+  attr :all_commentary, :list, required: true
+  attr :surfaced_ids, :any, required: true
+  attr :newly_surfaced_director_ids, :any, required: true
+  attr :about_to_surface_ids, :any, required: true
+  attr :next_director_seconds_away, :integer, default: nil
   attr :total_count, :integer, required: true
   attr :film, :any, required: true
+  attr :phase, :atom, required: true
+  attr :scroll_id, :string, required: true
   attr :body_class, :string, default: "max-h-[40vh]"
 
   def director_panel(assigns) do
     ~H"""
     <div class={[@body_class, "overflow-y-auto overscroll-contain"]}>
-      <%= if Enum.empty?(@commentary) do %>
+      <%= if @total_count == 0 do %>
+        <%!-- No commentary at all --%>
         <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
           <.icon name="hero-megaphone" class="w-5 h-5 text-zinc-700" />
-          <%= if @total_count > 0 do %>
-            <div>
-              <p class="text-sm text-zinc-400 font-medium">Commentary ahead</p>
-              <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
-                The director has left commentary that will appear as the film plays.
-              </p>
-            </div>
-          <% else %>
-            <div>
-              <p class="text-sm text-zinc-400 font-medium">No commentary</p>
-              <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
-                The director hasn't left any commentary for this film.
-              </p>
-            </div>
-          <% end %>
+          <div>
+            <p class="text-sm text-zinc-400 font-medium">No commentary</p>
+            <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
+              The director hasn't left any commentary for this film.
+            </p>
+          </div>
         </div>
       <% else %>
-        <ul class="divide-y divide-white/5">
-          <%= for entry <- @commentary do %>
-            <% thumb = mux_thumbnail_url(Film.get_mux_playback_id(@film.video), entry.offset_seconds) %>
-            <% director_name =
-              entry.user && entry.user.creative &&
-                Timesink.Cinema.Creative.full_name(entry.user.creative) %>
-            <li class="px-4 py-2">
-              <div class="flex items-start gap-3 px-4 py-3 rounded-xl border border-transparent">
-                <%= if thumb do %>
-                  <img
-                    src={thumb}
-                    alt=""
-                    class="w-16 h-9 rounded-md object-cover shrink-0 opacity-60"
-                    loading="lazy"
-                  />
-                <% end %>
-                <div class="min-w-0 flex-1">
-                  <div class="flex items-center justify-between mb-1">
-                    <span class="inline-flex items-center gap-1 text-[10px] font-medium text-amber-500/80 uppercase tracking-wider">
-                      <.icon name="hero-megaphone" class="w-3 h-3" />
-                      {if director_name, do: director_name, else: "Director"}
-                    </span>
-                    <span class="text-xs text-zinc-400 font-mono shrink-0">
-                      {format_offset(entry.offset_seconds)}
-                    </span>
-                  </div>
-                  <p class="mt-0.5 font-light text-zinc-100/60 text-sm whitespace-pre-line leading-snug">
-                    {entry.body}
-                  </p>
-                </div>
-              </div>
-            </li>
+        <%= if @phase != :playing do %>
+          <%!-- Film hasn't started — tease that commentary exists but don't reveal cards --%>
+          <div class="flex flex-col items-center justify-center min-h-40 gap-3 text-center px-6 py-8">
+            <.icon name="hero-megaphone" class="w-5 h-5 text-amber-700/50" />
+            <div>
+              <p class="text-sm text-amber-400/70 font-medium">Commentary ahead</p>
+              <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
+                The director has left commentary that will unlock as the film plays.
+              </p>
+            </div>
+          </div>
+        <% else %>
+          <%!-- Film is playing — show "next up" hint at top if something is about to surface --%>
+          <%= if not MapSet.equal?(@about_to_surface_ids, MapSet.new()) do %>
+            <% countdown_label =
+              cond do
+                @next_director_seconds_away != nil and @next_director_seconds_away < 10 ->
+                  "New commentary is moments away..."
+
+                @next_director_seconds_away != nil ->
+                  rounded = round(@next_director_seconds_away / 5) * 5
+                  "New commentary is on its way · ~#{rounded}s"
+
+                true ->
+                  "New commentary is on its way..."
+              end %>
+            <div class="mx-4 mt-3 mb-1 px-3 py-2 rounded-lg border border-amber-500/15 bg-amber-500/5 flex items-center gap-2">
+              <span class="text-[11px] text-amber-600/80 tracking-wide">{countdown_label}</span>
+            </div>
           <% end %>
-        </ul>
+          <ul class="divide-y divide-white/5">
+            <%= for entry <- @all_commentary do %>
+              <% is_surfaced = MapSet.member?(@surfaced_ids, entry.id) %>
+              <% is_new = MapSet.member?(@newly_surfaced_director_ids, entry.id) %>
+              <% is_next = MapSet.member?(@about_to_surface_ids, entry.id) %>
+              <% thumb =
+                mux_thumbnail_url(Film.get_mux_playback_id(@film.video), entry.offset_seconds) %>
+              <% director_name =
+                entry.user && entry.user.creative &&
+                  Timesink.Cinema.Creative.full_name(entry.user.creative) %>
+              <li class="px-4 py-2">
+                <div class={[
+                  "flex items-start gap-3 px-4 py-3 rounded-xl border-l-2 border border-white/6 transition-all duration-700",
+                  is_new && "border-l-amber-400 bg-amber-900/20",
+                  is_surfaced && not is_new && "border-l-amber-600/40 bg-amber-950/10",
+                  not is_surfaced && is_next && "border-l-amber-700/40 bg-amber-950/5 animate-pulse",
+                  not is_surfaced && not is_next && "border-l-zinc-800/40 bg-white/1"
+                ]}>
+                  <%= if thumb do %>
+                    <img
+                      src={thumb}
+                      alt=""
+                      class={[
+                        "w-16 h-9 rounded-md object-cover shrink-0 transition-all duration-700",
+                        is_surfaced && "opacity-60",
+                        not is_surfaced && "opacity-15 blur-sm"
+                      ]}
+                      loading="lazy"
+                    />
+                  <% end %>
+                  <div class={[
+                    "min-w-0 flex-1 transition-all duration-700",
+                    not is_surfaced && "blur-sm select-none"
+                  ]}>
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="inline-flex items-center gap-1 text-[10px] font-medium text-amber-500/80 uppercase tracking-wider">
+                        <.icon name="hero-megaphone" class="w-3 h-3" />
+                        {if director_name, do: director_name, else: "Director"}
+                      </span>
+                      <span class="text-xs text-zinc-400 font-mono shrink-0">
+                        {format_offset(entry.offset_seconds)}
+                      </span>
+                    </div>
+                    <p class="mt-0.5 font-light text-zinc-100/60 text-sm whitespace-pre-line leading-snug">
+                      {entry.body}
+                    </p>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
       <% end %>
     </div>
     """

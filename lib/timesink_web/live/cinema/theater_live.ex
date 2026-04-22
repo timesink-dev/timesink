@@ -169,7 +169,11 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
        |> assign(:freeze_notes?, false)
        # director commentary
        |> assign(:director_commentary, [])
+       |> assign(:all_director_commentary, FilmNote.list_commentary(film.id))
        |> assign(:total_director_commentary_count, length(FilmNote.list_commentary(film.id)))
+       |> assign(:newly_surfaced_director_ids, MapSet.new())
+       |> assign(:about_to_surface_director_ids, MapSet.new())
+       |> assign(:next_director_seconds_away, nil)
        # UI state
        |> assign(:open_panel, nil)
        |> assign(:chat_tab, :messages)
@@ -192,6 +196,8 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       phx-hook="TheaterBodyScroll"
       class="max-w-7xl md:max-w-4xl mx-auto px-4 md:px-6 mt-16 text-gray-100"
     >
+      <div id="notes-tv-banner" phx-hook="NotesTvBanner" class="hidden"></div>
+      <div id="director-tv-banner" phx-hook="DirectorTvBanner" class="hidden"></div>
       <!-- Header -->
       <div class="border-b border-white/10 pb-4 mb-10">
         <h1 class="text-lg font-bold font-gangster">{@theater.name}</h1>
@@ -354,9 +360,15 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
               </div>
               <div :if={@open_panel == :director_notes}>
                 <TheaterPanel.director_panel
-                  commentary={@director_commentary}
+                  all_commentary={@all_director_commentary}
+                  surfaced_ids={MapSet.new(@director_commentary, & &1.id)}
+                  newly_surfaced_director_ids={@newly_surfaced_director_ids}
+                  about_to_surface_ids={@about_to_surface_director_ids}
+                  next_director_seconds_away={@next_director_seconds_away}
+                  phase={@phase}
                   total_count={@total_director_commentary_count}
                   film={@film}
+                  scroll_id="director-body-desktop"
                   body_class="max-h-[40vh]"
                 />
               </div>
@@ -426,9 +438,15 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
           <div :if={@open_panel == :director_notes}>
             <TheaterPanel.director_panel
-              commentary={@director_commentary}
+              all_commentary={@all_director_commentary}
+              surfaced_ids={MapSet.new(@director_commentary, & &1.id)}
+              newly_surfaced_director_ids={@newly_surfaced_director_ids}
+              about_to_surface_ids={@about_to_surface_director_ids}
+              next_director_seconds_away={@next_director_seconds_away}
+              phase={@phase}
               total_count={@total_director_commentary_count}
               film={@film}
+              scroll_id="director-body-mobile"
               body_class="h-[45vh]"
             />
           </div>
@@ -491,12 +509,47 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       Process.send_after(self(), :clear_new_notes_count, 4000)
     end
 
-    director_commentary =
+    {director_commentary, newly_surfaced_director_ids, about_to_surface_director_ids,
+     next_director_seconds_away} =
       if film = socket.assigns[:film] do
-        FilmNote.list_commentary(film.id, current_offset)
+        surfaced = FilmNote.list_commentary(film.id, current_offset)
+
+        newly_surfaced =
+          if current_offset > previous_offset do
+            prev_ids = MapSet.new(socket.assigns.director_commentary, & &1.id)
+
+            surfaced
+            |> Enum.filter(fn n -> not MapSet.member?(prev_ids, n.id) end)
+            |> MapSet.new(& &1.id)
+          else
+            MapSet.new()
+          end
+
+        next_unsurfaced =
+          socket.assigns.all_director_commentary
+          |> Enum.find(fn n -> n.offset_seconds > current_offset end)
+
+        {about_to_surface, seconds_away} =
+          if next_unsurfaced do
+            secs = next_unsurfaced.offset_seconds - current_offset
+
+            if secs <= 90 do
+              {MapSet.new([next_unsurfaced.id]), secs}
+            else
+              {MapSet.new(), nil}
+            end
+          else
+            {MapSet.new(), nil}
+          end
+
+        {surfaced, newly_surfaced, about_to_surface, seconds_away}
       else
-        []
+        {[], MapSet.new(), MapSet.new(), nil}
       end
+
+    if MapSet.size(newly_surfaced_director_ids) > 0 do
+      Process.send_after(self(), :clear_newly_surfaced_director_ids, 3500)
+    end
 
     {:noreply,
      socket
@@ -517,10 +570,19 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
      )
      |> assign(:notes_pulse, should_pulse?)
      |> assign(:director_commentary, director_commentary)
+     |> assign(:newly_surfaced_director_ids, newly_surfaced_director_ids)
+     |> assign(:about_to_surface_director_ids, about_to_surface_director_ids)
+     |> assign(:next_director_seconds_away, next_director_seconds_away)
      |> then(fn s ->
        if has_newly_unlocked?,
          do: push_event(s, "new_notes", %{count: newly_unlocked_count}),
          else: s
+     end)
+     |> then(fn s ->
+       if phase == :playing, do: push_note_incoming(s, exhibition, notes, current_offset), else: s
+     end)
+     |> then(fn s ->
+       if phase == :playing, do: push_director_incoming(s, current_offset), else: s
      end)}
   end
 
@@ -581,6 +643,10 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
 
   def handle_info(:clear_just_posted_note, socket) do
     {:noreply, assign(socket, :just_posted_note_id, nil)}
+  end
+
+  def handle_info(:clear_newly_surfaced_director_ids, socket) do
+    {:noreply, assign(socket, :newly_surfaced_director_ids, MapSet.new())}
   end
 
   # ───────────────────────────────────────────────────────────
@@ -927,5 +993,53 @@ defmodule TimesinkWeb.Cinema.TheaterLive do
       String.pad_leading(to_string(seconds), 2, "0")
     ]
     |> Enum.join(":")
+  end
+
+  defp push_director_incoming(socket, current_offset) do
+    film = socket.assigns[:film]
+
+    if is_nil(film) do
+      push_event(socket, "director_incoming", %{incoming: false})
+    else
+      preview = Timesink.Cinema.Film.Note.next_commentary_preview(film.id, current_offset)
+
+      if is_nil(preview) do
+        push_event(socket, "director_incoming", %{incoming: false})
+      else
+        seconds_away = preview.offset_seconds - current_offset
+
+        if seconds_away > 300 do
+          push_event(socket, "director_incoming", %{incoming: false})
+        else
+          push_event(socket, "director_incoming", %{
+            incoming: true,
+            username: preview.username,
+            seconds_away: seconds_away
+          })
+        end
+      end
+    end
+  end
+
+  defp push_note_incoming(socket, exhibition, _visible_notes, current_offset) do
+    preview =
+      Timesink.Cinema.Exhibition.Note.next_note_preview(exhibition.id, current_offset)
+
+    if is_nil(preview) do
+      push_event(socket, "note_incoming", %{incoming: false})
+    else
+      seconds_away = preview.offset_seconds - current_offset
+
+      if seconds_away > 300 do
+        push_event(socket, "note_incoming", %{incoming: false})
+      else
+        push_event(socket, "note_incoming", %{
+          incoming: true,
+          body: preview.body,
+          username: preview.username,
+          seconds_away: seconds_away
+        })
+      end
+    end
   end
 end
