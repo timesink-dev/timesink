@@ -144,7 +144,7 @@ defmodule TimesinkWeb.Components.FilmInfo do
 
   def film_review(%{film: %{review: review}} = assigns) when is_binary(review) and review != "" do
     ~H"""
-    <div id="film-review" class="px-1">
+    <div id="film-review" class="rounded-xl bg-zinc-900/40 border border-white/5 px-6 py-5">
       <div class="flex items-center gap-3 mb-5">
         <div class="h-10 w-10 rounded-full overflow-hidden ring-1 ring-zinc-700 shrink-0">
           <img
