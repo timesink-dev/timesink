@@ -118,7 +118,7 @@ defmodule TimesinkWeb.Components.FilmInfo do
           <%!-- Crew: "Role BY Name" — role leads in muted text, name is the link --%>
           <% {role_part, name_part} = crew_label(fc) %>
           <%= if role_part do %>
-            <span class="text-zinc-600 uppercase text-[10px] tracking-wider">{role_part} </span>
+            <span class="text-zinc-600 uppercase text-[10px] tracking-wider">{role_part}</span>
             <span class="text-zinc-500 text-[10px] uppercase tracking-wider">BY </span>
           <% end %>
           <.link
